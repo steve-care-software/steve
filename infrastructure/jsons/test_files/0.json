@@ -1,0 +1,8 @@
+{
+    "myBytes": {
+        "bytes": [0, 34, 43]
+    },
+    "myString": {
+        "string": "this is a string"
+    }
+}
