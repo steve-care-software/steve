@@ -1,7 +1,7 @@
 package identities
 
 import (
-	"github.com/steve-care-software/steve/domain/identities"
+	"github.com/steve-care-software/steve/domain/accounts/identities"
 	layer_identities "github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers/identities"
 )
 

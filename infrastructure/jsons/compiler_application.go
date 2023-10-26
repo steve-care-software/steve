@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/steve-care-software/steve/applications/identities/compilers"
+	"github.com/steve-care-software/steve/applications/compilers"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers/parameters"
