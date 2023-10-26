@@ -6,6 +6,15 @@ import (
 	"github.com/steve-care-software/steve/domain/stencils/messages"
 )
 
+// Builder represents a query builder
+type Builder interface {
+	Create() Builder
+	WithMessage(message messages.Message) Builder
+	WithLayer(layer layers.Layer) Builder
+	WithParams(params symbols.Symbols) Builder
+	Now() (Query, error)
+}
+
 // Query represents the query
 type Query interface {
 	Message() messages.Message
