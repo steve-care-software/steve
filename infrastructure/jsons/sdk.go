@@ -4,6 +4,7 @@ import (
 	"github.com/steve-care-software/steve/applications/compilers"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers"
+	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers/constantvalues"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers/parameters"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers/reduces"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers/returns"
@@ -48,8 +49,8 @@ func NewJsonApplication() compilers.Application {
 	layerConditionBuilder := layers.NewConditionBuilder()
 	layerAssignableBuilder := layers.NewAssignableBuilder()
 	layerReduceBuilder := reduces.NewBuilder()
-	layerConstantValuesBuilder := layers.NewConstantValuesBuilder()
-	layerConstantValueBuilder := layers.NewConstantValueBuilder()
+	layerConstantValuesBuilder := constantvalues.NewConstantValuesBuilder()
+	layerConstantValueBuilder := constantvalues.NewConstantValueBuilder()
 	layerQueryBuilder := layers.NewQueryBuilder()
 	layerLayerInputBuilder := layers.NewLayerInputBuilder()
 	layerValueAssignmentsBuilder := layers.NewValueAssignmentsBuilder()

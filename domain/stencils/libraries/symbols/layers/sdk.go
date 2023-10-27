@@ -1,6 +1,8 @@
 package layers
 
 import (
+	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers/accounts"
+	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers/constantvalues"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers/parameters"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers/reduces"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers/returns"
@@ -45,16 +47,6 @@ func NewAssignmentBuilder() AssignmentBuilder {
 // NewAssignableBuilder create sa new assignable builder
 func NewAssignableBuilder() AssignableBuilder {
 	return createAssignableBuilder()
-}
-
-// NewConstantValuesBuilder creates a new constant values builder
-func NewConstantValuesBuilder() ConstantValuesBuilder {
-	return createConstantValuesBuilder()
-}
-
-// NewConstantValueBuilder creates a new constant value builder
-func NewConstantValueBuilder() ConstantValueBuilder {
-	return createConstantValueBuilder()
 }
 
 // NewConditionBuilder creates a new condition instance
@@ -201,10 +193,11 @@ type AssignableBuilder interface {
 	Create() AssignableBuilder
 	WithQuery(query Query) AssignableBuilder
 	WithReduce(reduce reduces.Reduce) AssignableBuilder
-	WithCompare(compare ConstantValues) AssignableBuilder
-	WithLength(length ConstantValue) AssignableBuilder
-	WithJoin(join ConstantValues) AssignableBuilder
-	WithValue(value ConstantValue) AssignableBuilder
+	WithCompare(compare constantvalues.ConstantValues) AssignableBuilder
+	WithLength(length constantvalues.ConstantValue) AssignableBuilder
+	WithJoin(join constantvalues.ConstantValues) AssignableBuilder
+	WithValue(value constantvalues.ConstantValue) AssignableBuilder
+	WithAccount(account accounts.Account) AssignableBuilder
 	Now() (Assignable, error)
 }
 
@@ -215,41 +208,15 @@ type Assignable interface {
 	IsReduce() bool
 	Reduce() reduces.Reduce
 	IsCompare() bool
-	Compare() ConstantValues
+	Compare() constantvalues.ConstantValues
 	IsLength() bool
-	Length() ConstantValue
+	Length() constantvalues.ConstantValue
 	IsJoin() bool
-	Join() ConstantValues
+	Join() constantvalues.ConstantValues
 	IsValue() bool
-	Value() ConstantValue
-}
-
-// ConstantValuesBuilder represents constant values builder
-type ConstantValuesBuilder interface {
-	Create() ConstantValuesBuilder
-	WithList(list []ConstantValue) ConstantValuesBuilder
-	Now() (ConstantValues, error)
-}
-
-// ConstantValues represents constant values
-type ConstantValues interface {
-	List() []ConstantValue
-}
-
-// ConstantValueBuilder represents a constant value builder
-type ConstantValueBuilder interface {
-	Create() ConstantValueBuilder
-	WithVariable(variable string) ConstantValueBuilder
-	WithConstant(constant []byte) ConstantValueBuilder
-	Now() (ConstantValue, error)
-}
-
-// ConstantValue represents a constant value
-type ConstantValue interface {
-	IsVariable() bool
-	Variable() string
-	IsConstant() bool
-	Constant() []byte
+	Value() constantvalues.ConstantValue
+	IsAccount() bool
+	Account() accounts.Account
 }
 
 // ConditionBuilder represents a condition builder
@@ -269,7 +236,7 @@ type Condition interface {
 // QueryBuilder represents a query builder
 type QueryBuilder interface {
 	Create() QueryBuilder
-	WithInput(input ConstantValue) QueryBuilder
+	WithInput(input constantvalues.ConstantValue) QueryBuilder
 	WithLayer(layer LayerInput) QueryBuilder
 	WithValues(values ValueAssignments) QueryBuilder
 	Now() (Query, error)
@@ -277,7 +244,7 @@ type QueryBuilder interface {
 
 // Query represents a query execution
 type Query interface {
-	Input() ConstantValue
+	Input() constantvalues.ConstantValue
 	Layer() LayerInput
 	HasValues() bool
 	Values() ValueAssignments

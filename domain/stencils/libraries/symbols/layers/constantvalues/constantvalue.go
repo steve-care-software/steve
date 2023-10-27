@@ -1,4 +1,4 @@
-package layers
+package constantvalues
 
 type constantValue struct {
 	variable string

@@ -9,6 +9,7 @@ import (
 	"github.com/steve-care-software/steve/applications/compilers"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers"
+	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers/constantvalues"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers/parameters"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers/reduces"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers/returns"
@@ -20,6 +21,8 @@ import (
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/links/preparations"
 	"github.com/steve-care-software/steve/domain/stencils/pointers"
 	pointer_symbols "github.com/steve-care-software/steve/domain/stencils/pointers/symbols"
+	"github.com/steve-care-software/steve/infrastructure/jsons/structs/layers/assignables/administrators"
+	struct_values "github.com/steve-care-software/steve/infrastructure/jsons/structs/values"
 )
 
 type compilerApplication struct {
@@ -52,8 +55,8 @@ type compilerApplication struct {
 	layerConditionBuilder         layers.ConditionBuilder
 	layerAssignableBuilder        layers.AssignableBuilder
 	layerReduceBuilder            reduces.Builder
-	layerConstantValuesBuilder    layers.ConstantValuesBuilder
-	layerConstantValueBuilder     layers.ConstantValueBuilder
+	layerConstantValuesBuilder    constantvalues.ConstantValuesBuilder
+	layerConstantValueBuilder     constantvalues.ConstantValueBuilder
 	layerQueryBuilder             layers.QueryBuilder
 	layerLayerInputBuilder        layers.LayerInputBuilder
 	layerValueAssignmentsBuilder  layers.ValueAssignmentsBuilder
@@ -91,8 +94,8 @@ func createCompilerApplication(
 	layerConditionBuilder layers.ConditionBuilder,
 	layerAssignableBuilder layers.AssignableBuilder,
 	layerReduceBuilder reduces.Builder,
-	layerConstantValuesBuilder layers.ConstantValuesBuilder,
-	layerConstantValueBuilder layers.ConstantValueBuilder,
+	layerConstantValuesBuilder constantvalues.ConstantValuesBuilder,
+	layerConstantValueBuilder constantvalues.ConstantValueBuilder,
 	layerQueryBuilder layers.QueryBuilder,
 	layerLayerInputBuilder layers.LayerInputBuilder,
 	layerValueAssignmentsBuilder layers.ValueAssignmentsBuilder,
@@ -585,7 +588,15 @@ func (app *compilerApplication) layerExecutionAssignable(input LayerExecutionAss
 		builder.WithValue(value)
 	}
 
+	if input.Administrator != nil {
+
+	}
+
 	return builder.Now()
+}
+
+func (app *compilerApplication) administrator(input administrators.Administrator) error {
+	return nil
 }
 
 func (app *compilerApplication) layerExecutionQuery(input LayerExecutionQuery) (layers.Query, error) {
@@ -702,8 +713,8 @@ func (app *compilerApplication) layerExecutionReduce(input LayerExecutionReduce)
 		Now()
 }
 
-func (app *compilerApplication) layerConstantValues(input []LayerConstantValue) (layers.ConstantValues, error) {
-	list := []layers.ConstantValue{}
+func (app *compilerApplication) layerConstantValues(input []LayerConstantValue) (constantvalues.ConstantValues, error) {
+	list := []constantvalues.ConstantValue{}
 	for _, oneInput := range input {
 		ins, err := app.layerConstantValue(oneInput)
 		if err != nil {
@@ -718,7 +729,7 @@ func (app *compilerApplication) layerConstantValues(input []LayerConstantValue) 
 		Now()
 }
 
-func (app *compilerApplication) layerConstantValue(input LayerConstantValue) (layers.ConstantValue, error) {
+func (app *compilerApplication) layerConstantValue(input LayerConstantValue) (constantvalues.ConstantValue, error) {
 	builder := app.layerConstantValueBuilder.Create()
 	if input.Variable != "" {
 		builder.WithVariable(input.Variable)
@@ -815,7 +826,7 @@ func (app *compilerApplication) layerParameter(name string, kind uint8) (paramet
 		Now()
 }
 
-func (app *compilerApplication) value(input Value) []byte {
+func (app *compilerApplication) value(input struct_values.Value) []byte {
 	if input.String != "" {
 		return []byte(input.String)
 	}

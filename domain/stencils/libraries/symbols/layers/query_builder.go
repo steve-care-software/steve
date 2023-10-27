@@ -2,10 +2,12 @@ package layers
 
 import (
 	"errors"
+
+	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers/constantvalues"
 )
 
 type queryBuilder struct {
-	input  ConstantValue
+	input  constantvalues.ConstantValue
 	layer  LayerInput
 	values ValueAssignments
 }
@@ -26,7 +28,7 @@ func (app *queryBuilder) Create() QueryBuilder {
 }
 
 // WithInput adds an input to the builder
-func (app *queryBuilder) WithInput(input ConstantValue) QueryBuilder {
+func (app *queryBuilder) WithInput(input constantvalues.ConstantValue) QueryBuilder {
 	app.input = input
 	return app
 }

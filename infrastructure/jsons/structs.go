@@ -1,10 +1,6 @@
 package jsons
 
-// Value represents a value
-type Value struct {
-	String string `json:"string"`
-	Bytes  []byte `json:"bytes"`
-}
+import "github.com/steve-care-software/steve/infrastructure/jsons/structs/layers/assignables/administrators"
 
 // Content represents a content
 type Content struct {
@@ -28,12 +24,13 @@ type LayerExecutionAssignment struct {
 
 // LayerExecutionAssignable represents a layer execution assignable
 type LayerExecutionAssignable struct {
-	Query   *LayerExecutionQuery  `json:"query"`
-	Reduce  *LayerExecutionReduce `json:"reduce"`
-	Compare []LayerConstantValue  `json:"compare"`
-	Length  *LayerConstantValue   `json:"length"`
-	Join    []LayerConstantValue  `json:"join"`
-	Value   *LayerConstantValue   `json:"value"`
+	Query         *LayerExecutionQuery          `json:"query"`
+	Reduce        *LayerExecutionReduce         `json:"reduce"`
+	Compare       []LayerConstantValue          `json:"compare"`
+	Length        *LayerConstantValue           `json:"length"`
+	Join          []LayerConstantValue          `json:"join"`
+	Value         *LayerConstantValue           `json:"value"`
+	Administrator *administrators.Administrator `json:"administrator"`
 }
 
 // LayerExecutionQuery represents a layer execution assignable query

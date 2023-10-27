@@ -6,8 +6,13 @@ import (
 	"fmt"
 	"strconv"
 
+	account_applications "github.com/steve-care-software/steve/applications/accounts"
+	applications_administrator "github.com/steve-care-software/steve/applications/accounts/administrators"
+	"github.com/steve-care-software/steve/domain/credentials"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers"
+	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers/accounts"
+	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers/constantvalues"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers/parameters"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers/reduces"
 	"github.com/steve-care-software/steve/domain/stencils/messages"
@@ -23,30 +28,33 @@ import (
 )
 
 type application struct {
-	computer           *computer
-	resultLayerBuilder result_layers.ExecutionBuilder
-	initBuilder        inits.Builder
-	initInputBuilder   init_inputs.Builder
-	initValuesBuilder  init_values.Builder
-	initValueBuilder   init_values.ValueBuilder
-	executionsBuilder  executions.Builder
-	executionBuilder   executions.ExecutionBuilder
-	assignmentBulder   assignments.Builder
-	queryBuilder       queries.Builder
-	messageBuilder     messages.Builder
+	accountApp                      account_applications.Application
+	accountAdminSaveCriteriaBuilder applications_administrator.SaveCriteriaBuilder
+	resultLayerBuilder              result_layers.ExecutionBuilder
+	initBuilder                     inits.Builder
+	initInputBuilder                init_inputs.Builder
+	initValuesBuilder               init_values.Builder
+	initValueBuilder                init_values.ValueBuilder
+	executionsBuilder               executions.Builder
+	executionBuilder                executions.ExecutionBuilder
+	assignmentBulder                assignments.Builder
+	queryBuilder                    queries.Builder
+	messageBuilder                  messages.Builder
+	credentialsBuilder              credentials.Builder
+	valueBuilder                    ValueBuilder
+	valueAccountBuilder             AccountBuilder
+	values                          map[string]Value
 }
 
-func createApplication(
-	computer *computer,
-) Application {
+func createApplication() Application {
 	out := application{
-		computer: computer,
+		values: map[string]Value{},
 	}
 
 	return &out
 }
 
-// Execute executes a layer
+// Execute executes the application
 func (app *application) Execute(query queries.Query) (result_layers.Execution, error) {
 	layerIns := query.Layer()
 	init, err := app.init(layerIns, query)
@@ -54,12 +62,12 @@ func (app *application) Execute(query queries.Query) (result_layers.Execution, e
 		return nil, err
 	}
 
-	pContext, err := app.computer.init(init)
+	err = app.reset(init)
 	if err != nil {
 		return nil, err
 	}
 
-	retExecutions, err := app.executions(*pContext, layerIns.Executions())
+	retExecutions, err := app.executions(layerIns.Executions())
 	if err != nil {
 		return nil, err
 	}
@@ -70,266 +78,6 @@ func (app *application) Execute(query queries.Query) (result_layers.Execution, e
 		WithExecutions(retExecutions).
 		WithReturn(ret).
 		Now()
-}
-
-func (app *application) executions(context uint, layerExecutions layers.Executions) (executions.Executions, error) {
-	list := layerExecutions.List()
-	output := []executions.Execution{}
-	for idx, oneExecution := range list {
-		execution, err := app.execution(context, uint(idx), oneExecution)
-		if err != nil {
-			return nil, err
-		}
-
-		output = append(output, execution)
-	}
-
-	return app.executionsBuilder.Create().
-		WithList(output).
-		Now()
-}
-
-func (app *application) execution(context uint, idx uint, execution layers.Execution) (executions.Execution, error) {
-	builder := app.executionBuilder.Create()
-	if execution.IsStop() {
-		builder.IsStop()
-	}
-
-	if execution.IsAssignment() {
-		assignment := execution.Assignment()
-		retAssignment, err := app.assignment(context, assignment)
-		if err != nil {
-			return nil, err
-		}
-
-		builder.WithAssignment(retAssignment)
-	}
-
-	if execution.IsCondition() {
-		condition := execution.Condition()
-		retExecutions, err := app.condition(context, condition)
-		if err != nil {
-			return nil, err
-		}
-
-		if retExecutions == nil {
-			return nil, nil
-		}
-
-		builder.WithExecutions(retExecutions)
-	}
-
-	return builder.Now()
-}
-
-func (app *application) condition(context uint, condition layers.Condition) (executions.Executions, error) {
-	variable := condition.Variable()
-	values, err := app.computer.retrieve(context, variable)
-	if err != nil {
-		return nil, err
-	}
-
-	if len(values) != 1 {
-		str := fmt.Sprintf("the variable (name: %s) is used in a condition an was therefore expected to contain a bool value", variable)
-		return nil, errors.New(str)
-	}
-
-	if values[0] == 0 {
-		executions := condition.Executions()
-		return app.executions(context, executions)
-	}
-
-	return nil, nil
-}
-
-func (app *application) assignment(context uint, assignment layers.Assignment) (assignments.Assignment, error) {
-	name := assignment.Name()
-	assignable := assignment.Assignable()
-	values, err := app.assignable(context, assignable)
-	if err != nil {
-		return nil, err
-	}
-
-	err = app.computer.assign(context, name, values)
-	if err != nil {
-		return nil, err
-	}
-
-	return app.assignmentBulder.Create().
-		WithName(name).
-		WithValue(values).
-		Now()
-}
-
-func (app *application) assignable(context uint, assignable layers.Assignable) ([]byte, error) {
-	if assignable.IsQuery() {
-		query := assignable.Query()
-		criteria, err := app.query(context, query)
-		if err != nil {
-			return nil, err
-		}
-
-		result, err := app.Execute(criteria)
-		if err != nil {
-			return nil, err
-		}
-
-		return result.Bytes(), nil
-	}
-
-	if assignable.IsReduce() {
-		reduce := assignable.Reduce()
-		return app.reduce(context, reduce)
-	}
-
-	if assignable.IsCompare() {
-		cmp := assignable.Compare()
-		return app.compare(context, cmp)
-	}
-
-	if assignable.IsLength() {
-		length := assignable.Length()
-		return app.length(context, length)
-	}
-
-	if assignable.IsJoin() {
-		join := assignable.Join()
-		return app.join(context, join)
-	}
-
-	value := assignable.Value()
-	return app.value(context, value)
-}
-
-func (app *application) query(context uint, query layers.Query) (queries.Query, error) {
-	inputValue := query.Input()
-	input, err := app.value(context, inputValue)
-	if err != nil {
-		return nil, err
-	}
-
-	layerInput := query.Layer()
-	layer, err := app.layerInput(context, layerInput)
-	if err != nil {
-		return nil, err
-	}
-
-	msg, err := app.messageBuilder.Create().
-		WithBytes(input).
-		Now()
-
-	if err != nil {
-		return nil, err
-	}
-
-	builder := app.queryBuilder.Create().
-		WithMessage(msg).
-		WithLayer(layer)
-
-	if query.HasValues() {
-		valueAssignments := query.Values()
-		params, err := app.valueAssignments(context, valueAssignments)
-		if err != nil {
-			return nil, err
-		}
-
-		builder.WithParams(params)
-	}
-
-	return builder.Now()
-}
-
-func (app *application) layerInput(context uint, input layers.LayerInput) (layers.Layer, error) {
-	if input.IsLayer() {
-		return input.Layer(), nil
-	}
-
-	name := input.Variable()
-	return app.computer.retrieveLayer(context, name)
-}
-
-func (app *application) valueAssignments(context uint, valueAssignments layers.ValueAssignments) (symbols.Symbols, error) {
-	return nil, nil
-}
-
-func (app *application) valueAssignment(context uint, valueAssignment layers.ValueAssignment) (symbols.Symbol, error) {
-	return nil, nil
-}
-
-/*
-
-Name() string
-	Value() Value
-
-IsVariable() bool
-	Variable() string
-	IsLayer() bool
-	Layer() Layer
-
-*/
-
-func (app *application) reduce(context uint, reduce reduces.Reduce) ([]byte, error) {
-	variable := reduce.Variable()
-	length := reduce.Length()
-	return app.computer.reduce(context, variable, length)
-}
-
-func (app *application) compare(context uint, constants layers.ConstantValues) ([]byte, error) {
-	first := []byte{}
-	list := constants.List()
-	for _, oneConstant := range list {
-		values, err := app.value(context, oneConstant)
-		if err != nil {
-			return nil, err
-		}
-
-		if len(first) <= 0 {
-			first = values
-			continue
-		}
-
-		if bytes.Equal(first, values) {
-			continue
-		}
-
-		return []byte{1}, nil
-	}
-
-	return []byte{0}, nil
-}
-
-func (app *application) length(context uint, constant layers.ConstantValue) ([]byte, error) {
-	bytes, err := app.value(context, constant)
-	if err != nil {
-		return nil, err
-	}
-
-	length := len(bytes)
-	return []byte(strconv.Itoa(length)), nil
-}
-
-func (app *application) join(context uint, constants layers.ConstantValues) ([]byte, error) {
-	output := []byte{}
-	list := constants.List()
-	for _, oneConstant := range list {
-		bytes, err := app.value(context, oneConstant)
-		if err != nil {
-			return nil, err
-		}
-
-		output = append(output, bytes...)
-	}
-
-	return output, nil
-}
-
-func (app *application) value(context uint, constant layers.ConstantValue) ([]byte, error) {
-	if constant.IsConstant() {
-		return constant.Constant(), nil
-	}
-
-	name := constant.Variable()
-	return app.computer.retrieve(context, name)
 }
 
 func (app *application) init(layerIns layers.Layer, query queries.Query) (inits.Init, error) {
@@ -361,6 +109,492 @@ func (app *application) init(layerIns layers.Layer, query queries.Query) (inits.
 	}
 
 	return initBuilder.Now()
+}
+
+func (app *application) reset(init inits.Init) error {
+	app.values = map[string]Value{}
+	input := init.Input()
+	inputValue, err := app.valueBuilder.Create().WithBytes(input.Bytes()).Now()
+	if err != nil {
+		return err
+	}
+
+	inputVariable := input.Variable()
+	app.assign(inputVariable, inputValue)
+	if init.HasValues() {
+		values := init.Values().List()
+		for _, oneValue := range values {
+			content := oneValue.Content()
+			valueBuilder := app.valueBuilder.Create()
+			if content.IsBytes() {
+				bytes := content.Bytes()
+				valueBuilder.WithBytes(bytes)
+			}
+
+			if content.IsLayer() {
+				layer := content.Layer()
+				valueBuilder.WithLayer(layer)
+			}
+
+			value, err := valueBuilder.Now()
+			if err != nil {
+				return err
+			}
+
+			variable := oneValue.Variable()
+			app.assign(variable, value)
+		}
+	}
+
+	return nil
+}
+
+func (app *application) retrieve(name string) (Value, error) {
+	if ins, ok := app.values[name]; ok {
+		return ins, nil
+	}
+
+	str := fmt.Sprintf("the variable (name: %s) cannot be retrieved because it has never been assigned", name)
+	return nil, errors.New(str)
+}
+
+func (app *application) assign(name string, value Value) {
+	app.values[name] = value
+}
+
+func (app *application) executions(layerExecutions layers.Executions) (executions.Executions, error) {
+	list := layerExecutions.List()
+	output := []executions.Execution{}
+	for idx, oneExecution := range list {
+		execution, err := app.execution(uint(idx), oneExecution)
+		if err != nil {
+			return nil, err
+		}
+
+		output = append(output, execution)
+	}
+
+	return app.executionsBuilder.Create().
+		WithList(output).
+		Now()
+}
+
+func (app *application) execution(idx uint, execution layers.Execution) (executions.Execution, error) {
+	builder := app.executionBuilder.Create()
+	if execution.IsStop() {
+		builder.IsStop()
+	}
+
+	if execution.IsAssignment() {
+		assignment := execution.Assignment()
+		retAssignment, err := app.assignment(assignment)
+		if err != nil {
+			return nil, err
+		}
+
+		builder.WithAssignment(retAssignment)
+	}
+
+	if execution.IsCondition() {
+		condition := execution.Condition()
+		retExecutions, err := app.condition(condition)
+		if err != nil {
+			return nil, err
+		}
+
+		if retExecutions == nil {
+			return nil, nil
+		}
+
+		builder.WithExecutions(retExecutions)
+	}
+
+	return builder.Now()
+}
+
+func (app *application) condition(condition layers.Condition) (executions.Executions, error) {
+	variable := condition.Variable()
+	value, err := app.retrieve(variable)
+	if err != nil {
+		return nil, err
+	}
+
+	if !value.IsBytes() {
+		str := fmt.Sprintf("the variable (name: %s) is used in a condition an was therefore expected to contain a bool value (bytes of length 1)", variable)
+		return nil, errors.New(str)
+	}
+
+	bytes := value.Bytes()
+	if len(bytes) != 1 {
+		str := fmt.Sprintf("the variable (name: %s) is used in a condition an was therefore expected to contain a bool value (bytes of length 1), %d bytes provided", variable, len(bytes))
+		return nil, errors.New(str)
+	}
+
+	if bytes[0] == 0 {
+		executions := condition.Executions()
+		return app.executions(executions)
+	}
+
+	return nil, nil
+}
+
+func (app *application) assignment(assignment layers.Assignment) (assignments.Assignment, error) {
+	name := assignment.Name()
+	assignable := assignment.Assignable()
+	value, err := app.assignable(assignable)
+	if err != nil {
+		return nil, err
+	}
+
+	app.assign(name, value)
+	builder := app.assignmentBulder.Create().WithName(name)
+	if value.IsBytes() {
+		bytes := value.Bytes()
+		builder.WithValue(bytes)
+	}
+
+	if !value.IsBytes() {
+		builder.IsInternal()
+	}
+
+	return builder.Now()
+}
+
+func (app *application) assignable(assignable layers.Assignable) (Value, error) {
+	valueBuilder := app.valueBuilder.Create()
+	if assignable.IsQuery() {
+		query := assignable.Query()
+		criteria, err := app.query(query)
+		if err != nil {
+			return nil, err
+		}
+
+		result, err := app.Execute(criteria)
+		if err != nil {
+			return nil, err
+		}
+
+		valueBuilder.WithResult(result)
+	}
+
+	if assignable.IsReduce() {
+		reduce := assignable.Reduce()
+		bytes, err := app.reduce(reduce)
+		if err != nil {
+			return nil, err
+		}
+
+		valueBuilder.WithBytes(bytes)
+	}
+
+	if assignable.IsCompare() {
+		cmp := assignable.Compare()
+		bytes, err := app.compare(cmp)
+		if err != nil {
+			return nil, err
+		}
+
+		valueBuilder.WithBytes(bytes)
+	}
+
+	if assignable.IsLength() {
+		length := assignable.Length()
+		bytes, err := app.length(length)
+		if err != nil {
+			return nil, err
+		}
+
+		valueBuilder.WithBytes(bytes)
+	}
+
+	if assignable.IsJoin() {
+		join := assignable.Join()
+		bytes, err := app.join(join)
+		if err != nil {
+			return nil, err
+		}
+
+		valueBuilder.WithBytes(bytes)
+	}
+
+	if assignable.IsValue() {
+		value := assignable.Value()
+		bytes, err := app.value(value)
+		if err != nil {
+			return nil, err
+		}
+
+		valueBuilder.WithBytes(bytes)
+	}
+
+	if assignable.IsAccount() {
+		account := assignable.Account()
+		retAccount, err := app.account(account)
+		if err != nil {
+			return nil, err
+		}
+
+		valueBuilder.WithAccount(retAccount)
+	}
+
+	return valueBuilder.Now()
+}
+
+func (app *application) account(account accounts.Account) (Account, error) {
+	builder := app.valueAccountBuilder.Create()
+	if account.IsAdministrator() {
+		administrator := account.Administrator()
+		variable := administrator.Application()
+		administratorApp, err := app.administratorApplicationByConstantValue(variable)
+		if err != nil {
+			return nil, err
+		}
+
+		content := administrator.Content()
+		if content.IsApplication() {
+			adminAppInstruction := content.Application()
+			if adminAppInstruction.IsRetrieve() {
+				retAdminIns, err := administratorApp.Retrieve()
+				if err != nil {
+					return nil, err
+				}
+
+				builder.WithAdministrator(retAdminIns)
+			}
+
+			if adminAppInstruction.IsSave() {
+				save := adminAppInstruction.Save()
+				instance := save.Instance()
+				password, err := app.value(save.Password())
+				if err != nil {
+					return nil, err
+				}
+
+				criteriaBuilder := app.accountAdminSaveCriteriaBuilder.Create().
+					WithAdministrator(instance).
+					WithPassword(password)
+
+				if save.HasNewPassword() {
+					newPassword, err := app.value(save.NewPassword())
+					if err != nil {
+						return nil, err
+					}
+
+					criteriaBuilder.WithNewPassword(newPassword)
+				}
+
+				ins, err := criteriaBuilder.Now()
+				if err != nil {
+					return nil, err
+				}
+
+				err = administratorApp.Save(ins)
+				if err != nil {
+					return nil, err
+				}
+
+				panic(errors.New("make save a non-assignable execution"))
+			}
+		}
+
+		if content.IsInstance() {
+			panic(errors.New("finish instance"))
+		}
+	}
+
+	if account.IsAuthenticate() {
+		accCredentials := account.Authenticate()
+		username, err := app.value(accCredentials.Username())
+		if err != nil {
+			return nil, err
+		}
+
+		password, err := app.value(accCredentials.Password())
+		if err != nil {
+			return nil, err
+		}
+
+		credentials, err := app.credentialsBuilder.Create().
+			WithUsername(string(username)).
+			WithPassword(password).
+			Now()
+
+		if err != nil {
+			return nil, err
+		}
+
+		adminApp, err := app.accountApp.Authenticate(credentials)
+		if err != nil {
+			return nil, err
+		}
+
+		builder.WithApplication(adminApp)
+	}
+
+	return builder.Now()
+}
+
+func (app *application) query(query layers.Query) (queries.Query, error) {
+	inputValue := query.Input()
+	input, err := app.value(inputValue)
+	if err != nil {
+		return nil, err
+	}
+
+	layerInput := query.Layer()
+	layer, err := app.layerInput(layerInput)
+	if err != nil {
+		return nil, err
+	}
+
+	msg, err := app.messageBuilder.Create().
+		WithBytes(input).
+		Now()
+
+	if err != nil {
+		return nil, err
+	}
+
+	builder := app.queryBuilder.Create().
+		WithMessage(msg).
+		WithLayer(layer)
+
+	if query.HasValues() {
+		valueAssignments := query.Values()
+		params, err := app.valueAssignments(valueAssignments)
+		if err != nil {
+			return nil, err
+		}
+
+		builder.WithParams(params)
+	}
+
+	return builder.Now()
+}
+
+func (app *application) valueAssignments(valueAssignments layers.ValueAssignments) (symbols.Symbols, error) {
+	return nil, nil
+}
+
+func (app *application) valueAssignment(valueAssignment layers.ValueAssignment) (symbols.Symbol, error) {
+	return nil, nil
+}
+
+func (app *application) reduce(reduce reduces.Reduce) ([]byte, error) {
+	variable := reduce.Variable()
+	length := reduce.Length()
+	value, err := app.retrieve(variable)
+	if err != nil {
+		return nil, err
+	}
+
+	if !value.IsBytes() {
+		str := fmt.Sprintf("the variable (name: %s) was expected to contain bytes when used using the reduce func")
+		return nil, errors.New(str)
+	}
+
+	bytes := value.Bytes()
+	if len(bytes) < int(length) {
+		str := fmt.Sprintf("the variable (name: %s) was expected to be reduced to %d bytes, but it only contains %d bytes", variable, len(bytes), length)
+		return nil, errors.New(str)
+	}
+
+	return bytes[:int(length)], nil
+}
+
+func (app *application) compare(constants constantvalues.ConstantValues) ([]byte, error) {
+	first := []byte{}
+	list := constants.List()
+	for _, oneConstant := range list {
+		values, err := app.value(oneConstant)
+		if err != nil {
+			return nil, err
+		}
+
+		if len(first) <= 0 {
+			first = values
+			continue
+		}
+
+		if bytes.Equal(first, values) {
+			continue
+		}
+
+		return []byte{1}, nil
+	}
+
+	return []byte{0}, nil
+}
+
+func (app *application) length(constant constantvalues.ConstantValue) ([]byte, error) {
+	bytes, err := app.value(constant)
+	if err != nil {
+		return nil, err
+	}
+
+	length := len(bytes)
+	return []byte(strconv.Itoa(length)), nil
+}
+
+func (app *application) join(constants constantvalues.ConstantValues) ([]byte, error) {
+	output := []byte{}
+	list := constants.List()
+	for _, oneConstant := range list {
+		bytes, err := app.value(oneConstant)
+		if err != nil {
+			return nil, err
+		}
+
+		output = append(output, bytes...)
+	}
+
+	return output, nil
+}
+
+func (app *application) layerInput(input layers.LayerInput) (layers.Layer, error) {
+	if input.IsLayer() {
+		return input.Layer(), nil
+	}
+
+	name := input.Variable()
+	retValue, err := app.retrieve(name)
+	if err != nil {
+		return nil, err
+	}
+
+	if !retValue.IsLayer() {
+		str := fmt.Sprintf("the variable (%s) was expected to contain a Layer instance", name)
+		return nil, errors.New(str)
+	}
+
+	return retValue.Layer(), nil
+}
+
+func (app *application) administratorApplicationByConstantValue(input constantvalues.ConstantValue) (applications_administrator.Application, error) {
+	return nil, nil
+}
+
+func (app *application) accountByConstantValue(input constantvalues.ConstantValue) (Account, error) {
+	return nil, nil
+}
+
+func (app *application) value(constant constantvalues.ConstantValue) ([]byte, error) {
+	if constant.IsConstant() {
+		return constant.Constant(), nil
+	}
+
+	name := constant.Variable()
+	retValue, err := app.retrieve(name)
+	if err != nil {
+		return nil, err
+	}
+
+	if !retValue.IsBytes() {
+		str := fmt.Sprintf("the variable (%s) was expected to contain bytes", name)
+		return nil, errors.New(str)
+	}
+
+	return retValue.Bytes(), nil
 }
 
 func (app *application) inputValues(symbolsIns symbols.Symbols, params parameters.Parameters) (init_values.Values, error) {

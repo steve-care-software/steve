@@ -13,5 +13,5 @@ type Application interface {
 	Authenticate(credentials credentials.Credentials) (administrators.Application, error)
 	Identify(credentials credentials.Credentials) (identities.Application, error)
 	Connect() (connections.Application, error)
-	Visitor() (visitors.Application, error)
+	Visit() (visitors.Application, error)
 }

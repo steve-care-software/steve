@@ -1,61 +1,71 @@
 package layers
 
 import (
+	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers/accounts"
+	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers/constantvalues"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers/reduces"
 )
 
 type assignable struct {
 	query   Query
 	reduce  reduces.Reduce
-	compare ConstantValues
-	length  ConstantValue
-	join    ConstantValues
-	value   ConstantValue
+	compare constantvalues.ConstantValues
+	length  constantvalues.ConstantValue
+	join    constantvalues.ConstantValues
+	value   constantvalues.ConstantValue
+	account accounts.Account
 }
 
 func createAssignableWithQuery(
 	query Query,
 ) Assignable {
-	return createAssignableInternally(query, nil, nil, nil, nil, nil)
+	return createAssignableInternally(query, nil, nil, nil, nil, nil, nil)
 }
 
 func createAssignableWithReduce(
 	reduce reduces.Reduce,
 ) Assignable {
-	return createAssignableInternally(nil, reduce, nil, nil, nil, nil)
+	return createAssignableInternally(nil, reduce, nil, nil, nil, nil, nil)
 }
 
 func createAssignableWithCompare(
-	compare ConstantValues,
+	compare constantvalues.ConstantValues,
 ) Assignable {
-	return createAssignableInternally(nil, nil, compare, nil, nil, nil)
+	return createAssignableInternally(nil, nil, compare, nil, nil, nil, nil)
 }
 
 func createAssignableWithLength(
-	length ConstantValue,
+	length constantvalues.ConstantValue,
 ) Assignable {
-	return createAssignableInternally(nil, nil, nil, length, nil, nil)
+	return createAssignableInternally(nil, nil, nil, length, nil, nil, nil)
 }
 
 func createAssignableWithJoin(
-	join ConstantValues,
+	join constantvalues.ConstantValues,
 ) Assignable {
-	return createAssignableInternally(nil, nil, nil, nil, join, nil)
+	return createAssignableInternally(nil, nil, nil, nil, join, nil, nil)
 }
 
 func createAssignableWithValue(
-	value ConstantValue,
+	value constantvalues.ConstantValue,
 ) Assignable {
-	return createAssignableInternally(nil, nil, nil, nil, nil, value)
+	return createAssignableInternally(nil, nil, nil, nil, nil, value, nil)
+}
+
+func createAssignableWithAccount(
+	account accounts.Account,
+) Assignable {
+	return createAssignableInternally(nil, nil, nil, nil, nil, nil, account)
 }
 
 func createAssignableInternally(
 	query Query,
 	reduce reduces.Reduce,
-	compare ConstantValues,
-	length ConstantValue,
-	join ConstantValues,
-	value ConstantValue,
+	compare constantvalues.ConstantValues,
+	length constantvalues.ConstantValue,
+	join constantvalues.ConstantValues,
+	value constantvalues.ConstantValue,
+	account accounts.Account,
 ) Assignable {
 	out := assignable{
 		query:   query,
@@ -64,6 +74,7 @@ func createAssignableInternally(
 		length:  length,
 		join:    join,
 		value:   value,
+		account: account,
 	}
 
 	return &out
@@ -95,7 +106,7 @@ func (obj *assignable) IsCompare() bool {
 }
 
 // Compare returns the compare, if any
-func (obj *assignable) Compare() ConstantValues {
+func (obj *assignable) Compare() constantvalues.ConstantValues {
 	return obj.compare
 }
 
@@ -105,7 +116,7 @@ func (obj *assignable) IsLength() bool {
 }
 
 // Length returns the length, if any
-func (obj *assignable) Length() ConstantValue {
+func (obj *assignable) Length() constantvalues.ConstantValue {
 	return obj.length
 }
 
@@ -115,7 +126,7 @@ func (obj *assignable) IsJoin() bool {
 }
 
 // Join returns the length, if any
-func (obj *assignable) Join() ConstantValues {
+func (obj *assignable) Join() constantvalues.ConstantValues {
 	return obj.join
 }
 
@@ -125,6 +136,16 @@ func (obj *assignable) IsValue() bool {
 }
 
 // Value returns the value, if any
-func (obj *assignable) Value() ConstantValue {
+func (obj *assignable) Value() constantvalues.ConstantValue {
 	return obj.value
+}
+
+// IsAccount returns true if there is an account, false otherwise
+func (obj *assignable) IsAccount() bool {
+	return obj.account != nil
+}
+
+// Account returns the account, if any
+func (obj *assignable) Account() accounts.Account {
+	return obj.account
 }

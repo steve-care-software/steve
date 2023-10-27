@@ -36,5 +36,5 @@ type Content interface {
 	IsAssignment() bool
 	Assignment() assignments.Assignment
 	IsExecutions() bool
-	Executions() Executions
+	Executions() Execution
 }

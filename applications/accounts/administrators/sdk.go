@@ -10,6 +10,15 @@ type Application interface {
 	Save(criteria SaveCriteria) error
 }
 
+// SaveCriteriaBuilder represents a save criteria builder
+type SaveCriteriaBuilder interface {
+	Create() SaveCriteriaBuilder
+	WithAdministrator(admin administrators.Administrator) SaveCriteriaBuilder
+	WithPassword(password []byte) SaveCriteriaBuilder
+	WithNewPassword(newPassword []byte) SaveCriteriaBuilder
+	Now() (SaveCriteria, error)
+}
+
 // SaveCriteria represents a save criteria
 type SaveCriteria interface {
 	Administrator() administrators.Administrator

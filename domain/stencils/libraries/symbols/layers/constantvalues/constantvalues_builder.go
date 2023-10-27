@@ -1,4 +1,4 @@
-package layers
+package constantvalues
 
 import "errors"
 

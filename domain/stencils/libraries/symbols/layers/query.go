@@ -1,20 +1,22 @@
 package layers
 
+import "github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers/constantvalues"
+
 type query struct {
-	input  ConstantValue
+	input  constantvalues.ConstantValue
 	layer  LayerInput
 	values ValueAssignments
 }
 
 func createQuery(
-	input ConstantValue,
+	input constantvalues.ConstantValue,
 	layer LayerInput,
 ) Query {
 	return createQueryInternally(input, layer, nil)
 }
 
 func createQueryWithValues(
-	input ConstantValue,
+	input constantvalues.ConstantValue,
 	layer LayerInput,
 	values ValueAssignments,
 ) Query {
@@ -22,7 +24,7 @@ func createQueryWithValues(
 }
 
 func createQueryInternally(
-	input ConstantValue,
+	input constantvalues.ConstantValue,
 	layer LayerInput,
 	values ValueAssignments,
 ) Query {
@@ -36,7 +38,7 @@ func createQueryInternally(
 }
 
 // Input returns the input
-func (obj *query) Input() ConstantValue {
+func (obj *query) Input() constantvalues.ConstantValue {
 	return obj.input
 }
 
