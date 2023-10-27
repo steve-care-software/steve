@@ -1,6 +1,9 @@
 package profiles
 
-import "github.com/steve-care-software/steve/domain/accounts/identities/profiles/authorizations"
+import (
+	"github.com/steve-care-software/steve/domain/accounts/identities/profiles/authorizations"
+	"github.com/steve-care-software/steve/domain/accounts/identities/profiles/roles"
+)
 
 // Profile represents a profile
 type Profile interface {
@@ -21,4 +24,6 @@ type Connection interface {
 	Profile() Profile
 	Authorization() authorizations.Authorization
 	IsPublic() bool
+	HasRole() bool
+	Role() roles.Role
 }
