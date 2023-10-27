@@ -3,7 +3,7 @@ package preparations
 import (
 	"errors"
 
-	"github.com/steve-care-software/steve/domain/stencils/pointers"
+	"github.com/steve-care-software/steve/domain/pointers"
 )
 
 type preparationBuilder struct {

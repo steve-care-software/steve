@@ -1,6 +1,6 @@
 package preparations
 
-import "github.com/steve-care-software/steve/domain/stencils/pointers/symbols"
+import "github.com/steve-care-software/steve/domain/pointers/symbols"
 
 // Builder represents preparations builder
 type Builder interface {

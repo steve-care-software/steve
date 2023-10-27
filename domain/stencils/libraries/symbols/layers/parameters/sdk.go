@@ -1,6 +1,6 @@
 package parameters
 
-import "github.com/steve-care-software/steve/domain/stencils/pointers/symbols"
+import "github.com/steve-care-software/steve/domain/pointers/symbols"
 
 // NewBuilder creates a new builder instance
 func NewBuilder() Builder {

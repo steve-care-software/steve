@@ -21,7 +21,7 @@ import (
 	"github.com/steve-care-software/steve/domain/stencils/results/executions/executions/assignments"
 	"github.com/steve-care-software/steve/domain/stencils/results/executions/inits"
 
-	pointer_symbols "github.com/steve-care-software/steve/domain/stencils/pointers/symbols"
+	pointer_symbols "github.com/steve-care-software/steve/domain/pointers/symbols"
 	result_layers "github.com/steve-care-software/steve/domain/stencils/results/executions"
 	init_inputs "github.com/steve-care-software/steve/domain/stencils/results/executions/inits/inputs"
 	init_values "github.com/steve-care-software/steve/domain/stencils/results/executions/inits/values"

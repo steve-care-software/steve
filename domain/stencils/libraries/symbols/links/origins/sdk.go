@@ -1,6 +1,6 @@
 package origins
 
-import "github.com/steve-care-software/steve/domain/stencils/pointers"
+import "github.com/steve-care-software/steve/domain/pointers"
 
 // NewBuilder creates a new builder instance
 func NewBuilder() Builder {

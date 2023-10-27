@@ -1,6 +1,6 @@
 package preparations
 
-import "github.com/steve-care-software/steve/domain/stencils/pointers"
+import "github.com/steve-care-software/steve/domain/pointers"
 
 type preparation struct {
 	isStop    bool

@@ -3,7 +3,7 @@ package pointers
 import (
 	"errors"
 
-	"github.com/steve-care-software/steve/domain/stencils/pointers/symbols"
+	"github.com/steve-care-software/steve/domain/pointers/symbols"
 )
 
 type pointerBuilder struct {

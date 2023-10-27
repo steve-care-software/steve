@@ -2,6 +2,8 @@ package jsons
 
 import (
 	"github.com/steve-care-software/steve/applications/compilers"
+	"github.com/steve-care-software/steve/domain/pointers"
+	pointer_symbols "github.com/steve-care-software/steve/domain/pointers/symbols"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers/constantvalues"
@@ -14,8 +16,6 @@ import (
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/links/executions"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/links/origins"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/links/preparations"
-	"github.com/steve-care-software/steve/domain/stencils/pointers"
-	pointer_symbols "github.com/steve-care-software/steve/domain/stencils/pointers/symbols"
 )
 
 // NewJsonApplication creates a new json compiler application

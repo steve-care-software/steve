@@ -7,6 +7,8 @@ import (
 	"strings"
 
 	"github.com/steve-care-software/steve/applications/compilers"
+	"github.com/steve-care-software/steve/domain/pointers"
+	pointer_symbols "github.com/steve-care-software/steve/domain/pointers/symbols"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers/constantvalues"
@@ -19,8 +21,6 @@ import (
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/links/executions"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/links/origins"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/links/preparations"
-	"github.com/steve-care-software/steve/domain/stencils/pointers"
-	pointer_symbols "github.com/steve-care-software/steve/domain/stencils/pointers/symbols"
 	"github.com/steve-care-software/steve/infrastructure/jsons/structs/layers/assignables/administrators"
 	struct_values "github.com/steve-care-software/steve/infrastructure/jsons/structs/values"
 )
