@@ -3,6 +3,7 @@ package links
 import (
 	"errors"
 
+	"github.com/steve-care-software/steve/domain/hash"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/links/executions"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/links/origins"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/links/preparations"
@@ -10,14 +11,18 @@ import (
 )
 
 type builder struct {
+	hashAdapter  hash.Adapter
 	origins      origins.Origins
 	execution    executions.Execution
 	preparations preparations.Preparations
 	suites       suites.Suites
 }
 
-func createBuilder() Builder {
+func createBuilder(
+	hashAdapter hash.Adapter,
+) Builder {
 	out := builder{
+		hashAdapter:  hashAdapter,
 		origins:      nil,
 		execution:    nil,
 		preparations: nil,
@@ -29,7 +34,9 @@ func createBuilder() Builder {
 
 // Create initializes the builder
 func (app *builder) Create() Builder {
-	return createBuilder()
+	return createBuilder(
+		app.hashAdapter,
+	)
 }
 
 // WithOrigins add origins to the builder
@@ -70,9 +77,24 @@ func (app *builder) Now() (Link, error) {
 		return nil, errors.New("the preparations is mandatory in order to build a Link instance")
 	}
 
-	if app.suites != nil {
-		return createLinkWithSuites(app.origins, app.execution, app.preparations, app.suites), nil
+	data := [][]byte{
+		app.origins.Hash().Bytes(),
+		app.execution.Hash().Bytes(),
+		app.preparations.Hash().Bytes(),
 	}
 
-	return createLink(app.origins, app.execution, app.preparations), nil
+	if app.suites != nil {
+		data = append(data, app.suites.Hash().Bytes())
+	}
+
+	pHash, err := app.hashAdapter.FromMultiBytes(data)
+	if err != nil {
+		return nil, err
+	}
+
+	if app.suites != nil {
+		return createLinkWithSuites(*pHash, app.origins, app.execution, app.preparations, app.suites), nil
+	}
+
+	return createLink(*pHash, app.origins, app.execution, app.preparations), nil
 }

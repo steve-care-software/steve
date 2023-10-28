@@ -1,6 +1,7 @@
 package links
 
 import (
+	"github.com/steve-care-software/steve/domain/hash"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/links/executions"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/links/origins"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/links/preparations"
@@ -8,6 +9,7 @@ import (
 )
 
 type link struct {
+	hash         hash.Hash
 	origins      origins.Origins
 	execution    executions.Execution
 	preparations preparations.Preparations
@@ -15,29 +17,33 @@ type link struct {
 }
 
 func createLink(
+	hash hash.Hash,
 	origins origins.Origins,
 	execution executions.Execution,
 	preparations preparations.Preparations,
 ) Link {
-	return createLinkInternally(origins, execution, preparations, nil)
+	return createLinkInternally(hash, origins, execution, preparations, nil)
 }
 
 func createLinkWithSuites(
+	hash hash.Hash,
 	origins origins.Origins,
 	execution executions.Execution,
 	preparations preparations.Preparations,
 	suites suites.Suites,
 ) Link {
-	return createLinkInternally(origins, execution, preparations, suites)
+	return createLinkInternally(hash, origins, execution, preparations, suites)
 }
 
 func createLinkInternally(
+	hash hash.Hash,
 	origins origins.Origins,
 	execution executions.Execution,
 	preparations preparations.Preparations,
 	suites suites.Suites,
 ) Link {
 	out := link{
+		hash:         hash,
 		origins:      origins,
 		execution:    execution,
 		preparations: preparations,
@@ -45,6 +51,11 @@ func createLinkInternally(
 	}
 
 	return &out
+}
+
+// Hash returns the hash
+func (Obj *link) Hash() hash.Hash {
+	return Obj.hash
 }
 
 // Origins returns the origins

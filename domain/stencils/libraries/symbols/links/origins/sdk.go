@@ -1,15 +1,24 @@
 package origins
 
-import "github.com/steve-care-software/steve/domain/pointers"
+import (
+	"github.com/steve-care-software/steve/domain/hash"
+	"github.com/steve-care-software/steve/domain/pointers"
+)
 
 // NewBuilder creates a new builder instance
 func NewBuilder() Builder {
-	return createBuilder()
+	hashAdapter := hash.NewAdapter()
+	return createBuilder(
+		hashAdapter,
+	)
 }
 
 // NewOriginBuilder creates a new origin builder
 func NewOriginBuilder() OriginBuilder {
-	return createOriginBuilder()
+	hashAdapter := hash.NewAdapter()
+	return createOriginBuilder(
+		hashAdapter,
+	)
 }
 
 // NewDirectionBuilder creates a new direction builder
@@ -26,6 +35,7 @@ type Builder interface {
 
 // Origins represents origins
 type Origins interface {
+	Hash() hash.Hash
 	List() []Origin
 }
 
@@ -39,6 +49,7 @@ type OriginBuilder interface {
 
 // Origin represents an origin
 type Origin interface {
+	Hash() hash.Hash
 	Symbol() pointers.Pointer
 	HasDirection() bool
 	Direction() Direction
@@ -54,6 +65,7 @@ type DirectionBuilder interface {
 
 // Direction represents a direction
 type Direction interface {
+	Hash() hash.Hash
 	IsNext() bool
 	Next() Origin
 	IsPrevious() bool

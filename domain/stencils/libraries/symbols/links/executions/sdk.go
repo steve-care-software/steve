@@ -1,12 +1,16 @@
 package executions
 
 import (
+	"github.com/steve-care-software/steve/domain/hash"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers"
 )
 
 // NewBuilder creates a new builder instance
 func NewBuilder() Builder {
-	return createBuilder()
+	hashAdapter := hash.NewAdapter()
+	return createBuilder(
+		hashAdapter,
+	)
 }
 
 // Builder represents an execution builder
@@ -19,6 +23,7 @@ type Builder interface {
 
 // Execution represents an execution
 type Execution interface {
+	Hash() hash.Hash
 	Layer() layers.LayerInput
 	HasValues() bool
 	Values() layers.ValueAssignments

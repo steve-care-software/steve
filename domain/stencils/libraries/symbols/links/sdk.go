@@ -1,6 +1,7 @@
 package links
 
 import (
+	"github.com/steve-care-software/steve/domain/hash"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/links/executions"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/links/origins"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/links/preparations"
@@ -9,7 +10,10 @@ import (
 
 // NewBuilder creates a new builder instance
 func NewBuilder() Builder {
-	return createBuilder()
+	hashAdapter := hash.NewAdapter()
+	return createBuilder(
+		hashAdapter,
+	)
 }
 
 // Builder represents a link builder
@@ -24,6 +28,7 @@ type Builder interface {
 
 // Link represents a link
 type Link interface {
+	Hash() hash.Hash
 	Origins() origins.Origins
 	Execution() executions.Execution
 	Preparations() preparations.Preparations

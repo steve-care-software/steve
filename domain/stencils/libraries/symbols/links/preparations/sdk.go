@@ -1,20 +1,32 @@
 package preparations
 
-import "github.com/steve-care-software/steve/domain/pointers"
+import (
+	"github.com/steve-care-software/steve/domain/hash"
+	"github.com/steve-care-software/steve/domain/pointers"
+)
 
 // NewBuilder creates a new builder
 func NewBuilder() Builder {
-	return createBuilder()
+	hashAdapter := hash.NewAdapter()
+	return createBuilder(
+		hashAdapter,
+	)
 }
 
 // NewPreparationBuilder creates a new preparation builder
 func NewPreparationBuilder() PreparationBuilder {
-	return createPreparationBuilder()
+	hashAdapter := hash.NewAdapter()
+	return createPreparationBuilder(
+		hashAdapter,
+	)
 }
 
 // NewConditionBuilder creates a new condition builder
 func NewConditionBuilder() ConditionBuilder {
-	return createConditionBuilder()
+	hashAdapter := hash.NewAdapter()
+	return createConditionBuilder(
+		hashAdapter,
+	)
 }
 
 // Builder represents a preparations builder
@@ -26,6 +38,7 @@ type Builder interface {
 
 // Preparations represents preparations
 type Preparations interface {
+	Hash() hash.Hash
 	List() []Preparation
 }
 
@@ -41,6 +54,7 @@ type PreparationBuilder interface {
 
 // Preparation represents a preparation
 type Preparation interface {
+	Hash() hash.Hash
 	IsStop() bool
 	IsLoad() bool
 	Load() pointers.Pointer
@@ -60,6 +74,7 @@ type ConditionBuilder interface {
 
 // Condition represents a condition
 type Condition interface {
+	Hash() hash.Hash
 	Variable() string
 	Preparations() Preparations
 }

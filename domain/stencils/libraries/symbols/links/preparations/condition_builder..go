@@ -1,14 +1,22 @@
 package preparations
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/steve-care-software/steve/domain/hash"
+)
 
 type conditionBuilder struct {
+	hashAdapter  hash.Adapter
 	variable     string
 	preparations Preparations
 }
 
-func createConditionBuilder() ConditionBuilder {
+func createConditionBuilder(
+	hashAdapter hash.Adapter,
+) ConditionBuilder {
 	out := conditionBuilder{
+		hashAdapter:  hashAdapter,
 		variable:     "",
 		preparations: nil,
 	}
@@ -18,7 +26,9 @@ func createConditionBuilder() ConditionBuilder {
 
 // Create initializes the builder
 func (app *conditionBuilder) Create() ConditionBuilder {
-	return createConditionBuilder()
+	return createConditionBuilder(
+		app.hashAdapter,
+	)
 }
 
 // WithVariable adds a variable to the builder
@@ -43,5 +53,14 @@ func (app *conditionBuilder) Now() (Condition, error) {
 		return nil, errors.New("the preparations is mandatory in order to build a Condition instance")
 	}
 
-	return createCondition(app.variable, app.preparations), nil
+	pHash, err := app.hashAdapter.FromMultiBytes([][]byte{
+		[]byte(app.variable),
+		app.preparations.Hash().Bytes(),
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return createCondition(*pHash, app.variable, app.preparations), nil
 }

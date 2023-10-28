@@ -3,20 +3,25 @@ package suites
 import (
 	"errors"
 
+	"github.com/steve-care-software/steve/domain/hash"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers/returns"
 )
 
 type suiteBuilder struct {
-	name   string
-	input  []byte
-	output returns.Return
+	hashAdapter hash.Adapter
+	name        string
+	input       []byte
+	output      returns.Return
 }
 
-func createSuiteBuilder() SuiteBuilder {
+func createSuiteBuilder(
+	hashAdapter hash.Adapter,
+) SuiteBuilder {
 	out := suiteBuilder{
-		name:   "",
-		input:  nil,
-		output: nil,
+		hashAdapter: hashAdapter,
+		name:        "",
+		input:       nil,
+		output:      nil,
 	}
 
 	return &out
@@ -24,7 +29,9 @@ func createSuiteBuilder() SuiteBuilder {
 
 // Create initializes the builder
 func (app *suiteBuilder) Create() SuiteBuilder {
-	return createSuiteBuilder()
+	return createSuiteBuilder(
+		app.hashAdapter,
+	)
 }
 
 // WithName adds a name to the builder
@@ -63,5 +70,15 @@ func (app *suiteBuilder) Now() (Suite, error) {
 		return nil, errors.New("the output is mandatory in order to build a SUite instance")
 	}
 
-	return createSuite(app.name, app.input, app.output), nil
+	pHash, err := app.hashAdapter.FromMultiBytes([][]byte{
+		[]byte(app.name),
+		app.input,
+		app.output.Hash().Bytes(),
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return createSuite(*pHash, app.name, app.input, app.output), nil
 }

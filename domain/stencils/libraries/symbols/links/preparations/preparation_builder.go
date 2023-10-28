@@ -3,22 +3,27 @@ package preparations
 import (
 	"errors"
 
+	"github.com/steve-care-software/steve/domain/hash"
 	"github.com/steve-care-software/steve/domain/pointers"
 )
 
 type preparationBuilder struct {
-	isStop    bool
-	load      pointers.Pointer
-	exists    pointers.Pointer
-	condition Condition
+	hashAdapter hash.Adapter
+	isStop      bool
+	load        pointers.Pointer
+	exists      pointers.Pointer
+	condition   Condition
 }
 
-func createPreparationBuilder() PreparationBuilder {
+func createPreparationBuilder(
+	hashAdapter hash.Adapter,
+) PreparationBuilder {
 	out := preparationBuilder{
-		isStop:    false,
-		load:      nil,
-		exists:    nil,
-		condition: nil,
+		hashAdapter: hashAdapter,
+		isStop:      false,
+		load:        nil,
+		exists:      nil,
+		condition:   nil,
 	}
 
 	return &out
@@ -26,7 +31,9 @@ func createPreparationBuilder() PreparationBuilder {
 
 // Create initializes the builder
 func (app *preparationBuilder) Create() PreparationBuilder {
-	return createPreparationBuilder()
+	return createPreparationBuilder(
+		app.hashAdapter,
+	)
 }
 
 // WithLoad adds a load to the builder
@@ -55,21 +62,44 @@ func (app *preparationBuilder) IsStop() PreparationBuilder {
 
 // Now builds a new Preparation instance
 func (app *preparationBuilder) Now() (Preparation, error) {
+
+	data := [][]byte{}
 	if app.load != nil {
-		return createPreparationWithLoad(app.load), nil
+		data = append(data, app.load.Hash().Bytes())
 	}
 
 	if app.exists != nil {
-		return createPreparationWithExists(app.exists), nil
+		data = append(data, app.exists.Hash().Bytes())
 	}
 
 	if app.condition != nil {
-		return createPreparationWithCondition(app.condition), nil
+		data = append(data, app.condition.Hash().Bytes())
 	}
 
 	if app.isStop {
-		return createPreparationWithStop(), nil
+		data = append(data, []byte{0})
 	}
 
-	return nil, errors.New("the Preparation is invalid")
+	if len(data) <= 0 {
+		return nil, errors.New("the Preparation is invalid")
+	}
+
+	pHash, err := app.hashAdapter.FromMultiBytes(data)
+	if err != nil {
+		return nil, err
+	}
+
+	if app.load != nil {
+		return createPreparationWithLoad(*pHash, app.load), nil
+	}
+
+	if app.exists != nil {
+		return createPreparationWithExists(*pHash, app.exists), nil
+	}
+
+	if app.condition != nil {
+		return createPreparationWithCondition(*pHash, app.condition), nil
+	}
+
+	return createPreparationWithStop(*pHash), nil
 }

@@ -1,35 +1,48 @@
 package origins
 
-import "github.com/steve-care-software/steve/domain/pointers"
+import (
+	"github.com/steve-care-software/steve/domain/hash"
+	"github.com/steve-care-software/steve/domain/pointers"
+)
 
 type origin struct {
+	hash      hash.Hash
 	symbol    pointers.Pointer
 	direction Direction
 }
 
 func createOrigin(
+	hash hash.Hash,
 	symbol pointers.Pointer,
 ) Origin {
-	return createOriginInternally(symbol, nil)
+	return createOriginInternally(hash, symbol, nil)
 }
 
 func createOriginWithDirection(
+	hash hash.Hash,
 	symbol pointers.Pointer,
 	direction Direction,
 ) Origin {
-	return createOriginInternally(symbol, direction)
+	return createOriginInternally(hash, symbol, direction)
 }
 
 func createOriginInternally(
+	hash hash.Hash,
 	symbol pointers.Pointer,
 	direction Direction,
 ) Origin {
 	out := origin{
+		hash:      hash,
 		symbol:    symbol,
 		direction: direction,
 	}
 
 	return &out
+}
+
+// Hash returns the hash
+func (obj *origin) Hash() hash.Hash {
+	return obj.hash
 }
 
 // Symbol returns the symbol

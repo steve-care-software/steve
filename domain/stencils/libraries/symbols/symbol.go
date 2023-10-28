@@ -1,20 +1,24 @@
 package symbols
 
 import (
+	"github.com/steve-care-software/steve/domain/hash"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/links"
 )
 
 type symbol struct {
+	hash  hash.Hash
 	bytes []byte
 	layer layers.Layer
 	link  links.Link
 }
 
 func createSymbolWithBytes(
+	hash hash.Hash,
 	bytes []byte,
 ) Symbol {
 	return createSymbolInternally(
+		hash,
 		bytes,
 		nil,
 		nil,
@@ -22,9 +26,11 @@ func createSymbolWithBytes(
 }
 
 func createSymbolWithLayer(
+	hash hash.Hash,
 	layer layers.Layer,
 ) Symbol {
 	return createSymbolInternally(
+		hash,
 		nil,
 		layer,
 		nil,
@@ -32,9 +38,11 @@ func createSymbolWithLayer(
 }
 
 func createSymbolWithLink(
+	hash hash.Hash,
 	link links.Link,
 ) Symbol {
 	return createSymbolInternally(
+		hash,
 		nil,
 		nil,
 		link,
@@ -42,17 +50,24 @@ func createSymbolWithLink(
 }
 
 func createSymbolInternally(
+	hash hash.Hash,
 	bytes []byte,
 	layer layers.Layer,
 	link links.Link,
 ) Symbol {
 	out := symbol{
+		hash:  hash,
 		bytes: bytes,
 		layer: layer,
 		link:  link,
 	}
 
 	return &out
+}
+
+// Hash returns the hash
+func (obj *symbol) Hash() hash.Hash {
+	return obj.hash
 }
 
 // IsBytes returns true if there is bytes, false otherwise

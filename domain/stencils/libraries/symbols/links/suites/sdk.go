@@ -1,15 +1,24 @@
 package suites
 
-import "github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers/returns"
+import (
+	"github.com/steve-care-software/steve/domain/hash"
+	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers/returns"
+)
 
 // NewBuilder creates a new builder instance
 func NewBuilder() Builder {
-	return createBuilder()
+	hashAdapter := hash.NewAdapter()
+	return createBuilder(
+		hashAdapter,
+	)
 }
 
 // NewSuiteBuilder creates a new suite builder
 func NewSuiteBuilder() SuiteBuilder {
-	return createSuiteBuilder()
+	hashAdapter := hash.NewAdapter()
+	return createSuiteBuilder(
+		hashAdapter,
+	)
 }
 
 // Builder represents a suites builder
@@ -21,6 +30,7 @@ type Builder interface {
 
 // Suites represents suites
 type Suites interface {
+	Hash() hash.Hash
 	List() []Suite
 }
 
@@ -35,6 +45,7 @@ type SuiteBuilder interface {
 
 // Suite represents suite
 type Suite interface {
+	Hash() hash.Hash
 	Name() string
 	Input() []byte
 	Output() returns.Return

@@ -1,43 +1,54 @@
 package preparations
 
-import "github.com/steve-care-software/steve/domain/pointers"
+import (
+	"github.com/steve-care-software/steve/domain/hash"
+	"github.com/steve-care-software/steve/domain/pointers"
+)
 
 type preparation struct {
+	hash      hash.Hash
 	isStop    bool
 	load      pointers.Pointer
 	exists    pointers.Pointer
 	condition Condition
 }
 
-func createPreparationWithStop() Preparation {
-	return createPreparationInternally(true, nil, nil, nil)
+func createPreparationWithStop(
+	hash hash.Hash,
+) Preparation {
+	return createPreparationInternally(hash, true, nil, nil, nil)
 }
 
 func createPreparationWithLoad(
+	hash hash.Hash,
 	load pointers.Pointer,
 ) Preparation {
-	return createPreparationInternally(false, load, nil, nil)
+	return createPreparationInternally(hash, false, load, nil, nil)
 }
 
 func createPreparationWithExists(
+	hash hash.Hash,
 	exists pointers.Pointer,
 ) Preparation {
-	return createPreparationInternally(false, nil, exists, nil)
+	return createPreparationInternally(hash, false, nil, exists, nil)
 }
 
 func createPreparationWithCondition(
+	hash hash.Hash,
 	condition Condition,
 ) Preparation {
-	return createPreparationInternally(false, nil, nil, condition)
+	return createPreparationInternally(hash, false, nil, nil, condition)
 }
 
 func createPreparationInternally(
+	hash hash.Hash,
 	isStop bool,
 	load pointers.Pointer,
 	exists pointers.Pointer,
 	condition Condition,
 ) Preparation {
 	out := preparation{
+		hash:      hash,
 		isStop:    isStop,
 		load:      load,
 		exists:    exists,
@@ -45,6 +56,11 @@ func createPreparationInternally(
 	}
 
 	return &out
+}
+
+// Hash returns the hash
+func (obj *preparation) Hash() hash.Hash {
+	return obj.hash
 }
 
 // IsStop returns true if stop, false otherwise

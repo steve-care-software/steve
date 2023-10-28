@@ -1,5 +1,7 @@
 package origins
 
+import "github.com/steve-care-software/steve/domain/hash"
+
 type direction struct {
 	next     Origin
 	previous Origin
@@ -27,6 +29,15 @@ func createDirectionInternally(
 	}
 
 	return &out
+}
+
+// Hash returns the hash
+func (obj *direction) Hash() hash.Hash {
+	if obj.IsNext() {
+		return obj.next.Hash()
+	}
+
+	return obj.previous.Hash()
 }
 
 // IsNext returns true if there is a next, false otherwise

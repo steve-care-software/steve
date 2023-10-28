@@ -1,6 +1,9 @@
 package pointers
 
-import "github.com/steve-care-software/steve/domain/pointers/symbols"
+import (
+	"github.com/steve-care-software/steve/domain/hash"
+	"github.com/steve-care-software/steve/domain/pointers/symbols"
+)
 
 // NewBuilder creates a new builder instance
 func NewBuilder() Builder {
@@ -34,6 +37,7 @@ type PointerBuilder interface {
 
 // Pointer represents a symbol pointer
 type Pointer interface {
+	Hash() hash.Hash
 	Path() []string
 	Symbol() symbols.Symbol
 }

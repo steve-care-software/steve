@@ -8,12 +8,18 @@ import (
 
 // NewBuilder creates a new builder instance
 func NewBuilder() Builder {
-	return createBuilder()
+	hashAdapter := hash.NewAdapter()
+	return createBuilder(
+		hashAdapter,
+	)
 }
 
 // NewSymbolBuilder creates a new symbol builder
 func NewSymbolBuilder() SymbolBuilder {
-	return createSymbolBuilder()
+	hashAdapter := hash.NewAdapter()
+	return createSymbolBuilder(
+		hashAdapter,
+	)
 }
 
 // Builder represents a symbols builder
@@ -25,6 +31,7 @@ type Builder interface {
 
 // Symbols represents symbols
 type Symbols interface {
+	Hash() hash.Hash
 	List() []Symbol
 	Fetch(name string) (Symbol, error)
 }
@@ -40,6 +47,7 @@ type SymbolBuilder interface {
 
 // Symbol represents a symbol
 type Symbol interface {
+	Hash() hash.Hash
 	IsBytes() bool
 	Bytes() []byte
 	IsLayer() bool
