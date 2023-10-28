@@ -2,19 +2,25 @@ package layers
 
 import (
 	"errors"
+
+	"github.com/steve-care-software/steve/domain/hash"
 )
 
 type executionBuilder struct {
-	isStop     bool
-	assignment Assignment
-	condition  Condition
+	hashAdapter hash.Adapter
+	isStop      bool
+	assignment  Assignment
+	condition   Condition
 }
 
-func createExecutionBuilder() ExecutionBuilder {
+func createExecutionBuilder(
+	hashAdapter hash.Adapter,
+) ExecutionBuilder {
 	out := executionBuilder{
-		isStop:     false,
-		assignment: nil,
-		condition:  nil,
+		hashAdapter: hashAdapter,
+		isStop:      false,
+		assignment:  nil,
+		condition:   nil,
 	}
 
 	return &out
@@ -22,7 +28,9 @@ func createExecutionBuilder() ExecutionBuilder {
 
 // Create initializes the builder
 func (app *executionBuilder) Create() ExecutionBuilder {
-	return createExecutionBuilder()
+	return createExecutionBuilder(
+		app.hashAdapter,
+	)
 }
 
 // WithAssignment adds an assignment to the builder
@@ -45,17 +53,35 @@ func (app *executionBuilder) IsStop() ExecutionBuilder {
 
 // Now builds a new Execution instance
 func (app *executionBuilder) Now() (Execution, error) {
+	data := [][]byte{}
 	if app.isStop {
-		return createExecutionWithStop(), nil
+		data = append(data, []byte{0})
 	}
 
 	if app.assignment != nil {
-		return createExecutionWithAssignment(app.assignment), nil
+		data = append(data, app.assignment.Hash().Bytes())
 	}
 
 	if app.condition != nil {
-		return createExecutionWithCondition(app.condition), nil
+		data = append(data, app.condition.Hash().Bytes())
 	}
 
-	return nil, errors.New("the Execution is invalid")
+	if len(data) <= 0 {
+		return nil, errors.New("the Execution is invalid")
+	}
+
+	pHash, err := app.hashAdapter.FromMultiBytes(data)
+	if err != nil {
+		return nil, err
+	}
+
+	if app.isStop {
+		return createExecutionWithStop(*pHash), nil
+	}
+
+	if app.assignment != nil {
+		return createExecutionWithAssignment(*pHash, app.assignment), nil
+	}
+
+	return createExecutionWithCondition(*pHash, app.condition), nil
 }

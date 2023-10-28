@@ -1,6 +1,7 @@
 package layers
 
 import (
+	"github.com/steve-care-software/steve/domain/hash"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers/accounts"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers/constantvalues"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers/parameters"
@@ -11,37 +12,58 @@ import (
 
 // NewBuilder creates a new builder instance
 func NewBuilder() Builder {
-	return createBuilder()
+	hashAdapter := hash.NewAdapter()
+	return createBuilder(
+		hashAdapter,
+	)
 }
 
 // NewLayerBuilder creates a new layer builder
 func NewLayerBuilder() LayerBuilder {
-	return createLayerBuilder()
+	hashAdapter := hash.NewAdapter()
+	return createLayerBuilder(
+		hashAdapter,
+	)
 }
 
 // NewSuitesBuilder creates a new suites builder
 func NewSuitesBuilder() SuitesBuilder {
-	return createSuitesBuilder()
+	hashAdapter := hash.NewAdapter()
+	return createSuitesBuilder(
+		hashAdapter,
+	)
 }
 
 // NewSuiteBuilder creates a new suite builder
 func NewSuiteBuilder() SuiteBuilder {
-	return createSuiteBuilder()
+	hashAdapter := hash.NewAdapter()
+	return createSuiteBuilder(
+		hashAdapter,
+	)
 }
 
 // NewExecutionsBuilder creates a new executions builder
 func NewExecutionsBuilder() ExecutionsBuilder {
-	return createExecutionsBuilder()
+	hashAdapter := hash.NewAdapter()
+	return createExecutionsBuilder(
+		hashAdapter,
+	)
 }
 
 // NewExecutionBuilder creates a new execution builder
 func NewExecutionBuilder() ExecutionBuilder {
-	return createExecutionBuilder()
+	hashAdapter := hash.NewAdapter()
+	return createExecutionBuilder(
+		hashAdapter,
+	)
 }
 
 // NewAssignmentBuilder creates a new assignment builder
 func NewAssignmentBuilder() AssignmentBuilder {
-	return createAssignmentBuilder()
+	hashAdapter := hash.NewAdapter()
+	return createAssignmentBuilder(
+		hashAdapter,
+	)
 }
 
 // NewAssignableBuilder create sa new assignable builder
@@ -51,32 +73,50 @@ func NewAssignableBuilder() AssignableBuilder {
 
 // NewConditionBuilder creates a new condition instance
 func NewConditionBuilder() ConditionBuilder {
-	return createConditionBuilder()
+	hashAdapter := hash.NewAdapter()
+	return createConditionBuilder(
+		hashAdapter,
+	)
 }
 
 // NewQueryBuilder creates a new query builder
 func NewQueryBuilder() QueryBuilder {
-	return createQueryBuilder()
+	hashAdapter := hash.NewAdapter()
+	return createQueryBuilder(
+		hashAdapter,
+	)
 }
 
 // NewLayerInputBuilder creates a new layer input builder
 func NewLayerInputBuilder() LayerInputBuilder {
-	return createLayerInputBuilder()
+	hashAdapter := hash.NewAdapter()
+	return createLayerInputBuilder(
+		hashAdapter,
+	)
 }
 
 // NewValueAssignmentsBuilder creates a new value assignments builder
 func NewValueAssignmentsBuilder() ValueAssignmentsBuilder {
-	return createValueAssignmentsBuilder()
+	hashAdapter := hash.NewAdapter()
+	return createValueAssignmentsBuilder(
+		hashAdapter,
+	)
 }
 
 // NewValueAssignmentBuilder creates a new value assignment builder
 func NewValueAssignmentBuilder() ValueAssignmentBuilder {
-	return createValueAssignmentBuilder()
+	hashAdapter := hash.NewAdapter()
+	return createValueAssignmentBuilder(
+		hashAdapter,
+	)
 }
 
 // NewValueBuilder creates a new value builder
 func NewValueBuilder() ValueBuilder {
-	return createValueBuilder()
+	hashAdapter := hash.NewAdapter()
+	return createValueBuilder(
+		hashAdapter,
+	)
 }
 
 // Builder represents a layers builder
@@ -88,6 +128,7 @@ type Builder interface {
 
 // Layers represents layers
 type Layers interface {
+	Hash() hash.Hash
 	List() []Layer
 }
 
@@ -104,6 +145,7 @@ type LayerBuilder interface {
 
 // Layer represents a layer
 type Layer interface {
+	Hash() hash.Hash
 	Input() string
 	Executions() Executions
 	Return() return_expectations.Expectation
@@ -122,6 +164,7 @@ type SuitesBuilder interface {
 
 // Suites represents suites
 type Suites interface {
+	Hash() hash.Hash
 	List() []Suite
 }
 
@@ -137,6 +180,7 @@ type SuiteBuilder interface {
 
 // Suite represents a layer suites
 type Suite interface {
+	Hash() hash.Hash
 	Name() string
 	Input() []byte
 	Return() returns.Return
@@ -153,6 +197,7 @@ type ExecutionsBuilder interface {
 
 // Executions represents executions
 type Executions interface {
+	Hash() hash.Hash
 	List() []Execution
 }
 
@@ -167,6 +212,7 @@ type ExecutionBuilder interface {
 
 // Execution represents an execution
 type Execution interface {
+	Hash() hash.Hash
 	IsStop() bool
 	IsAssignment() bool
 	Assignment() Assignment
@@ -184,6 +230,7 @@ type AssignmentBuilder interface {
 
 // Assignment represents an assignment
 type Assignment interface {
+	Hash() hash.Hash
 	Name() string
 	Assignable() Assignable
 }
@@ -203,6 +250,7 @@ type AssignableBuilder interface {
 
 // Assignable represents an assignable
 type Assignable interface {
+	Hash() hash.Hash
 	IsQuery() bool
 	Query() Query
 	IsReduce() bool
@@ -229,6 +277,7 @@ type ConditionBuilder interface {
 
 // Condition represents a condition
 type Condition interface {
+	Hash() hash.Hash
 	Variable() string
 	Executions() Executions
 }
@@ -244,6 +293,7 @@ type QueryBuilder interface {
 
 // Query represents a query execution
 type Query interface {
+	Hash() hash.Hash
 	Input() constantvalues.ConstantValue
 	Layer() LayerInput
 	HasValues() bool
@@ -260,6 +310,7 @@ type LayerInputBuilder interface {
 
 // LayerInput represents a layer input
 type LayerInput interface {
+	Hash() hash.Hash
 	IsVariable() bool
 	Variable() string
 	IsLayer() bool
@@ -275,6 +326,7 @@ type ValueAssignmentsBuilder interface {
 
 // ValueAssignments represents a value assignments
 type ValueAssignments interface {
+	Hash() hash.Hash
 	List() []ValueAssignment
 }
 
@@ -288,6 +340,7 @@ type ValueAssignmentBuilder interface {
 
 // ValueAssignment represents a alue assignment
 type ValueAssignment interface {
+	Hash() hash.Hash
 	Name() string
 	Value() Value
 }
@@ -303,6 +356,7 @@ type ValueBuilder interface {
 
 // Value represents a value
 type Value interface {
+	Hash() hash.Hash
 	IsVariable() bool
 	Variable() string
 	IsConstant() bool

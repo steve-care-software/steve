@@ -1,11 +1,13 @@
 package layers
 
 import (
+	"github.com/steve-care-software/steve/domain/hash"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers/parameters"
 	return_expectations "github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers/returns/expectations"
 )
 
 type layer struct {
+	hash       hash.Hash
 	input      string
 	executions Executions
 	ret        return_expectations.Expectation
@@ -14,42 +16,47 @@ type layer struct {
 }
 
 func createLayer(
+	hash hash.Hash,
 	input string,
 	executions Executions,
 	ret return_expectations.Expectation,
 ) Layer {
-	return createLayerInternally(input, executions, ret, nil, nil)
+	return createLayerInternally(hash, input, executions, ret, nil, nil)
 }
 
 func createLayerWithParams(
+	hash hash.Hash,
 	input string,
 	executions Executions,
 	ret return_expectations.Expectation,
 	params parameters.Parameters,
 ) Layer {
-	return createLayerInternally(input, executions, ret, params, nil)
+	return createLayerInternally(hash, input, executions, ret, params, nil)
 }
 
 func createLayerWithSuites(
+	hash hash.Hash,
 	input string,
 	executions Executions,
 	ret return_expectations.Expectation,
 	suites Suites,
 ) Layer {
-	return createLayerInternally(input, executions, ret, nil, suites)
+	return createLayerInternally(hash, input, executions, ret, nil, suites)
 }
 
 func createLayerWithParamsAndSuites(
+	hash hash.Hash,
 	input string,
 	executions Executions,
 	ret return_expectations.Expectation,
 	params parameters.Parameters,
 	suites Suites,
 ) Layer {
-	return createLayerInternally(input, executions, ret, params, suites)
+	return createLayerInternally(hash, input, executions, ret, params, suites)
 }
 
 func createLayerInternally(
+	hash hash.Hash,
 	input string,
 	executions Executions,
 	ret return_expectations.Expectation,
@@ -57,6 +64,7 @@ func createLayerInternally(
 	suites Suites,
 ) Layer {
 	out := layer{
+		hash:       hash,
 		input:      input,
 		executions: executions,
 		ret:        ret,
@@ -65,6 +73,11 @@ func createLayerInternally(
 	}
 
 	return &out
+}
+
+// Hash returns the hash
+func (obj *layer) Hash() hash.Hash {
+	return obj.hash
 }
 
 // Input returns the input

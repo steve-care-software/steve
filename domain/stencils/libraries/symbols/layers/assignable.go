@@ -1,6 +1,9 @@
 package layers
 
 import (
+	"errors"
+
+	"github.com/steve-care-software/steve/domain/hash"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers/accounts"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers/constantvalues"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers/reduces"
@@ -78,6 +81,36 @@ func createAssignableInternally(
 	}
 
 	return &out
+}
+
+// Hash returns the hash
+func (obj *assignable) Hash() hash.Hash {
+	if obj.IsQuery() {
+		return obj.Query().Hash()
+	}
+
+	if obj.IsReduce() {
+		return obj.Reduce().Hash()
+	}
+
+	if obj.IsCompare() {
+		return obj.Compare().Hash()
+	}
+
+	if obj.IsLength() {
+		return obj.length.Hash()
+	}
+
+	if obj.IsJoin() {
+		return obj.join.Hash()
+	}
+
+	if obj.IsValue() {
+		return obj.value.Hash()
+	}
+
+	panic(errors.New("finish account hash in assignable"))
+	return nil
 }
 
 // IsQuery returns true if there is a query, false otherwise

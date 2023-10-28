@@ -7,7 +7,10 @@ import (
 
 // NewBuilder creates a new builder
 func NewBuilder() Builder {
-	return createBuilder()
+	hashAdapter := hash.NewAdapter()
+	return createBuilder(
+		hashAdapter,
+	)
 }
 
 // Builder represents an expectation builder

@@ -3,18 +3,23 @@ package returns
 import (
 	"errors"
 
+	"github.com/steve-care-software/steve/domain/hash"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers/returns/kinds"
 )
 
 type builder struct {
-	output []byte
-	kind   kinds.Kind
+	hashAdapter hash.Adapter
+	output      []byte
+	kind        kinds.Kind
 }
 
-func createBuilder() Builder {
+func createBuilder(
+	hashAdapter hash.Adapter,
+) Builder {
 	out := builder{
-		output: nil,
-		kind:   nil,
+		hashAdapter: hashAdapter,
+		output:      nil,
+		kind:        nil,
 	}
 
 	return &out
@@ -22,7 +27,9 @@ func createBuilder() Builder {
 
 // Create initializes the builder
 func (app *builder) Create() Builder {
-	return createBuilder()
+	return createBuilder(
+		app.hashAdapter,
+	)
 }
 
 // WithOutput adds an output to the builder
@@ -51,5 +58,14 @@ func (app *builder) Now() (Return, error) {
 		return nil, errors.New("the kind is mandatory in order to build a Return return instance")
 	}
 
-	return createReturn(app.output, app.kind), nil
+	pHash, err := app.hashAdapter.FromMultiBytes([][]byte{
+		app.output,
+		app.kind.Hash().Bytes(),
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return createReturn(*pHash, app.output, app.kind), nil
 }

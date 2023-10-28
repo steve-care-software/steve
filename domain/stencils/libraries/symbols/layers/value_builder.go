@@ -1,18 +1,26 @@
 package layers
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/steve-care-software/steve/domain/hash"
+)
 
 type valueBuilder struct {
-	variable string
-	constant []byte
-	layer    Layer
+	hashAdapter hash.Adapter
+	variable    string
+	constant    []byte
+	layer       Layer
 }
 
-func createValueBuilder() ValueBuilder {
+func createValueBuilder(
+	hashAdapter hash.Adapter,
+) ValueBuilder {
 	out := valueBuilder{
-		variable: "",
-		constant: nil,
-		layer:    nil,
+		hashAdapter: hashAdapter,
+		variable:    "",
+		constant:    nil,
+		layer:       nil,
 	}
 
 	return &out
@@ -20,7 +28,9 @@ func createValueBuilder() ValueBuilder {
 
 // Create initializes the builder
 func (app *valueBuilder) Create() ValueBuilder {
-	return createValueBuilder()
+	return createValueBuilder(
+		app.hashAdapter,
+	)
 }
 
 // WithVariable adds a variable to the builder
@@ -43,20 +53,38 @@ func (app *valueBuilder) WithLayer(layer Layer) ValueBuilder {
 
 // Now builds a new Value instance
 func (app *valueBuilder) Now() (Value, error) {
-	if app.variable != "" {
-		return createValueWithVariable(app.variable), nil
-	}
-
 	if app.constant != nil && len(app.constant) <= 0 {
 		app.constant = nil
 	}
 
+	data := [][]byte{}
+	if app.variable != "" {
+		data = append(data, []byte(app.variable))
+	}
+
 	if app.constant != nil {
-		return createValueWithConstant(app.constant), nil
+		data = append(data, app.constant)
 	}
 
 	if app.layer != nil {
-		return createValueWithLayer(app.layer), nil
+		data = append(data, app.layer.Hash().Bytes())
+	}
+
+	pHash, err := app.hashAdapter.FromMultiBytes(data)
+	if err != nil {
+		return nil, err
+	}
+
+	if app.variable != "" {
+		return createValueWithVariable(*pHash, app.variable), nil
+	}
+
+	if app.constant != nil {
+		return createValueWithConstant(*pHash, app.constant), nil
+	}
+
+	if app.layer != nil {
+		return createValueWithLayer(*pHash, app.layer), nil
 	}
 
 	return nil, errors.New("the Value is invalid")

@@ -3,22 +3,27 @@ package layers
 import (
 	"errors"
 
+	"github.com/steve-care-software/steve/domain/hash"
 	result_returns "github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers/returns"
 )
 
 type suiteBuilder struct {
-	name   string
-	input  []byte
-	ret    result_returns.Return
-	values ValueAssignments
+	hashAdapter hash.Adapter
+	name        string
+	input       []byte
+	ret         result_returns.Return
+	values      ValueAssignments
 }
 
-func createSuiteBuilder() SuiteBuilder {
+func createSuiteBuilder(
+	hashAdapter hash.Adapter,
+) SuiteBuilder {
 	out := suiteBuilder{
-		name:   "",
-		input:  nil,
-		ret:    nil,
-		values: nil,
+		hashAdapter: hashAdapter,
+		name:        "",
+		input:       nil,
+		ret:         nil,
+		values:      nil,
 	}
 
 	return &out
@@ -26,7 +31,9 @@ func createSuiteBuilder() SuiteBuilder {
 
 // Create initializes the builder
 func (app *suiteBuilder) Create() SuiteBuilder {
-	return createSuiteBuilder()
+	return createSuiteBuilder(
+		app.hashAdapter,
+	)
 }
 
 // WithName adds a name to the builder
@@ -71,9 +78,24 @@ func (app *suiteBuilder) Now() (Suite, error) {
 		return nil, errors.New("the return is mandatory in order to build a Suite instance")
 	}
 
-	if app.values != nil {
-		return createSuiteWithValues(app.name, app.input, app.ret, app.values), nil
+	data := [][]byte{
+		[]byte(app.name),
+		app.input,
+		app.ret.Hash().Bytes(),
 	}
 
-	return createSuite(app.name, app.input, app.ret), nil
+	if app.values != nil {
+		data = append(data, app.values.Hash().Bytes())
+	}
+
+	pHash, err := app.hashAdapter.FromMultiBytes(data)
+	if err != nil {
+		return nil, err
+	}
+
+	if app.values != nil {
+		return createSuiteWithValues(*pHash, app.name, app.input, app.ret, app.values), nil
+	}
+
+	return createSuite(*pHash, app.name, app.input, app.ret), nil
 }

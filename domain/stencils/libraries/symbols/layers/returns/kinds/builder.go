@@ -1,18 +1,26 @@
 package kinds
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/steve-care-software/steve/domain/hash"
+)
 
 type builder struct {
-	isContinue bool
-	isPrompt   bool
-	execute    []string
+	hashAdapter hash.Adapter
+	isContinue  bool
+	isPrompt    bool
+	execute     []string
 }
 
-func createBuilder() Builder {
+func createBuilder(
+	hashAdapter hash.Adapter,
+) Builder {
 	out := builder{
-		isContinue: false,
-		isPrompt:   false,
-		execute:    nil,
+		hashAdapter: hashAdapter,
+		isContinue:  false,
+		isPrompt:    false,
+		execute:     nil,
 	}
 
 	return &out
@@ -20,7 +28,9 @@ func createBuilder() Builder {
 
 // Create initializes the builder
 func (app *builder) Create() Builder {
-	return createBuilder()
+	return createBuilder(
+		app.hashAdapter,
+	)
 }
 
 // WithExecute adds execute commands to the builder
@@ -43,12 +53,34 @@ func (app *builder) IsPrompt() Builder {
 
 // Now builds a new Kind instance
 func (app *builder) Now() (Kind, error) {
+
+	data := [][]byte{}
 	if app.isContinue {
-		return createKindWithContinue(), nil
+		data = append(data, []byte{0})
 	}
 
 	if app.isPrompt {
-		return createKindWithPrompt(), nil
+		data = append(data, []byte{1})
+	}
+
+	if app.execute != nil {
+		data = append(data, []byte{2})
+		for _, oneCmd := range app.execute {
+			data = append(data, []byte(oneCmd))
+		}
+	}
+
+	pHash, err := app.hashAdapter.FromMultiBytes(data)
+	if err != nil {
+		return nil, err
+	}
+
+	if app.isContinue {
+		return createKindWithContinue(*pHash), nil
+	}
+
+	if app.isPrompt {
+		return createKindWithPrompt(*pHash), nil
 	}
 
 	if app.execute != nil && len(app.execute) <= 0 {
@@ -56,7 +88,7 @@ func (app *builder) Now() (Kind, error) {
 	}
 
 	if app.execute != nil {
-		return createKindWithExecute(app.execute), nil
+		return createKindWithExecute(*pHash, app.execute), nil
 	}
 
 	return nil, errors.New("the Kind is invalid")

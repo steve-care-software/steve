@@ -1,16 +1,24 @@
 package layers
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/steve-care-software/steve/domain/hash"
+)
 
 type assignmentBuilder struct {
-	name       string
-	assignable Assignable
+	hashAdapter hash.Adapter
+	name        string
+	assignable  Assignable
 }
 
-func createAssignmentBuilder() AssignmentBuilder {
+func createAssignmentBuilder(
+	hashAdapter hash.Adapter,
+) AssignmentBuilder {
 	out := assignmentBuilder{
-		name:       "",
-		assignable: nil,
+		hashAdapter: hashAdapter,
+		name:        "",
+		assignable:  nil,
 	}
 
 	return &out
@@ -18,7 +26,9 @@ func createAssignmentBuilder() AssignmentBuilder {
 
 // Create initializes the builder
 func (app *assignmentBuilder) Create() AssignmentBuilder {
-	return createAssignmentBuilder()
+	return createAssignmentBuilder(
+		app.hashAdapter,
+	)
 }
 
 // WithName adds a name to the builder
@@ -43,5 +53,14 @@ func (app *assignmentBuilder) Now() (Assignment, error) {
 		return nil, errors.New("the assignable is mandatory in order to build an Assignment instance")
 	}
 
-	return createAssignment(app.name, app.assignable), nil
+	pHash, err := app.hashAdapter.FromMultiBytes([][]byte{
+		[]byte(app.name),
+		app.assignable.Hash().Bytes(),
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return createAssignment(*pHash, app.name, app.assignable), nil
 }

@@ -1,39 +1,53 @@
 package layers
 
+import "github.com/steve-care-software/steve/domain/hash"
+
 type execution struct {
+	hash       hash.Hash
 	isStop     bool
 	assignment Assignment
 	condition  Condition
 }
 
-func createExecutionWithStop() Execution {
-	return createExecutionInternally(true, nil, nil)
+func createExecutionWithStop(
+	hash hash.Hash,
+) Execution {
+	return createExecutionInternally(hash, true, nil, nil)
 }
 
 func createExecutionWithAssignment(
+	hash hash.Hash,
 	assignment Assignment,
 ) Execution {
-	return createExecutionInternally(false, assignment, nil)
+	return createExecutionInternally(hash, false, assignment, nil)
 }
 
 func createExecutionWithCondition(
+	hash hash.Hash,
 	condition Condition,
 ) Execution {
-	return createExecutionInternally(false, nil, condition)
+	return createExecutionInternally(hash, false, nil, condition)
 }
 
 func createExecutionInternally(
+	hash hash.Hash,
 	isStop bool,
 	assignment Assignment,
 	condition Condition,
 ) Execution {
 	out := execution{
+		hash:       hash,
 		isStop:     isStop,
 		assignment: assignment,
 		condition:  condition,
 	}
 
 	return &out
+}
+
+// Hash returns the hash
+func (obj *execution) Hash() hash.Hash {
+	return obj.hash
 }
 
 // IsStop returns true if there is a stop, false otherwise

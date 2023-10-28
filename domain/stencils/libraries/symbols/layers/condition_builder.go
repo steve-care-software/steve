@@ -1,16 +1,24 @@
 package layers
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/steve-care-software/steve/domain/hash"
+)
 
 type conditionBuilder struct {
-	variable   string
-	executions Executions
+	hashAdapter hash.Adapter
+	variable    string
+	executions  Executions
 }
 
-func createConditionBuilder() ConditionBuilder {
+func createConditionBuilder(
+	hashAdapter hash.Adapter,
+) ConditionBuilder {
 	out := conditionBuilder{
-		variable:   "",
-		executions: nil,
+		hashAdapter: hashAdapter,
+		variable:    "",
+		executions:  nil,
 	}
 
 	return &out
@@ -18,7 +26,9 @@ func createConditionBuilder() ConditionBuilder {
 
 // Create initializes the builder
 func (app *conditionBuilder) Create() ConditionBuilder {
-	return createConditionBuilder()
+	return createConditionBuilder(
+		app.hashAdapter,
+	)
 }
 
 // WithVariable adds a variable to the builder
@@ -43,5 +53,14 @@ func (app *conditionBuilder) Now() (Condition, error) {
 		return nil, errors.New("the executions is mandatory in order to build a Condition instance")
 	}
 
-	return createCondition(app.variable, app.executions), nil
+	pHash, err := app.hashAdapter.FromMultiBytes([][]byte{
+		[]byte(app.variable),
+		app.executions.Hash().Bytes(),
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return createCondition(*pHash, app.variable, app.executions), nil
 }

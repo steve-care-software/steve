@@ -1,16 +1,24 @@
 package layers
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/steve-care-software/steve/domain/hash"
+)
 
 type layerInputBuilder struct {
-	variable string
-	layer    Layer
+	hashAdapter hash.Adapter
+	variable    string
+	layer       Layer
 }
 
-func createLayerInputBuilder() LayerInputBuilder {
+func createLayerInputBuilder(
+	hashAdapter hash.Adapter,
+) LayerInputBuilder {
 	out := layerInputBuilder{
-		variable: "",
-		layer:    nil,
+		hashAdapter: hashAdapter,
+		variable:    "",
+		layer:       nil,
 	}
 
 	return &out
@@ -18,7 +26,9 @@ func createLayerInputBuilder() LayerInputBuilder {
 
 // Create initializes the builder
 func (app *layerInputBuilder) Create() LayerInputBuilder {
-	return createLayerInputBuilder()
+	return createLayerInputBuilder(
+		app.hashAdapter,
+	)
 }
 
 // WithVariable adds a variable to the builder
@@ -43,5 +53,14 @@ func (app *layerInputBuilder) Now() (LayerInput, error) {
 		return nil, errors.New("the layer is mandatory in order to build a LayerInput instance")
 	}
 
-	return createLayerInput(app.variable, app.layer), nil
+	pHash, err := app.hashAdapter.FromMultiBytes([][]byte{
+		[]byte(app.variable),
+		app.layer.Hash().Bytes(),
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return createLayerInput(*pHash, app.variable, app.layer), nil
 }

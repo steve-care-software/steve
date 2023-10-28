@@ -1,20 +1,30 @@
 package layers
 
+import "github.com/steve-care-software/steve/domain/hash"
+
 type condition struct {
+	hash       hash.Hash
 	variable   string
 	executions Executions
 }
 
 func createCondition(
+	hash hash.Hash,
 	variable string,
 	executions Executions,
 ) Condition {
 	out := condition{
+		hash:       hash,
 		variable:   variable,
 		executions: executions,
 	}
 
 	return &out
+}
+
+// Hash returns the hash
+func (obj *condition) Hash() hash.Hash {
+	return obj.hash
 }
 
 // Variable returns the variable

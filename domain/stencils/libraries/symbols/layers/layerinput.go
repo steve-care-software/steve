@@ -1,20 +1,30 @@
 package layers
 
+import "github.com/steve-care-software/steve/domain/hash"
+
 type layerInput struct {
+	hash     hash.Hash
 	variable string
 	layer    Layer
 }
 
 func createLayerInput(
+	hash hash.Hash,
 	variable string,
 	layer Layer,
 ) LayerInput {
 	out := layerInput{
+		hash:     hash,
 		variable: variable,
 		layer:    layer,
 	}
 
 	return &out
+}
+
+// Hash returns the hash
+func (obj *layerInput) Hash() hash.Hash {
+	return obj.hash
 }
 
 // IsVariable returns true if there is a variable, false otherwise

@@ -1,20 +1,30 @@
 package layers
 
+import "github.com/steve-care-software/steve/domain/hash"
+
 type assignment struct {
+	hash       hash.Hash
 	name       string
 	assignable Assignable
 }
 
 func createAssignment(
+	hash hash.Hash,
 	name string,
 	assignable Assignable,
 ) Assignment {
 	out := assignment{
+		hash:       hash,
 		name:       name,
 		assignable: assignable,
 	}
 
 	return &out
+}
+
+// Hash returns the hash
+func (obj *assignment) Hash() hash.Hash {
+	return obj.hash
 }
 
 // Name returns the name

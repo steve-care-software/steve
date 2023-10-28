@@ -1,10 +1,12 @@
 package layers
 
 import (
+	"github.com/steve-care-software/steve/domain/hash"
 	result_returns "github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers/returns"
 )
 
 type suite struct {
+	hash   hash.Hash
 	name   string
 	input  []byte
 	ret    result_returns.Return
@@ -12,29 +14,33 @@ type suite struct {
 }
 
 func createSuite(
+	hash hash.Hash,
 	name string,
 	input []byte,
 	ret result_returns.Return,
 ) Suite {
-	return createSuiteInternally(name, input, ret, nil)
+	return createSuiteInternally(hash, name, input, ret, nil)
 }
 
 func createSuiteWithValues(
+	hash hash.Hash,
 	name string,
 	input []byte,
 	ret result_returns.Return,
 	values ValueAssignments,
 ) Suite {
-	return createSuiteInternally(name, input, ret, values)
+	return createSuiteInternally(hash, name, input, ret, values)
 }
 
 func createSuiteInternally(
+	hash hash.Hash,
 	name string,
 	input []byte,
 	ret result_returns.Return,
 	values ValueAssignments,
 ) Suite {
 	out := suite{
+		hash:   hash,
 		name:   name,
 		input:  input,
 		ret:    ret,
@@ -42,6 +48,11 @@ func createSuiteInternally(
 	}
 
 	return &out
+}
+
+// Hash returns the hash
+func (obj *suite) Hash() hash.Hash {
+	return obj.hash
 }
 
 // Name returns the name

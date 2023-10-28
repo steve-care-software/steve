@@ -12,6 +12,8 @@ type Profile interface {
 	Description() string
 	HasConnections() bool
 	Connections() Connections
+	HasParent() bool
+	Parent() Profile
 }
 
 // Connections represents connections

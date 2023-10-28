@@ -1,40 +1,53 @@
 package layers
 
-import "github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers/constantvalues"
+import (
+	"github.com/steve-care-software/steve/domain/hash"
+	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers/constantvalues"
+)
 
 type query struct {
+	hash   hash.Hash
 	input  constantvalues.ConstantValue
 	layer  LayerInput
 	values ValueAssignments
 }
 
 func createQuery(
+	hash hash.Hash,
 	input constantvalues.ConstantValue,
 	layer LayerInput,
 ) Query {
-	return createQueryInternally(input, layer, nil)
+	return createQueryInternally(hash, input, layer, nil)
 }
 
 func createQueryWithValues(
+	hash hash.Hash,
 	input constantvalues.ConstantValue,
 	layer LayerInput,
 	values ValueAssignments,
 ) Query {
-	return createQueryInternally(input, layer, values)
+	return createQueryInternally(hash, input, layer, values)
 }
 
 func createQueryInternally(
+	hash hash.Hash,
 	input constantvalues.ConstantValue,
 	layer LayerInput,
 	values ValueAssignments,
 ) Query {
 	out := query{
+		hash:   hash,
 		input:  input,
 		layer:  layer,
 		values: values,
 	}
 
 	return &out
+}
+
+// Hash returns the hash
+func (obj *query) Hash() hash.Hash {
+	return obj.hash
 }
 
 // Input returns the input

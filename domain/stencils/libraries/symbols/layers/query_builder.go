@@ -3,20 +3,25 @@ package layers
 import (
 	"errors"
 
+	"github.com/steve-care-software/steve/domain/hash"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers/constantvalues"
 )
 
 type queryBuilder struct {
-	input  constantvalues.ConstantValue
-	layer  LayerInput
-	values ValueAssignments
+	hashAdapter hash.Adapter
+	input       constantvalues.ConstantValue
+	layer       LayerInput
+	values      ValueAssignments
 }
 
-func createQueryBuilder() QueryBuilder {
+func createQueryBuilder(
+	hashAdapter hash.Adapter,
+) QueryBuilder {
 	out := queryBuilder{
-		input:  nil,
-		layer:  nil,
-		values: nil,
+		hashAdapter: hashAdapter,
+		input:       nil,
+		layer:       nil,
+		values:      nil,
 	}
 
 	return &out
@@ -24,7 +29,9 @@ func createQueryBuilder() QueryBuilder {
 
 // Create initializes the builder
 func (app *queryBuilder) Create() QueryBuilder {
-	return createQueryBuilder()
+	return createQueryBuilder(
+		app.hashAdapter,
+	)
 }
 
 // WithInput adds an input to the builder
@@ -55,9 +62,23 @@ func (app *queryBuilder) Now() (Query, error) {
 		return nil, errors.New("the layer input is mandatory in order to build a Query instance")
 	}
 
-	if app.values != nil {
-		return createQueryWithValues(app.input, app.layer, app.values), nil
+	data := [][]byte{
+		app.input.Hash().Bytes(),
+		app.layer.Hash().Bytes(),
 	}
 
-	return createQuery(app.input, app.layer), nil
+	if app.values != nil {
+		data = append(data, app.values.Hash().Bytes())
+	}
+
+	pHash, err := app.hashAdapter.FromMultiBytes(data)
+	if err != nil {
+		return nil, err
+	}
+
+	if app.values != nil {
+		return createQueryWithValues(*pHash, app.input, app.layer, app.values), nil
+	}
+
+	return createQuery(*pHash, app.input, app.layer), nil
 }

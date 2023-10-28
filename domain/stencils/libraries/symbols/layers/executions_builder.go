@@ -1,14 +1,22 @@
 package layers
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/steve-care-software/steve/domain/hash"
+)
 
 type executionsBuilder struct {
-	list []Execution
+	hashAdapter hash.Adapter
+	list        []Execution
 }
 
-func createExecutionsBuilder() ExecutionsBuilder {
+func createExecutionsBuilder(
+	hashAdapter hash.Adapter,
+) ExecutionsBuilder {
 	out := executionsBuilder{
-		list: nil,
+		hashAdapter: hashAdapter,
+		list:        nil,
 	}
 
 	return &out
@@ -16,7 +24,9 @@ func createExecutionsBuilder() ExecutionsBuilder {
 
 // Create initializes the executionsBuilder
 func (app *executionsBuilder) Create() ExecutionsBuilder {
-	return createExecutionsBuilder()
+	return createExecutionsBuilder(
+		app.hashAdapter,
+	)
 }
 
 // WithList adds a list to the executionsBuilder
@@ -35,5 +45,15 @@ func (app *executionsBuilder) Now() (Executions, error) {
 		return nil, errors.New("there must be at least 1 Execution in order to build a Executions instance")
 	}
 
-	return createExecutions(app.list), nil
+	data := [][]byte{}
+	for _, oneExecution := range app.list {
+		data = append(data, oneExecution.Hash().Bytes())
+	}
+
+	pHash, err := app.hashAdapter.FromMultiBytes(data)
+	if err != nil {
+		return nil, err
+	}
+
+	return createExecutions(*pHash, app.list), nil
 }

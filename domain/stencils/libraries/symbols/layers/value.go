@@ -1,41 +1,54 @@
 package layers
 
+import "github.com/steve-care-software/steve/domain/hash"
+
 type value struct {
+	hash     hash.Hash
 	variable string
 	constant []byte
 	layer    Layer
 }
 
 func createValueWithVariable(
+	hash hash.Hash,
 	variable string,
 ) Value {
-	return createValueInternally(variable, nil, nil)
+	return createValueInternally(hash, variable, nil, nil)
 }
 
 func createValueWithConstant(
+	hash hash.Hash,
 	constant []byte,
 ) Value {
-	return createValueInternally("", constant, nil)
+	return createValueInternally(hash, "", constant, nil)
 }
 
 func createValueWithLayer(
+	hash hash.Hash,
 	layer Layer,
 ) Value {
-	return createValueInternally("", nil, layer)
+	return createValueInternally(hash, "", nil, layer)
 }
 
 func createValueInternally(
+	hash hash.Hash,
 	variable string,
 	constant []byte,
 	layer Layer,
 ) Value {
 	out := value{
+		hash:     hash,
 		variable: variable,
 		constant: constant,
 		layer:    layer,
 	}
 
 	return &out
+}
+
+// Hash returns the hash
+func (obj *value) Hash() hash.Hash {
+	return obj.hash
 }
 
 // IsVariable returns true if there is a variable, false otherwise
