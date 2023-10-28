@@ -3,18 +3,23 @@ package symbols
 import (
 	"errors"
 
+	"github.com/steve-care-software/steve/domain/hash"
 	"github.com/steve-care-software/steve/domain/pointers/symbols/kinds"
 )
 
 type builder struct {
-	name string
-	kind kinds.Kind
+	hashAdapter hash.Adapter
+	name        string
+	kind        kinds.Kind
 }
 
-func createBuilder() Builder {
+func createBuilder(
+	hashAdapter hash.Adapter,
+) Builder {
 	out := builder{
-		name: "",
-		kind: nil,
+		hashAdapter: hashAdapter,
+		name:        "",
+		kind:        nil,
 	}
 
 	return &out
@@ -22,7 +27,9 @@ func createBuilder() Builder {
 
 // Create initializes the builder
 func (app *builder) Create() Builder {
-	return createBuilder()
+	return createBuilder(
+		app.hashAdapter,
+	)
 }
 
 // WithName adds a name to the builder
@@ -47,5 +54,14 @@ func (app *builder) Now() (Symbol, error) {
 		return nil, errors.New("the kind is mandatory in order to build a Symbol instance")
 	}
 
-	return createSymbol(app.name, app.kind), nil
+	pHash, err := app.hashAdapter.FromMultiBytes([][]byte{
+		[]byte(app.name),
+		app.kind.Hash().Bytes(),
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return createSymbol(*pHash, app.name, app.kind), nil
 }

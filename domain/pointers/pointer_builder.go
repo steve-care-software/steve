@@ -3,18 +3,23 @@ package pointers
 import (
 	"errors"
 
+	"github.com/steve-care-software/steve/domain/hash"
 	"github.com/steve-care-software/steve/domain/pointers/symbols"
 )
 
 type pointerBuilder struct {
-	path   []string
-	symbol symbols.Symbol
+	hashAdapter hash.Adapter
+	path        []string
+	symbol      symbols.Symbol
 }
 
-func createPointerBuilder() PointerBuilder {
+func createPointerBuilder(
+	hashAdapter hash.Adapter,
+) PointerBuilder {
 	out := pointerBuilder{
-		path:   nil,
-		symbol: nil,
+		hashAdapter: hashAdapter,
+		path:        nil,
+		symbol:      nil,
 	}
 
 	return &out
@@ -22,7 +27,9 @@ func createPointerBuilder() PointerBuilder {
 
 // Create initializes the builder
 func (app *pointerBuilder) Create() PointerBuilder {
-	return createPointerBuilder()
+	return createPointerBuilder(
+		app.hashAdapter,
+	)
 }
 
 // WithPath adds a path to the builder
@@ -47,5 +54,22 @@ func (app *pointerBuilder) Now() (Pointer, error) {
 		return nil, errors.New("the path is mandatory in order to build a Pointer instance")
 	}
 
-	return createPointer(app.path, app.symbol), nil
+	if app.symbol == nil {
+		return nil, errors.New("the symbol is mandatory in order to build a Pointer instance")
+	}
+
+	data := [][]byte{
+		app.symbol.Hash().Bytes(),
+	}
+
+	for _, oneFolder := range app.path {
+		data = append(data, []byte(oneFolder))
+	}
+
+	pHash, err := app.hashAdapter.FromMultiBytes(data)
+	if err != nil {
+		return nil, err
+	}
+
+	return createPointer(*pHash, app.path, app.symbol), nil
 }

@@ -7,12 +7,18 @@ import (
 
 // NewBuilder creates a new builder instance
 func NewBuilder() Builder {
-	return createBuilder()
+	hashAdapter := hash.NewAdapter()
+	return createBuilder(
+		hashAdapter,
+	)
 }
 
 // NewPointerBuilder creates a new pointer builder
 func NewPointerBuilder() PointerBuilder {
-	return createPointerBuilder()
+	hashAdapter := hash.NewAdapter()
+	return createPointerBuilder(
+		hashAdapter,
+	)
 }
 
 // Builder represents a pointers builder
@@ -24,6 +30,7 @@ type Builder interface {
 
 // Pointers represents symbol pointers
 type Pointers interface {
+	Hash() hash.Hash
 	List() []Pointer
 }
 
