@@ -1,14 +1,22 @@
 package constantvalues
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/steve-care-software/steve/domain/hash"
+)
 
 type constantValuesBuilder struct {
-	list []ConstantValue
+	hashAdapter hash.Adapter
+	list        []ConstantValue
 }
 
-func createConstantValuesBuilder() ConstantValuesBuilder {
+func createConstantValuesBuilder(
+	hashAdapter hash.Adapter,
+) ConstantValuesBuilder {
 	out := constantValuesBuilder{
-		list: nil,
+		hashAdapter: hashAdapter,
+		list:        nil,
 	}
 
 	return &out
@@ -16,7 +24,9 @@ func createConstantValuesBuilder() ConstantValuesBuilder {
 
 // Create initializes the constantValuesBuilder
 func (app *constantValuesBuilder) Create() ConstantValuesBuilder {
-	return createConstantValuesBuilder()
+	return createConstantValuesBuilder(
+		app.hashAdapter,
+	)
 }
 
 // WithList adds a list to the constantValuesBuilder
@@ -35,5 +45,15 @@ func (app *constantValuesBuilder) Now() (ConstantValues, error) {
 		return nil, errors.New("there must be at least 1 ConstantValue in order to build a ConstantValues instance")
 	}
 
-	return createConstantValues(app.list), nil
+	bytes := [][]byte{}
+	for _, oneValue := range app.list {
+		bytes = append(bytes, oneValue.Hash().Bytes())
+	}
+
+	pHash, err := app.hashAdapter.FromMultiBytes(bytes)
+	if err != nil {
+		return nil, err
+	}
+
+	return createConstantValues(*pHash, app.list), nil
 }

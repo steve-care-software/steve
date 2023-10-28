@@ -1,13 +1,21 @@
 package constantvalues
 
+import "github.com/steve-care-software/steve/domain/hash"
+
 // NewConstantValuesBuilder creates a new constant values builder
 func NewConstantValuesBuilder() ConstantValuesBuilder {
-	return createConstantValuesBuilder()
+	hashAdapter := hash.NewAdapter()
+	return createConstantValuesBuilder(
+		hashAdapter,
+	)
 }
 
 // NewConstantValueBuilder creates a new constant value builder
 func NewConstantValueBuilder() ConstantValueBuilder {
-	return createConstantValueBuilder()
+	hashAdapter := hash.NewAdapter()
+	return createConstantValueBuilder(
+		hashAdapter,
+	)
 }
 
 // ConstantValuesBuilder represents constant values builder
@@ -19,6 +27,7 @@ type ConstantValuesBuilder interface {
 
 // ConstantValues represents constant values
 type ConstantValues interface {
+	Hash() hash.Hash
 	List() []ConstantValue
 }
 
@@ -32,8 +41,15 @@ type ConstantValueBuilder interface {
 
 // ConstantValue represents a constant value
 type ConstantValue interface {
+	Hash() hash.Hash
 	IsVariable() bool
 	Variable() string
 	IsConstant() bool
 	Constant() []byte
+}
+
+// Service represents a symbol service
+type Service interface {
+	Insert(context uint, container []string, value constantValue) error
+	InsertList(context uint, container []string, values constantValues) error
 }

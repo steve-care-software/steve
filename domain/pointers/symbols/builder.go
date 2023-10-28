@@ -1,16 +1,20 @@
 package symbols
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/steve-care-software/steve/domain/pointers/symbols/kinds"
+)
 
 type builder struct {
-	name  string
-	pKind *uint8
+	name string
+	kind kinds.Kind
 }
 
 func createBuilder() Builder {
 	out := builder{
-		name:  "",
-		pKind: nil,
+		name: "",
+		kind: nil,
 	}
 
 	return &out
@@ -28,8 +32,8 @@ func (app *builder) WithName(name string) Builder {
 }
 
 // WithKind adds a kind to the builder
-func (app *builder) WithKind(kind uint8) Builder {
-	app.pKind = &kind
+func (app *builder) WithKind(kind kinds.Kind) Builder {
+	app.kind = kind
 	return app
 }
 
@@ -39,14 +43,9 @@ func (app *builder) Now() (Symbol, error) {
 		return nil, errors.New("the name is mandatory in order to build a Symbol instance")
 	}
 
-	if app.pKind == nil {
+	if app.kind == nil {
 		return nil, errors.New("the kind is mandatory in order to build a Symbol instance")
 	}
 
-	kind := *app.pKind
-	if kind&KindBytes|KindLayer|KindLink == 0 {
-		return nil, errors.New("the kind is invalid when creating a Symbol instance")
-	}
-
-	return createSymbol(app.name, kind), nil
+	return createSymbol(app.name, app.kind), nil
 }

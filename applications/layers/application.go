@@ -21,7 +21,6 @@ import (
 	"github.com/steve-care-software/steve/domain/stencils/results/executions/executions/assignments"
 	"github.com/steve-care-software/steve/domain/stencils/results/executions/inits"
 
-	pointer_symbols "github.com/steve-care-software/steve/domain/pointers/symbols"
 	result_layers "github.com/steve-care-software/steve/domain/stencils/results/executions"
 	init_inputs "github.com/steve-care-software/steve/domain/stencils/results/executions/inits/inputs"
 	init_values "github.com/steve-care-software/steve/domain/stencils/results/executions/inits/values"
@@ -611,7 +610,7 @@ func (app *application) inputValues(symbolsIns symbols.Symbols, params parameter
 		valueBuilder := app.initValueBuilder.Create().
 			WithVariable(name)
 
-		if expectedKind == pointer_symbols.KindBytes {
+		if expectedKind.IsBytes() {
 			if !symbol.IsBytes() {
 				str := fmt.Sprintf("the parameter (name: %s) was expected to contain bytes", name)
 				return nil, errors.New(str)
@@ -621,7 +620,7 @@ func (app *application) inputValues(symbolsIns symbols.Symbols, params parameter
 			valueBuilder.WithBytes(bytes)
 		}
 
-		if expectedKind == pointer_symbols.KindLayer {
+		if expectedKind.IsLayer() {
 			if !symbol.IsLayer() {
 				str := fmt.Sprintf("the parameter (name: %s) was expected to contain a layer", name)
 				return nil, errors.New(str)

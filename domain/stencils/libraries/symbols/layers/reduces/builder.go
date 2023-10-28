@@ -3,17 +3,24 @@ package reduces
 import (
 	"errors"
 	"fmt"
+	"strconv"
+
+	"github.com/steve-care-software/steve/domain/hash"
 )
 
 type builder struct {
-	variable string
-	pLength  *uint8
+	hashAdapter hash.Adapter
+	variable    string
+	pLength     *uint8
 }
 
-func createBuilder() Builder {
+func createBuilder(
+	hashAdapter hash.Adapter,
+) Builder {
 	out := builder{
-		variable: "",
-		pLength:  nil,
+		hashAdapter: hashAdapter,
+		variable:    "",
+		pLength:     nil,
 	}
 
 	return &out
@@ -21,7 +28,9 @@ func createBuilder() Builder {
 
 // Create initializes the builder
 func (app *builder) Create() Builder {
-	return createBuilder()
+	return createBuilder(
+		app.hashAdapter,
+	)
 }
 
 // WithVariable adds a variable to the builder
@@ -52,5 +61,14 @@ func (app *builder) Now() (Reduce, error) {
 		return nil, errors.New(str)
 	}
 
-	return createReduce(app.variable, length), nil
+	pHash, err := app.hashAdapter.FromMultiBytes([][]byte{
+		[]byte(app.variable),
+		[]byte(strconv.Itoa(int(length))),
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return createReduce(*pHash, app.variable, length), nil
 }

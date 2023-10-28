@@ -1,20 +1,24 @@
 package parameters
 
-import "github.com/steve-care-software/steve/domain/pointers/symbols"
+import (
+	"github.com/steve-care-software/steve/domain/hash"
+	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers/parameters/kinds"
+)
 
 // NewBuilder creates a new builder instance
 func NewBuilder() Builder {
-	return createBuilder()
-}
-
-// Validate validates the kind
-func Validate(kind uint8) bool {
-	return kind&symbols.KindBytes|symbols.KindLayer == 0
+	hashAdapter := hash.NewAdapter()
+	return createBuilder(
+		hashAdapter,
+	)
 }
 
 // NewParameterBuilder creates a new parameter builder
 func NewParameterBuilder() ParameterBuilder {
-	return createParameterBuilder()
+	hashAdapter := hash.NewAdapter()
+	return createParameterBuilder(
+		hashAdapter,
+	)
 }
 
 // Builder represents a parameters builder
@@ -26,6 +30,7 @@ type Builder interface {
 
 // Parameters represents a parameters
 type Parameters interface {
+	Hash() hash.Hash
 	List() []Parameter
 }
 
@@ -33,12 +38,13 @@ type Parameters interface {
 type ParameterBuilder interface {
 	Create() ParameterBuilder
 	WithName(name string) ParameterBuilder
-	WithKind(kind uint8) ParameterBuilder
+	WithKind(kind kinds.Kind) ParameterBuilder
 	Now() (Parameter, error)
 }
 
 // Parameter represents a parameter
 type Parameter interface {
+	Hash() hash.Hash
 	Name() string
-	Kind() uint8
+	Kind() kinds.Kind
 }

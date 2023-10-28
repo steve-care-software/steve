@@ -34,8 +34,9 @@ func (app *application) Authorize(message messages.Message, username string, pas
 		return nil, err
 	}
 
+	container := []string{}
 	symbolHash := adminIns.Dashboard().Root().Root()
-	symbol, err := app.symbolRepository.Retrieve(symbolHash)
+	symbol, err := app.symbolRepository.Retrieve(container, symbolHash)
 	if err != nil {
 		return nil, err
 	}

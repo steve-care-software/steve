@@ -48,7 +48,20 @@ type Symbol interface {
 	Link() links.Link
 }
 
+// RepositoryBuilder represents a reposiotry builder
+type RepositoryBuilder interface {
+	Create() RepositoryBuilder
+	WithContext(context uint) RepositoryBuilder
+	Now() (Repository, error)
+}
+
 // Repository represents the symbol repository
 type Repository interface {
-	Retrieve(hash hash.Hash) (Symbol, error)
+	Exists(container []string, hash hash.Hash) (bool, error)
+	Retrieve(container []string, hash hash.Hash) (Symbol, error)
+}
+
+// Service represents a symbol service
+type Service interface {
+	Insert(context uint, container []string, symbol Symbol) error
 }

@@ -1,8 +1,13 @@
 package reduces
 
+import "github.com/steve-care-software/steve/domain/hash"
+
 // NewBuilder creates a new builder instance
 func NewBuilder() Builder {
-	return createBuilder()
+	hashAdapter := hash.NewAdapter()
+	return createBuilder(
+		hashAdapter,
+	)
 }
 
 // Builder represents a reduce
@@ -15,6 +20,7 @@ type Builder interface {
 
 // Reduce represents a reduce
 type Reduce interface {
+	Hash() hash.Hash
 	Variable() string
 	Length() uint8
 }

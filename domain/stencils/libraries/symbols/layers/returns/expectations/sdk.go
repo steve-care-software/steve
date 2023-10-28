@@ -1,6 +1,9 @@
 package expectations
 
-import "github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers/returns/kinds"
+import (
+	"github.com/steve-care-software/steve/domain/hash"
+	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers/returns/kinds"
+)
 
 // NewBuilder creates a new builder
 func NewBuilder() Builder {
@@ -17,6 +20,7 @@ type Builder interface {
 
 // Expectation represents a return expectation
 type Expectation interface {
+	Hash() hash.Hash
 	Variable() string
 	Kind() kinds.Kind
 }

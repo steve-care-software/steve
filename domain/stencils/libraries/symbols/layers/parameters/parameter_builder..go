@@ -1,16 +1,25 @@
 package parameters
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/steve-care-software/steve/domain/hash"
+	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers/parameters/kinds"
+)
 
 type parameterBuilder struct {
-	name  string
-	pKind *uint8
+	hashAdapter hash.Adapter
+	name        string
+	kind        kinds.Kind
 }
 
-func createParameterBuilder() ParameterBuilder {
+func createParameterBuilder(
+	hashAdapter hash.Adapter,
+) ParameterBuilder {
 	out := parameterBuilder{
-		name:  "",
-		pKind: nil,
+		hashAdapter: hashAdapter,
+		name:        "",
+		kind:        nil,
 	}
 
 	return &out
@@ -18,7 +27,9 @@ func createParameterBuilder() ParameterBuilder {
 
 // Create initializes the builder
 func (app *parameterBuilder) Create() ParameterBuilder {
-	return createParameterBuilder()
+	return createParameterBuilder(
+		app.hashAdapter,
+	)
 }
 
 // WithName adds a name to the builder
@@ -28,8 +39,8 @@ func (app *parameterBuilder) WithName(name string) ParameterBuilder {
 }
 
 // WithKind adds a kind to the builder
-func (app *parameterBuilder) WithKind(kind uint8) ParameterBuilder {
-	app.pKind = &kind
+func (app *parameterBuilder) WithKind(kind kinds.Kind) ParameterBuilder {
+	app.kind = kind
 	return app
 }
 
@@ -39,14 +50,18 @@ func (app *parameterBuilder) Now() (Parameter, error) {
 		return nil, errors.New("the name is mandatory in order to build a Parameter instance")
 	}
 
-	if app.pKind == nil {
+	if app.kind == nil {
 		return nil, errors.New("the kind is mandatory in order to build a Parameter instance")
 	}
 
-	kind := *app.pKind
-	if !Validate(kind) {
-		return nil, errors.New("the kind was expected to be one of these: tree, token, layer, link")
+	pHash, err := app.hashAdapter.FromMultiBytes([][]byte{
+		[]byte(app.name),
+		app.kind.Hash().Bytes(),
+	})
+
+	if err != nil {
+		return nil, err
 	}
 
-	return createParameter(app.name, kind), nil
+	return createParameter(*pHash, app.name, app.kind), nil
 }

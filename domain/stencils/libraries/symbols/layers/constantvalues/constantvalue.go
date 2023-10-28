@@ -1,28 +1,38 @@
 package constantvalues
 
+import "github.com/steve-care-software/steve/domain/hash"
+
 type constantValue struct {
+	hash     hash.Hash
 	variable string
 	constant []byte
 }
 
-func createConstantValueWithVariable(variable string) ConstantValue {
-	return createConstantValueInternally(variable, nil)
+func createConstantValueWithVariable(hash hash.Hash, variable string) ConstantValue {
+	return createConstantValueInternally(hash, variable, nil)
 }
 
-func createConstantValueWithConstant(constant []byte) ConstantValue {
-	return createConstantValueInternally("", constant)
+func createConstantValueWithConstant(hash hash.Hash, constant []byte) ConstantValue {
+	return createConstantValueInternally(hash, "", constant)
 }
 
 func createConstantValueInternally(
+	hash hash.Hash,
 	variable string,
 	constant []byte,
 ) ConstantValue {
 	out := constantValue{
+		hash:     hash,
 		variable: variable,
 		constant: constant,
 	}
 
 	return &out
+}
+
+// Hash returns the hash
+func (obj *constantValue) Hash() hash.Hash {
+	return obj.hash
 }
 
 // IsVariable returns true if there is a variable, false otherwise

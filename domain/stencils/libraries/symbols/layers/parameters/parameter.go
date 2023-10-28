@@ -1,20 +1,33 @@
 package parameters
 
+import (
+	"github.com/steve-care-software/steve/domain/hash"
+	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers/parameters/kinds"
+)
+
 type parameter struct {
+	hash hash.Hash
 	name string
-	kind uint8
+	kind kinds.Kind
 }
 
 func createParameter(
+	hash hash.Hash,
 	name string,
-	kind uint8,
+	kind kinds.Kind,
 ) Parameter {
 	out := parameter{
+		hash: hash,
 		name: name,
 		kind: kind,
 	}
 
 	return &out
+}
+
+// Hash returns the hash
+func (obj *parameter) Hash() hash.Hash {
+	return obj.hash
 }
 
 // Name returns the name
@@ -23,6 +36,6 @@ func (obj *parameter) Name() string {
 }
 
 // Kind returns the kind
-func (obj *parameter) Kind() uint8 {
+func (obj *parameter) Kind() kinds.Kind {
 	return obj.kind
 }

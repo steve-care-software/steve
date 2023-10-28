@@ -1,13 +1,15 @@
 package symbols
 
+import "github.com/steve-care-software/steve/domain/pointers/symbols/kinds"
+
 type symbol struct {
 	name string
-	kind uint8
+	kind kinds.Kind
 }
 
 func createSymbol(
 	name string,
-	kind uint8,
+	kind kinds.Kind,
 ) Symbol {
 	out := symbol{
 		name: name,
@@ -23,6 +25,6 @@ func (obj *symbol) Name() string {
 }
 
 // Kind returns the kind
-func (obj *symbol) Kind() uint8 {
+func (obj *symbol) Kind() kinds.Kind {
 	return obj.kind
 }
