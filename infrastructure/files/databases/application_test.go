@@ -9,12 +9,11 @@ func TestExists_thenCreate_thenDelete_Success(t *testing.T) {
 	dirPath := "./test_files"
 	dstExtension := "destination"
 	bckExtension := "backup"
-	readChunkSize := uint(1000000)
 	defer func() {
 		os.RemoveAll(dirPath)
 	}()
 
-	database := NewApplication(dirPath, dstExtension, bckExtension, readChunkSize, nil)
+	database := NewApplication(dirPath, dstExtension, bckExtension, nil)
 
 	name := "my_name"
 	exists, err := database.Exists(name)

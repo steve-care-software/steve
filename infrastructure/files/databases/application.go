@@ -8,71 +8,29 @@ import (
 	"path/filepath"
 
 	"github.com/juju/fslock"
-	databases "github.com/steve-care-software/steve/applications/databases"
-	"github.com/steve-care-software/steve/domain/databases/contents"
-	"github.com/steve-care-software/steve/domain/databases/references"
-	"github.com/steve-care-software/steve/domain/trees"
+	databases "github.com/steve-care-software/steve/applications/blockchains/databases"
 )
 
 type application struct {
-	onOpenFn                    databases.OnOpenFn
-	contentsBuilder             contents.Builder
-	contentBuilder              contents.ContentBuilder
-	referenceAdapter            references.Adapter
-	referenceBuilder            references.Builder
-	referenceContentKeysBuilder references.ContentKeysBuilder
-	referenceContentKeyBuilder  references.ContentKeyBuilder
-	referenceCommitsBuilder     references.CommitsBuilder
-	referenceCommitAdapter      references.CommitAdapter
-	referenceCommitBuilder      references.CommitBuilder
-	referenceActionBuilder      references.ActionBuilder
-	referencePointerBuilder     references.PointerBuilder
-	hashTreeBuilder             trees.Builder
-	dirPath                     string
-	dstExtension                string
-	bckExtension                string
-	readChunkSize               uint
-	contexts                    map[uint]*context
+	onOpenFn     databases.OnOpenFn
+	dirPath      string
+	dstExtension string
+	bckExtension string
+	contexts     map[uint]*context
 }
 
 func createApplication(
 	onOpenFn databases.OnOpenFn,
-	contentsBuilder contents.Builder,
-	contentBuilder contents.ContentBuilder,
-	referenceAdapter references.Adapter,
-	referenceBuilder references.Builder,
-	referenceContentKeysBuilder references.ContentKeysBuilder,
-	referenceContentKeyBuilder references.ContentKeyBuilder,
-	referenceCommitsBuilder references.CommitsBuilder,
-	referenceCommitAdapter references.CommitAdapter,
-	referenceCommitBuilder references.CommitBuilder,
-	referenceActionBuilder references.ActionBuilder,
-	referencePointerBuilder references.PointerBuilder,
-	hashTreeBuilder trees.Builder,
 	dirPath string,
 	dstExtension string,
 	bckExtension string,
-	readChunkSize uint,
 ) databases.Application {
 	out := application{
-		onOpenFn:                    onOpenFn,
-		contentsBuilder:             contentsBuilder,
-		contentBuilder:              contentBuilder,
-		referenceAdapter:            referenceAdapter,
-		referenceBuilder:            referenceBuilder,
-		referenceContentKeysBuilder: referenceContentKeysBuilder,
-		referenceContentKeyBuilder:  referenceContentKeyBuilder,
-		referenceCommitsBuilder:     referenceCommitsBuilder,
-		referenceCommitAdapter:      referenceCommitAdapter,
-		referenceCommitBuilder:      referenceCommitBuilder,
-		referenceActionBuilder:      referenceActionBuilder,
-		referencePointerBuilder:     referencePointerBuilder,
-		hashTreeBuilder:             hashTreeBuilder,
-		dirPath:                     dirPath,
-		dstExtension:                dstExtension,
-		bckExtension:                bckExtension,
-		readChunkSize:               readChunkSize,
-		contexts:                    map[uint]*context{},
+		onOpenFn:     onOpenFn,
+		dirPath:      dirPath,
+		dstExtension: dstExtension,
+		bckExtension: bckExtension,
+		contexts:     map[uint]*context{},
 	}
 
 	return &out
@@ -154,8 +112,6 @@ func (app *application) Open(name string) (*uint, error) {
 		pConn:      pConn,
 		pLock:      pLock,
 		name:       name,
-		insertList: []contents.Content{},
-		delList:    map[string]references.ContentKey{},
 	}
 
 	// execute the open callback

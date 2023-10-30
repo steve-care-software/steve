@@ -15,6 +15,6 @@ type SignerFactory interface {
 type Signer interface {
 	PublicKey() publickeys.PublicKey
 	Sign(msg []byte) (signatures.Signature, error)
-	Vote(msg []byte, ring []publickeys.PublicKey) (votes.Vote, error)
+	Vote(msg []byte) (votes.Vote, error)
 	Bytes() []byte
 }
