@@ -1,5 +1,7 @@
 package authenticates
 
+import "github.com/steve-care-software/steve/domain/commands/inputs/administrators/administrators/authenticates/credentials"
+
 // Builder represents an authenticate builder
 type Builder interface {
 	Create() Builder
@@ -12,6 +14,5 @@ type Builder interface {
 // Authenticate represents an authenticate
 type Authenticate interface {
 	AssignToVariable() string
-	Username() string
-	Password() []byte
+	Credentials() credentials.Credentials
 }
