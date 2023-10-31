@@ -1,40 +1,29 @@
 package administrators
 
 import (
-	"github.com/steve-care-software/steve/domain/commands/administrators/executions"
-	"github.com/steve-care-software/steve/domain/commands/administrators/inputs"
+	executions "github.com/steve-care-software/steve/domain/commands/executions/administrators"
+	inputs "github.com/steve-care-software/steve/domain/commands/inputs/administrators"
 )
 
 type application struct {
-	inputAdapter inputs.Adapter
 }
 
-func createApplication(
-	inputAdapter inputs.Adapter,
-) Application {
-	out := application{
-		inputAdapter: inputAdapter,
-	}
-
+func createApplication() Application {
+	out := application{}
 	return &out
 }
 
-// Execute executes a command
-func (app *application) Execute(message []byte, username string, password []byte) (executions.Execution, error) {
-	input, err := app.inputAdapter.ToInput(message)
-	if err != nil {
-		return nil, err
-	}
-
-	if input.IsAdministrator() {
+// Execute executes an administrator
+func (app *application) Execute(administrator inputs.Administrator) (executions.Administrator, error) {
+	if administrator.IsAdministrator() {
 
 	}
 
-	if input.IsIdentities() {
+	if administrator.IsIdentities() {
 
 	}
 
-	if input.IsDashboard() {
+	if administrator.IsDashboard() {
 
 	}
 

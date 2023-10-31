@@ -5,14 +5,13 @@ import (
 
 	"github.com/steve-care-software/steve/domain/accounts/administrators"
 	account_visitors "github.com/steve-care-software/steve/domain/accounts/visitors"
-	"github.com/steve-care-software/steve/domain/commands/visitors/executions"
-	execution_accounts "github.com/steve-care-software/steve/domain/commands/visitors/executions/accounts"
-	execution_administrators "github.com/steve-care-software/steve/domain/commands/visitors/executions/administrators"
-	command_visitors "github.com/steve-care-software/steve/domain/commands/visitors/inputs"
+	executions "github.com/steve-care-software/steve/domain/commands/executions/visitors"
+	execution_accounts "github.com/steve-care-software/steve/domain/commands/executions/visitors/accounts"
+	execution_administrators "github.com/steve-care-software/steve/domain/commands/executions/visitors/administrators"
+	inputs "github.com/steve-care-software/steve/domain/commands/inputs/visitors"
 )
 
 type application struct {
-	adapter                       command_visitors.Adapter
 	adminRepository               administrators.Repository
 	adminService                  administrators.Service
 	adminBuilder                  administrators.Builder
@@ -25,7 +24,6 @@ type application struct {
 }
 
 func createApplication(
-	adapter command_visitors.Adapter,
 	adminRepository administrators.Repository,
 	adminService administrators.Service,
 	adminBuilder administrators.Builder,
@@ -36,7 +34,6 @@ func createApplication(
 	executionAdministratorBuilder execution_administrators.Builder,
 ) Application {
 	out := application{
-		adapter:                       adapter,
 		adminRepository:               adminRepository,
 		adminService:                  adminService,
 		adminBuilder:                  adminBuilder,
@@ -51,14 +48,9 @@ func createApplication(
 }
 
 // Execute executes a visitor's application
-func (app *application) Execute(message []byte) (executions.Execution, error) {
-	command, err := app.adapter.ToInput(message)
-	if err != nil {
-		return nil, err
-	}
-
-	if command.IsAdministrator() {
-		cmdAdmin := command.Administrator()
+func (app *application) Execute(visitor inputs.Visitor) (executions.Visitor, error) {
+	if visitor.IsAdministrator() {
+		cmdAdmin := visitor.Administrator()
 		if cmdAdmin.IsCreate() {
 			exists, err := app.adminRepository.Exists()
 			if err != nil {
@@ -103,8 +95,8 @@ func (app *application) Execute(message []byte) (executions.Execution, error) {
 		return nil, errors.New("the Administrator command is invalid")
 	}
 
-	if command.IsAccount() {
-		account := command.Account()
+	if visitor.IsAccount() {
+		account := visitor.Account()
 		if account.IsCreate() {
 			exists, err := app.visitorRepository.Exists()
 			if err != nil {

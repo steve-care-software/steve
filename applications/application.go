@@ -1,85 +1,62 @@
 package applications
 
 import (
-	"errors"
-	"fmt"
-
-	"github.com/steve-care-software/steve/applications/accounts/visitors"
-	application_layers "github.com/steve-care-software/steve/applications/layers"
-	"github.com/steve-care-software/steve/domain/accounts/administrators"
-	"github.com/steve-care-software/steve/domain/accounts/identities/signers/signatures"
-	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols"
-	"github.com/steve-care-software/steve/domain/stencils/messages"
-	"github.com/steve-care-software/steve/domain/stencils/queries"
-	"github.com/steve-care-software/steve/domain/stencils/results/executions"
+	"github.com/steve-care-software/steve/applications/administrators"
+	"github.com/steve-care-software/steve/applications/visitors"
+	"github.com/steve-care-software/steve/domain/commands/executions"
+	"github.com/steve-care-software/steve/domain/commands/inputs"
 )
 
 type application struct {
 	visitorApp       visitors.Application
-	layerApp         application_layers.Application
-	adminRepository  administrators.Repository
-	adminService     administrators.Service
-	symbolRepository symbols.Repository
-	queryBuilder     queries.Builder
+	adminApp         administrators.Application
+	inputAdapter     inputs.Adapter
+	executionBuilder executions.Builder
 }
 
 func createApplication(
 	visitorApp visitors.Application,
+	adminApp administrators.Application,
+	inputAdapter inputs.Adapter,
+	executionBuilder executions.Builder,
 ) Application {
 	out := application{
-		visitorApp: visitorApp,
+		visitorApp:       visitorApp,
+		adminApp:         adminApp,
+		inputAdapter:     inputAdapter,
+		executionBuilder: executionBuilder,
 	}
 
 	return &out
 }
 
-// Authorize executes an authorized query
-func (app *application) Authorize(message messages.Message, username string, password []byte) (executions.Execution, error) {
-	adminIns, err := app.adminRepository.Retrieve(username, password)
+// Execute executes the application
+func (app *application) Execute(input []byte) (executions.Execution, error) {
+	inputIns, err := app.inputAdapter.ToInput(input)
 	if err != nil {
 		return nil, err
 	}
 
-	container := []string{}
-	symbolHash := adminIns.Dashboard().Root().Root()
-	symbol, err := app.symbolRepository.Retrieve(container, symbolHash)
-	if err != nil {
-		return nil, err
+	builder := app.executionBuilder.Create()
+	if inputIns.IsAdministrator() {
+		admin := inputIns.Administrator()
+		retExec, err := app.adminApp.Execute(admin)
+		if err != nil {
+			return nil, err
+		}
+
+		builder.WithAdministrator(retExec)
 	}
 
-	if !symbol.IsLayer() {
-		str := fmt.Sprintf("the Symbol (hash: %s) was expected to contain a Layer", symbolHash.String())
-		return nil, errors.New(str)
+	if inputIns.IsVisitor() {
+		visitor := inputIns.Visitor()
+		retExec, err := app.visitorApp.Execute(visitor)
+		if err != nil {
+			return nil, err
+		}
+
+		builder.WithVisitor(retExec)
 	}
 
-	layer := symbol.Layer()
-	query, err := app.queryBuilder.Create().
-		WithMessage(message).
-		WithLayer(layer).
-		Now()
-
-	if err != nil {
-		return nil, err
-	}
-
-	result, err := app.layerApp.Execute(query)
-	if err != nil {
-		return nil, err
-	}
-
-	// find the link to execute, then execute it.
-
-	fmt.Printf("\n%v\n", result)
-
-	return nil, nil
-}
-
-// Authenticate executes an authenticated query
-func (app *application) Authenticate(message messages.Message, signature signatures.Signature) (executions.Execution, error) {
-	return nil, nil
-}
-
-// Visitor returns the visitor's application
-func (app *application) Visitor() visitors.Application {
-	return app.visitorApp
+	return builder.Now()
 }

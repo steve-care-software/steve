@@ -1,8 +1,11 @@
 package visitors
 
-import "github.com/steve-care-software/steve/domain/commands/visitors/executions"
+import (
+	executions "github.com/steve-care-software/steve/domain/commands/executions/visitors"
+	inputs "github.com/steve-care-software/steve/domain/commands/inputs/visitors"
+)
 
 // Application represents the visitor application
 type Application interface {
-	Execute(message []byte) (executions.Execution, error)
+	Execute(visitor inputs.Visitor) (executions.Visitor, error)
 }
