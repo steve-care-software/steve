@@ -52,7 +52,7 @@ func createApplication(
 
 // Execute executes a visitor's application
 func (app *application) Execute(message []byte) (executions.Execution, error) {
-	command, err := app.adapter.ToVisitor(message)
+	command, err := app.adapter.ToInput(message)
 	if err != nil {
 		return nil, err
 	}

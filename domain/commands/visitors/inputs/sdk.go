@@ -7,12 +7,12 @@ import (
 
 // Adapter represents a visitor's adapter
 type Adapter interface {
-	ToVisitor(bytes []byte) (Visitor, error)
-	ToBytes(ins Visitor) ([]byte, error)
+	ToInput(bytes []byte) (Input, error)
+	ToBytes(ins Input) ([]byte, error)
 }
 
-// Visitor represents visitor's commands
-type Visitor interface {
+// Input represents visitor's input ommand
+type Input interface {
 	IsAccount() bool
 	Account() accounts.Account
 	IsAdministrator() bool
