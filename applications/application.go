@@ -4,10 +4,10 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/steve-care-software/steve/applications/accounts/visitors"
 	application_layers "github.com/steve-care-software/steve/applications/layers"
 	"github.com/steve-care-software/steve/domain/accounts/administrators"
 	"github.com/steve-care-software/steve/domain/accounts/identities/signers/signatures"
-	"github.com/steve-care-software/steve/domain/stencils"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols"
 	"github.com/steve-care-software/steve/domain/stencils/messages"
 	"github.com/steve-care-software/steve/domain/stencils/queries"
@@ -15,6 +15,7 @@ import (
 )
 
 type application struct {
+	visitorApp       visitors.Application
 	layerApp         application_layers.Application
 	adminRepository  administrators.Repository
 	adminService     administrators.Service
@@ -22,8 +23,13 @@ type application struct {
 	queryBuilder     queries.Builder
 }
 
-func createApplication() Application {
-	out := application{}
+func createApplication(
+	visitorApp visitors.Application,
+) Application {
+	out := application{
+		visitorApp: visitorApp,
+	}
+
 	return &out
 }
 
@@ -73,7 +79,7 @@ func (app *application) Authenticate(message messages.Message, signature signatu
 	return nil, nil
 }
 
-// Visit executes a visitor query
-func (app *application) Visit(message messages.Message, stencil stencils.Stencil) (executions.Execution, error) {
-	return nil, nil
+// Visitor returns the visitor's application
+func (app *application) Visitor() visitors.Application {
+	return app.visitorApp
 }

@@ -5,6 +5,15 @@ import (
 	"github.com/steve-care-software/steve/domain/dashboards"
 )
 
+// Builder represents an administrator's builder
+type Builder interface {
+	Create() Builder
+	WithUsername(username string) Builder
+	WithDashboard(dashboard dashboards.Dashboard) Builder
+	WithIdentities(identities identities.Identities) Builder
+	Now() (Administrator, error)
+}
+
 // Administrator represents an administrator
 type Administrator interface {
 	Username() string
@@ -15,11 +24,13 @@ type Administrator interface {
 
 // Repository represents an administrator's repository
 type Repository interface {
+	Exists() (bool, error)
 	Retrieve(username string, password []byte) (Administrator, error)
 }
 
 // Service represents an administrator's service
 type Service interface {
-	Insert(admin Administrator, password []byte, newPassword []byte) error
+	Insert(admin Administrator, password []byte) error
+	Save(admin Administrator, password []byte, newPassword []byte) error
 	Delete(username string, password []byte) error
 }
