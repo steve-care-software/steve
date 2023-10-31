@@ -13,4 +13,5 @@ type Pointer interface {
 	Index() uint
 	Length() uint
 	Next() uint
+	Delimiter() uint
 }

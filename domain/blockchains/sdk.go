@@ -2,12 +2,19 @@ package blockchains
 
 import (
 	"github.com/steve-care-software/steve/domain/blockchains/blocks"
+	"github.com/steve-care-software/steve/domain/blockchains/blocks/commits/actions/inserts"
 	"github.com/steve-care-software/steve/domain/blockchains/blocks/commits/resources"
 	"github.com/steve-care-software/steve/domain/blockchains/blocks/commits/resources/headers/identifiers"
 	"github.com/steve-care-software/steve/domain/blockchains/blocks/commits/resources/headers/links"
 	"github.com/steve-care-software/steve/domain/blockchains/blocks/commits/resources/pointers"
 	"github.com/steve-care-software/steve/domain/hash"
 )
+
+// Adapter represents a blockchain adapter
+type Adapter interface {
+	ToBytes(ins Blockchain) ([]byte, error)
+	ToBlockchain(bytes []byte) (Blockchain, error)
+}
 
 // Builder represents a blockchain builder
 type Builder interface {
@@ -39,6 +46,6 @@ type Repository interface {
 
 // Service represents a service
 type Service interface {
-	Save(blockchain Blockchain) error
+	Save(blockchain Blockchain, inserts inserts.Inserts) error
 	Delete(identifier hash.Hash) error
 }

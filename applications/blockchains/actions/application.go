@@ -8,6 +8,7 @@ import (
 	"github.com/steve-care-software/steve/domain/blockchains"
 	"github.com/steve-care-software/steve/domain/blockchains/blocks"
 	"github.com/steve-care-software/steve/domain/blockchains/blocks/commits"
+	"github.com/steve-care-software/steve/domain/blockchains/blocks/commits/actions"
 	"github.com/steve-care-software/steve/domain/blockchains/blocks/commits/resources"
 	"github.com/steve-care-software/steve/domain/blockchains/blocks/commits/resources/headers"
 	"github.com/steve-care-software/steve/domain/blockchains/blocks/commits/resources/headers/identifiers"
@@ -25,6 +26,7 @@ type application struct {
 	parentBuilder       blocks.ParentBuilder
 	commitsBuilder      commits.Builder
 	commitBuilder       commits.CommitBuilder
+	actionBuilder       actions.ActionBuilder
 	resourcesBuilder    resources.Builder
 	resourceBuilder     resources.ResourceBuilder
 	pointerBuilder      pointers.Builder
@@ -47,6 +49,7 @@ func createApplication(
 	parentBuilder blocks.ParentBuilder,
 	commitsBuilder commits.Builder,
 	commitBuilder commits.CommitBuilder,
+	actionBuilder actions.ActionBuilder,
 	resourcesBuilder resources.Builder,
 	resourceBuilder resources.ResourceBuilder,
 	pointerBuilder pointers.Builder,
@@ -66,6 +69,7 @@ func createApplication(
 		parentBuilder:       parentBuilder,
 		commitsBuilder:      commitsBuilder,
 		commitBuilder:       commitBuilder,
+		actionBuilder:       actionBuilder,
 		resourcesBuilder:    resourcesBuilder,
 		resourceBuilder:     resourceBuilder,
 		pointerBuilder:      pointerBuilder,

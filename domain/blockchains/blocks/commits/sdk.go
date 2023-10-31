@@ -1,6 +1,8 @@
 package commits
 
-import "github.com/steve-care-software/steve/domain/blockchains/blocks/commits/resources"
+import (
+	"github.com/steve-care-software/steve/domain/blockchains/blocks/commits/actions"
+)
 
 // Builder represents a commits builder
 type Builder interface {
@@ -18,12 +20,12 @@ type Commits interface {
 type CommitBuilder interface {
 	Create() CommitBuilder
 	WithMessage(msg string) CommitBuilder
-	WithResources(resources resources.Resources) CommitBuilder
+	WithActions(actions actions.Actions) CommitBuilder
 	Now() (Commit, error)
 }
 
 // Commit represents a commit
 type Commit interface {
 	Message() string
-	Resources() resources.Resources
+	Actions() actions.Actions
 }
