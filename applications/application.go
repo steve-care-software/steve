@@ -40,7 +40,7 @@ func (app *application) Execute(input []byte) (executions.Execution, error) {
 	builder := app.executionBuilder.Create()
 	if inputIns.IsAdministrator() {
 		admin := inputIns.Administrator()
-		retExec, err := app.adminApp.Execute(admin)
+		retExec, err := app.adminApp.Execute(admin, nil)
 		if err != nil {
 			return nil, err
 		}

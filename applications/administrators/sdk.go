@@ -1,11 +1,12 @@
 package administrators
 
 import (
-	executions "github.com/steve-care-software/steve/domain/commands/executions/administrators/administrators"
+	executions "github.com/steve-care-software/steve/domain/commands/executions/administrators"
 	inputs "github.com/steve-care-software/steve/domain/commands/inputs/administrators"
+	"github.com/steve-care-software/steve/domain/stacks"
 )
 
 // Application represents the administrator's application
 type Application interface {
-	Execute(administrator inputs.Administrator) (executions.Administrator, error)
+	Execute(administrator inputs.Administrator, stack stacks.Stack) (executions.Administrator, error)
 }
