@@ -1,19 +1,19 @@
-package instances
+package identities
 
 import (
-	"github.com/steve-care-software/steve/applications/administrators/administrators/instances/deletes"
-	"github.com/steve-care-software/steve/applications/administrators/administrators/instances/fetches"
-	"github.com/steve-care-software/steve/applications/administrators/administrators/instances/updates"
-	executions "github.com/steve-care-software/steve/domain/commands/executions/administrators/administrators/instances"
-	"github.com/steve-care-software/steve/domain/commands/executions/administrators/administrators/instances/failures"
-	"github.com/steve-care-software/steve/domain/commands/executions/administrators/administrators/instances/successes"
-	inputs "github.com/steve-care-software/steve/domain/commands/inputs/administrators/administrators/instances"
+	"github.com/steve-care-software/steve/applications/administrators/identities/deletes"
+	"github.com/steve-care-software/steve/applications/administrators/identities/fetches"
+	"github.com/steve-care-software/steve/applications/administrators/identities/inserts"
+	executions "github.com/steve-care-software/steve/domain/commands/executions/administrators/identities"
+	"github.com/steve-care-software/steve/domain/commands/executions/administrators/identities/failures"
+	"github.com/steve-care-software/steve/domain/commands/executions/administrators/identities/successes"
+	inputs "github.com/steve-care-software/steve/domain/commands/inputs/administrators/identities"
 	"github.com/steve-care-software/steve/domain/stacks"
 )
 
 type application struct {
 	fetchApp         fetches.Application
-	updateApp        updates.Application
+	insertApp        inserts.Application
 	delApp           deletes.Application
 	executionBuilder executions.Builder
 	successBuilder   successes.Builder
@@ -22,7 +22,7 @@ type application struct {
 
 func createApplication(
 	fetchApp fetches.Application,
-	updateApp updates.Application,
+	insertApp inserts.Application,
 	delApp deletes.Application,
 	executionBuilder executions.Builder,
 	successBuilder successes.Builder,
@@ -30,7 +30,7 @@ func createApplication(
 ) Application {
 	out := application{
 		fetchApp:         fetchApp,
-		updateApp:        updateApp,
+		insertApp:        insertApp,
 		delApp:           delApp,
 		executionBuilder: executionBuilder,
 		successBuilder:   successBuilder,
@@ -40,8 +40,8 @@ func createApplication(
 	return &out
 }
 
-// Execute executes an application
-func (app *application) Execute(instance inputs.Instance, stack stacks.Stack) (executions.Instance, error) {
+// Execute executes the application
+func (app *application) Execute(instance inputs.Identities, stack stacks.Stack) (executions.Identities, error) {
 	name := instance.Name()
 	assignable, err := stack.Fetch(name)
 	if err != nil {
@@ -59,9 +59,24 @@ func (app *application) Execute(instance inputs.Instance, stack stacks.Stack) (e
 			Now()
 	}
 
-	retBadKindFailureFn := func() (executions.Instance, error) {
+	if err != nil {
 		failure, err := app.failureBuilder.Create().
-			InstanceIsNotAdministrator().
+			InstanceIsNotDeclared().
+			WithName(name).
+			Now()
+
+		if err != nil {
+			return nil, err
+		}
+
+		return app.executionBuilder.Create().
+			WithFailure(failure).
+			Now()
+	}
+
+	retBadKindFailureFn := func() (executions.Identities, error) {
+		failure, err := app.failureBuilder.Create().
+			InstanceIsNotIdentities().
 			WithName(name).
 			Now()
 
@@ -79,16 +94,16 @@ func (app *application) Execute(instance inputs.Instance, stack stacks.Stack) (e
 	}
 
 	assAdmin := assignable.Administrator()
-	if !assAdmin.IsInstance() {
+	if !assAdmin.IsIdentities() {
 		return retBadKindFailureFn()
 	}
 
-	administrator := assAdmin.Instance()
+	identities := assAdmin.Identities()
 	content := instance.Content()
 	successBuilder := app.successBuilder.Create()
 	if content.IsFetch() {
 		fetch := content.Fetch()
-		exec, err := app.fetchApp.Execute(fetch, administrator)
+		exec, err := app.fetchApp.Execute(fetch, identities)
 		if err != nil {
 			return nil, err
 		}
@@ -96,19 +111,19 @@ func (app *application) Execute(instance inputs.Instance, stack stacks.Stack) (e
 		successBuilder.WithFetch(exec)
 	}
 
-	if content.IsUpdate() {
-		update := content.Update()
-		exec, err := app.updateApp.Execute(update, administrator)
+	if content.IsInsert() {
+		insert := content.Insert()
+		exec, err := app.insertApp.Execute(insert, identities)
 		if err != nil {
 			return nil, err
 		}
 
-		successBuilder.WithUpdate(exec)
+		successBuilder.WithInsert(exec)
 	}
 
 	if content.IsDelete() {
 		del := content.Delete()
-		exec, err := app.delApp.Execute(del, administrator)
+		exec, err := app.delApp.Execute(del, identities)
 		if err != nil {
 			return nil, err
 		}

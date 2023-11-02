@@ -2,9 +2,9 @@ package fetches
 
 import (
 	"github.com/steve-care-software/steve/domain/accounts/administrators/identities"
-	executions "github.com/steve-care-software/steve/domain/commands/executions/administrators/identities/fetches"
-	"github.com/steve-care-software/steve/domain/commands/executions/administrators/identities/fetches/failures"
-	"github.com/steve-care-software/steve/domain/commands/executions/administrators/identities/fetches/successes"
+	executions "github.com/steve-care-software/steve/domain/commands/executions/administrators/identities/successes/fetches"
+	"github.com/steve-care-software/steve/domain/commands/executions/administrators/identities/successes/fetches/failures"
+	"github.com/steve-care-software/steve/domain/commands/executions/administrators/identities/successes/fetches/successes"
 	inputs "github.com/steve-care-software/steve/domain/commands/inputs/administrators/identities/contents/fetches"
 )
 

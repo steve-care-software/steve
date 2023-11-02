@@ -1,8 +1,8 @@
 package fetches
 
 import (
-	"github.com/steve-care-software/steve/domain/commands/executions/administrators/identities/fetches/failures"
-	"github.com/steve-care-software/steve/domain/commands/executions/administrators/identities/fetches/successes"
+	"github.com/steve-care-software/steve/domain/commands/executions/administrators/identities/successes/fetches/failures"
+	"github.com/steve-care-software/steve/domain/commands/executions/administrators/identities/successes/fetches/successes"
 )
 
 // Builder represents a fetch builder

@@ -1,6 +1,6 @@
 package identities
 
-import "github.com/steve-care-software/steve/domain/commands/inputs/administrators/administrators/instances/contents"
+import "github.com/steve-care-software/steve/domain/commands/inputs/administrators/identities/contents"
 
 // Builder represents an instance builder
 type Builder interface {

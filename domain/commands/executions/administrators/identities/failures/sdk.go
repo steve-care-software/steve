@@ -5,7 +5,7 @@ type Builder interface {
 	Create() Builder
 	WithName(name string) Builder
 	InstanceIsNotDeclared() Builder
-	InstanceIsNotAdministrator() Builder
+	InstanceIsNotIdentities() Builder
 	Now() (Failure, error)
 }
 
@@ -18,5 +18,5 @@ type Failure interface {
 // Content represents a failure content
 type Content interface {
 	InstanceIsNotDeclared() bool
-	InstanceIsNotAdministrator() bool
+	InstanceIsNotIdentities() bool
 }

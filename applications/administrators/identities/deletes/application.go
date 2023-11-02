@@ -2,8 +2,8 @@ package deletes
 
 import (
 	"github.com/steve-care-software/steve/domain/accounts/administrators/identities"
-	executions "github.com/steve-care-software/steve/domain/commands/executions/administrators/identities/deletes"
-	"github.com/steve-care-software/steve/domain/commands/executions/administrators/identities/deletes/failures"
+	executions "github.com/steve-care-software/steve/domain/commands/executions/administrators/identities/successes/deletes"
+	"github.com/steve-care-software/steve/domain/commands/executions/administrators/identities/successes/deletes/failures"
 	inputs "github.com/steve-care-software/steve/domain/commands/inputs/administrators/identities/contents/deletes"
 )
 
