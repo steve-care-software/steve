@@ -1,7 +1,7 @@
 package administrators
 
 import (
-	executions "github.com/steve-care-software/steve/domain/commands/executions/administrators"
+	executions "github.com/steve-care-software/steve/domain/commands/executions/administrators/administrators"
 	inputs "github.com/steve-care-software/steve/domain/commands/inputs/administrators"
 )
 

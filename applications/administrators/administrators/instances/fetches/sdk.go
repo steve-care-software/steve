@@ -2,7 +2,7 @@ package fetches
 
 import (
 	"github.com/steve-care-software/steve/domain/accounts/administrators"
-	executions "github.com/steve-care-software/steve/domain/commands/executions/administrators/instances/successes/fetches"
+	executions "github.com/steve-care-software/steve/domain/commands/executions/administrators/administrators/instances/successes/fetches"
 	inputs "github.com/steve-care-software/steve/domain/commands/inputs/administrators/administrators/instances/contents/fetches"
 )
 

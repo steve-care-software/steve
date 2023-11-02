@@ -5,7 +5,6 @@ type Builder interface {
 	Create() Builder
 	WithName(name string) Builder
 	WithContainer(container []string) Builder
-	WithPassword(password []byte) Builder
 	Now() (Insert, error)
 }
 
@@ -13,5 +12,4 @@ type Builder interface {
 type Insert interface {
 	Name() string
 	Container() []string
-	Password() []byte
 }

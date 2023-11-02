@@ -1,9 +1,9 @@
 package successes
 
 import (
-	"github.com/steve-care-software/steve/domain/commands/executions/administrators/instances/successes/deletes"
-	"github.com/steve-care-software/steve/domain/commands/executions/administrators/instances/successes/fetches"
-	"github.com/steve-care-software/steve/domain/commands/executions/administrators/instances/successes/updates"
+	"github.com/steve-care-software/steve/domain/commands/executions/administrators/administrators/instances/successes/deletes"
+	"github.com/steve-care-software/steve/domain/commands/executions/administrators/administrators/instances/successes/fetches"
+	"github.com/steve-care-software/steve/domain/commands/executions/administrators/administrators/instances/successes/updates"
 )
 
 // Builder represents the success builder

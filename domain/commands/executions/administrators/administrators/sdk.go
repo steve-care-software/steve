@@ -1,8 +1,8 @@
 package administrators
 
 import (
-	"github.com/steve-care-software/steve/domain/commands/executions/administrators/authenticates"
-	"github.com/steve-care-software/steve/domain/commands/executions/administrators/instances"
+	"github.com/steve-care-software/steve/domain/commands/executions/administrators/administrators/authenticates"
+	"github.com/steve-care-software/steve/domain/commands/executions/administrators/administrators/instances"
 )
 
 // Builder represents the builder

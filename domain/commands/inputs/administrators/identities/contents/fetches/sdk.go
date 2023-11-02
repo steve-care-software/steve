@@ -6,7 +6,6 @@ import "github.com/steve-care-software/steve/domain/commands/inputs/administrato
 type Builder interface {
 	Create() Builder
 	WithAssignTo(assignTo string) Builder
-	WithObject(object string) Builder
 	WithProperty(property properties.Property) Builder
 	Now() (Fetch, error)
 }
@@ -14,6 +13,5 @@ type Builder interface {
 // Fetch represents a fetch
 type Fetch interface {
 	AssignTo() string
-	Object() string
 	Property() properties.Property
 }

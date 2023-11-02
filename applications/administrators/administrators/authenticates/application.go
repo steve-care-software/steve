@@ -2,8 +2,8 @@ package authenticates
 
 import (
 	"github.com/steve-care-software/steve/domain/accounts/administrators"
-	executions "github.com/steve-care-software/steve/domain/commands/executions/administrators/authenticates"
-	"github.com/steve-care-software/steve/domain/commands/executions/administrators/authenticates/successes"
+	executions "github.com/steve-care-software/steve/domain/commands/executions/administrators/administrators/authenticates"
+	"github.com/steve-care-software/steve/domain/commands/executions/administrators/administrators/authenticates/successes"
 	inputs "github.com/steve-care-software/steve/domain/commands/inputs/administrators/administrators/authenticates"
 )
 

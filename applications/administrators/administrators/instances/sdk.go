@@ -1,7 +1,7 @@
 package instances
 
 import (
-	executions "github.com/steve-care-software/steve/domain/commands/executions/administrators/instances"
+	executions "github.com/steve-care-software/steve/domain/commands/executions/administrators/administrators/instances"
 	inputs "github.com/steve-care-software/steve/domain/commands/inputs/administrators/administrators/instances"
 )
 

@@ -1,6 +1,6 @@
 package updates
 
-import "github.com/steve-care-software/steve/domain/commands/executions/administrators/instances/successes/updates/passwords"
+import "github.com/steve-care-software/steve/domain/commands/executions/administrators/administrators/instances/successes/updates/passwords"
 
 // Builder represents an update builder
 type Builder interface {

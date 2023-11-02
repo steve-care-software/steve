@@ -1,8 +1,8 @@
 package instances
 
 import (
-	"github.com/steve-care-software/steve/domain/commands/executions/administrators/instances/failures"
-	"github.com/steve-care-software/steve/domain/commands/executions/administrators/instances/successes"
+	"github.com/steve-care-software/steve/domain/commands/executions/administrators/administrators/instances/failures"
+	"github.com/steve-care-software/steve/domain/commands/executions/administrators/administrators/instances/successes"
 )
 
 // Builder represents an instance builder

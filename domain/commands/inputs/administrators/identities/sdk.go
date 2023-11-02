@@ -1,18 +1,17 @@
 package identities
 
-import (
-	"github.com/steve-care-software/steve/domain/commands/inputs/administrators/identities/instances"
-)
+import "github.com/steve-care-software/steve/domain/commands/inputs/administrators/administrators/instances/contents"
 
-// Builder represents an identities builder
+// Builder represents an instance builder
 type Builder interface {
 	Create() Builder
-	WithInstance(instance instances.Instance) Builder
+	WithName(name string) Builder
+	WithContent(content contents.Content) Builder
 	Now() (Identities, error)
 }
 
-// Identities represents identities
+// Instance represents an identities command
 type Identities interface {
-	IsInstance() bool
-	Instance() instances.Instance
+	Name() string
+	Content() contents.Content
 }

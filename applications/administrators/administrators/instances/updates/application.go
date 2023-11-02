@@ -3,7 +3,7 @@ package updates
 import (
 	"github.com/steve-care-software/steve/applications/administrators/administrators/instances/updates/passwords"
 	"github.com/steve-care-software/steve/domain/accounts/administrators"
-	executions "github.com/steve-care-software/steve/domain/commands/executions/administrators/instances/successes/updates"
+	executions "github.com/steve-care-software/steve/domain/commands/executions/administrators/administrators/instances/successes/updates"
 	inputs "github.com/steve-care-software/steve/domain/commands/inputs/administrators/administrators/instances/contents/updates"
 )
 

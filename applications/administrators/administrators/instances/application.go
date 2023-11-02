@@ -5,9 +5,9 @@ import (
 	"github.com/steve-care-software/steve/applications/administrators/administrators/instances/fetches"
 	"github.com/steve-care-software/steve/applications/administrators/administrators/instances/updates"
 	"github.com/steve-care-software/steve/applications/interpreters"
-	executions "github.com/steve-care-software/steve/domain/commands/executions/administrators/instances"
-	"github.com/steve-care-software/steve/domain/commands/executions/administrators/instances/failures"
-	"github.com/steve-care-software/steve/domain/commands/executions/administrators/instances/successes"
+	executions "github.com/steve-care-software/steve/domain/commands/executions/administrators/administrators/instances"
+	"github.com/steve-care-software/steve/domain/commands/executions/administrators/administrators/instances/failures"
+	"github.com/steve-care-software/steve/domain/commands/executions/administrators/administrators/instances/successes"
 	inputs "github.com/steve-care-software/steve/domain/commands/inputs/administrators/administrators/instances"
 )
 

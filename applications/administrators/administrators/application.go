@@ -3,7 +3,7 @@ package administrators
 import (
 	"github.com/steve-care-software/steve/applications/administrators/administrators/authenticates"
 	"github.com/steve-care-software/steve/applications/administrators/administrators/instances"
-	executions "github.com/steve-care-software/steve/domain/commands/executions/administrators"
+	executions "github.com/steve-care-software/steve/domain/commands/executions/administrators/administrators"
 	inputs "github.com/steve-care-software/steve/domain/commands/inputs/administrators/administrators"
 )
 

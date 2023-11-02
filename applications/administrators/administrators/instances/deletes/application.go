@@ -3,8 +3,8 @@ package deletes
 import (
 	"github.com/steve-care-software/steve/domain/accounts/administrators"
 	"github.com/steve-care-software/steve/domain/accounts/administrators/credentials"
-	executions "github.com/steve-care-software/steve/domain/commands/executions/administrators/instances/successes/deletes"
-	"github.com/steve-care-software/steve/domain/commands/executions/administrators/instances/successes/deletes/failures"
+	executions "github.com/steve-care-software/steve/domain/commands/executions/administrators/administrators/instances/successes/deletes"
+	"github.com/steve-care-software/steve/domain/commands/executions/administrators/administrators/instances/successes/deletes/failures"
 	inputs "github.com/steve-care-software/steve/domain/commands/inputs/administrators/administrators/instances/contents/deletes"
 )
 
