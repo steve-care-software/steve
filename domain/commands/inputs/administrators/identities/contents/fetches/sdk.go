@@ -1,6 +1,6 @@
 package fetches
 
-import "github.com/steve-care-software/steve/domain/commands/inputs/administrators/administrators/instances/contents/fetches/properties"
+import "github.com/steve-care-software/steve/domain/commands/inputs/administrators/identities/contents/fetches/properties"
 
 // Builder represents a fetch builder
 type Builder interface {

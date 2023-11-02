@@ -27,13 +27,10 @@ func createApplication(
 // Execute executes the application
 func (app *application) Execute(instance inputs.Delete, current identities.Identities) (executions.Delete, error) {
 	index := instance.Index()
-	list := current.List()
-	amount := uint(len(list))
-	if (index + uint(1)) >= amount {
+	if current.Exceeds(index) {
 		failure, err := app.failureBuilder.Create().
 			IsIndexExceedAmount().
 			WithIndex(index).
-			WithAmount(amount).
 			Now()
 
 		if err != nil {
