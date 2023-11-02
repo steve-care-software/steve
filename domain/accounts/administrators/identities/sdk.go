@@ -1,5 +1,12 @@
 package identities
 
+// Builder represents an identities builder
+type Builder interface {
+	Create() Builder
+	WithList(list []Identity) Builder
+	Now() (Identities, error)
+}
+
 // Identities represents identities
 type Identities interface {
 	List() []Identity
@@ -9,8 +16,16 @@ type Identities interface {
 	Exceeds(amount uint) bool
 }
 
+// IdentityBuilder represents the identity builder
+type IdentityBuilder interface {
+	Create() IdentityBuilder
+	WithName(name string) IdentityBuilder
+	WithContainer(container []string) IdentityBuilder
+	Now() (Identity, error)
+}
+
 // Identity represents an identity
 type Identity interface {
 	Name() string
-	Container() string
+	Container() []string
 }

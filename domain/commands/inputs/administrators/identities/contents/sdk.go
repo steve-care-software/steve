@@ -1,9 +1,10 @@
 package contents
 
 import (
-	"github.com/steve-care-software/steve/domain/commands/inputs/administrators/identities/instances/contents/deletes"
-	"github.com/steve-care-software/steve/domain/commands/inputs/administrators/identities/instances/contents/fetches"
-	"github.com/steve-care-software/steve/domain/commands/inputs/administrators/identities/instances/contents/inserts"
+	"github.com/steve-care-software/steve/domain/accounts/administrators/identities"
+	"github.com/steve-care-software/steve/domain/commands/inputs/administrators/identities/contents/deletes"
+	"github.com/steve-care-software/steve/domain/commands/inputs/administrators/identities/contents/fetches"
+	"github.com/steve-care-software/steve/domain/commands/inputs/administrators/identities/contents/inserts"
 )
 
 // Builder represents a content builder
@@ -20,7 +21,7 @@ type Content interface {
 	IsFetch() bool
 	Fetch() fetches.Fetch
 	IsInsert() bool
-	Insert() inserts.Insert
+	Insert() identities.Identity
 	IsDelete() bool
 	Delete() deletes.Delete
 }

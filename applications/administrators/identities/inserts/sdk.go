@@ -1,0 +1,12 @@
+package inserts
+
+import (
+	"github.com/steve-care-software/steve/domain/accounts/administrators/identities"
+	executions "github.com/steve-care-software/steve/domain/commands/executions/administrators/identities/inserts"
+	inputs "github.com/steve-care-software/steve/domain/commands/inputs/administrators/identities/contents/inserts"
+)
+
+// Application represents the fetch application
+type Application interface {
+	Execute(instance inputs.Insert, current identities.Identities) (executions.Insert, error)
+}
