@@ -2,7 +2,7 @@ package deletes
 
 import (
 	"github.com/steve-care-software/steve/domain/accounts/administrators"
-	"github.com/steve-care-software/steve/domain/commands/executions/administrators/instances/deletes/failures"
+	"github.com/steve-care-software/steve/domain/commands/executions/administrators/instances/successes/deletes/failures"
 )
 
 // Builder represents a delete builder

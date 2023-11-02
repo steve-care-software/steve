@@ -5,13 +5,13 @@ import "github.com/steve-care-software/steve/domain/commands/inputs/administrato
 // Builder represents an instance builder
 type Builder interface {
 	Create() Builder
-	WithObject(object string) Builder
+	WithName(name string) Builder
 	WithContent(content contents.Content) Builder
 	Now() (Instance, error)
 }
 
 // Instance represents an instance command
 type Instance interface {
-	Object() string
+	Name() string
 	Content() contents.Content
 }
