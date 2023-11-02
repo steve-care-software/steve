@@ -4,15 +4,14 @@ import (
 	"github.com/steve-care-software/steve/applications/administrators/administrators/instances/deletes"
 	"github.com/steve-care-software/steve/applications/administrators/administrators/instances/fetches"
 	"github.com/steve-care-software/steve/applications/administrators/administrators/instances/updates"
-	"github.com/steve-care-software/steve/applications/interpreters"
 	executions "github.com/steve-care-software/steve/domain/commands/executions/administrators/administrators/instances"
 	"github.com/steve-care-software/steve/domain/commands/executions/administrators/administrators/instances/failures"
 	"github.com/steve-care-software/steve/domain/commands/executions/administrators/administrators/instances/successes"
 	inputs "github.com/steve-care-software/steve/domain/commands/inputs/administrators/administrators/instances"
+	"github.com/steve-care-software/steve/domain/stacks"
 )
 
 type application struct {
-	interpreterApp   interpreters.Application
 	fetchApp         fetches.Application
 	updateApp        updates.Application
 	delApp           deletes.Application
@@ -22,7 +21,6 @@ type application struct {
 }
 
 func createApplication(
-	interpreterApp interpreters.Application,
 	fetchApp fetches.Application,
 	updateApp updates.Application,
 	delApp deletes.Application,
@@ -31,7 +29,6 @@ func createApplication(
 	failureBuilder failures.Builder,
 ) Application {
 	out := application{
-		interpreterApp:   interpreterApp,
 		fetchApp:         fetchApp,
 		updateApp:        updateApp,
 		delApp:           delApp,
@@ -44,9 +41,9 @@ func createApplication(
 }
 
 // Execute executes an application
-func (app *application) Execute(instance inputs.Instance) (executions.Instance, error) {
+func (app *application) Execute(instance inputs.Instance, stack stacks.Stack) (executions.Instance, error) {
 	name := instance.Name()
-	assignable, err := app.interpreterApp.Retrieve(name)
+	assignable, err := stack.Fetch(name)
 	if err != nil {
 		return nil, err
 	}
