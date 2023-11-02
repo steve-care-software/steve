@@ -1,8 +1,8 @@
 package authenticates
 
 import (
+	"github.com/steve-care-software/steve/domain/accounts/administrators/credentials"
 	"github.com/steve-care-software/steve/domain/commands/executions/administrators/authenticates/successes"
-	"github.com/steve-care-software/steve/domain/commands/inputs/administrators/administrators/authenticates/credentials"
 )
 
 // Builder represents an authenticate builder

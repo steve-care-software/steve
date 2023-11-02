@@ -1,6 +1,7 @@
 package administrators
 
 import (
+	"github.com/steve-care-software/steve/domain/accounts/administrators/credentials"
 	"github.com/steve-care-software/steve/domain/accounts/administrators/identities"
 	"github.com/steve-care-software/steve/domain/dashboards"
 )
@@ -25,12 +26,12 @@ type Administrator interface {
 // Repository represents an administrator's repository
 type Repository interface {
 	Exists() (bool, error)
-	Retrieve(username string, password []byte) (Administrator, error)
+	Retrieve(credentials credentials.Credentials) (Administrator, error)
 }
 
 // Service represents an administrator's service
 type Service interface {
 	Insert(admin Administrator, password []byte) error
 	Save(admin Administrator, password []byte, newPassword []byte) error
-	Delete(username string, password []byte) error
+	Delete(credentials credentials.Credentials) error
 }

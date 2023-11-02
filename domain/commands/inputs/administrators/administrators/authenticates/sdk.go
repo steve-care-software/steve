@@ -1,6 +1,6 @@
 package authenticates
 
-import "github.com/steve-care-software/steve/domain/commands/inputs/administrators/administrators/authenticates/credentials"
+import "github.com/steve-care-software/steve/domain/accounts/administrators/credentials"
 
 // Builder represents an authenticate builder
 type Builder interface {

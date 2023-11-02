@@ -30,9 +30,7 @@ func createApplication(
 // Execute executes the authentication
 func (app *application) Execute(administrator inputs.Authenticate) (executions.Authenticate, error) {
 	credentials := administrator.Credentials()
-	username := credentials.Username()
-	password := credentials.Password()
-	admin, err := app.adminRepository.Retrieve(username, password)
+	admin, err := app.adminRepository.Retrieve(credentials)
 	builder := app.executionBuilder.Create()
 	if err != nil {
 		return builder.WithFailure(credentials).
