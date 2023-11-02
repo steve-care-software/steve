@@ -1,4 +1,4 @@
-package contents
+package instances
 
 import (
 	"github.com/steve-care-software/steve/domain/commands/executions/administrators/instances/failures"
