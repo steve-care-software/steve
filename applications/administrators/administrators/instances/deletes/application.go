@@ -14,7 +14,6 @@ type application struct {
 	executionBuilder   executions.Builder
 	failureBuilder     failures.Builder
 	credentialsBuilder credentials.Builder
-	current            administrators.Administrator
 }
 
 func createApplication(
@@ -23,23 +22,21 @@ func createApplication(
 	executionBuilder executions.Builder,
 	failureBuilder failures.Builder,
 	credentialsBuilder credentials.Builder,
-	current administrators.Administrator,
 ) Application {
 	out := application{
 		adminRepository:    adminRepository,
 		executionBuilder:   executionBuilder,
 		failureBuilder:     failureBuilder,
 		credentialsBuilder: credentialsBuilder,
-		current:            current,
 	}
 
 	return &out
 }
 
 // Execute executes the application
-func (app *application) Execute(delete inputs.Delete) (executions.Delete, error) {
+func (app *application) Execute(delete inputs.Delete, current administrators.Administrator) (executions.Delete, error) {
 	password := delete.Password()
-	username := app.current.Username()
+	username := current.Username()
 	credentials, err := app.credentialsBuilder.Create().
 		WithUsername(username).
 		WithPassword(password).

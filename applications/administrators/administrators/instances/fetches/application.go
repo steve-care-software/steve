@@ -10,44 +10,41 @@ import (
 type application struct {
 	executionBuilder executions.Builder
 	valueBuilder     values.Builder
-	current          administrators.Administrator
 }
 
 func createApplication(
 	executionBuilder executions.Builder,
 	valueBuilder values.Builder,
-	current administrators.Administrator,
 ) Application {
 	out := application{
 		executionBuilder: executionBuilder,
 		valueBuilder:     valueBuilder,
-		current:          current,
 	}
 
 	return &out
 }
 
 // Execute executes the application
-func (app *application) Execute(fetch inputs.Fetch) (executions.Fetch, error) {
+func (app *application) Execute(fetch inputs.Fetch, current administrators.Administrator) (executions.Fetch, error) {
 	property := fetch.Property()
 	valueBuilder := app.valueBuilder.Create()
 	if property.IsUsername() {
-		username := app.current.Username()
+		username := current.Username()
 		valueBuilder.WithUsername(username)
 	}
 
 	if property.IsDashboard() {
-		dashboard := app.current.Dashboard()
+		dashboard := current.Dashboard()
 		valueBuilder.WithDashboard(dashboard)
 	}
 
 	if property.IsHasIdentities() {
-		hasIdentities := app.current.HasIdentities()
+		hasIdentities := current.HasIdentities()
 		valueBuilder.WithHasIdentities(hasIdentities)
 	}
 
 	if property.IsIdentities() {
-		identities := app.current.Identities()
+		identities := current.Identities()
 		valueBuilder.WithIdentities(identities)
 	}
 

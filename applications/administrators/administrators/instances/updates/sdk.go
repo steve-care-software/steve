@@ -1,0 +1,12 @@
+package updates
+
+import (
+	"github.com/steve-care-software/steve/domain/accounts/administrators"
+	executions "github.com/steve-care-software/steve/domain/commands/executions/administrators/instances/updates"
+	inputs "github.com/steve-care-software/steve/domain/commands/inputs/administrators/administrators/instances/contents/updates"
+)
+
+// Application represents the fetch application
+type Application interface {
+	Execute(update inputs.Update, current administrators.Administrator) (executions.Update, error)
+}
