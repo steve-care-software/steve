@@ -37,7 +37,7 @@ func (app *application) Execute(identity inputs.Identity, stack stacks.Stack) (e
 	builder := app.executionBuilder.Create()
 	if identity.IsAuthenticate() {
 		authenticate := identity.Authenticate()
-		exec, err := app.authenticateApp.Execute(authenticate, stack)
+		exec, err := app.authenticateApp.Execute(authenticate)
 		if err != nil {
 			return nil, err
 		}
