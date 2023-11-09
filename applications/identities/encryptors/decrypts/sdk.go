@@ -8,5 +8,5 @@ import (
 
 // Application represents the application
 type Application interface {
-	Execute(encryptor inputs.Decrypt, current encryptors.Encryptor) (executions.Decrypt, error)
+	Execute(decrypt inputs.Decrypt, current encryptors.Encryptor) (executions.Decrypt, error)
 }
