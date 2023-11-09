@@ -1,10 +1,10 @@
 package administrators
 
 import (
-	"github.com/steve-care-software/steve/applications/visitors/administrators/creates"
-	execution_administrators "github.com/steve-care-software/steve/domain/commands/executions/visitors/administrators"
-	executions "github.com/steve-care-software/steve/domain/commands/executions/visitors/administrators"
-	inputs "github.com/steve-care-software/steve/domain/commands/inputs/visitors/administrators"
+	"github.com/steve-care-software/steve/applications/shares/administrators/creates"
+	execution_administrators "github.com/steve-care-software/steve/domain/commands/executions/shares/administrators"
+	executions "github.com/steve-care-software/steve/domain/commands/executions/shares/administrators"
+	inputs "github.com/steve-care-software/steve/domain/commands/inputs/shares/administrators"
 )
 
 type application struct {

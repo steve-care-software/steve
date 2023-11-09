@@ -1,7 +1,7 @@
 package administrators
 
 import (
-	"github.com/steve-care-software/steve/domain/commands/executions/visitors/administrators/creates"
+	"github.com/steve-care-software/steve/domain/commands/executions/shares/administrators/creates"
 )
 
 // Builder represents an administrator's builder

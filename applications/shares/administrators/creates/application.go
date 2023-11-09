@@ -2,9 +2,9 @@ package creates
 
 import (
 	"github.com/steve-care-software/steve/domain/accounts/administrators"
-	executions "github.com/steve-care-software/steve/domain/commands/executions/visitors/administrators/creates"
-	"github.com/steve-care-software/steve/domain/commands/executions/visitors/administrators/creates/failures"
-	inputs "github.com/steve-care-software/steve/domain/commands/inputs/visitors/administrators/creates"
+	executions "github.com/steve-care-software/steve/domain/commands/executions/shares/administrators/creates"
+	"github.com/steve-care-software/steve/domain/commands/executions/shares/administrators/creates/failures"
+	inputs "github.com/steve-care-software/steve/domain/commands/inputs/shares/administrators/creates"
 )
 
 type application struct {

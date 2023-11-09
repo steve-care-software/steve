@@ -1,18 +1,22 @@
 package visitors
 
 import (
-	"github.com/steve-care-software/steve/domain/commands/executions/visitors/administrators"
+	"github.com/steve-care-software/steve/domain/commands/executions/visitors/failures"
+	"github.com/steve-care-software/steve/domain/commands/executions/visitors/successes"
 )
 
 // Builder represents a builder
 type Builder interface {
 	Create() Builder
-	WithAdministrator(administrator administrators.Administrator) Builder
+	WithSuccess(success successes.Success) Builder
+	WithFailure(failure failures.Failure) Builder
 	Now() (Visitor, error)
 }
 
 // Visitor represents a visitor
 type Visitor interface {
-	IsAdministrator() bool
-	Administrator() administrators.Administrator
+	IsSuccess() bool
+	Success() successes.Success
+	IsFailure() bool
+	Failure() failures.Failure
 }

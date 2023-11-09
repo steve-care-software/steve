@@ -2,7 +2,7 @@ package creates
 
 import (
 	"github.com/steve-care-software/steve/domain/accounts/administrators"
-	"github.com/steve-care-software/steve/domain/commands/executions/visitors/administrators/creates/failures"
+	"github.com/steve-care-software/steve/domain/commands/executions/shares/administrators/creates/failures"
 )
 
 // Builder represents a create builder
