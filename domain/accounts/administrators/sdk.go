@@ -28,7 +28,7 @@ type Administrator interface {
 
 // Repository represents an administrator's repository
 type Repository interface {
-	Exists() (bool, error)
+	Exists(username string) (bool, error)
 	Retrieve(credentials credentials.Credentials) (Administrator, error)
 }
 

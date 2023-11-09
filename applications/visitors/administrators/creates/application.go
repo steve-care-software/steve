@@ -35,14 +35,17 @@ func createApplication(
 
 // Execute executes an application
 func (app *application) Execute(create inputs.Create) (executions.Create, error) {
-	exists, err := app.adminRepository.Exists()
+	credentials := create.Credentials()
+	username := credentials.Username()
+	exists, err := app.adminRepository.Exists(username)
 	if err != nil {
 		return nil, err
 	}
 
 	if exists {
+		username := credentials.Username()
 		failure, err := app.failureBuilder.Create().
-			AdminAlreadyExists().
+			WithUsernameAlreadyExists(username).
 			Now()
 
 		if err != nil {
@@ -52,9 +55,9 @@ func (app *application) Execute(create inputs.Create) (executions.Create, error)
 		return app.executionBuilder.Create().
 			WithFailure(failure).
 			Now()
+
 	}
 
-	username := create.Username()
 	dashboard := create.Dashboard()
 	visitor := create.Visitor()
 	admin, err := app.adminBuilder.Create().
@@ -67,7 +70,7 @@ func (app *application) Execute(create inputs.Create) (executions.Create, error)
 		return nil, err
 	}
 
-	password := create.Password()
+	password := credentials.Password()
 	err = app.adminService.Insert(admin, password)
 	if err != nil {
 		return nil, err
