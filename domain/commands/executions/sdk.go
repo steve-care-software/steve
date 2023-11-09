@@ -1,7 +1,7 @@
 package executions
 
 import (
-	"github.com/steve-care-software/steve/domain/commands/executions/administrators/administrators"
+	"github.com/steve-care-software/steve/domain/commands/executions/administrators"
 	"github.com/steve-care-software/steve/domain/commands/executions/visitors"
 )
 

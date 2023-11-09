@@ -6,8 +6,8 @@ import (
 	"github.com/steve-care-software/steve/domain/commands/executions/identities/identities"
 	"github.com/steve-care-software/steve/domain/commands/executions/identities/profiles"
 	"github.com/steve-care-software/steve/domain/commands/executions/identities/shares"
+	"github.com/steve-care-software/steve/domain/commands/executions/identities/signers"
 	"github.com/steve-care-software/steve/domain/commands/executions/shares/dashboards"
-	"github.com/steve-care-software/steve/domain/commands/inputs/identities/signers"
 )
 
 // Builder represents an identity builder
