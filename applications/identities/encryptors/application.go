@@ -81,7 +81,10 @@ func (app *application) Execute(encryptor inputs.Encryptor, stack stacks.Stack) 
 
 	current := assIdentity.Encryptor()
 	content := encryptor.Content()
-	successBuilder := app.successBuilder.Create()
+	variable := encryptor.AssignToVariable()
+	successBuilder := app.successBuilder.Create().
+		WithVariable(variable)
+
 	if content.IsBytes() {
 		bytes := current.Bytes()
 		successBuilder.WithBytes(bytes)
@@ -99,7 +102,7 @@ func (app *application) Execute(encryptor inputs.Encryptor, stack stacks.Stack) 
 
 	if content.IsPublicKey() {
 		pubKey := content.PublicKey()
-		exec, err := app.pubKeyApp.Execute(pubKey, current)
+		exec, err := app.pubKeyApp.Execute(pubKey, current.Public())
 		if err != nil {
 			return nil, err
 		}

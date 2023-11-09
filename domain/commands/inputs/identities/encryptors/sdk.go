@@ -8,6 +8,7 @@ import (
 type Builder interface {
 	Create() Builder
 	WithName(name string) Builder
+	WithAssignToVariable(assignToVariable string) Builder
 	WithContent(content contents.Content) Builder
 	Now() (Encryptor, error)
 }
@@ -15,5 +16,6 @@ type Builder interface {
 // Encryptor represents an encryptor
 type Encryptor interface {
 	Name() string
+	AssignToVariable() string
 	Content() contents.Content
 }

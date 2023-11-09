@@ -28,9 +28,7 @@ func (app *application) Execute(decrypt inputs.Decrypt, current encryptors.Encry
 		return nil, err
 	}
 
-	variable := decrypt.AssignToVariable()
 	return app.executionBuilder.Create().
-		WithVariable(variable).
 		WithMessage(msg).
 		Now()
 }

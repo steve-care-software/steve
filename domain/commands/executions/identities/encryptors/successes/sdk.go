@@ -8,6 +8,7 @@ import (
 // Builder represents the encryptor builder
 type Builder interface {
 	Create() Builder
+	WithVariable(variable string) Builder
 	WithDecrypt(decrypt decrypts.Decrypt) Builder
 	WithPublicKey(publicKey publickeys.PublicKey) Builder
 	WithBytes(bytes []byte) Builder
@@ -16,6 +17,12 @@ type Builder interface {
 
 // Success represents a success
 type Success interface {
+	Variable() string
+	Content() Content
+}
+
+// Content represents a success content
+type Content interface {
 	IsDecrypt() bool
 	Decrypt() decrypts.Decrypt
 	IsPublicKey() bool
