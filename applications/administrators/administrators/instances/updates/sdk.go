@@ -6,7 +6,7 @@ import (
 	inputs "github.com/steve-care-software/steve/domain/commands/inputs/administrators/administrators/instances/contents/updates"
 )
 
-// Application represents the fetch application
+// Application represents the update application
 type Application interface {
 	Execute(update inputs.Update, current administrators.Administrator) (executions.Update, error)
 }
