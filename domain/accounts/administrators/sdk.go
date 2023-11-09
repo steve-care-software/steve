@@ -1,8 +1,8 @@
 package administrators
 
 import (
-	"github.com/steve-care-software/steve/domain/accounts/administrators/credentials"
 	"github.com/steve-care-software/steve/domain/accounts/administrators/identities"
+	"github.com/steve-care-software/steve/domain/accounts/credentials"
 	"github.com/steve-care-software/steve/domain/dashboards"
 )
 

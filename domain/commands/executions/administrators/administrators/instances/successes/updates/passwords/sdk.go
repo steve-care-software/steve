@@ -1,6 +1,6 @@
 package passwords
 
-import "github.com/steve-care-software/steve/domain/accounts/administrators/credentials"
+import "github.com/steve-care-software/steve/domain/accounts/credentials"
 
 // Builder represents a password builder
 type Builder interface {

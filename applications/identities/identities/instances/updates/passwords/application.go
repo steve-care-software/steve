@@ -1,7 +1,7 @@
 package passwords
 
 import (
-	"github.com/steve-care-software/steve/domain/accounts/administrators/credentials"
+	"github.com/steve-care-software/steve/domain/accounts/credentials"
 	"github.com/steve-care-software/steve/domain/accounts/identities"
 	executions "github.com/steve-care-software/steve/domain/commands/executions/identities/identities/instances/successes/updates/passwords"
 	inputs "github.com/steve-care-software/steve/domain/commands/inputs/identities/identities/instances/contents/updates/passwords"
