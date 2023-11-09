@@ -1,7 +1,7 @@
 package creates
 
 import (
-	"github.com/steve-care-software/steve/domain/credentials"
+	"github.com/steve-care-software/steve/domain/accounts/credentials"
 	"github.com/steve-care-software/steve/domain/dashboards"
 	"github.com/steve-care-software/steve/domain/stencils"
 )
