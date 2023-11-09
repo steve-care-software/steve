@@ -7,6 +7,7 @@ type Builder interface {
 	IsEncryptor() Builder
 	IsSigner() Builder
 	IsProfile() Builder
+	IsHasConnections() Builder
 	IsConnections() Builder
 	IsHasShares() Builder
 	IsShares() Builder
@@ -19,6 +20,7 @@ type Property interface {
 	IsEncryptor() bool
 	IsSigner() bool
 	IsProfile() bool
+	IsHasConnections() bool
 	IsConnections() bool
 	IsHasShares() bool
 	IsShares() bool
