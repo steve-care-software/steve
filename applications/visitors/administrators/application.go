@@ -24,7 +24,7 @@ func createApplication(
 	return &out
 }
 
-// Execute executes a visitor's administrator application
+// Execute executes an application
 func (app *application) Execute(administrator inputs.Administrator) (executions.Administrator, error) {
 	builder := app.executionBuilder.Create()
 	if administrator.IsCreate() {

@@ -5,7 +5,7 @@ import (
 	inputs "github.com/steve-care-software/steve/domain/commands/inputs/visitors/administrators"
 )
 
-// Application represents the visitor application
+// Application represents the application
 type Application interface {
 	Execute(administrator inputs.Administrator) (executions.Administrator, error)
 }

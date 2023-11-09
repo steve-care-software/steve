@@ -1,16 +1,18 @@
 package administrators
 
-import "github.com/steve-care-software/steve/domain/accounts/administrators"
+import (
+	"github.com/steve-care-software/steve/domain/commands/executions/visitors/administrators/creates"
+)
 
 // Builder represents an administrator's builder
 type Builder interface {
 	Create() Builder
-	WithCreate(create administrators.Administrator) Builder
+	WithCreate(create creates.Create) Builder
 	Now() (Administrator, error)
 }
 
 // Administrator represents an administrator's
 type Administrator interface {
 	IsCreate() bool
-	Create() administrators.Administrator
+	Create() creates.Create
 }

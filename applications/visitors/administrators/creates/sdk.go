@@ -1,11 +1,11 @@
 package creates
 
 import (
-	"github.com/steve-care-software/steve/domain/accounts/administrators"
+	executions "github.com/steve-care-software/steve/domain/commands/executions/visitors/administrators/creates"
 	inputs "github.com/steve-care-software/steve/domain/commands/inputs/visitors/administrators/creates"
 )
 
-// Application represents the visitor application
+// Application represents the application
 type Application interface {
-	Execute(administrator inputs.Create) (administrators.Administrator, error)
+	Execute(administrator inputs.Create) (executions.Create, error)
 }
