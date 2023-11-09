@@ -8,5 +8,5 @@ import (
 
 // Application represents the application
 type Application interface {
-	Execute(identity inputs.List, stack stacks.Stack) (executions.List, error)
+	Execute(list inputs.List, stack stacks.Stack) (executions.List, error)
 }
