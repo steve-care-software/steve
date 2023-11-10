@@ -1,6 +1,6 @@
 package preparations
 
-import "github.com/steve-care-software/steve/domain/hash"
+import "github.com/steve-care-software/steve/domain/blockchains/hash"
 
 type preparations struct {
 	hash hash.Hash

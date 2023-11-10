@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/steve-care-software/steve/domain/hash"
+	"github.com/steve-care-software/steve/domain/blockchains/hash"
 )
 
 type compactAdapter struct {

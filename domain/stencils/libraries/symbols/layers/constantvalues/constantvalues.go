@@ -1,6 +1,6 @@
 package constantvalues
 
-import "github.com/steve-care-software/steve/domain/hash"
+import "github.com/steve-care-software/steve/domain/blockchains/hash"
 
 type constantValues struct {
 	hash hash.Hash

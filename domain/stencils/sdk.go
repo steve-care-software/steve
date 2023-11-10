@@ -1,8 +1,7 @@
 package stencils
 
 import (
-	"github.com/steve-care-software/steve/domain/hash"
-	"github.com/steve-care-software/steve/domain/stencils/resolutions"
+	"github.com/steve-care-software/steve/domain/blockchains/hash"
 )
 
 // Stencils represents stencils
@@ -14,6 +13,5 @@ type Stencils interface {
 type Stencil interface {
 	Name() string
 	Description() string
-	Resolution() resolutions.Resolution
 	Root() hash.Hash
 }

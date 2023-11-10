@@ -1,6 +1,6 @@
 package reduces
 
-import "github.com/steve-care-software/steve/domain/hash"
+import "github.com/steve-care-software/steve/domain/blockchains/hash"
 
 type reduce struct {
 	hash     hash.Hash

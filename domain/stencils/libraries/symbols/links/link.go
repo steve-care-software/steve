@@ -1,7 +1,7 @@
 package links
 
 import (
-	"github.com/steve-care-software/steve/domain/hash"
+	"github.com/steve-care-software/steve/domain/blockchains/hash"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/links/executions"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/links/origins"
 	"github.com/steve-care-software/steve/domain/stencils/libraries/symbols/links/preparations"

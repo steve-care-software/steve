@@ -1,6 +1,6 @@
 package pointers
 
-import "github.com/steve-care-software/steve/domain/hash"
+import "github.com/steve-care-software/steve/domain/blockchains/hash"
 
 type pointers struct {
 	hash hash.Hash

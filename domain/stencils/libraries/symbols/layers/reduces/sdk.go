@@ -1,6 +1,6 @@
 package reduces
 
-import "github.com/steve-care-software/steve/domain/hash"
+import "github.com/steve-care-software/steve/domain/blockchains/hash"
 
 // NewBuilder creates a new builder instance
 func NewBuilder() Builder {

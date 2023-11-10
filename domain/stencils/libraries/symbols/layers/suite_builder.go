@@ -3,7 +3,7 @@ package layers
 import (
 	"errors"
 
-	"github.com/steve-care-software/steve/domain/hash"
+	"github.com/steve-care-software/steve/domain/blockchains/hash"
 	result_returns "github.com/steve-care-software/steve/domain/stencils/libraries/symbols/layers/returns"
 )
 

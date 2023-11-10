@@ -1,6 +1,6 @@
 package layers
 
-import "github.com/steve-care-software/steve/domain/hash"
+import "github.com/steve-care-software/steve/domain/blockchains/hash"
 
 type assignment struct {
 	hash       hash.Hash

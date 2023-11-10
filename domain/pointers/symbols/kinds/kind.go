@@ -1,6 +1,6 @@
 package kinds
 
-import "github.com/steve-care-software/steve/domain/hash"
+import "github.com/steve-care-software/steve/domain/blockchains/hash"
 
 type kind struct {
 	hash    hash.Hash

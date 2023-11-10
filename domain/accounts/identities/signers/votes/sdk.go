@@ -2,7 +2,7 @@ package votes
 
 import (
 	"github.com/steve-care-software/steve/domain/accounts/identities/signers/publickeys"
-	"github.com/steve-care-software/steve/domain/hash"
+	"github.com/steve-care-software/steve/domain/blockchains/hash"
 )
 
 // Vote represents a vote

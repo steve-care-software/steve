@@ -1,6 +1,6 @@
 package constantvalues
 
-import "github.com/steve-care-software/steve/domain/hash"
+import "github.com/steve-care-software/steve/domain/blockchains/hash"
 
 // NewConstantValuesBuilder creates a new constant values builder
 func NewConstantValuesBuilder() ConstantValuesBuilder {

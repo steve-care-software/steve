@@ -1,6 +1,6 @@
 package symbols
 
-import "github.com/steve-care-software/steve/domain/hash"
+import "github.com/steve-care-software/steve/domain/blockchains/hash"
 
 type symbols struct {
 	hash hash.Hash

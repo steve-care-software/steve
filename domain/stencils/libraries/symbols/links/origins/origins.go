@@ -1,6 +1,6 @@
 package origins
 
-import "github.com/steve-care-software/steve/domain/hash"
+import "github.com/steve-care-software/steve/domain/blockchains/hash"
 
 type origins struct {
 	hash hash.Hash
