@@ -114,7 +114,14 @@ func (app *application) Execute(context uint, input []byte, frame frames.Frame) 
 
 // Queue returns the commands queue
 func (app *application) Queue(context uint) (commands.Commands, error) {
-	return nil, nil
+	if !app.Exists(context) {
+		str := fmt.Sprintf("the provided context (%d) does not exists", context)
+		return nil, errors.New(str)
+	}
+
+	return app.commandsBuilder.Create().
+		WithList(app.queue[context]).
+		Now()
 }
 
 // Commit commits the current commands queue to a block
