@@ -47,6 +47,11 @@ func (app *application) Begin() (*uint, error) {
 	return nil, nil
 }
 
+// Init inits the blockchain with a root and path
+func (app *application) Init(context uint, root roots.Root, path string) error {
+	return nil
+}
+
 // Execute executes a command, using the passed frame and context then returns the result
 func (app *application) Execute(context uint, input []byte, frame frames.Frame) ([]byte, error) {
 	return nil, nil
