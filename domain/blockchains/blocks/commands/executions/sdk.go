@@ -15,6 +15,13 @@ type Builder interface {
 
 // Execution represents an execution
 type Execution interface {
+	Content() Content
+	HasOutput() bool
+	Output() []byte
+}
+
+// Content represents the execution content
+type Content interface {
 	IsAdministrator() bool
 	Administrator() administrators.Administrator
 	IsVisitor() bool

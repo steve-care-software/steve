@@ -24,7 +24,7 @@ type CommandBuilder interface {
 	Create() CommandBuilder
 	WithInput(input inputs.Input) CommandBuilder
 	WithExecution(execution executions.Execution) CommandBuilder
-	WithFrame(frame frames.Frame) CommandBuilder
+	WithPreviousFrame(previousFrame frames.Frame) CommandBuilder
 	Now() (Command, error)
 }
 

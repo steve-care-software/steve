@@ -1,11 +1,15 @@
 package applications
 
 import (
+	"errors"
+	"fmt"
+
 	command_applications "github.com/steve-care-software/steve/applications/commands"
 	"github.com/steve-care-software/steve/domain/blockchains"
 	"github.com/steve-care-software/steve/domain/blockchains/blocks"
 	"github.com/steve-care-software/steve/domain/blockchains/blocks/commands"
 	"github.com/steve-care-software/steve/domain/blockchains/blocks/commands/frames"
+	"github.com/steve-care-software/steve/domain/blockchains/blocks/commands/inputs"
 	"github.com/steve-care-software/steve/domain/blockchains/roots"
 	"github.com/steve-care-software/steve/domain/blockchains/roots/resolutions"
 )
@@ -18,6 +22,8 @@ type application struct {
 	resolutionBuilder resolutions.Builder
 	commandsBuilder   commands.Builder
 	commandBuilder    commands.CommandBuilder
+	inputAdapter      inputs.Adapter
+	queue             map[uint][]commands.Command
 }
 
 func createApplication(
@@ -28,6 +34,7 @@ func createApplication(
 	resolutionBuilder resolutions.Builder,
 	commandsBuilder commands.Builder,
 	commandBuilder commands.CommandBuilder,
+	inputAdapter inputs.Adapter,
 ) Application {
 	out := application{
 		cmdApplication:    cmdApplication,
@@ -37,6 +44,8 @@ func createApplication(
 		resolutionBuilder: resolutionBuilder,
 		commandsBuilder:   commandsBuilder,
 		commandBuilder:    commandBuilder,
+		inputAdapter:      inputAdapter,
+		queue:             map[uint][]commands.Command{},
 	}
 
 	return &out
@@ -44,7 +53,18 @@ func createApplication(
 
 // Begin creates a context and returns it
 func (app *application) Begin() (*uint, error) {
-	return nil, nil
+	ctx := uint(len(app.queue))
+	app.queue[ctx] = []commands.Command{}
+	return &ctx, nil
+}
+
+// Exists returns true if the context exists, false otherwise
+func (app *application) Exists(context uint) bool {
+	if _, ok := app.queue[context]; ok {
+		return true
+	}
+
+	return false
 }
 
 // Init inits the blockchain with a root and path
@@ -59,6 +79,36 @@ func (app *application) Source(context uint, path string) error {
 
 // Execute executes a command, using the passed frame and context then returns the result
 func (app *application) Execute(context uint, input []byte, frame frames.Frame) ([]byte, error) {
+	if !app.Exists(context) {
+		str := fmt.Sprintf("the provided context (%d) does not exists", context)
+		return nil, errors.New(str)
+	}
+
+	inputIns, err := app.inputAdapter.ToInput(input)
+	if err != nil {
+		return nil, err
+	}
+
+	exec, err := app.cmdApplication.Execute(inputIns, frame)
+	if err != nil {
+		return nil, err
+	}
+
+	cmd, err := app.commandBuilder.Create().
+		WithExecution(exec).
+		WithInput(inputIns).
+		WithPreviousFrame(frame).
+		Now()
+
+	if err != nil {
+		return nil, err
+	}
+
+	app.queue[context] = append(app.queue[context], cmd)
+	if exec.HasOutput() {
+		return exec.Output(), nil
+	}
+
 	return nil, nil
 }
 

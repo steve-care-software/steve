@@ -4,26 +4,24 @@ import (
 	"github.com/steve-care-software/steve/applications/commands/administrators"
 	"github.com/steve-care-software/steve/applications/commands/visitors"
 	"github.com/steve-care-software/steve/domain/blockchains/blocks/commands/executions"
+	"github.com/steve-care-software/steve/domain/blockchains/blocks/commands/frames"
 	"github.com/steve-care-software/steve/domain/blockchains/blocks/commands/inputs"
 )
 
 type application struct {
 	visitorApp       visitors.Application
 	adminApp         administrators.Application
-	inputAdapter     inputs.Adapter
 	executionBuilder executions.Builder
 }
 
 func createApplication(
 	visitorApp visitors.Application,
 	adminApp administrators.Application,
-	inputAdapter inputs.Adapter,
 	executionBuilder executions.Builder,
 ) Application {
 	out := application{
 		visitorApp:       visitorApp,
 		adminApp:         adminApp,
-		inputAdapter:     inputAdapter,
 		executionBuilder: executionBuilder,
 	}
 
@@ -31,12 +29,7 @@ func createApplication(
 }
 
 // Execute executes the application
-func (app *application) Execute(input []byte) (executions.Execution, error) {
-	inputIns, err := app.inputAdapter.ToInput(input)
-	if err != nil {
-		return nil, err
-	}
-
+func (app *application) Execute(inputIns inputs.Input, frame frames.Frame) (executions.Execution, error) {
 	builder := app.executionBuilder.Create()
 	if inputIns.IsAdministrator() {
 		admin := inputIns.Administrator()

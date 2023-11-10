@@ -9,6 +9,7 @@ import (
 // Application represents the application
 type Application interface {
 	Begin() (*uint, error)
+	Exists(context uint) bool
 	Init(context uint, root roots.Root, path string) error
 	Source(context uint, path string) error
 	Execute(context uint, input []byte, frame frames.Frame) ([]byte, error)
