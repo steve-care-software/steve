@@ -10,6 +10,7 @@ import (
 type Application interface {
 	Begin() (*uint, error)
 	Init(context uint, root roots.Root, path string) error
+	Source(context uint, path string) error
 	Execute(context uint, input []byte, frame frames.Frame) ([]byte, error)
 	Queue(context uint) (commands.Commands, error)
 	Commit(context uint, message string) error

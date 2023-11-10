@@ -52,6 +52,11 @@ func (app *application) Init(context uint, root roots.Root, path string) error {
 	return nil
 }
 
+// Source sources the blockchain context with a path.  The application will retrieve the blockchain from its repository and use it in the provided context
+func (app *application) Source(context uint, path string) error {
+	return nil
+}
+
 // Execute executes a command, using the passed frame and context then returns the result
 func (app *application) Execute(context uint, input []byte, frame frames.Frame) ([]byte, error) {
 	return nil, nil
