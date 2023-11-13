@@ -2,9 +2,9 @@ package authenticates
 
 import (
 	"github.com/steve-care-software/steve/domain/accounts/administrators"
-	executions "github.com/steve-care-software/steve/domain/blockchains/blocks/commands/executions/administrators/administrators/authenticates"
-	"github.com/steve-care-software/steve/domain/blockchains/blocks/commands/executions/administrators/administrators/authenticates/successes"
-	inputs "github.com/steve-care-software/steve/domain/blockchains/blocks/commands/inputs/administrators/administrators/authenticates"
+	executions "github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/executions/administrators/administrators/authenticates"
+	"github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/executions/administrators/administrators/authenticates/successes"
+	inputs "github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/inputs/administrators/administrators/authenticates"
 )
 
 type application struct {

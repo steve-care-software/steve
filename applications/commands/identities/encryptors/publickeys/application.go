@@ -3,8 +3,8 @@ package publickeys
 import (
 	"github.com/steve-care-software/steve/applications/commands/identities/encryptors/publickeys/encrypts"
 	identity_publickeys "github.com/steve-care-software/steve/domain/accounts/identities/encryptors/publickeys"
-	executions "github.com/steve-care-software/steve/domain/blockchains/blocks/commands/executions/identities/encryptors/successes/publickeys"
-	inputs "github.com/steve-care-software/steve/domain/blockchains/blocks/commands/inputs/identities/encryptors/contents/publickeys"
+	executions "github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/executions/identities/encryptors/successes/publickeys"
+	inputs "github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/inputs/identities/encryptors/contents/publickeys"
 )
 
 type application struct {

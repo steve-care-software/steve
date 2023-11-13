@@ -2,9 +2,9 @@ package lists
 
 import (
 	"github.com/steve-care-software/steve/domain/accounts/identities"
-	executions "github.com/steve-care-software/steve/domain/blockchains/blocks/commands/executions/identities/identities/lists"
-	"github.com/steve-care-software/steve/domain/blockchains/blocks/commands/frames"
-	inputs "github.com/steve-care-software/steve/domain/blockchains/blocks/commands/inputs/identities/identities/lists"
+	executions "github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/executions/identities/identities/lists"
+	"github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/frames"
+	inputs "github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/inputs/identities/identities/lists"
 )
 
 type application struct {

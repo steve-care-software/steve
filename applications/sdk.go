@@ -1,22 +1,20 @@
 package applications
 
 import (
-	"github.com/steve-care-software/steve/domain/blockchains/blocks/commands"
-	"github.com/steve-care-software/steve/domain/blockchains/blocks/commands/frames"
+	"github.com/steve-care-software/steve/domain/blockchains/blocks/queues"
+	"github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/frames"
 	"github.com/steve-care-software/steve/domain/blockchains/roots"
 )
 
 // Application represents the application
 type Application interface {
-	Begin() (*uint, error)
+	Init(root roots.Root, path string) error
+	Begin(path string) (*uint, error)
 	Exists(context uint) bool
-	Init(context uint, root roots.Root, path string) error
-	Source(context uint, path string) error
 	Execute(context uint, input []byte, frame frames.Frame) ([]byte, error)
-	Queue(context uint) (commands.Commands, error)
+	Queue(context uint) (queues.Queue, error)
 	Commit(context uint, message string) error
 	Back(context uint) error
 	Clear(context uint) error
 	Rollback(context uint) error
-	Reset(context uint) error
 }

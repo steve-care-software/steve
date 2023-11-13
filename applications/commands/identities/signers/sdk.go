@@ -1,9 +1,9 @@
 package signers
 
 import (
-	executions "github.com/steve-care-software/steve/domain/blockchains/blocks/commands/executions/identities/signers"
-	"github.com/steve-care-software/steve/domain/blockchains/blocks/commands/frames"
-	inputs "github.com/steve-care-software/steve/domain/blockchains/blocks/commands/inputs/identities/signers"
+	executions "github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/executions/identities/signers"
+	"github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/frames"
+	inputs "github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/inputs/identities/signers"
 )
 
 // Application represents the application

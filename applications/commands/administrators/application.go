@@ -4,9 +4,9 @@ import (
 	"github.com/steve-care-software/steve/applications/commands/administrators/administrators"
 	"github.com/steve-care-software/steve/applications/commands/administrators/identities"
 	"github.com/steve-care-software/steve/applications/commands/shares/dashboards"
-	executions "github.com/steve-care-software/steve/domain/blockchains/blocks/commands/executions/administrators"
-	"github.com/steve-care-software/steve/domain/blockchains/blocks/commands/frames"
-	inputs "github.com/steve-care-software/steve/domain/blockchains/blocks/commands/inputs/administrators"
+	executions "github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/executions/administrators"
+	"github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/frames"
+	inputs "github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/inputs/administrators"
 )
 
 type application struct {

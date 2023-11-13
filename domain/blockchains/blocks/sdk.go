@@ -3,7 +3,7 @@ package blocks
 import (
 	"time"
 
-	"github.com/steve-care-software/steve/domain/blockchains/blocks/commands"
+	"github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands"
 	"github.com/steve-care-software/steve/domain/blockchains/hash"
 )
 

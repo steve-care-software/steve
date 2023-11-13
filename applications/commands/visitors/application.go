@@ -3,10 +3,10 @@ package visitors
 import (
 	admin_applications "github.com/steve-care-software/steve/applications/commands/shares/administrators/creates"
 	"github.com/steve-care-software/steve/domain/accounts/administrators"
-	executions "github.com/steve-care-software/steve/domain/blockchains/blocks/commands/executions/visitors"
-	"github.com/steve-care-software/steve/domain/blockchains/blocks/commands/executions/visitors/failures"
-	"github.com/steve-care-software/steve/domain/blockchains/blocks/commands/executions/visitors/successes"
-	inputs "github.com/steve-care-software/steve/domain/blockchains/blocks/commands/inputs/visitors"
+	executions "github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/executions/visitors"
+	"github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/executions/visitors/failures"
+	"github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/executions/visitors/successes"
+	inputs "github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/inputs/visitors"
 )
 
 type application struct {

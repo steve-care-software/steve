@@ -1,9 +1,9 @@
 package commands
 
 import (
-	"github.com/steve-care-software/steve/domain/blockchains/blocks/commands/executions"
-	"github.com/steve-care-software/steve/domain/blockchains/blocks/commands/frames"
-	"github.com/steve-care-software/steve/domain/blockchains/blocks/commands/inputs"
+	"github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/executions"
+	"github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/frames"
+	"github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/inputs"
 )
 
 // Application represents the command application

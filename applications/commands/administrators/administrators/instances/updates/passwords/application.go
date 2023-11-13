@@ -3,8 +3,8 @@ package passwords
 import (
 	"github.com/steve-care-software/steve/domain/accounts/administrators"
 	"github.com/steve-care-software/steve/domain/accounts/credentials"
-	executions "github.com/steve-care-software/steve/domain/blockchains/blocks/commands/executions/administrators/administrators/instances/successes/updates/passwords"
-	inputs "github.com/steve-care-software/steve/domain/blockchains/blocks/commands/inputs/administrators/administrators/instances/contents/updates/passwords"
+	executions "github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/executions/administrators/administrators/instances/successes/updates/passwords"
+	inputs "github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/inputs/administrators/administrators/instances/contents/updates/passwords"
 )
 
 type application struct {

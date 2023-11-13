@@ -1,9 +1,9 @@
 package shares
 
 import (
-	executions "github.com/steve-care-software/steve/domain/blockchains/blocks/commands/executions/identities/shares"
-	"github.com/steve-care-software/steve/domain/blockchains/blocks/commands/frames"
-	inputs "github.com/steve-care-software/steve/domain/blockchains/blocks/commands/inputs/identities/shares"
+	executions "github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/executions/identities/shares"
+	"github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/frames"
+	inputs "github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/inputs/identities/shares"
 )
 
 // Application represents the application

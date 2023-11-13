@@ -1,8 +1,8 @@
 package visitors
 
 import (
-	executions "github.com/steve-care-software/steve/domain/blockchains/blocks/commands/executions/visitors"
-	inputs "github.com/steve-care-software/steve/domain/blockchains/blocks/commands/inputs/visitors"
+	executions "github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/executions/visitors"
+	inputs "github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/inputs/visitors"
 )
 
 // Application represents the visitor application

@@ -2,9 +2,9 @@ package deletes
 
 import (
 	"github.com/steve-care-software/steve/domain/accounts/administrators/identities"
-	executions "github.com/steve-care-software/steve/domain/blockchains/blocks/commands/executions/administrators/identities/successes/deletes"
-	"github.com/steve-care-software/steve/domain/blockchains/blocks/commands/executions/administrators/identities/successes/deletes/failures"
-	inputs "github.com/steve-care-software/steve/domain/blockchains/blocks/commands/inputs/administrators/identities/contents/deletes"
+	executions "github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/executions/administrators/identities/successes/deletes"
+	"github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/executions/administrators/identities/successes/deletes/failures"
+	inputs "github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/inputs/administrators/identities/contents/deletes"
 )
 
 type application struct {

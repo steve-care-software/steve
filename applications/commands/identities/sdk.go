@@ -1,9 +1,9 @@
 package identities
 
 import (
-	executions "github.com/steve-care-software/steve/domain/blockchains/blocks/commands/executions/identities"
-	"github.com/steve-care-software/steve/domain/blockchains/blocks/commands/frames"
-	inputs "github.com/steve-care-software/steve/domain/blockchains/blocks/commands/inputs/identities"
+	executions "github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/executions/identities"
+	"github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/frames"
+	inputs "github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/inputs/identities"
 )
 
 // Application represents the application

@@ -3,9 +3,9 @@ package administrators
 import (
 	"github.com/steve-care-software/steve/applications/commands/administrators/administrators/authenticates"
 	"github.com/steve-care-software/steve/applications/commands/administrators/administrators/instances"
-	executions "github.com/steve-care-software/steve/domain/blockchains/blocks/commands/executions/administrators/administrators"
-	"github.com/steve-care-software/steve/domain/blockchains/blocks/commands/frames"
-	inputs "github.com/steve-care-software/steve/domain/blockchains/blocks/commands/inputs/administrators/administrators"
+	executions "github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/executions/administrators/administrators"
+	"github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/frames"
+	inputs "github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/inputs/administrators/administrators"
 )
 
 type application struct {

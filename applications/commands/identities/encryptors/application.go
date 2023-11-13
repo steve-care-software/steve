@@ -3,11 +3,11 @@ package encryptors
 import (
 	"github.com/steve-care-software/steve/applications/commands/identities/encryptors/decrypts"
 	"github.com/steve-care-software/steve/applications/commands/identities/encryptors/publickeys"
-	executions "github.com/steve-care-software/steve/domain/blockchains/blocks/commands/executions/identities/encryptors"
-	"github.com/steve-care-software/steve/domain/blockchains/blocks/commands/executions/identities/encryptors/failures"
-	"github.com/steve-care-software/steve/domain/blockchains/blocks/commands/executions/identities/encryptors/successes"
-	"github.com/steve-care-software/steve/domain/blockchains/blocks/commands/frames"
-	inputs "github.com/steve-care-software/steve/domain/blockchains/blocks/commands/inputs/identities/encryptors"
+	executions "github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/executions/identities/encryptors"
+	"github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/executions/identities/encryptors/failures"
+	"github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/executions/identities/encryptors/successes"
+	"github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/frames"
+	inputs "github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/inputs/identities/encryptors"
 )
 
 type application struct {

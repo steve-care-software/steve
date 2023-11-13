@@ -2,9 +2,9 @@ package administrators
 
 import (
 	"github.com/steve-care-software/steve/applications/commands/shares/administrators/creates"
-	execution_administrators "github.com/steve-care-software/steve/domain/blockchains/blocks/commands/executions/shares/administrators"
-	executions "github.com/steve-care-software/steve/domain/blockchains/blocks/commands/executions/shares/administrators"
-	inputs "github.com/steve-care-software/steve/domain/blockchains/blocks/commands/inputs/shares/administrators"
+	execution_administrators "github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/executions/shares/administrators"
+	executions "github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/executions/shares/administrators"
+	inputs "github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/inputs/shares/administrators"
 )
 
 type application struct {

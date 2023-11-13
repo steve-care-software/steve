@@ -8,9 +8,9 @@ import (
 	"github.com/steve-care-software/steve/applications/commands/identities/shares"
 	"github.com/steve-care-software/steve/applications/commands/identities/signers"
 	"github.com/steve-care-software/steve/applications/commands/shares/dashboards"
-	executions "github.com/steve-care-software/steve/domain/blockchains/blocks/commands/executions/identities"
-	"github.com/steve-care-software/steve/domain/blockchains/blocks/commands/frames"
-	inputs "github.com/steve-care-software/steve/domain/blockchains/blocks/commands/inputs/identities"
+	executions "github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/executions/identities"
+	"github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/frames"
+	inputs "github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/inputs/identities"
 )
 
 type application struct {

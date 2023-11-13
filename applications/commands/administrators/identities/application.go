@@ -4,11 +4,11 @@ import (
 	"github.com/steve-care-software/steve/applications/commands/administrators/identities/deletes"
 	"github.com/steve-care-software/steve/applications/commands/administrators/identities/fetches"
 	"github.com/steve-care-software/steve/applications/commands/administrators/identities/inserts"
-	executions "github.com/steve-care-software/steve/domain/blockchains/blocks/commands/executions/administrators/identities"
-	"github.com/steve-care-software/steve/domain/blockchains/blocks/commands/executions/administrators/identities/failures"
-	"github.com/steve-care-software/steve/domain/blockchains/blocks/commands/executions/administrators/identities/successes"
-	"github.com/steve-care-software/steve/domain/blockchains/blocks/commands/frames"
-	inputs "github.com/steve-care-software/steve/domain/blockchains/blocks/commands/inputs/administrators/identities"
+	executions "github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/executions/administrators/identities"
+	"github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/executions/administrators/identities/failures"
+	"github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/executions/administrators/identities/successes"
+	"github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/frames"
+	inputs "github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/inputs/administrators/identities"
 )
 
 type application struct {

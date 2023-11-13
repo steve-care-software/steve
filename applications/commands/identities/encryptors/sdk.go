@@ -1,9 +1,9 @@
 package encryptors
 
 import (
-	executions "github.com/steve-care-software/steve/domain/blockchains/blocks/commands/executions/identities/encryptors"
-	"github.com/steve-care-software/steve/domain/blockchains/blocks/commands/frames"
-	inputs "github.com/steve-care-software/steve/domain/blockchains/blocks/commands/inputs/identities/encryptors"
+	executions "github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/executions/identities/encryptors"
+	"github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/frames"
+	inputs "github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/inputs/identities/encryptors"
 )
 
 // Application represents the application

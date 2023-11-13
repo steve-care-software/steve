@@ -2,11 +2,11 @@ package dashboards
 
 import (
 	"github.com/steve-care-software/steve/applications/commands/shares/dashboards/fetches"
-	executions "github.com/steve-care-software/steve/domain/blockchains/blocks/commands/executions/shares/dashboards"
-	"github.com/steve-care-software/steve/domain/blockchains/blocks/commands/executions/shares/dashboards/failures"
-	"github.com/steve-care-software/steve/domain/blockchains/blocks/commands/executions/shares/dashboards/successes"
-	"github.com/steve-care-software/steve/domain/blockchains/blocks/commands/frames"
-	inputs "github.com/steve-care-software/steve/domain/blockchains/blocks/commands/inputs/shares/dashboards"
+	executions "github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/executions/shares/dashboards"
+	"github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/executions/shares/dashboards/failures"
+	"github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/executions/shares/dashboards/successes"
+	"github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/frames"
+	inputs "github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/inputs/shares/dashboards"
 )
 
 type application struct {

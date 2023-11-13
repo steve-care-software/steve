@@ -2,8 +2,8 @@ package inserts
 
 import (
 	"github.com/steve-care-software/steve/domain/accounts/administrators/identities"
-	executions "github.com/steve-care-software/steve/domain/blockchains/blocks/commands/executions/administrators/identities/successes/inserts"
-	inputs "github.com/steve-care-software/steve/domain/blockchains/blocks/commands/inputs/administrators/identities/contents/inserts"
+	executions "github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/executions/administrators/identities/successes/inserts"
+	inputs "github.com/steve-care-software/steve/domain/blockchains/blocks/queues/commands/inputs/administrators/identities/contents/inserts"
 )
 
 type application struct {
