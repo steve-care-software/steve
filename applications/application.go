@@ -236,7 +236,11 @@ func (app *application) Rollback(context uint) error {
 
 	head := blockchain.Head()
 	headCommands := head.Commands()
-	headQueue, err := app.queueBuilder.Create().WithCommands(headCommands).WithPath(path).Now()
+	headQueue, err := app.queueBuilder.Create().
+		WithCommands(headCommands).
+		WithPath(path).
+		Now()
+
 	if err != nil {
 		return err
 	}
