@@ -30,7 +30,6 @@ type application struct {
 	commandsBuilder      commands.Builder
 	commandBuilder       commands.CommandBuilder
 	inputAdapter         inputs.Adapter
-	queue                map[uint][]commands.Command
 }
 
 func createApplication(
@@ -62,7 +61,6 @@ func createApplication(
 		commandsBuilder:      commandsBuilder,
 		commandBuilder:       commandBuilder,
 		inputAdapter:         inputAdapter,
-		queue:                map[uint][]commands.Command{},
 	}
 
 	return &out
