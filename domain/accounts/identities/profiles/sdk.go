@@ -3,7 +3,7 @@ package profiles
 import (
 	"github.com/steve-care-software/steve/domain/accounts/identities/profiles/authorizations"
 	"github.com/steve-care-software/steve/domain/accounts/identities/profiles/roles"
-	"github.com/steve-care-software/steve/domain/stencils"
+	"github.com/steve-care-software/steve/domain/dashboards/stencils"
 )
 
 // Profile represents a profile

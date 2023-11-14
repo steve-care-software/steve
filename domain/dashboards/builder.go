@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"github.com/steve-care-software/steve/domain/blockchains/hash"
-	"github.com/steve-care-software/steve/domain/stencils"
+	"github.com/steve-care-software/steve/domain/dashboards/stencils"
 )
 
 type builder struct {

@@ -1,6 +1,6 @@
 package values
 
-import "github.com/steve-care-software/steve/domain/stencils"
+import "github.com/steve-care-software/steve/domain/dashboards/stencils"
 
 // Builder represents the fetch builder
 type Builder interface {
