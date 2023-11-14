@@ -3,8 +3,8 @@ package results
 import (
 	bytes_results "github.com/steve-care-software/steve/vms/bytes/results"
 	"github.com/steve-care-software/steve/vms/bytes/results/hash"
-	"github.com/steve-care-software/steve/vms/queries/scopes/layers/instructions/frames"
-	assignable_results "github.com/steve-care-software/steve/vms/queries/scopes/layers/instructions/scopes/assignments/scopes/assignables/results"
+	"github.com/steve-care-software/steve/vms/queries/scopes/layers/scopes/instructions/frames"
+	assignable_results "github.com/steve-care-software/steve/vms/queries/scopes/layers/scopes/instructions/scopes/assignments/scopes/assignables/results"
 )
 
 // Builder represents the result builder

@@ -3,7 +3,7 @@ package programs
 import (
 	bytes_programs "github.com/steve-care-software/steve/vms/bytes/programs"
 	"github.com/steve-care-software/steve/vms/bytes/results/hash"
-	assignment_programs "github.com/steve-care-software/steve/vms/queries/scopes/layers/instructions/scopes/assignments/programs"
+	assignment_programs "github.com/steve-care-software/steve/vms/queries/scopes/layers/scopes/instructions/scopes/assignments/programs"
 )
 
 // Builder represents a programs builder

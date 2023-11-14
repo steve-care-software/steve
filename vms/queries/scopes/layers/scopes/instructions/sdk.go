@@ -1,8 +1,8 @@
 package instructions
 
 import (
-	"github.com/steve-care-software/steve/vms/queries/scopes/layers/instructions/frames"
-	"github.com/steve-care-software/steve/vms/queries/scopes/layers/instructions/programs"
+	"github.com/steve-care-software/steve/vms/queries/scopes/layers/scopes/instructions/frames"
+	"github.com/steve-care-software/steve/vms/queries/scopes/layers/scopes/instructions/programs"
 )
 
 // Instruction represents an instruction

@@ -1,9 +1,9 @@
 package assignments
 
 import (
-	"github.com/steve-care-software/steve/vms/queries/scopes/layers/instructions/scopes/assignments/frames"
-	"github.com/steve-care-software/steve/vms/queries/scopes/layers/instructions/scopes/assignments/programs"
-	"github.com/steve-care-software/steve/vms/queries/scopes/layers/instructions/scopes/assignments/scopes/assignables"
+	"github.com/steve-care-software/steve/vms/queries/scopes/layers/scopes/instructions/scopes/assignments/frames"
+	"github.com/steve-care-software/steve/vms/queries/scopes/layers/scopes/instructions/scopes/assignments/programs"
+	"github.com/steve-care-software/steve/vms/queries/scopes/layers/scopes/instructions/scopes/assignments/scopes/assignables"
 )
 
 type assignment struct {

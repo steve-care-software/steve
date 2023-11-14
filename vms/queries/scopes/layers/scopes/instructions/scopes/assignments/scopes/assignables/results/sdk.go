@@ -2,7 +2,7 @@ package results
 
 import (
 	"github.com/steve-care-software/steve/vms/bytes/results/hash"
-	compare_results "github.com/steve-care-software/steve/vms/queries/scopes/layers/instructions/scopes/assignments/scopes/assignables/scopes/compares/results"
+	compare_results "github.com/steve-care-software/steve/vms/queries/scopes/layers/scopes/instructions/scopes/assignments/scopes/assignables/scopes/compares/results"
 )
 
 // Results represents results

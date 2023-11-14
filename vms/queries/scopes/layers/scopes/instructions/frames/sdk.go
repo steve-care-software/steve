@@ -2,7 +2,7 @@ package frames
 
 import (
 	"github.com/steve-care-software/steve/vms/bytes/results/hash"
-	"github.com/steve-care-software/steve/vms/queries/scopes/layers/instructions/scopes/assignments/frames"
+	"github.com/steve-care-software/steve/vms/queries/scopes/layers/scopes/instructions/scopes/assignments/frames"
 )
 
 // Builder represents the frames builder

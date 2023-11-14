@@ -2,7 +2,7 @@ package programs
 
 import (
 	"github.com/steve-care-software/steve/vms/bytes/results/hash"
-	assignable_programs "github.com/steve-care-software/steve/vms/queries/scopes/layers/instructions/scopes/assignments/scopes/assignables/programs"
+	assignable_programs "github.com/steve-care-software/steve/vms/queries/scopes/layers/scopes/instructions/scopes/assignments/scopes/assignables/programs"
 )
 
 // Builder represents a program builder

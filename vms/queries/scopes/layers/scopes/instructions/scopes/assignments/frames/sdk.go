@@ -3,7 +3,7 @@ package frames
 import (
 	bytes_frames "github.com/steve-care-software/steve/vms/bytes/frames"
 	"github.com/steve-care-software/steve/vms/bytes/results/hash"
-	assignable_results "github.com/steve-care-software/steve/vms/queries/scopes/layers/instructions/scopes/assignments/scopes/assignables/results"
+	assignable_results "github.com/steve-care-software/steve/vms/queries/scopes/layers/scopes/instructions/scopes/assignments/scopes/assignables/results"
 )
 
 // Builder represents the frames builder

@@ -3,9 +3,9 @@ package compares
 import (
 	bytes_vm "github.com/steve-care-software/steve/vms/bytes"
 	bytes_programs "github.com/steve-care-software/steve/vms/bytes/programs"
-	"github.com/steve-care-software/steve/vms/queries/scopes/layers/instructions/scopes/assignments/frames"
-	"github.com/steve-care-software/steve/vms/queries/scopes/layers/instructions/scopes/assignments/scopes/assignables/scopes/compares/results"
-	result_compares "github.com/steve-care-software/steve/vms/queries/scopes/layers/instructions/scopes/assignments/scopes/assignables/scopes/compares/results"
+	"github.com/steve-care-software/steve/vms/queries/scopes/layers/scopes/instructions/scopes/assignments/frames"
+	"github.com/steve-care-software/steve/vms/queries/scopes/layers/scopes/instructions/scopes/assignments/scopes/assignables/scopes/compares/results"
+	result_compares "github.com/steve-care-software/steve/vms/queries/scopes/layers/scopes/instructions/scopes/assignments/scopes/assignables/scopes/compares/results"
 )
 
 type compare struct {
