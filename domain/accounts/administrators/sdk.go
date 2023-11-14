@@ -4,14 +4,12 @@ import (
 	"github.com/steve-care-software/steve/domain/accounts/administrators/identities"
 	"github.com/steve-care-software/steve/domain/accounts/credentials"
 	"github.com/steve-care-software/steve/domain/dashboards"
-	"github.com/steve-care-software/steve/domain/stencils"
 )
 
 // Builder represents an administrator's builder
 type Builder interface {
 	Create() Builder
 	WithUsername(username string) Builder
-	WithVisitor(visitor stencils.Stencil) Builder
 	WithDashboard(dashboard dashboards.Dashboard) Builder
 	WithIdentities(identities identities.Identities) Builder
 	Now() (Administrator, error)
@@ -20,7 +18,6 @@ type Builder interface {
 // Administrator represents an administrator
 type Administrator interface {
 	Username() string
-	Visitor() stencils.Stencil
 	Dashboard() dashboards.Dashboard
 	HasIdentities() bool
 	Identities() identities.Identities

@@ -59,11 +59,9 @@ func (app *application) Execute(create inputs.Create) (executions.Create, error)
 	}
 
 	dashboard := create.Dashboard()
-	visitor := create.Visitor()
 	admin, err := app.adminBuilder.Create().
 		WithUsername(username).
 		WithDashboard(dashboard).
-		WithVisitor(visitor).
 		Now()
 
 	if err != nil {

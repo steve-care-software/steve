@@ -26,7 +26,7 @@ func createApplication(
 
 // Execute executes the application
 func (app *application) Execute(fetch inputs.Fetch, current dashboards.Dashboard) (executions.Fetch, error) {
-	content := fetch.Content()
+	/*content := fetch.Content()
 	valueBuilder := app.valueBuilder.Create()
 	if content.IsRoot() {
 		root := current.Root()
@@ -47,5 +47,7 @@ func (app *application) Execute(fetch inputs.Fetch, current dashboards.Dashboard
 	return app.executionBuilder.Create().
 		WithAssignTo(assignTo).
 		WithValue(value).
-		Now()
+		Now()*/
+
+	return nil, nil
 }

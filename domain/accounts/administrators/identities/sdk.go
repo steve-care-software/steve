@@ -1,5 +1,7 @@
 package identities
 
+import "github.com/steve-care-software/steve/domain/dashboards"
+
 // Builder represents an identities builder
 type Builder interface {
 	Create() Builder
@@ -21,6 +23,7 @@ type IdentityBuilder interface {
 	Create() IdentityBuilder
 	WithName(name string) IdentityBuilder
 	WithContainer(container []string) IdentityBuilder
+	WithDashboard(dashboard dashboards.Dashboard) IdentityBuilder
 	Now() (Identity, error)
 }
 
@@ -28,4 +31,5 @@ type IdentityBuilder interface {
 type Identity interface {
 	Name() string
 	Container() []string
+	Dashboard() dashboards.Dashboard
 }

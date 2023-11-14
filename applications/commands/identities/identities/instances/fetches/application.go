@@ -30,8 +30,8 @@ func (app *application) Execute(fetch inputs.Fetch, current identities.Identity)
 	valueBuilder := app.valueBuilder.Create()
 
 	if property.IsDashboard() {
-		dashboard := current.Dashboard()
-		valueBuilder.WithDashboard(dashboard)
+		//dashboard := current.Dashboard()
+		//valueBuilder.WithDashboard(dashboard)
 	}
 
 	if property.IsProfile() {

@@ -6,12 +6,10 @@ import (
 	"github.com/steve-care-software/steve/domain/accounts/identities/profiles"
 	"github.com/steve-care-software/steve/domain/accounts/identities/shares"
 	"github.com/steve-care-software/steve/domain/accounts/identities/signers"
-	"github.com/steve-care-software/steve/domain/dashboards"
 )
 
 // Identity represents an identity
 type Identity interface {
-	Dashboard() dashboards.Dashboard
 	Encryptor() encryptors.Encryptor
 	Signer() signers.Signer
 	Profile() profiles.Profile
