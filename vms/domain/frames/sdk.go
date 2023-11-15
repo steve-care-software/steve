@@ -2,16 +2,28 @@ package frames
 
 import "github.com/steve-care-software/steve/vms/domain/resources/blocks/queues"
 
-// Factory represents a frame factory
-type Factory interface {
+// Builder represents a frames builder
+type Builder interface {
+	Create() Builder
+	WithList(list []Frame) Builder
+	Now() (Frames, error)
+}
+
+// Frames represents frames
+type Frames interface {
+	List() []Frame
+}
+
+// FrameFactory represents a frame factory
+type FrameFactory interface {
 	Create() Frame
 }
 
-// Builder represents a frame builder
-type Builder interface {
-	Create() Builder
-	WithAssignables(assignables Assignables) Builder
-	Now() (Assignables, error)
+// FrameBuilder represents a frame builder
+type FrameBuilder interface {
+	Create() FrameBuilder
+	WithAssignables(assignables Assignables) FrameBuilder
+	Now() (Frame, error)
 }
 
 // Frame represents a frame

@@ -63,14 +63,14 @@ type Init interface {
 // RootBuilder represents the root builder
 type RootBuilder interface {
 	Create() RootBuilder
-	WithFee(fee uint16) RootBuilder
+	WithFees(fees uint16) RootBuilder
 	WithAffiliate(affiliate uint16) RootBuilder
 	Now() (Root, error)
 }
 
 // Root represents a root instruction
 type Root interface {
-	Fee() uint16
+	Fees() uint16
 	Affiliate() uint16
 }
 
