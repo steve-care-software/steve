@@ -15,7 +15,8 @@ type Builder interface {
 type Results interface {
 	Hash() hash.Hash
 	List() []Result
-	IsSuccess() bool
+	HasFailure() bool
+	Failure() Failure
 }
 
 // ResultBuilder represents the result builder

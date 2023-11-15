@@ -3,33 +3,32 @@ package programs
 import (
 	bytes_programs "github.com/steve-care-software/steve/vms/bytes/programs"
 	"github.com/steve-care-software/steve/vms/bytes/results/hash"
+	query_programs "github.com/steve-care-software/steve/vms/queries/programs"
+	reduce_programs "github.com/steve-care-software/steve/vms/queries/scopes/layers/scopes/instructions/scopes/assignments/scopes/assignables/scopes/reduces/programs"
 )
 
 // ProgramBuilder represents the program builder
 type ProgramBuilder interface {
 	Create() ProgramBuilder
-	/*WithQuery(query Query) AssignableBuilder
-	WithReduce(reduce reduces.Reduce) AssignableBuilder*/
+	WithQuery(query query_programs.Program) ProgramBuilder
 	WithCompare(compare bytes_programs.Programs) ProgramBuilder
-	/*WithLength(length bytes_programs.Programs) AssignableBuilder
-	WithJoin(join bytes_programs.Programs) AssignableBuilder
-	WithValue(value bytes_programs.Programs) AssignableBuilder*/
+	WithLength(length bytes_programs.Programs) ProgramBuilder
+	WithJoin(join bytes_programs.Programs) ProgramBuilder
+	WithReduce(reduce reduce_programs.Program) ProgramBuilder
 	Now() (Program, error)
 }
 
 // Program represents a program
 type Program interface {
 	Hash() hash.Hash
-	/*IsQuery() bool
-	Query() Query
-	IsReduce() bool
-	Reduce() reduces.Reduce*/
+	IsQuery() bool
+	Query() query_programs.Program
 	IsCompare() bool
 	Compare() bytes_programs.Programs
-	/*IsLength() bool
+	IsLength() bool
 	Length() bytes_programs.Programs
 	IsJoin() bool
 	Join() bytes_programs.Programs
-	IsValue() bool
-	Value() bytes_programs.Programs*/
+	IsReduce() bool
+	Reduce() reduce_programs.Program
 }

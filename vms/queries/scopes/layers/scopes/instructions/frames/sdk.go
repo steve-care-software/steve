@@ -1,8 +1,10 @@
 package frames
 
 import (
+	bytes_frames "github.com/steve-care-software/steve/vms/bytes/frames"
+	bytes_results "github.com/steve-care-software/steve/vms/bytes/results"
 	"github.com/steve-care-software/steve/vms/bytes/results/hash"
-	"github.com/steve-care-software/steve/vms/queries/scopes/layers/scopes/instructions/scopes/assignments/frames"
+	assignment_frames "github.com/steve-care-software/steve/vms/queries/scopes/layers/scopes/instructions/scopes/assignments/frames"
 )
 
 // Builder represents the frames builder
@@ -28,6 +30,8 @@ type FrameBuilder interface {
 // Frame represents a frame
 type Frame interface {
 	Hash() hash.Hash
+	Bytes() bytes_frames.Frame
+	Assignment() assignment_frames.Frame
 	List() []Entry
 	Fetch(index uint) (Entry, error)
 }
@@ -35,9 +39,7 @@ type Frame interface {
 // EntryBuilder represents an entry builder
 type EntryBuilder interface {
 	Create() EntryBuilder
-	IsStop() EntryBuilder
-	WithIndex(index uint) EntryBuilder
-	WithFrame(frame frames.Frame) EntryBuilder
+	WithFrame(frame assignment_frames.Frame) EntryBuilder
 	WithBlock(block Block) EntryBuilder
 	Now() (Entry, error)
 }
@@ -45,16 +47,8 @@ type EntryBuilder interface {
 // Entry represents a frame entry
 type Entry interface {
 	Hash() hash.Hash
-	Index() uint
-	Content() Content
-}
-
-// Content represents an entry content
-type Content interface {
-	Hash() hash.Hash
-	IsStop() bool
 	IsFrame() bool
-	Frame() frames.Frame
+	Frame() assignment_frames.Frame
 	IsBlock() bool
 	Block() Block
 }
@@ -62,13 +56,28 @@ type Content interface {
 // BlockBuilder represents a block builder
 type BlockBuilder interface {
 	Create() BlockBuilder
-	WithCondition(condition []byte) BlockBuilder
-	WithFrames(frames frames.Frames) BlockBuilder
+	WithSuccess(success Frames) BlockBuilder
+	WithFailure(failure BlockFailure) BlockBuilder
 	Now() (Block, error)
 }
 
 // Block represents a block
 type Block interface {
-	Condition() []byte
-	Frames() frames.Frames
+	IsSuccess() bool
+	Success() Frames
+	IsFailure() bool
+	Failure() BlockFailure
+}
+
+// BlockFailureBuilder represents a block failure builder
+type BlockFailureBuilder interface {
+	Create() BlockFailureBuilder
+	WithConditionFailed(conditionFailed bytes_results.Result) BlockFailureBuilder
+	Now() (BlockFailure, error)
+}
+
+// BlockFailure represents a block failure
+type BlockFailure interface {
+	IsConditionFailed() bool
+	ConditionFailed() bytes_results.Result
 }

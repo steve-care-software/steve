@@ -35,7 +35,7 @@ type Program interface {
 	IsAssignment() bool
 	Assignment() assignment_programs.Program
 	IsCondition() bool
-	Condition()
+	Condition() Condition
 }
 
 // ConditionBuilder represents a condition builder

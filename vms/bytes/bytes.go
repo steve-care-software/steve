@@ -35,7 +35,11 @@ func (app *bytes) Programs(programs programs.Programs, frame frames.Frame) (resu
 		if err != nil {
 			return nil, err
 		}
+
 		list = append(list, ins)
+		if ins.IsFailure() {
+			break
+		}
 	}
 
 	return app.resultsBuilder.Create().

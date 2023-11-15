@@ -33,7 +33,7 @@ func createQuery(
 
 // Execute executes the query
 func (app *query) Execute(input programs.Program, frame frames.Frame) (results.Result, error) {
-	layerName := input.Layer()
+	/*layerName := input.Layer()
 	assignment, err := frame.Fetch(layerName)
 	if err != nil {
 		return nil, err
@@ -48,7 +48,7 @@ func (app *query) Execute(input programs.Program, frame frames.Frame) (results.R
 	execLayer, err := app.vmLayer.Execute(layer, frame)
 	if err != nil {
 		return nil, err
-	}
+	}*/
 
 	return nil, nil
 }

@@ -2,7 +2,8 @@ package results
 
 import (
 	"github.com/steve-care-software/steve/vms/bytes/results/hash"
-	compare_results "github.com/steve-care-software/steve/vms/queries/scopes/layers/scopes/instructions/scopes/assignments/scopes/assignables/scopes/compares/results"
+	reduce_results "github.com/steve-care-software/steve/vms/queries/scopes/layers/scopes/instructions/scopes/assignments/scopes/assignables/scopes/reduces/results"
+	transformation_results "github.com/steve-care-software/steve/vms/queries/scopes/layers/scopes/instructions/scopes/assignments/scopes/assignables/scopes/transformations/results"
 )
 
 // Results represents results
@@ -14,7 +15,10 @@ type Results interface {
 // ResultBuilder represents the result builder
 type ResultBuilder interface {
 	Create() ResultBuilder
-	WithCompare(compare compare_results.Result) ResultBuilder
+	WithCompare(compare transformation_results.Result) ResultBuilder
+	WithLength(length transformation_results.Result) ResultBuilder
+	WithJoin(join transformation_results.Result) ResultBuilder
+	WithReduce(reduce reduce_results.Result) ResultBuilder
 	Now() (Result, error)
 }
 
@@ -22,5 +26,11 @@ type ResultBuilder interface {
 type Result interface {
 	Hash() hash.Hash
 	IsCompare() bool
-	Compare() compare_results.Result
+	Compare() transformation_results.Result
+	IsLength() bool
+	Length() transformation_results.Result
+	IsJoin() bool
+	Join() transformation_results.Result
+	IsReduce() bool
+	Reduce() reduce_results.Result
 }

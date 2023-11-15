@@ -5,6 +5,13 @@ import (
 	"github.com/steve-care-software/steve/vms/queries/scopes/layers/programs"
 )
 
+// Builder represents a frame builder
+type Builder interface {
+	Create() Builder
+	WithList(list []Assignment) Builder
+	Now() (Frame, error)
+}
+
 // Frame represents a frame
 type Frame interface {
 	List() []Assignment
