@@ -3,6 +3,7 @@ package applications
 import (
 	"time"
 
+	commnd_resources "github.com/steve-care-software/steve/vms/children/commands/domain/resources"
 	"github.com/steve-care-software/steve/vms/domain/frames"
 	"github.com/steve-care-software/steve/vms/domain/programs"
 	"github.com/steve-care-software/steve/vms/domain/resources"
@@ -27,6 +28,7 @@ type application struct {
 	queueBuilder            queues.Builder
 	queueRepository         queues.Repository
 	queueService            queues.Service
+	commandsBuilder         commnd_resources.Builder
 }
 
 func createApplication(
@@ -43,6 +45,7 @@ func createApplication(
 	queueBuilder queues.Builder,
 	queueRepository queues.Repository,
 	queueService queues.Service,
+	commandsBuilder commnd_resources.Builder,
 ) Application {
 	out := application{
 		frameFactory:            frameFactory,
@@ -58,6 +61,7 @@ func createApplication(
 		queueBuilder:            queueBuilder,
 		queueRepository:         queueRepository,
 		queueService:            queueService,
+		commandsBuilder:         commandsBuilder,
 	}
 
 	return &out
@@ -102,6 +106,84 @@ func (app *application) executeInstruction(instruction programs.Instruction, fra
 
 	init := instruction.Init()
 	return app.executeInit(init)
+}
+
+func (app *application) executeAssignment(assignment programs.Assignment, frame frames.Frame) error {
+	assignable := assignment.Assignable()
+	if assignable.IsBack() {
+		variable := assignable.Back()
+		return app.executeBack(variable, frame)
+	}
+
+	if assignable.IsBegin() {
+
+	}
+
+	if assignable.IsClear() {
+
+	}
+
+	if assignable.IsCommit() {
+
+	}
+
+	if assignable.IsExists() {
+
+	}
+
+	if assignable.IsQueue() {
+
+	}
+
+	if assignable.IsRollback() {
+
+	}
+
+	if assignable.IsTransact() {
+
+	}
+
+	return nil
+}
+
+func (app *application) executeBack(variable string, frame frames.Frame) error {
+	pContext, err := frame.FetchContext(variable)
+	if err != nil {
+		return err
+	}
+
+	queue, err := app.queueRepository.Retrieve(*pContext)
+	if err != nil {
+		return err
+	}
+
+	commandsList := queue.Commands().List()
+	if len(commandsList) <= 1 {
+		return app.queueService.Clear(*pContext)
+	}
+
+	updatedCommands, err := app.commandsBuilder.Create().
+		WithList(commandsList[:len(commandsList)-1]).
+		Now()
+
+	if err != nil {
+		return err
+	}
+
+	path := queue.Path()
+	updatedQueue, err := app.queueBuilder.Create().
+		WithPath(path).Create().
+		WithCommands(updatedCommands).
+		Now()
+
+	if err != nil {
+		return err
+	}
+
+	return app.queueService.Replace(
+		*pContext,
+		updatedQueue,
+	)
 }
 
 func (app *application) executeInit(init programs.Init) error {

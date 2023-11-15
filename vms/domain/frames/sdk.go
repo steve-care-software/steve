@@ -30,6 +30,7 @@ type FrameBuilder interface {
 type Frame interface {
 	Save(name string, assignable Assignable) error
 	Fetch(name string) (Assignable, error)
+	FetchContext(name string) (*uint, error)
 }
 
 // AssignablesBuilder represents the assignables builder
