@@ -10,8 +10,6 @@ type Builder interface {
 	Create() Builder
 	WithLayer(layer string) Builder
 	WithBytes(bytes bytes_programs.Program) Builder
-	WithParams(params bytes_programs.Programs) Builder
-	WithDependencies(dependencies []string) Builder
 	Now() (Program, error)
 }
 
@@ -20,9 +18,6 @@ type Program interface {
 	Hash() hash.Hash
 	Layer() string
 	Bytes() bytes_programs.Program
-	Params() bytes_programs.Programs
-	HasDependencies() bool
-	Dependencies() []string
 }
 
 // SuitesBuilder represents a suites builder
