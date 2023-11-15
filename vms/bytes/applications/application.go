@@ -1,4 +1,4 @@
-package bytes
+package applications
 
 import (
 	"github.com/steve-care-software/steve/vms/bytes/frames"
@@ -6,18 +6,18 @@ import (
 	"github.com/steve-care-software/steve/vms/bytes/results"
 )
 
-type bytes struct {
+type application struct {
 	resultsBuilder results.Builder
 	resultBuilder  results.ResultBuilder
 	failureBuilder results.FailureBuilder
 }
 
-func createBytes(
+func createApplication(
 	resultsBuilder results.Builder,
 	resultBuilder results.ResultBuilder,
 	failureBuilder results.FailureBuilder,
-) Bytes {
-	out := bytes{
+) Application {
+	out := application{
 		resultsBuilder: resultsBuilder,
 		resultBuilder:  resultBuilder,
 		failureBuilder: failureBuilder,
@@ -27,7 +27,7 @@ func createBytes(
 }
 
 // Programs execute programs
-func (app *bytes) Programs(programs programs.Programs, frame frames.Frame) (results.Results, error) {
+func (app *application) Programs(programs programs.Programs, frame frames.Frame) (results.Results, error) {
 	list := []results.Result{}
 	programsList := programs.List()
 	for _, oneProgram := range programsList {
@@ -48,7 +48,7 @@ func (app *bytes) Programs(programs programs.Programs, frame frames.Frame) (resu
 }
 
 // Program execute program
-func (app *bytes) Program(program programs.Program, frame frames.Frame) (results.Result, error) {
+func (app *application) Program(program programs.Program, frame frames.Frame) (results.Result, error) {
 	builder := app.resultBuilder.Create()
 	if program.IsVariable() {
 		variable := program.Variable()

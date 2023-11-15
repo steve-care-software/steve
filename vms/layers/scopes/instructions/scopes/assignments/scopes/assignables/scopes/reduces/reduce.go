@@ -1,25 +1,25 @@
 package reduces
 
 import (
-	bytes_vm "github.com/steve-care-software/steve/vms/bytes"
+	bytes_applications "github.com/steve-care-software/steve/vms/bytes/applications"
 	"github.com/steve-care-software/steve/vms/layers/scopes/instructions/scopes/assignments/frames"
 	"github.com/steve-care-software/steve/vms/layers/scopes/instructions/scopes/assignments/scopes/assignables/scopes/reduces/programs"
 	"github.com/steve-care-software/steve/vms/layers/scopes/instructions/scopes/assignments/scopes/assignables/scopes/reduces/results"
 )
 
 type reduce struct {
-	vmBytes        bytes_vm.Bytes
+	bytesApp       bytes_applications.Application
 	resultBuilder  results.Builder
 	failureBuilder results.FailureBuilder
 }
 
 func createReduce(
-	vmBytes bytes_vm.Bytes,
+	bytesApp bytes_applications.Application,
 	resultBuilder results.Builder,
 	failureBuilder results.FailureBuilder,
 ) Reduce {
 	out := reduce{
-		vmBytes:        vmBytes,
+		bytesApp:       bytesApp,
 		resultBuilder:  resultBuilder,
 		failureBuilder: failureBuilder,
 	}
@@ -30,7 +30,7 @@ func createReduce(
 // Execute executes the program
 func (app *reduce) Execute(input programs.Program, frame frames.Frame) (results.Result, error) {
 	bytes := input.Bytes()
-	exec, err := app.vmBytes.Program(bytes, frame.Bytes())
+	exec, err := app.bytesApp.Program(bytes, frame.Bytes())
 	if err != nil {
 		return nil, err
 	}

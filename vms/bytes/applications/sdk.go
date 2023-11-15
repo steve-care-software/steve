@@ -1,4 +1,4 @@
-package bytes
+package applications
 
 import (
 	"github.com/steve-care-software/steve/vms/bytes/frames"
@@ -6,8 +6,8 @@ import (
 	"github.com/steve-care-software/steve/vms/bytes/results"
 )
 
-// Bytes represents the bytes
-type Bytes interface {
+// Application represents the bytes application
+type Application interface {
 	Programs(programs programs.Programs, frame frames.Frame) (results.Results, error)
 	Program(program programs.Program, frame frames.Frame) (results.Result, error)
 }

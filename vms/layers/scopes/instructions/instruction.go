@@ -3,14 +3,14 @@ package instructions
 import (
 	"bytes"
 
-	vm_bytes "github.com/steve-care-software/steve/vms/bytes"
+	bytes_applications "github.com/steve-care-software/steve/vms/bytes/applications"
 	"github.com/steve-care-software/steve/vms/layers/scopes/instructions/frames"
 	"github.com/steve-care-software/steve/vms/layers/scopes/instructions/programs"
 	"github.com/steve-care-software/steve/vms/layers/scopes/instructions/scopes/assignments"
 )
 
 type instruction struct {
-	vmBytes             vm_bytes.Bytes
+	bytesApp            bytes_applications.Application
 	vmAssignment        assignments.Assignment
 	framesBuilder       frames.Builder
 	frameBuilder        frames.FrameBuilder
@@ -21,7 +21,7 @@ type instruction struct {
 }
 
 func createInstruction(
-	vmBytes vm_bytes.Bytes,
+	bytesApp bytes_applications.Application,
 	vmAssignment assignments.Assignment,
 	framesBuilder frames.Builder,
 	frameBuilder frames.FrameBuilder,
@@ -31,7 +31,7 @@ func createInstruction(
 	trueBytes []byte,
 ) Instruction {
 	out := instruction{
-		vmBytes:             vmBytes,
+		bytesApp:            bytesApp,
 		vmAssignment:        vmAssignment,
 		framesBuilder:       framesBuilder,
 		frameBuilder:        frameBuilder,
@@ -118,7 +118,7 @@ func (app *instruction) Instruction(program programs.Program, frame frames.Frame
 // Condition executes the condition
 func (app *instruction) Condition(program programs.Condition, frame frames.Frame) (frames.Block, error) {
 	constraint := program.Constraint()
-	execCons, err := app.vmBytes.Program(constraint, frame.Bytes())
+	execCons, err := app.bytesApp.Program(constraint, frame.Bytes())
 	if err != nil {
 		return nil, err
 	}

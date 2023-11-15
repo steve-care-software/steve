@@ -3,23 +3,23 @@ package transformations
 import (
 	"encoding/binary"
 
-	bytes_vm "github.com/steve-care-software/steve/vms/bytes"
+	bytes_applications "github.com/steve-care-software/steve/vms/bytes/applications"
 	bytes_programs "github.com/steve-care-software/steve/vms/bytes/programs"
 	"github.com/steve-care-software/steve/vms/layers/scopes/instructions/scopes/assignments/frames"
 	"github.com/steve-care-software/steve/vms/layers/scopes/instructions/scopes/assignments/scopes/assignables/scopes/transformations/results"
 )
 
 type length struct {
-	vmBytes       bytes_vm.Bytes
+	bytesApp      bytes_applications.Application
 	resultBuilder results.Builder
 }
 
 func createLength(
-	vmBytes bytes_vm.Bytes,
+	bytesApp bytes_applications.Application,
 	resultBuilder results.Builder,
 ) Transformation {
 	out := length{
-		vmBytes:       vmBytes,
+		bytesApp:      bytesApp,
 		resultBuilder: resultBuilder,
 	}
 
@@ -28,7 +28,7 @@ func createLength(
 
 // Execute executes the length
 func (app *length) Execute(input bytes_programs.Programs, frame frames.Frame) (results.Result, error) {
-	exec, err := app.vmBytes.Programs(input, frame.Bytes())
+	exec, err := app.bytesApp.Programs(input, frame.Bytes())
 	if err != nil {
 		return nil, err
 	}

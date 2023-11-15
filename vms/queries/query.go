@@ -1,22 +1,22 @@
 package queries
 
 import (
-	vm_bytes "github.com/steve-care-software/steve/vms/bytes"
+	bytes_applications "github.com/steve-care-software/steve/vms/bytes/applications"
 	"github.com/steve-care-software/steve/vms/queries/programs"
 	"github.com/steve-care-software/steve/vms/queries/results"
 )
 
 type query struct {
-	vmBytes       vm_bytes.Bytes
+	bytesApp      bytes_applications.Application
 	resultBuilder results.Builder
 }
 
 func createQuery(
-	vmBytes vm_bytes.Bytes,
+	bytesApp bytes_applications.Application,
 	resultBuilder results.Builder,
 ) Query {
 	out := query{
-		vmBytes:       vmBytes,
+		bytesApp:      bytesApp,
 		resultBuilder: resultBuilder,
 	}
 
