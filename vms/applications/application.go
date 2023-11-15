@@ -92,10 +92,6 @@ func (app *application) executeInstructions(instructions programs.Instructions, 
 }
 
 func (app *application) executeInstruction(instruction programs.Instruction, frame frames.Frame) error {
-	if instruction.IsInit() {
-
-	}
-
 	if instruction.IsAssignment() {
 
 	}
