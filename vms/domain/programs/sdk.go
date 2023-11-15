@@ -32,6 +32,10 @@ type InstructionBuilder interface {
 	Create() InstructionBuilder
 	WithInit(init Init) InstructionBuilder
 	WithDelete(del string) InstructionBuilder
+	WithBack(back string) InstructionBuilder
+	WithCommit(commit Commit) InstructionBuilder
+	WithClear(clear string) InstructionBuilder
+	WithRollback(rollback string) InstructionBuilder
 	WithAssignment(assignment Assignment) InstructionBuilder
 	Now() (Instruction, error)
 }
@@ -42,6 +46,14 @@ type Instruction interface {
 	Init() Init
 	IsDelete() bool
 	Delete() string
+	IsBack() bool
+	Back() string
+	IsCommit() bool
+	Commit() Commit
+	IsClear() bool
+	Clear() string
+	IsRollback() bool
+	Rollback() string
 	IsAssignment() bool
 	Assignment() Assignment
 }
@@ -74,6 +86,20 @@ type Root interface {
 	Affiliate() uint16
 }
 
+// CommitBuilder represents the commit builder
+type CommitBuilder interface {
+	Create() CommitBuilder
+	WithContext(context string) CommitBuilder
+	WithMessage(message string) CommitBuilder
+	Now() (Commit, error)
+}
+
+// Commit represents a commit
+type Commit interface {
+	Context() string
+	Message() string
+}
+
 // AssignmentBuilder represents the assignment builder
 type AssignmentBuilder interface {
 	Create() AssignmentBuilder
@@ -95,10 +121,6 @@ type AssignableBuilder interface {
 	WithExists(exists string) AssignableBuilder
 	WithTransact(trx Transact) AssignableBuilder
 	WithQueue(queue string) AssignableBuilder
-	WithCommit(commit Commit) AssignableBuilder
-	WithBack(back string) AssignableBuilder
-	WithClear(clear string) AssignableBuilder
-	WithRollback(rollback string) AssignableBuilder
 	Now() (Assignable, error)
 }
 
@@ -112,14 +134,6 @@ type Assignable interface {
 	Transact() Transact
 	IsQueue() bool
 	Queue() string
-	IsCommit() bool
-	Commit() Commit
-	IsBack() bool
-	Back() string
-	IsClear() bool
-	Clear() string
-	IsRollback() bool
-	Rollback() string
 }
 
 // TransactBuilder represents a transact builder
@@ -134,18 +148,4 @@ type TransactBuilder interface {
 type Transact interface {
 	Context() string
 	Input() []byte
-}
-
-// CommitBuilder represents the commit builder
-type CommitBuilder interface {
-	Create() CommitBuilder
-	WithContext(context string) CommitBuilder
-	WithMessage(message string) CommitBuilder
-	Now() (Commit, error)
-}
-
-// Commit represents a commit
-type Commit interface {
-	Context() string
-	Message() string
 }

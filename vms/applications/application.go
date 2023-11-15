@@ -18,6 +18,7 @@ type application struct {
 	frameFactory            frames.FrameFactory
 	frameBuilder            frames.FrameBuilder
 	frameAssignablesBuilder frames.AssignablesBuilder
+	frameAssignableBuilder  frames.AssignableBuilder
 	resultBuilder           results.Builder
 	blockchainBuilder       resources.Builder
 	blockchainRepository    resources.Repository
@@ -104,28 +105,33 @@ func (app *application) executeInstruction(instruction programs.Instruction, fra
 
 	}
 
+	if instruction.IsClear() {
+
+	}
+
+	if instruction.IsBack() {
+		variable := instruction.Back()
+		return app.executeBack(variable, frame)
+	}
+
+	if instruction.IsCommit() {
+		commit := instruction.Commit()
+		return app.executeCommit(commit, frame)
+	}
+
+	if instruction.IsRollback() {
+
+	}
+
 	init := instruction.Init()
 	return app.executeInit(init)
 }
 
-func (app *application) executeAssignment(assignment programs.Assignment, frame frames.Frame) error {
+func (app *application) executeAssignment(assignment programs.Assignment, frame frames.Frame) (frames.Assignable, error) {
 	assignable := assignment.Assignable()
-	if assignable.IsBack() {
-		variable := assignable.Back()
-		return app.executeBack(variable, frame)
-	}
 
 	if assignable.IsBegin() {
 
-	}
-
-	if assignable.IsClear() {
-
-	}
-
-	if assignable.IsCommit() {
-		commit := assignable.Commit()
-		return app.executeCommit(commit, frame)
 	}
 
 	if assignable.IsExists() {
@@ -133,18 +139,31 @@ func (app *application) executeAssignment(assignment programs.Assignment, frame 
 	}
 
 	if assignable.IsQueue() {
-
-	}
-
-	if assignable.IsRollback() {
-
+		variable := assignable.Queue()
+		return app.fetchQueue(variable, frame)
 	}
 
 	if assignable.IsTransact() {
 
 	}
 
-	return nil
+	return nil, nil
+}
+
+func (app *application) fetchQueue(variable string, frame frames.Frame) (frames.Assignable, error) {
+	pContext, err := frame.FetchContext(variable)
+	if err != nil {
+		return nil, err
+	}
+
+	queue, err := app.queueRepository.Retrieve(*pContext)
+	if err != nil {
+		return nil, err
+	}
+
+	return app.frameAssignableBuilder.Create().
+		WithQueue(queue).
+		Now()
 }
 
 func (app *application) executeCommit(commit programs.Commit, frame frames.Frame) error {
