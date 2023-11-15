@@ -124,7 +124,8 @@ func (app *application) executeAssignment(assignment programs.Assignment, frame 
 	}
 
 	if assignable.IsCommit() {
-
+		commit := assignable.Commit()
+		return app.executeCommit(commit, frame)
 	}
 
 	if assignable.IsExists() {
@@ -144,6 +145,54 @@ func (app *application) executeAssignment(assignment programs.Assignment, frame 
 	}
 
 	return nil
+}
+
+func (app *application) executeCommit(commit programs.Commit, frame frames.Frame) error {
+	contextVariable := commit.Context()
+	pContext, err := frame.FetchContext(contextVariable)
+	if err != nil {
+		return err
+	}
+
+	message := commit.Message()
+
+	queue, err := app.queueRepository.Retrieve(*pContext)
+	if err != nil {
+		return err
+	}
+
+	path := queue.Path()
+	blockchain, err := app.blockchainRepository.Retrieve(path)
+	if err != nil {
+		return err
+	}
+
+	createdOn := time.Now().UTC()
+	commands := queue.Commands()
+	rootHash := blockchain.Root().Hash()
+	blockBuilder := app.blockBuilder.Create().
+		WithMessage(message).
+		WithCommands(commands).
+		CreatedOn(createdOn).
+		WithParent(rootHash)
+
+	if blockchain.HasHead() {
+		headHash := blockchain.Head().Hash()
+		blockBuilder.WithParent(headHash)
+	}
+
+	block, err := blockBuilder.Now()
+	if err != nil {
+		return err
+	}
+
+	return app.blockchainService.Chain(
+		blockchain,
+		block,
+		func() error {
+			return app.queueService.Clear(*pContext)
+		},
+	)
 }
 
 func (app *application) executeBack(variable string, frame frames.Frame) error {

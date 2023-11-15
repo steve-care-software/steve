@@ -3,8 +3,8 @@ package blocks
 import (
 	"time"
 
-	"github.com/steve-care-software/steve/domain/blockchains/hash"
 	"github.com/steve-care-software/steve/vms/children/commands/domain/resources"
+	"github.com/steve-care-software/steve/vms/libraries/hash"
 )
 
 // Builder represents the block builder
