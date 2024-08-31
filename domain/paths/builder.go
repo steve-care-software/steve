@@ -1,13 +1,9 @@
 package paths
 
-import (
-	"errors"
-
-	"github.com/steve-care-software/steve/domain/connections"
-)
+import "errors"
 
 type builder struct {
-	list []connections.Connections
+	list []Path
 }
 
 func createBuilder() Builder {
@@ -24,7 +20,7 @@ func (app *builder) Create() Builder {
 }
 
 // WithList adds a list to the builder
-func (app *builder) WithList(list []connections.Connections) Builder {
+func (app *builder) WithList(list []Path) Builder {
 	app.list = list
 	return app
 }
@@ -36,7 +32,7 @@ func (app *builder) Now() (Paths, error) {
 	}
 
 	if app.list == nil {
-		return nil, errors.New("there must be at least 1 Path (list of Connections) in order to build a Paths instance")
+		return nil, errors.New("there must be at least 1 Path in order to build a Paths instance")
 	}
 
 	return createPaths(app.list), nil

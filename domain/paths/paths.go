@@ -3,11 +3,11 @@ package paths
 import "github.com/steve-care-software/steve/domain/connections"
 
 type paths struct {
-	list []connections.Connections
+	list []Path
 }
 
 func createPaths(
-	list []connections.Connections,
+	list []Path,
 ) Paths {
 	out := paths{
 		list: list,
@@ -16,7 +16,18 @@ func createPaths(
 	return &out
 }
 
-// List returns the list of path
-func (obj *paths) List() []connections.Connections {
+// List returns the list of paths
+func (obj *paths) List() []Path {
 	return obj.list
+}
+
+// Successfuls returns the successful paths
+func (obj *paths) Successfuls() [][]connections.Connection {
+	output := [][]connections.Connection{}
+	for _, onePath := range obj.list {
+		successfuls := onePath.Successfuls()
+		output = append(output, successfuls...)
+	}
+
+	return output
 }
