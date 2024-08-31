@@ -1,45 +1,47 @@
 package contexts
 
-import "github.com/google/uuid"
+import (
+	"github.com/steve-care-software/steve/domain/hash"
+)
 
 type context struct {
-	identifier uuid.UUID
-	name       string
-	pParent    *uuid.UUID
+	hash   hash.Hash
+	name   string
+	parent hash.Hash
 }
 
 func createContext(
-	identifier uuid.UUID,
+	hash hash.Hash,
 	name string,
 ) Context {
-	return createContextInternally(identifier, name, nil)
+	return createContextInternally(hash, name, nil)
 }
 
 func createContextWithParent(
-	identifier uuid.UUID,
+	hash hash.Hash,
 	name string,
-	pParent *uuid.UUID,
+	parent hash.Hash,
 ) Context {
-	return createContextInternally(identifier, name, pParent)
+	return createContextInternally(hash, name, parent)
 }
 
 func createContextInternally(
-	identifier uuid.UUID,
+	hash hash.Hash,
 	name string,
-	pParent *uuid.UUID,
+	parent hash.Hash,
 ) Context {
 	out := context{
-		identifier: identifier,
-		name:       name,
-		pParent:    pParent,
+		hash:   hash,
+		name:   name,
+		parent: parent,
 	}
 
 	return &out
 }
 
-// Identifier returns the identifier
-func (obj *context) Identifier() uuid.UUID {
-	return obj.identifier
+// Hash returns the hash
+func (obj *context) Hash() hash.Hash {
+	return obj.hash
 }
 
 // Name returns the name
@@ -49,10 +51,10 @@ func (obj *context) Name() string {
 
 // HasParent returns true if there is parent, false otherwise
 func (obj *context) HasParent() bool {
-	return obj.pParent != nil
+	return obj.parent != nil
 }
 
 // Parent returns the parent, if any
-func (obj *context) Parent() *uuid.UUID {
-	return obj.pParent
+func (obj *context) Parent() hash.Hash {
+	return obj.parent
 }

@@ -3,20 +3,22 @@ package contexts
 import (
 	"errors"
 
-	"github.com/google/uuid"
+	"github.com/steve-care-software/steve/domain/hash"
 )
 
 type contextBuilder struct {
-	pIdentifier *uuid.UUID
+	hashAdapter hash.Adapter
 	name        string
-	pParent     *uuid.UUID
+	parent      hash.Hash
 }
 
-func createContextBuilder() ContextBuilder {
+func createContextBuilder(
+	hashAdapter hash.Adapter,
+) ContextBuilder {
 	out := contextBuilder{
-		pIdentifier: nil,
+		hashAdapter: hashAdapter,
 		name:        "",
-		pParent:     nil,
+		parent:      nil,
 	}
 
 	return &out
@@ -24,13 +26,9 @@ func createContextBuilder() ContextBuilder {
 
 // Create initializes the builder
 func (app *contextBuilder) Create() ContextBuilder {
-	return createContextBuilder()
-}
-
-// WithIdentifier adds an identifier to the builder
-func (app *contextBuilder) WithIdentifier(identifier uuid.UUID) ContextBuilder {
-	app.pIdentifier = &identifier
-	return app
+	return createContextBuilder(
+		app.hashAdapter,
+	)
 }
 
 // WithName adds a name to the builder
@@ -40,24 +38,33 @@ func (app *contextBuilder) WithName(name string) ContextBuilder {
 }
 
 // WithParent adds a parent to the builder
-func (app *contextBuilder) WithParent(parent uuid.UUID) ContextBuilder {
-	app.pParent = &parent
+func (app *contextBuilder) WithParent(parent hash.Hash) ContextBuilder {
+	app.parent = parent
 	return app
 }
 
 // Now builds a new Context instance
 func (app *contextBuilder) Now() (Context, error) {
-	if app.pIdentifier == nil {
-		return nil, errors.New("the identifier is mandatory in order to build a Context instance")
-	}
-
 	if app.name == "" {
 		return nil, errors.New("the name is mandatory in order to build a Context instance")
 	}
 
-	if app.pParent != nil {
-		return createContextWithParent(*app.pIdentifier, app.name, app.pParent), nil
+	data := [][]byte{
+		[]byte(app.name),
 	}
 
-	return createContext(*app.pIdentifier, app.name), nil
+	if app.parent != nil {
+		data = append(data, app.parent.Bytes())
+	}
+
+	pHash, err := app.hashAdapter.FromMultiBytes(data)
+	if err != nil {
+		return nil, err
+	}
+
+	if app.parent != nil {
+		return createContextWithParent(*pHash, app.name, app.parent), nil
+	}
+
+	return createContext(*pHash, app.name), nil
 }

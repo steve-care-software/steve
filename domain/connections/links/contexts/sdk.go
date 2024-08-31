@@ -1,6 +1,8 @@
 package contexts
 
-import "github.com/google/uuid"
+import (
+	"github.com/steve-care-software/steve/domain/hash"
+)
 
 // NewBuilder creates a new builder
 func NewBuilder() Builder {
@@ -9,7 +11,10 @@ func NewBuilder() Builder {
 
 // NewContextBuilder creates a new context builder
 func NewContextBuilder() ContextBuilder {
-	return createContextBuilder()
+	hashAdapter := hash.NewAdapter()
+	return createContextBuilder(
+		hashAdapter,
+	)
 }
 
 // Builder represents the contexts builder
@@ -27,16 +32,15 @@ type Contexts interface {
 // ContextBuilder represents the context builder
 type ContextBuilder interface {
 	Create() ContextBuilder
-	WithIdentifier(identifier uuid.UUID) ContextBuilder
 	WithName(name string) ContextBuilder
-	WithParent(parent uuid.UUID) ContextBuilder
+	WithParent(parent hash.Hash) ContextBuilder
 	Now() (Context, error)
 }
 
 // Context represents a context
 type Context interface {
-	Identifier() uuid.UUID
+	Hash() hash.Hash
 	Name() string
 	HasParent() bool
-	Parent() *uuid.UUID
+	Parent() hash.Hash
 }
