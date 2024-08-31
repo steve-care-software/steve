@@ -3,7 +3,7 @@ package points
 import (
 	"errors"
 
-	"github.com/steve-care-software/steve/domain/relations/data/connections"
+	"github.com/steve-care-software/steve/domain/data/connections"
 )
 
 type pointBuilder struct {

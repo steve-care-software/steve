@@ -1,6 +1,6 @@
 package links
 
-import "github.com/steve-care-software/steve/domain/relations/data/connections/links/contexts"
+import "github.com/steve-care-software/steve/domain/data/connections/links/contexts"
 
 type link struct {
 	name     string
