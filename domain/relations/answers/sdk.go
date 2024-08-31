@@ -5,6 +5,16 @@ import (
 	"github.com/steve-care-software/steve/domain/relations/data/points"
 )
 
+// Builder represents the answer builder
+type Builder interface {
+	Create() Builder
+	WithPoint(point points.Point) Builder
+	WithPoints(points points.Points) Builder
+	WithLink(link links.Link) Builder
+	WithLinks(links links.Links) Builder
+	Now() (Answer, error)
+}
+
 // Answer represents an answer
 type Answer interface {
 	IsPoint() bool
@@ -12,7 +22,7 @@ type Answer interface {
 	IsPoints() bool
 	Points() points.Points
 	IsLink() bool
-	Link() links.Links
+	Link() links.Link
 	IsLinks() bool
 	Links() links.Links
 }
