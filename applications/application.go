@@ -7,7 +7,6 @@ import (
 	"github.com/google/uuid"
 	applications_connections "github.com/steve-care-software/steve/applications/connections"
 	"github.com/steve-care-software/steve/domain/connections"
-	"github.com/steve-care-software/steve/domain/paths"
 	"github.com/steve-care-software/steve/domain/queries"
 	"github.com/steve-care-software/steve/domain/routes"
 )
@@ -16,8 +15,6 @@ type application struct {
 	connApp            applications_connections.Application
 	routesBuilder      routes.Builder
 	routeBuilder       routes.RouteBuilder
-	pathsBuilder       paths.Builder
-	pathBuilder        paths.PathBuilder
 	connectionsBuilder connections.Builder
 }
 
@@ -25,16 +22,12 @@ func createApplication(
 	connApp applications_connections.Application,
 	routesBuilder routes.Builder,
 	routeBuilder routes.RouteBuilder,
-	pathsBuilder paths.Builder,
-	pathBuilder paths.PathBuilder,
 	connectionsBuilder connections.Builder,
 ) Application {
 	out := application{
 		connApp:            connApp,
 		routesBuilder:      routesBuilder,
 		routeBuilder:       routeBuilder,
-		pathsBuilder:       pathsBuilder,
-		pathBuilder:        pathBuilder,
 		connectionsBuilder: connectionsBuilder,
 	}
 
@@ -63,7 +56,7 @@ func (app *application) Routes(queries queries.Queries) (routes.Routes, error) {
 func (app *application) Route(query queries.Query) (routes.Route, error) {
 	from := query.From()
 	to := query.To()
-	retPath, err := app.followUntilReached(
+	retConnectionsList, err := app.followUntilReached(
 		from,
 		to,
 		[]connections.Connection{},
@@ -73,22 +66,8 @@ func (app *application) Route(query queries.Query) (routes.Route, error) {
 		return nil, err
 	}
 
-	connectionsList := []connections.Connections{}
-	successfuls := retPath.Successfuls()
-	for _, oneSuccessful := range successfuls {
-		connections, err := app.connectionsBuilder.Create().
-			WithList(oneSuccessful).
-			Now()
-
-		if err != nil {
-			return nil, err
-		}
-
-		connectionsList = append(connectionsList, connections)
-	}
-
 	return app.routeBuilder.Create().
-		WithPossibilities(connectionsList).
+		WithPossibilities(retConnectionsList).
 		Now()
 }
 
@@ -96,32 +75,33 @@ func (app *application) followUntilReached(
 	start uuid.UUID,
 	destination uuid.UUID,
 	connectionsList []connections.Connection,
-) (paths.Path, error) {
+) ([]connections.Connections, error) {
 	listTo, err := app.connApp.ListFrom(start)
 	if err != nil {
 		str := fmt.Sprintf("there is no link between the requested points (start: %s, to: %s)", start.String(), destination.String())
 		return nil, errors.New(str)
 	}
 
-	retPathList := []paths.Path{}
+	retOutputList := []connections.Connections{}
 	listToConnectionsList := listTo.List()
 	for _, oneConnection := range listToConnectionsList {
+		merged := append(connectionsList, oneConnection)
 		if oneConnection.To().String() == destination.String() {
 			// reached destination
-			paths, err := app.pathsBuilder.Create().WithList(retPathList).Now()
+			retConnections, err := app.connectionsBuilder.Create().
+				WithList(merged).
+				Now()
+
 			if err != nil {
 				return nil, err
 			}
 
-			return app.pathBuilder.Create().
-				WithDestination(oneConnection).
-				WithPossibilities(paths).
-				Now()
+			retOutputList = append(retOutputList, retConnections)
+			continue
 		}
 
 		newFrom := oneConnection.To()
-		merged := append(connectionsList, oneConnection)
-		retPath, err := app.followUntilReached(
+		retConnectionsList, err := app.followUntilReached(
 			newFrom,
 			destination,
 			merged,
@@ -131,23 +111,8 @@ func (app *application) followUntilReached(
 			continue
 		}
 
-		retPathList = append(retPathList, retPath)
+		retOutputList = append(retOutputList, retConnectionsList...)
 	}
 
-	if len(retPathList) <= 0 {
-		str := fmt.Sprintf("there is no path between the requested points (start: %s, to: %s)", start.String(), destination.String())
-		return nil, errors.New(str)
-	}
-
-	paths, err := app.pathsBuilder.Create().
-		WithList(retPathList).
-		Now()
-
-	if err != nil {
-		return nil, err
-	}
-
-	return app.pathBuilder.Create().
-		WithPossibilities(paths).
-		Now()
+	return retOutputList, nil
 }

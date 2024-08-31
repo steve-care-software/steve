@@ -1,6 +1,8 @@
 package connections
 
 import (
+	"fmt"
+
 	"github.com/google/uuid"
 	"github.com/steve-care-software/steve/domain/connections/links"
 	"github.com/steve-care-software/steve/domain/hash"
@@ -47,4 +49,9 @@ func (obj *connection) Link() links.Link {
 // To returns the to identifier
 func (obj *connection) To() uuid.UUID {
 	return obj.to
+}
+
+// Debug returns the string debug representation of the link
+func (obj *connection) Debug() string {
+	return fmt.Sprintf("\nfrom: %s\nto: %s\nlink: %s\n-----\n", obj.from.String(), obj.to.String(), obj.link.Debug())
 }

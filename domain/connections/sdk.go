@@ -29,6 +29,7 @@ type Builder interface {
 // Connections represents connections
 type Connections interface {
 	List() []Connection
+	Debug() string
 }
 
 // ConnectionBuilder represents a connection builder
@@ -46,4 +47,5 @@ type Connection interface {
 	From() uuid.UUID
 	Link() links.Link
 	To() uuid.UUID
+	Debug() string
 }

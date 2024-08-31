@@ -1,6 +1,8 @@
 package links
 
 import (
+	"fmt"
+
 	"github.com/steve-care-software/steve/domain/connections/links/contexts"
 	"github.com/steve-care-software/steve/domain/hash"
 )
@@ -54,4 +56,9 @@ func (obj *link) IsLeft() bool {
 // Weight returns the weight
 func (obj *link) Weight() float32 {
 	return obj.weight
+}
+
+// Debug returns the string debug representation of the link
+func (obj *link) Debug() string {
+	return fmt.Sprintf("name: %s, isLeft: %t, weight: %f", obj.name, obj.isLeft, obj.weight)
 }

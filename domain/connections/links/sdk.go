@@ -47,4 +47,5 @@ type Link interface {
 	Name() string
 	IsLeft() bool
 	Weight() float32
+	Debug() string
 }

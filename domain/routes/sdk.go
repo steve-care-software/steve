@@ -34,4 +34,5 @@ type RouteBuilder interface {
 // Route represents a route
 type Route interface {
 	Possibilities() []connections.Connections
+	Debug() string
 }
