@@ -1,7 +1,7 @@
 package programs
 
 import (
-	"github.com/steve-care-software/steve/domain/data/points/programs/grammars"
+	"github.com/steve-care-software/steve/domain/points/programs/grammars"
 )
 
 // Program represents the program

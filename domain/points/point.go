@@ -1,6 +1,6 @@
 package points
 
-import "github.com/steve-care-software/steve/domain/data/connections"
+import "github.com/steve-care-software/steve/domain/connections"
 
 type point struct {
 	connection connections.Connection

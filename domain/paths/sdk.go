@@ -1,7 +1,7 @@
 package paths
 
 import (
-	"github.com/steve-care-software/steve/domain/data/connections"
+	"github.com/steve-care-software/steve/domain/connections"
 )
 
 // Builder represents a paths builder

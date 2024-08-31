@@ -3,7 +3,7 @@ package links
 import (
 	"errors"
 
-	"github.com/steve-care-software/steve/domain/data/connections/links/contexts"
+	"github.com/steve-care-software/steve/domain/connections/links/contexts"
 )
 
 type linkBuilder struct {

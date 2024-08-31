@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"github.com/google/uuid"
-	"github.com/steve-care-software/steve/domain/data/connections/links"
+	"github.com/steve-care-software/steve/domain/connections/links"
 )
 
 type connectionBuilder struct {

@@ -1,8 +1,8 @@
 package points
 
 import (
-	"github.com/steve-care-software/steve/domain/data/connections"
-	"github.com/steve-care-software/steve/domain/data/points/programs"
+	"github.com/steve-care-software/steve/domain/connections"
+	"github.com/steve-care-software/steve/domain/points/programs"
 )
 
 // NewBuilder creates a new builder
