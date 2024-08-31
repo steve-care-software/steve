@@ -1,5 +1,15 @@
 package contexts
 
+// NewBuilder creates a new builder
+func NewBuilder() Builder {
+	return createBuilder()
+}
+
+// NewContextBuilder creates a new context builder
+func NewContextBuilder() ContextBuilder {
+	return createContextBuilder()
+}
+
 // Builder represents the contexts builder
 type Builder interface {
 	Create() Builder
@@ -10,19 +20,19 @@ type Builder interface {
 // Contexts represents contexts
 type Contexts interface {
 	List() []Context
-	Fetch(name string) (Context, error)
 }
 
 // ContextBuilder represents the context builder
 type ContextBuilder interface {
 	Create() ContextBuilder
 	WithName(name string) ContextBuilder
-	WithValue(value string) ContextBuilder
+	WithParent(parent Context) ContextBuilder
 	Now() (Context, error)
 }
 
 // Context represents a context
 type Context interface {
 	Name() string
-	Value() string
+	HasParent() bool
+	Parent() Context
 }
