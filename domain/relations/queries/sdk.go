@@ -1,7 +1,7 @@
 package queries
 
 import (
-	"github.com/steve-care-software/steve/domain/relations/data/connections/contexts"
+	"github.com/steve-care-software/steve/domain/relations/data/connections/links/contexts"
 	"github.com/steve-care-software/steve/domain/relations/data/points"
 	"github.com/steve-care-software/steve/domain/relations/queries/questions"
 )

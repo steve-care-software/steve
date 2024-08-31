@@ -18,7 +18,7 @@ type ContextBuilder interface {
 	Create() ContextBuilder
 	WithName(name string) ContextBuilder
 	WithValue(value string) ContextBuilder
-	NOw() (Context, error)
+	Now() (Context, error)
 }
 
 // Context represents a context

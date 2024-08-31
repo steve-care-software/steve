@@ -2,7 +2,6 @@ package connections
 
 import (
 	"github.com/google/uuid"
-	"github.com/steve-care-software/steve/domain/relations/data/connections/contexts"
 	"github.com/steve-care-software/steve/domain/relations/data/connections/links"
 )
 
@@ -21,7 +20,6 @@ type Connections interface {
 // ConnectionBuilder represents a connection builder
 type ConnectionBuilder interface {
 	Create() ConnectionBuilder
-	WithContexts(contexts contexts.Contexts) ConnectionBuilder
 	WithLink(link links.Link) ConnectionBuilder
 	From(from uuid.UUID) ConnectionBuilder
 	To(to uuid.UUID) ConnectionBuilder
@@ -30,7 +28,6 @@ type ConnectionBuilder interface {
 
 // Connection represents a connection
 type Connection interface {
-	Contexts() contexts.Contexts
 	From() uuid.UUID
 	Link() links.Link
 	To() uuid.UUID
