@@ -4,6 +4,11 @@ import (
 	"github.com/steve-care-software/steve/domain/connections"
 )
 
+// NewBuilder creates a new builder
+func NewBuilder() Builder {
+	return createBuilder()
+}
+
 // Builder represents a paths builder
 type Builder interface {
 	Create() Builder
