@@ -78,7 +78,7 @@ func (app *linkBuilder) Now() (Link, error) {
 	pHash, err := app.hashAdapter.FromMultiBytes([][]byte{
 		app.contexts.Hash().Bytes(),
 		[]byte(app.name),
-		[]byte(strconv.FormatFloat(float64(app.weight), 'f', 32, 10)),
+		[]byte(strconv.FormatFloat(float64(app.weight), 'f', 10, 32)),
 	})
 
 	if err != nil {
