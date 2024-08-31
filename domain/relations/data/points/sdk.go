@@ -5,6 +5,16 @@ import (
 	"github.com/steve-care-software/steve/domain/relations/data/points/programs"
 )
 
+// NewBuilder creates a new builder
+func NewBuilder() Builder {
+	return createBuilder()
+}
+
+// NewPointBuilder creates a new point builder
+func NewPointBuilder() PointBuilder {
+	return createPointBuilder()
+}
+
 // Builder represents the points builder
 type Builder interface {
 	Create() Builder
@@ -21,16 +31,16 @@ type Points interface {
 type PointBuilder interface {
 	Create() PointBuilder
 	WithConnection(connection connections.Connection) PointBuilder
-	From(from string) PointBuilder
+	From(from []byte) PointBuilder
 	Now() (Point, error)
 }
 
 // Point represents a point
 type Point interface {
 	Connection() connections.Connection
-	From() string
-	HasNode() bool
-	Node() Node
+	From() []byte
+	//HasNode() bool
+	//Node() Node
 }
 
 // NodeBuilder represents a node builder
