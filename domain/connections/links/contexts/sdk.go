@@ -1,5 +1,7 @@
 package contexts
 
+import "github.com/google/uuid"
+
 // NewBuilder creates a new builder
 func NewBuilder() Builder {
 	return createBuilder()
@@ -25,14 +27,16 @@ type Contexts interface {
 // ContextBuilder represents the context builder
 type ContextBuilder interface {
 	Create() ContextBuilder
+	WithIdentifier(identifier uuid.UUID) ContextBuilder
 	WithName(name string) ContextBuilder
-	WithParent(parent Context) ContextBuilder
+	WithParent(parent uuid.UUID) ContextBuilder
 	Now() (Context, error)
 }
 
 // Context represents a context
 type Context interface {
+	Identifier() uuid.UUID
 	Name() string
 	HasParent() bool
-	Parent() Context
+	Parent() *uuid.UUID
 }

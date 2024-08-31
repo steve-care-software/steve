@@ -1,33 +1,45 @@
 package contexts
 
+import "github.com/google/uuid"
+
 type context struct {
-	name   string
-	parent Context
+	identifier uuid.UUID
+	name       string
+	pParent    *uuid.UUID
 }
 
 func createContext(
+	identifier uuid.UUID,
 	name string,
 ) Context {
-	return createContextInternally(name, nil)
+	return createContextInternally(identifier, name, nil)
 }
 
 func createContextWithParent(
+	identifier uuid.UUID,
 	name string,
-	parent Context,
+	pParent *uuid.UUID,
 ) Context {
-	return createContextInternally(name, parent)
+	return createContextInternally(identifier, name, pParent)
 }
 
 func createContextInternally(
+	identifier uuid.UUID,
 	name string,
-	parent Context,
+	pParent *uuid.UUID,
 ) Context {
 	out := context{
-		name:   name,
-		parent: parent,
+		identifier: identifier,
+		name:       name,
+		pParent:    pParent,
 	}
 
 	return &out
+}
+
+// Identifier returns the identifier
+func (obj *context) Identifier() uuid.UUID {
+	return obj.identifier
 }
 
 // Name returns the name
@@ -37,10 +49,10 @@ func (obj *context) Name() string {
 
 // HasParent returns true if there is parent, false otherwise
 func (obj *context) HasParent() bool {
-	return obj.parent != nil
+	return obj.pParent != nil
 }
 
 // Parent returns the parent, if any
-func (obj *context) Parent() Context {
-	return obj.parent
+func (obj *context) Parent() *uuid.UUID {
+	return obj.pParent
 }
