@@ -14,14 +14,14 @@ func NewLinksForTests(list []Link) Links {
 
 // NewLinkForTests creates a new link for tests
 func NewLinkForTests(
-	contexts contexts.Contexts,
+	context contexts.Context,
 	name string,
 	isLeft bool,
 	weight float32,
 ) Link {
 	builder := NewLinkBuilder().Create().
 		WithName(name).
-		WithContexts(contexts).
+		WithContext(context).
 		WithWeight(weight)
 
 	if isLeft {

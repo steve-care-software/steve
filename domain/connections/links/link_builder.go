@@ -10,7 +10,7 @@ import (
 
 type linkBuilder struct {
 	hashAdapter hash.Adapter
-	contexts    contexts.Contexts
+	context     contexts.Context
 	name        string
 	isLeft      bool
 	weight      float32
@@ -21,7 +21,7 @@ func createLinkBuilder(
 ) LinkBuilder {
 	out := linkBuilder{
 		hashAdapter: hashAdapter,
-		contexts:    nil,
+		context:     nil,
 		name:        "",
 		isLeft:      false,
 		weight:      0.0,
@@ -37,9 +37,9 @@ func (app *linkBuilder) Create() LinkBuilder {
 	)
 }
 
-// WithContexts add contexts to the builder
-func (app *linkBuilder) WithContexts(contexts contexts.Contexts) LinkBuilder {
-	app.contexts = contexts
+// WithContext add context to the builder
+func (app *linkBuilder) WithContext(context contexts.Context) LinkBuilder {
+	app.context = context
 	return app
 }
 
@@ -63,8 +63,8 @@ func (app *linkBuilder) IsLeft() LinkBuilder {
 
 // Now builds a new Link instance
 func (app *linkBuilder) Now() (Link, error) {
-	if app.contexts == nil {
-		return nil, errors.New("the contexts is mandatory in order to build a Link instance")
+	if app.context == nil {
+		return nil, errors.New("the context is mandatory in order to build a Link instance")
 	}
 
 	if app.name == "" {
@@ -76,7 +76,7 @@ func (app *linkBuilder) Now() (Link, error) {
 	}
 
 	pHash, err := app.hashAdapter.FromMultiBytes([][]byte{
-		app.contexts.Hash().Bytes(),
+		app.context.Hash().Bytes(),
 		[]byte(app.name),
 		[]byte(strconv.FormatFloat(float64(app.weight), 'f', 10, 32)),
 	})
@@ -87,7 +87,7 @@ func (app *linkBuilder) Now() (Link, error) {
 
 	return createLink(
 		*pHash,
-		app.contexts,
+		app.context,
 		app.name,
 		app.isLeft,
 		app.weight,

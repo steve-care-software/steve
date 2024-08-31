@@ -33,7 +33,7 @@ type Links interface {
 // LinkBuilder represents the link builder
 type LinkBuilder interface {
 	Create() LinkBuilder
-	WithContexts(contexts contexts.Contexts) LinkBuilder
+	WithContext(context contexts.Context) LinkBuilder
 	WithName(name string) LinkBuilder
 	WithWeight(weight float32) LinkBuilder
 	IsLeft() LinkBuilder
@@ -43,7 +43,7 @@ type LinkBuilder interface {
 // Link represents a link
 type Link interface {
 	Hash() hash.Hash
-	Contexts() contexts.Contexts
+	Context() contexts.Context
 	Name() string
 	IsLeft() bool
 	Weight() float32

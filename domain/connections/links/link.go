@@ -8,26 +8,26 @@ import (
 )
 
 type link struct {
-	hash     hash.Hash
-	contexts contexts.Contexts
-	name     string
-	isLeft   bool
-	weight   float32
+	hash    hash.Hash
+	context contexts.Context
+	name    string
+	isLeft  bool
+	weight  float32
 }
 
 func createLink(
 	hash hash.Hash,
-	contexts contexts.Contexts,
+	context contexts.Context,
 	name string,
 	isLeft bool,
 	weight float32,
 ) Link {
 	out := link{
-		hash:     hash,
-		contexts: contexts,
-		name:     name,
-		isLeft:   isLeft,
-		weight:   weight,
+		hash:    hash,
+		context: context,
+		name:    name,
+		isLeft:  isLeft,
+		weight:  weight,
 	}
 
 	return &out
@@ -38,9 +38,9 @@ func (obj *link) Hash() hash.Hash {
 	return obj.hash
 }
 
-// Contexts returns the contexts, if any
-func (obj *link) Contexts() contexts.Contexts {
-	return obj.contexts
+// Contexts returns the context, if any
+func (obj *link) Context() contexts.Context {
+	return obj.context
 }
 
 // Name returns the name

@@ -13,10 +13,7 @@ import (
 
 func TestApplication_Success(t *testing.T) {
 
-	contexts := contexts.NewContextsForTests([]contexts.Context{
-		contexts.NewContextForTests("family"),
-		contexts.NewContextForTests("english"),
-	})
+	context := contexts.NewContextForTests("family")
 
 	son, _ := uuid.NewRandom()
 	father, _ := uuid.NewRandom()
@@ -28,42 +25,42 @@ func TestApplication_Success(t *testing.T) {
 	connections := connections.NewConnectionsForTests([]connections.Connection{
 		connections.NewConnectionForTests(
 			son,
-			links.NewLinkForTests(contexts, "son - father", false, 1.0),
+			links.NewLinkForTests(context, "son - father", false, 1.0),
 			father,
 		),
 		connections.NewConnectionForTests(
 			son,
-			links.NewLinkForTests(contexts, "son - grand-father", false, 1.0),
+			links.NewLinkForTests(context, "son - grand-father", false, 1.0),
 			grandFather,
 		),
 		connections.NewConnectionForTests(
 			son,
-			links.NewLinkForTests(contexts, "son - grand-grand father", false, 1.0),
+			links.NewLinkForTests(context, "son - grand-grand father", false, 1.0),
 			grandGrandFather,
 		),
 		connections.NewConnectionForTests(
 			father,
-			links.NewLinkForTests(contexts, "father - grandfather", false, 1.0),
+			links.NewLinkForTests(context, "father - grandfather", false, 1.0),
 			grandFather,
 		),
 		connections.NewConnectionForTests(
 			father,
-			links.NewLinkForTests(contexts, "father - great-grand-father", false, 1.0),
+			links.NewLinkForTests(context, "father - great-grand-father", false, 1.0),
 			grandGrandFather,
 		),
 		connections.NewConnectionForTests(
 			grandFather,
-			links.NewLinkForTests(contexts, "grand-father - great-grand-father", false, 1.0),
+			links.NewLinkForTests(context, "grand-father - great-grand-father", false, 1.0),
 			grandGrandFather,
 		),
 		connections.NewConnectionForTests(
 			son,
-			links.NewLinkForTests(contexts, "son - nowhere", false, 1.0),
+			links.NewLinkForTests(context, "son - nowhere", false, 1.0),
 			noWhereID,
 		),
 		connections.NewConnectionForTests(
 			anotherNoWhereID,
-			links.NewLinkForTests(contexts, "another no-where - great-grand-father", false, 1.0),
+			links.NewLinkForTests(context, "another no-where - great-grand-father", false, 1.0),
 			grandGrandFather,
 		),
 	})
