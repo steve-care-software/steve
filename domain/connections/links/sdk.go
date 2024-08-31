@@ -29,6 +29,7 @@ type LinkBuilder interface {
 	Create() LinkBuilder
 	WithContexts(contexts contexts.Contexts) LinkBuilder
 	WithName(name string) LinkBuilder
+	WithWeight(weight float32) LinkBuilder
 	IsLeft() LinkBuilder
 	Now() (Link, error)
 }
@@ -37,5 +38,6 @@ type LinkBuilder interface {
 type Link interface {
 	Name() string
 	IsLeft() bool
+	Weight() float32
 	Contexts() contexts.Contexts
 }

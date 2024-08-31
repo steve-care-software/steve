@@ -9,6 +9,7 @@ import (
 type linkBuilder struct {
 	name     string
 	isLeft   bool
+	weight   float32
 	contexts contexts.Contexts
 }
 
@@ -16,6 +17,7 @@ func createLinkBuilder() LinkBuilder {
 	out := linkBuilder{
 		name:     "",
 		isLeft:   false,
+		weight:   0.0,
 		contexts: nil,
 	}
 
@@ -39,6 +41,12 @@ func (app *linkBuilder) WithName(name string) LinkBuilder {
 	return app
 }
 
+// WithWeight adds a weight to the builder
+func (app *linkBuilder) WithWeight(weight float32) LinkBuilder {
+	app.weight = weight
+	return app
+}
+
 // IsLeft flags the builder as left
 func (app *linkBuilder) IsLeft() LinkBuilder {
 	app.isLeft = true
@@ -55,5 +63,9 @@ func (app *linkBuilder) Now() (Link, error) {
 		return nil, errors.New("the name is mandatory in order to build a Link instance")
 	}
 
-	return createLink(app.name, app.isLeft, app.contexts), nil
+	if app.weight <= 0.0 {
+		return nil, errors.New("the weight must be greater than 0.0 in order to build a Link instance")
+	}
+
+	return createLink(app.name, app.isLeft, app.weight, app.contexts), nil
 }
