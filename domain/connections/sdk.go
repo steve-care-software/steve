@@ -3,6 +3,7 @@ package connections
 import (
 	"github.com/google/uuid"
 	"github.com/steve-care-software/steve/domain/connections/links"
+	"github.com/steve-care-software/steve/domain/hash"
 )
 
 // NewBuilder creates a new builder
@@ -12,7 +13,10 @@ func NewBuilder() Builder {
 
 // NewConnectionBuilder creates a new connection builder
 func NewConnectionBuilder() ConnectionBuilder {
-	return createConnectionBuilder()
+	hashAdapter := hash.NewAdapter()
+	return createConnectionBuilder(
+		hashAdapter,
+	)
 }
 
 // Builder represents the connections builder
@@ -38,6 +42,7 @@ type ConnectionBuilder interface {
 
 // Connection represents a connection
 type Connection interface {
+	Hash() hash.Hash
 	From() uuid.UUID
 	Link() links.Link
 	To() uuid.UUID

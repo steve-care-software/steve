@@ -5,19 +5,24 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/steve-care-software/steve/domain/connections/links"
+	"github.com/steve-care-software/steve/domain/hash"
 )
 
 type connectionBuilder struct {
-	pFrom *uuid.UUID
-	link  links.Link
-	pTo   *uuid.UUID
+	hashAdapter hash.Adapter
+	pFrom       *uuid.UUID
+	link        links.Link
+	pTo         *uuid.UUID
 }
 
-func createConnectionBuilder() ConnectionBuilder {
+func createConnectionBuilder(
+	hashAdapter hash.Adapter,
+) ConnectionBuilder {
 	out := connectionBuilder{
-		pFrom: nil,
-		link:  nil,
-		pTo:   nil,
+		hashAdapter: hashAdapter,
+		pFrom:       nil,
+		link:        nil,
+		pTo:         nil,
 	}
 
 	return &out
@@ -25,7 +30,9 @@ func createConnectionBuilder() ConnectionBuilder {
 
 // Create initializes the builder
 func (app *connectionBuilder) Create() ConnectionBuilder {
-	return createConnectionBuilder()
+	return createConnectionBuilder(
+		app.hashAdapter,
+	)
 }
 
 // WithLink adds a link to the builder
@@ -53,12 +60,27 @@ func (app *connectionBuilder) Now() (Connection, error) {
 	}
 
 	if app.pFrom == nil {
-		return nil, errors.New("the from is mandatory in order to build a Connection instance")
+		return nil, errors.New("the from identifier is mandatory in order to build a Connection instance")
 	}
 
 	if app.pTo == nil {
-		return nil, errors.New("the to is mandatory in order to build a Connection instance")
+		return nil, errors.New("the to identifier is mandatory in order to build a Connection instance")
 	}
 
-	return createConnection(*app.pFrom, app.link, *app.pTo), nil
+	pHash, err := app.hashAdapter.FromMultiBytes([][]byte{
+		app.link.Hash().Bytes(),
+		[]byte(app.pFrom.String()),
+		[]byte(app.pTo.String()),
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return createConnection(
+		*pHash,
+		*app.pFrom,
+		app.link,
+		*app.pTo,
+	), nil
 }
