@@ -5,6 +5,16 @@ import (
 	"github.com/steve-care-software/steve/domain/relations/data/connections/links"
 )
 
+// NewBuilder creates a new builder
+func NewBuilder() Builder {
+	return createBuilder()
+}
+
+// NewConnectionBuilder creates a new connection builder
+func NewConnectionBuilder() ConnectionBuilder {
+	return createConnectionBuilder()
+}
+
 // Builder represents the connections builder
 type Builder interface {
 	Create() Builder
