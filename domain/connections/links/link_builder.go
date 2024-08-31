@@ -12,8 +12,8 @@ type linkBuilder struct {
 	hashAdapter hash.Adapter
 	context     contexts.Context
 	name        string
-	isLeft      bool
 	weight      float32
+	reverse     string
 }
 
 func createLinkBuilder(
@@ -23,8 +23,8 @@ func createLinkBuilder(
 		hashAdapter: hashAdapter,
 		context:     nil,
 		name:        "",
-		isLeft:      false,
 		weight:      0.0,
+		reverse:     "",
 	}
 
 	return &out
@@ -55,9 +55,9 @@ func (app *linkBuilder) WithWeight(weight float32) LinkBuilder {
 	return app
 }
 
-// IsLeft flags the builder as left
-func (app *linkBuilder) IsLeft() LinkBuilder {
-	app.isLeft = true
+// WithReverse adds a reverse to the builder
+func (app *linkBuilder) WithReverse(reverse string) LinkBuilder {
+	app.reverse = reverse
 	return app
 }
 
@@ -75,21 +75,35 @@ func (app *linkBuilder) Now() (Link, error) {
 		return nil, errors.New("the weight must be greater than 0.0 in order to build a Link instance")
 	}
 
-	pHash, err := app.hashAdapter.FromMultiBytes([][]byte{
+	data := [][]byte{
 		app.context.Hash().Bytes(),
 		[]byte(app.name),
 		[]byte(strconv.FormatFloat(float64(app.weight), 'f', 10, 32)),
-	})
+	}
 
+	if app.reverse != "" {
+		data = append(data, []byte(app.reverse))
+	}
+
+	pHash, err := app.hashAdapter.FromMultiBytes(data)
 	if err != nil {
 		return nil, err
+	}
+
+	if app.reverse != "" {
+		return createLinkWithReverse(
+			*pHash,
+			app.context,
+			app.name,
+			app.weight,
+			app.reverse,
+		), nil
 	}
 
 	return createLink(
 		*pHash,
 		app.context,
 		app.name,
-		app.isLeft,
 		app.weight,
 	), nil
 }

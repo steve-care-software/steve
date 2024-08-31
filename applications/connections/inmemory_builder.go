@@ -4,20 +4,27 @@ import (
 	"errors"
 
 	"github.com/steve-care-software/steve/domain/connections"
+	"github.com/steve-care-software/steve/domain/connections/links"
 	"github.com/steve-care-software/steve/domain/points"
 )
 
 type inMemoryBuilder struct {
 	connectionsBuilder connections.Builder
+	connectionBuilder  connections.ConnectionBuilder
+	linkBuilder        links.LinkBuilder
 	connections        connections.Connections
 	points             points.Points
 }
 
 func createInMemoryBuilder(
 	connectionsBuilder connections.Builder,
+	connectionBuilder connections.ConnectionBuilder,
+	linkBuilder links.LinkBuilder,
 ) InMemoryBuilder {
 	out := inMemoryBuilder{
 		connectionsBuilder: connectionsBuilder,
+		connectionBuilder:  connectionBuilder,
+		linkBuilder:        linkBuilder,
 		connections:        nil,
 		points:             nil,
 	}
@@ -29,6 +36,8 @@ func createInMemoryBuilder(
 func (app *inMemoryBuilder) Create() InMemoryBuilder {
 	return createInMemoryBuilder(
 		app.connectionsBuilder,
+		app.connectionBuilder,
+		app.linkBuilder,
 	)
 }
 
@@ -59,6 +68,34 @@ func (app *inMemoryBuilder) Now() (Application, error) {
 		}
 
 		mpFromList[keyname] = append(mpFromList[keyname], oneConnection)
+
+		// if there is a reverse, add the to as the from:
+		link := oneConnection.Link()
+		if !link.HasReverse() {
+			continue
+		}
+
+		name := link.Reverse()
+		weight := link.Weight()
+		context := link.Context()
+		newLink, err := app.linkBuilder.Create().WithContext(context).WithName(name).WithWeight(weight).Now()
+		if err != nil {
+			return nil, err
+		}
+
+		from := oneConnection.To()
+		to := oneConnection.From()
+		newConnection, err := app.connectionBuilder.Create().From(from).To(to).WithLink(newLink).Now()
+		if err != nil {
+			return nil, err
+		}
+
+		keyname = newConnection.From().String()
+		if _, ok := mpFromList[keyname]; !ok {
+			mpFromList[keyname] = []connections.Connection{}
+		}
+
+		mpFromList[keyname] = append(mpFromList[keyname], newConnection)
 	}
 
 	mpFromConns := map[string]connections.Connections{}

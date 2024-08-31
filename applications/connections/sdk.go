@@ -3,14 +3,19 @@ package connections
 import (
 	"github.com/google/uuid"
 	"github.com/steve-care-software/steve/domain/connections"
+	"github.com/steve-care-software/steve/domain/connections/links"
 	"github.com/steve-care-software/steve/domain/points"
 )
 
 // NewInMemoryBuilder creates a new in-memory application builder
 func NewInMemoryBuilder() InMemoryBuilder {
 	connectionsBuilder := connections.NewBuilder()
+	connectionBuilder := connections.NewConnectionBuilder()
+	linkBuilder := links.NewLinkBuilder()
 	return createInMemoryBuilder(
 		connectionsBuilder,
+		connectionBuilder,
+		linkBuilder,
 	)
 }
 

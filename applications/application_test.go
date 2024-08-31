@@ -25,42 +25,42 @@ func TestApplication_Success(t *testing.T) {
 	connections := connections.NewConnectionsForTests([]connections.Connection{
 		connections.NewConnectionForTests(
 			son,
-			links.NewLinkForTests(context, "son - father", false, 1.0),
+			links.NewLinkWithReverseForTests(context, "son - father", 1.0, "father - son"),
 			father,
 		),
 		connections.NewConnectionForTests(
 			son,
-			links.NewLinkForTests(context, "son - grand-father", false, 1.0),
+			links.NewLinkWithReverseForTests(context, "son - grand-father", 1.0, "grand-father - son"),
 			grandFather,
 		),
 		connections.NewConnectionForTests(
 			son,
-			links.NewLinkForTests(context, "son - grand-grand father", false, 1.0),
+			links.NewLinkWithReverseForTests(context, "son - grand-grand father", 1.0, "grand-grand father - son"),
 			grandGrandFather,
 		),
 		connections.NewConnectionForTests(
 			father,
-			links.NewLinkForTests(context, "father - grandfather", false, 1.0),
+			links.NewLinkWithReverseForTests(context, "father - grandfather", 1.0, "grandfather, father"),
 			grandFather,
 		),
 		connections.NewConnectionForTests(
 			father,
-			links.NewLinkForTests(context, "father - great-grand-father", false, 1.0),
+			links.NewLinkWithReverseForTests(context, "father - great-grand-father", 1.0, "great-grand-father - father"),
 			grandGrandFather,
 		),
 		connections.NewConnectionForTests(
 			grandFather,
-			links.NewLinkForTests(context, "grand-father - great-grand-father", false, 1.0),
+			links.NewLinkWithReverseForTests(context, "grand-father - great-grand-father", 1.0, "great-grand-father - grand-father"),
 			grandGrandFather,
 		),
 		connections.NewConnectionForTests(
 			son,
-			links.NewLinkForTests(context, "son - nowhere", false, 1.0),
+			links.NewLinkWithReverseForTests(context, "son - nowhere", 1.0, "nowhere - son"),
 			noWhereID,
 		),
 		connections.NewConnectionForTests(
 			anotherNoWhereID,
-			links.NewLinkForTests(context, "another no-where - great-grand-father", false, 1.0),
+			links.NewLinkWithReverseForTests(context, "another no-where - great-grand-father", 1.0, "great-grand-father - another no-where"),
 			grandGrandFather,
 		),
 	})
@@ -75,7 +75,7 @@ func TestApplication_Success(t *testing.T) {
 		return
 	}
 
-	query := queries.NewQueryForTests(son, grandGrandFather)
+	query := queries.NewQueryForTests(grandGrandFather, son)
 
 	application := NewApplication(inMemoryApp)
 	retRoute, err := application.Route(query)
@@ -85,8 +85,8 @@ func TestApplication_Success(t *testing.T) {
 	}
 
 	possibilities := retRoute.Possibilities()
-	if len(possibilities) != 4 {
-		t.Errorf("the Route was expected to contain %d possibilities, %d returned", 4, len(possibilities))
+	if len(possibilities) != 5 {
+		t.Errorf("the Route was expected to contain %d possibilities, %d returned", 5, len(possibilities))
 		return
 	}
 

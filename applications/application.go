@@ -1,9 +1,6 @@
 package applications
 
 import (
-	"errors"
-	"fmt"
-
 	"github.com/google/uuid"
 	applications_connections "github.com/steve-care-software/steve/applications/connections"
 	"github.com/steve-care-software/steve/domain/connections"
@@ -78,13 +75,27 @@ func (app *application) followUntilReached(
 ) ([]connections.Connections, error) {
 	listTo, err := app.connApp.ListFrom(start)
 	if err != nil {
-		str := fmt.Sprintf("there is no link between the requested points (start: %s, to: %s)", start.String(), destination.String())
-		return nil, errors.New(str)
+		return nil, err
 	}
 
 	retOutputList := []connections.Connections{}
 	listToConnectionsList := listTo.List()
 	for _, oneConnection := range listToConnectionsList {
+		// make sure there is no circular link:
+		skip := false
+		currentToStr := oneConnection.To().String()
+		for _, onePreviousConn := range connectionsList {
+			prevFromStr := onePreviousConn.From().String()
+			if prevFromStr == currentToStr {
+				skip = true
+				break
+			}
+		}
+
+		if skip {
+			continue
+		}
+
 		merged := append(connectionsList, oneConnection)
 		if oneConnection.To().String() == destination.String() {
 			// reached destination

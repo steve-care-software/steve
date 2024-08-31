@@ -16,19 +16,35 @@ func NewLinksForTests(list []Link) Links {
 func NewLinkForTests(
 	context contexts.Context,
 	name string,
-	isLeft bool,
 	weight float32,
 ) Link {
-	builder := NewLinkBuilder().Create().
+	ins, err := NewLinkBuilder().Create().
 		WithName(name).
 		WithContext(context).
-		WithWeight(weight)
+		WithWeight(weight).
+		Now()
 
-	if isLeft {
-		builder.IsLeft()
+	if err != nil {
+		panic(err)
 	}
 
-	ins, err := builder.Now()
+	return ins
+}
+
+// NewLinkForTests creates a new link for tests
+func NewLinkWithReverseForTests(
+	context contexts.Context,
+	name string,
+	weight float32,
+	reverse string,
+) Link {
+	ins, err := NewLinkBuilder().Create().
+		WithName(name).
+		WithContext(context).
+		WithWeight(weight).
+		WithReverse(reverse).
+		Now()
+
 	if err != nil {
 		panic(err)
 	}

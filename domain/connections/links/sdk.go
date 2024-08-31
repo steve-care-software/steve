@@ -35,8 +35,8 @@ type LinkBuilder interface {
 	Create() LinkBuilder
 	WithContext(context contexts.Context) LinkBuilder
 	WithName(name string) LinkBuilder
+	WithReverse(reverse string) LinkBuilder
 	WithWeight(weight float32) LinkBuilder
-	IsLeft() LinkBuilder
 	Now() (Link, error)
 }
 
@@ -45,7 +45,8 @@ type Link interface {
 	Hash() hash.Hash
 	Context() contexts.Context
 	Name() string
-	IsLeft() bool
 	Weight() float32
 	Debug() string
+	HasReverse() bool
+	Reverse() string
 }
