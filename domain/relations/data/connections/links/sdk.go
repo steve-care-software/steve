@@ -2,6 +2,16 @@ package links
 
 import "github.com/steve-care-software/steve/domain/relations/data/connections/links/contexts"
 
+// NewBuilder creates a new builder
+func NewBuilder() Builder {
+	return createBuilder()
+}
+
+// NewLinkBuilder creates a new link builder
+func NewLinkBuilder() LinkBuilder {
+	return createLinkBuilder()
+}
+
 // Builder represents the links builder
 type Builder interface {
 	Create() Builder
@@ -27,6 +37,5 @@ type LinkBuilder interface {
 type Link interface {
 	Name() string
 	IsLeft() bool
-	HasContexts() bool
 	Contexts() contexts.Contexts
 }

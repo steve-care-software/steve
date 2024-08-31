@@ -1,5 +1,7 @@
 package contexts
 
+import "errors"
+
 type contextBuilder struct {
 	name   string
 	parent Context
@@ -34,7 +36,7 @@ func (app *contextBuilder) WithParent(parent Context) ContextBuilder {
 // Now builds a new Context instance
 func (app *contextBuilder) Now() (Context, error) {
 	if app.name == "" {
-
+		return nil, errors.New("the name is mandatory in order to build a Context instance")
 	}
 
 	if app.parent != nil {
