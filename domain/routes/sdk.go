@@ -2,6 +2,16 @@ package routes
 
 import "github.com/steve-care-software/steve/domain/connections"
 
+// NewBuilder creates a new builder
+func NewBuilder() Builder {
+	return createBuilder()
+}
+
+// NewRouteBuilder creates a new route builder
+func NewRouteBuilder() RouteBuilder {
+	return createRouteBuilder()
+}
+
 // Builder represents routes builder
 type Builder interface {
 	Create() Builder
@@ -17,7 +27,7 @@ type Routes interface {
 // RouteBuilder represents a route builder
 type RouteBuilder interface {
 	Create() RouteBuilder
-	WithPossibilities([]connections.Connections) RouteBuilder
+	WithPossibilities(possibilities []connections.Connections) RouteBuilder
 	Now() (Route, error)
 }
 
