@@ -1,6 +1,9 @@
 package links
 
-import "github.com/steve-care-software/steve/domain/connections/links/contexts"
+import (
+	"github.com/steve-care-software/steve/domain/connections/links/contexts"
+	"github.com/steve-care-software/steve/domain/hash"
+)
 
 // NewBuilder creates a new builder
 func NewBuilder() Builder {
@@ -9,7 +12,10 @@ func NewBuilder() Builder {
 
 // NewLinkBuilder creates a new link builder
 func NewLinkBuilder() LinkBuilder {
-	return createLinkBuilder()
+	hashAdapter := hash.NewAdapter()
+	return createLinkBuilder(
+		hashAdapter,
+	)
 }
 
 // Builder represents the links builder
@@ -36,8 +42,9 @@ type LinkBuilder interface {
 
 // Link represents a link
 type Link interface {
+	Hash() hash.Hash
+	Contexts() contexts.Contexts
 	Name() string
 	IsLeft() bool
 	Weight() float32
-	Contexts() contexts.Contexts
 }

@@ -2,23 +2,29 @@ package links
 
 import (
 	"errors"
+	"strconv"
 
 	"github.com/steve-care-software/steve/domain/connections/links/contexts"
+	"github.com/steve-care-software/steve/domain/hash"
 )
 
 type linkBuilder struct {
-	name     string
-	isLeft   bool
-	weight   float32
-	contexts contexts.Contexts
+	hashAdapter hash.Adapter
+	contexts    contexts.Contexts
+	name        string
+	isLeft      bool
+	weight      float32
 }
 
-func createLinkBuilder() LinkBuilder {
+func createLinkBuilder(
+	hashAdapter hash.Adapter,
+) LinkBuilder {
 	out := linkBuilder{
-		name:     "",
-		isLeft:   false,
-		weight:   0.0,
-		contexts: nil,
+		hashAdapter: hashAdapter,
+		contexts:    nil,
+		name:        "",
+		isLeft:      false,
+		weight:      0.0,
 	}
 
 	return &out
@@ -26,7 +32,9 @@ func createLinkBuilder() LinkBuilder {
 
 // Create initializes the builder
 func (app *linkBuilder) Create() LinkBuilder {
-	return createLinkBuilder()
+	return createLinkBuilder(
+		app.hashAdapter,
+	)
 }
 
 // WithContexts add contexts to the builder
@@ -67,5 +75,21 @@ func (app *linkBuilder) Now() (Link, error) {
 		return nil, errors.New("the weight must be greater than 0.0 in order to build a Link instance")
 	}
 
-	return createLink(app.name, app.isLeft, app.weight, app.contexts), nil
+	pHash, err := app.hashAdapter.FromMultiBytes([][]byte{
+		app.contexts.Hash().Bytes(),
+		[]byte(app.name),
+		[]byte(strconv.FormatFloat(float64(app.weight), 'f', 32, 10)),
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return createLink(
+		*pHash,
+		app.contexts,
+		app.name,
+		app.isLeft,
+		app.weight,
+	), nil
 }

@@ -6,7 +6,10 @@ import (
 
 // NewBuilder creates a new builder
 func NewBuilder() Builder {
-	return createBuilder()
+	hashAdapter := hash.NewAdapter()
+	return createBuilder(
+		hashAdapter,
+	)
 }
 
 // NewContextBuilder creates a new context builder
@@ -26,6 +29,7 @@ type Builder interface {
 
 // Contexts represents contexts
 type Contexts interface {
+	Hash() hash.Hash
 	List() []Context
 }
 
