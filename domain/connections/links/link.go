@@ -9,37 +9,32 @@ import (
 type link struct {
 	hash    hash.Hash
 	name    string
-	weight  float32
 	reverse string
 }
 
 func createLink(
 	hash hash.Hash,
 	name string,
-	weight float32,
 ) Link {
-	return createLinkInternally(hash, name, weight, "")
+	return createLinkInternally(hash, name, "")
 }
 
 func createLinkWithReverse(
 	hash hash.Hash,
 	name string,
-	weight float32,
 	reverse string,
 ) Link {
-	return createLinkInternally(hash, name, weight, reverse)
+	return createLinkInternally(hash, name, reverse)
 }
 
 func createLinkInternally(
 	hash hash.Hash,
 	name string,
-	weight float32,
 	reverse string,
 ) Link {
 	out := link{
 		hash:    hash,
 		name:    name,
-		weight:  weight,
 		reverse: reverse,
 	}
 
@@ -54,11 +49,6 @@ func (obj *link) Hash() hash.Hash {
 // Name returns the name
 func (obj *link) Name() string {
 	return obj.name
-}
-
-// Weight returns the weight
-func (obj *link) Weight() float32 {
-	return obj.weight
 }
 
 // HasReverse returns true if there is a reverse, false otherwise
@@ -77,5 +67,5 @@ func (obj *link) Debug() string {
 	if obj.HasReverse() {
 		reverseStr = fmt.Sprintf("reverse: %s, ", obj.Reverse())
 	}
-	return fmt.Sprintf("name: %s, %sweight: %f", obj.name, reverseStr, obj.weight)
+	return fmt.Sprintf("name: %s", obj.name, reverseStr)
 }

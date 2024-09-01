@@ -34,7 +34,6 @@ type LinkBuilder interface {
 	Create() LinkBuilder
 	WithName(name string) LinkBuilder
 	WithReverse(reverse string) LinkBuilder
-	WithWeight(weight float32) LinkBuilder
 	Now() (Link, error)
 }
 
@@ -42,7 +41,6 @@ type LinkBuilder interface {
 type Link interface {
 	Hash() hash.Hash
 	Name() string
-	Weight() float32
 	Debug() string
 	HasReverse() bool
 	Reverse() string

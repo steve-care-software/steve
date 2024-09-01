@@ -2,7 +2,6 @@ package links
 
 import (
 	"errors"
-	"strconv"
 
 	"github.com/steve-care-software/steve/domain/hash"
 )
@@ -10,7 +9,6 @@ import (
 type linkBuilder struct {
 	hashAdapter hash.Adapter
 	name        string
-	weight      float32
 	reverse     string
 }
 
@@ -20,7 +18,6 @@ func createLinkBuilder(
 	out := linkBuilder{
 		hashAdapter: hashAdapter,
 		name:        "",
-		weight:      0.0,
 		reverse:     "",
 	}
 
@@ -40,12 +37,6 @@ func (app *linkBuilder) WithName(name string) LinkBuilder {
 	return app
 }
 
-// WithWeight adds a weight to the builder
-func (app *linkBuilder) WithWeight(weight float32) LinkBuilder {
-	app.weight = weight
-	return app
-}
-
 // WithReverse adds a reverse to the builder
 func (app *linkBuilder) WithReverse(reverse string) LinkBuilder {
 	app.reverse = reverse
@@ -58,13 +49,8 @@ func (app *linkBuilder) Now() (Link, error) {
 		return nil, errors.New("the name is mandatory in order to build a Link instance")
 	}
 
-	if app.weight <= 0.0 {
-		return nil, errors.New("the weight must be greater than 0.0 in order to build a Link instance")
-	}
-
 	data := [][]byte{
 		[]byte(app.name),
-		[]byte(strconv.FormatFloat(float64(app.weight), 'f', 10, 32)),
 	}
 
 	if app.reverse != "" {
@@ -80,7 +66,6 @@ func (app *linkBuilder) Now() (Link, error) {
 		return createLinkWithReverse(
 			*pHash,
 			app.name,
-			app.weight,
 			app.reverse,
 		), nil
 	}
@@ -88,6 +73,5 @@ func (app *linkBuilder) Now() (Link, error) {
 	return createLink(
 		*pHash,
 		app.name,
-		app.weight,
 	), nil
 }

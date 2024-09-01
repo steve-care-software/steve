@@ -76,8 +76,7 @@ func (app *inMemoryBuilder) Now() (Application, error) {
 		}
 
 		name := link.Reverse()
-		weight := link.Weight()
-		newLink, err := app.linkBuilder.Create().WithName(name).WithWeight(weight).Now()
+		newLink, err := app.linkBuilder.Create().WithName(name).Now()
 		if err != nil {
 			return nil, err
 		}

@@ -21,42 +21,42 @@ func TestApplication_Success(t *testing.T) {
 	connections := connections.NewConnectionsForTests([]connections.Connection{
 		connections.NewConnectionForTests(
 			son,
-			links.NewLinkWithReverseForTests("son - father", 1.0, "father - son"),
+			links.NewLinkWithReverseForTests("son - father", "father - son"),
 			father,
 		),
 		connections.NewConnectionForTests(
 			son,
-			links.NewLinkWithReverseForTests("son - grand-father", 1.0, "grand-father - son"),
+			links.NewLinkWithReverseForTests("son - grand-father", "grand-father - son"),
 			grandFather,
 		),
 		connections.NewConnectionForTests(
 			son,
-			links.NewLinkWithReverseForTests("son - grand-grand father", 1.0, "grand-grand father - son"),
+			links.NewLinkWithReverseForTests("son - grand-grand father", "grand-grand father - son"),
 			grandGrandFather,
 		),
 		connections.NewConnectionForTests(
 			father,
-			links.NewLinkWithReverseForTests("father - grandfather", 1.0, "grandfather, father"),
+			links.NewLinkWithReverseForTests("father - grandfather", "grandfather, father"),
 			grandFather,
 		),
 		connections.NewConnectionForTests(
 			father,
-			links.NewLinkWithReverseForTests("father - great-grand-father", 1.0, "great-grand-father - father"),
+			links.NewLinkWithReverseForTests("father - great-grand-father", "great-grand-father - father"),
 			grandGrandFather,
 		),
 		connections.NewConnectionForTests(
 			grandFather,
-			links.NewLinkWithReverseForTests("grand-father - great-grand-father", 1.0, "great-grand-father - grand-father"),
+			links.NewLinkWithReverseForTests("grand-father - great-grand-father", "great-grand-father - grand-father"),
 			grandGrandFather,
 		),
 		connections.NewConnectionForTests(
 			son,
-			links.NewLinkWithReverseForTests("son - nowhere", 1.0, "nowhere - son"),
+			links.NewLinkWithReverseForTests("son - nowhere", "nowhere - son"),
 			noWhereID,
 		),
 		connections.NewConnectionForTests(
 			anotherNoWhereID,
-			links.NewLinkWithReverseForTests("another no-where - great-grand-father", 1.0, "great-grand-father - another no-where"),
+			links.NewLinkWithReverseForTests("another no-where - great-grand-father", "great-grand-father - another no-where"),
 			grandGrandFather,
 		),
 	})
