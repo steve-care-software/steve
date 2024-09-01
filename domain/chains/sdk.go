@@ -29,7 +29,7 @@ type Chain interface {
 // ActionBuilder represents the action builder
 type ActionBuilder interface {
 	Create() ActionBuilder
-	WithInterpret(interpret Next) ActionBuilder
+	WithInterpret(interpret Interpreter) ActionBuilder
 	WithTranspile(transpile Transpile) ActionBuilder
 	Now() (Action, error)
 }
@@ -38,9 +38,16 @@ type ActionBuilder interface {
 type Action interface {
 	Hash() hash.Hash
 	IsInterpret() bool
-	Interpret() Next
+	Interpret() Interpreter
 	IsTranspile() bool
 	Transpile() Transpile
+}
+
+// Interpreter represents the interpreter
+type Interpreter interface {
+	Variable() string
+	HasNext() bool
+	Next() Chain
 }
 
 // TranspileBuilder represents a transpile builder
@@ -48,7 +55,7 @@ type TranspileBuilder interface {
 	Create() TranspileBuilder
 	WithBridge(bridge nfts.NFT) TranspileBuilder
 	WithTarget(target nfts.NFT) TranspileBuilder
-	WithNext(next Next) TranspileBuilder
+	WithNext(next Chain) TranspileBuilder
 	Now() (Transpile, error)
 }
 
@@ -58,21 +65,5 @@ type Transpile interface {
 	Bridge() nfts.NFT // bridge code
 	Target() nfts.NFT // grammar code
 	HasNext() bool
-	Next() Next
-}
-
-// NextBuilder represents the next builder
-type NextBuilder interface {
-	Create() NextBuilder
-	WithChain(chain Chain) NextBuilder
-	IsOutput() NextBuilder
-	Now() (Next, error)
-}
-
-// Next represents the next step
-type Next interface {
-	Hash() hash.Hash
-	IsOutput() bool
-	IsChain() bool
-	Chain() Chain
+	Next() Chain
 }

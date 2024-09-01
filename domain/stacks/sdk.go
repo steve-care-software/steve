@@ -37,6 +37,7 @@ type Builder interface {
 type Stack interface {
 	Frame() frames.Frame
 	Fetch(name string) (variables.Variable, error)
+	FetchBytes(name string) ([]byte, error)
 	Height() uint
 	HasParent() bool
 	Parent() Stack

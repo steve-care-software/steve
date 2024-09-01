@@ -40,6 +40,11 @@ func (obj *stack) Frame() frames.Frame {
 	return obj.frame
 }
 
+// FetchBytes fetches the bytes from the variable
+func (obj *stack) FetchBytes(name string) ([]byte, error) {
+	return nil, nil
+}
+
 // Fetch fetches a variable by name
 func (obj *stack) Fetch(name string) (variables.Variable, error) {
 	retVariable, err := obj.frame.Fetch(name)
