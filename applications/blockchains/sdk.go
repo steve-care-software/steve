@@ -25,6 +25,9 @@ type Application interface {
 	// Authenticated returns the authenticated identity, if any
 	Authenticated() (string, error)
 
+	// Units returns the amount of units the authenticated identity has
+	Units() (*uint64, error)
+
 	// Transact creates a new transaction and adds it to our queue list
 	Transact(blockchain uuid.UUID, script []byte, fees uint64) error
 
