@@ -8,7 +8,6 @@ import (
 // Content represents a block content
 type Content interface {
 	Hash() hash.Hash
-	Database() hash.Hash
 	Transactions() transactions.Transactions
 	Parent() hash.Hash
 }
