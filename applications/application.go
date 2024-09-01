@@ -4,7 +4,6 @@ import (
 	"github.com/google/uuid"
 	applications_connections "github.com/steve-care-software/steve/applications/connections"
 	"github.com/steve-care-software/steve/domain/connections"
-	"github.com/steve-care-software/steve/domain/queries"
 	"github.com/steve-care-software/steve/domain/routes"
 )
 
@@ -31,28 +30,8 @@ func createApplication(
 	return &out
 }
 
-// Routes execute queries in order to discover matching routes
-func (app *application) Routes(queries queries.Queries) (routes.Routes, error) {
-	list := queries.List()
-	routeList := []routes.Route{}
-	for _, oneQuery := range list {
-		retPath, err := app.Route(oneQuery)
-		if err != nil {
-			return nil, err
-		}
-
-		routeList = append(routeList, retPath)
-	}
-
-	return app.routesBuilder.Create().
-		WithList(routeList).
-		Now()
-}
-
-// Route execute a query in order to discover a matching route
-func (app *application) Route(query queries.Query) (routes.Route, error) {
-	from := query.From()
-	to := query.To()
+// Route returns the possible routes between 2 points
+func (app *application) Route(from uuid.UUID, to uuid.UUID) (routes.Route, error) {
 	retConnectionsList, err := app.followUntilReached(
 		from,
 		to,

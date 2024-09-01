@@ -7,7 +7,6 @@ import (
 	applications_connections "github.com/steve-care-software/steve/applications/connections"
 	"github.com/steve-care-software/steve/domain/connections"
 	"github.com/steve-care-software/steve/domain/connections/links"
-	"github.com/steve-care-software/steve/domain/queries"
 )
 
 func TestApplication_Success(t *testing.T) {
@@ -71,10 +70,8 @@ func TestApplication_Success(t *testing.T) {
 		return
 	}
 
-	query := queries.NewQueryForTests(grandGrandFather, son)
-
 	application := NewApplication(inMemoryApp)
-	retRoute, err := application.Route(query)
+	retRoute, err := application.Route(grandGrandFather, son)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return

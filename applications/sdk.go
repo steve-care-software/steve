@@ -1,9 +1,9 @@
 package applications
 
 import (
+	"github.com/google/uuid"
 	applications_connections "github.com/steve-care-software/steve/applications/connections"
 	"github.com/steve-care-software/steve/domain/connections"
-	"github.com/steve-care-software/steve/domain/queries"
 	"github.com/steve-care-software/steve/domain/routes"
 )
 
@@ -24,6 +24,6 @@ func NewApplication(
 
 // Application represents the application
 type Application interface {
-	Routes(queries queries.Queries) (routes.Routes, error)
-	Route(query queries.Query) (routes.Route, error)
+	// Route returns the possible routes between 2 points
+	Route(from uuid.UUID, to uuid.UUID) (routes.Route, error)
 }
