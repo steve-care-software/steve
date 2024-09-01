@@ -1,7 +1,7 @@
 package bridges
 
 import (
-	"github.com/steve-care-software/steve/domain/connections/links"
+	"github.com/steve-care-software/steve/domain/connections"
 	"github.com/steve-care-software/steve/domain/hash"
 )
 
@@ -16,7 +16,7 @@ func NewBuilder() Builder {
 // Builder represents the bridge builder
 type Builder interface {
 	Create() Builder
-	WithLink(link links.Link) Builder
+	WithConnection(connection connections.Connection) Builder
 	WithWeight(weight float32) Builder
 	Now() (Bridge, error)
 }
@@ -24,6 +24,7 @@ type Builder interface {
 // Bridge represents a bridge
 type Bridge interface {
 	Hash() hash.Hash
-	Link() links.Link
+	Connection() connections.Connection
+	HasWeight() bool
 	Weight() float32
 }

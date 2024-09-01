@@ -4,13 +4,13 @@ import (
 	"errors"
 	"strconv"
 
-	"github.com/steve-care-software/steve/domain/connections/links"
+	"github.com/steve-care-software/steve/domain/connections"
 	"github.com/steve-care-software/steve/domain/hash"
 )
 
 type builder struct {
 	hashAdapter hash.Adapter
-	link        links.Link
+	connection  connections.Connection
 	weight      float32
 }
 
@@ -19,7 +19,7 @@ func createBuilder(
 ) Builder {
 	out := builder{
 		hashAdapter: hashAdapter,
-		link:        nil,
+		connection:  nil,
 		weight:      0.0,
 	}
 
@@ -33,9 +33,9 @@ func (app *builder) Create() Builder {
 	)
 }
 
-// WithLink adds a link to the builder
-func (app *builder) WithLink(link links.Link) Builder {
-	app.link = link
+// WithConnection adds a connection to the builder
+func (app *builder) WithConnection(connection connections.Connection) Builder {
+	app.connection = connection
 	return app
 }
 
@@ -47,22 +47,26 @@ func (app *builder) WithWeight(weight float32) Builder {
 
 // Now builds a new Bridge instance
 func (app *builder) Now() (Bridge, error) {
-	if app.link == nil {
-		return nil, errors.New("the link is mandatory in order to build a Bridge instance")
+	if app.connection == nil {
+		return nil, errors.New("the connection is mandatory in order to build a Bridge instance")
 	}
 
-	if app.weight <= 0.0 {
-		return nil, errors.New("the weight is mandatory in order to build a Bridge instance")
+	data := [][]byte{
+		app.connection.Hash().Bytes(),
 	}
 
-	pHash, err := app.hashAdapter.FromMultiBytes([][]byte{
-		app.link.Hash().Bytes(),
-		[]byte(strconv.FormatFloat(float64(app.weight), 'f', 10, 32)),
-	})
+	if app.weight > 0.0 {
+		data = append(data, []byte(strconv.FormatFloat(float64(app.weight), 'f', 10, 32)))
+	}
 
+	pHash, err := app.hashAdapter.FromMultiBytes(data)
 	if err != nil {
 		return nil, err
 	}
 
-	return createBridge(*pHash, app.link, app.weight), nil
+	if app.weight > 0.0 {
+		return createBridgeWithWeight(*pHash, app.connection, app.weight), nil
+	}
+
+	return createBridge(*pHash, app.connection), nil
 }

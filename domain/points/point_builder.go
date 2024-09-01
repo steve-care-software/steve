@@ -3,21 +3,18 @@ package points
 import (
 	"errors"
 
-	"github.com/steve-care-software/steve/domain/connections"
 	"github.com/steve-care-software/steve/domain/points/bridges"
 )
 
 type pointBuilder struct {
-	connection connections.Connection
-	from       []byte
-	bridge     bridges.Bridge
+	bridge bridges.Bridge
+	from   []byte
 }
 
 func createPointBuilder() PointBuilder {
 	out := pointBuilder{
-		connection: nil,
-		from:       nil,
-		bridge:     nil,
+		bridge: nil,
+		from:   nil,
 	}
 
 	return &out
@@ -28,9 +25,9 @@ func (app *pointBuilder) Create() PointBuilder {
 	return createPointBuilder()
 }
 
-// WithConnection adds a connection to the builder
-func (app *pointBuilder) WithConnection(connection connections.Connection) PointBuilder {
-	app.connection = connection
+// WithBridge adds a bridge to the builder
+func (app *pointBuilder) WithBridge(bridge bridges.Bridge) PointBuilder {
+	app.bridge = bridge
 	return app
 }
 
@@ -40,16 +37,10 @@ func (app *pointBuilder) From(from []byte) PointBuilder {
 	return app
 }
 
-// WithBridge adds a bridge to the builder
-func (app *pointBuilder) WithBridge(bridge bridges.Bridge) PointBuilder {
-	app.bridge = bridge
-	return app
-}
-
 // Now builds a new Point instance
 func (app *pointBuilder) Now() (Point, error) {
-	if app.connection == nil {
-		return nil, errors.New("the connection is mandatory in order to build a Point instance")
+	if app.bridge == nil {
+		return nil, errors.New("the bridge is mandatory in order to build a Point instance")
 	}
 
 	if app.from != nil && len(app.from) <= 0 {
@@ -60,9 +51,5 @@ func (app *pointBuilder) Now() (Point, error) {
 		return nil, errors.New("the from data is mandatory in order to build a Point instance")
 	}
 
-	if app.bridge != nil {
-		return createPointWithBridge(app.connection, app.from, app.bridge), nil
-	}
-
-	return createPoint(app.connection, app.from), nil
+	return createPoint(app.bridge, app.from), nil
 }

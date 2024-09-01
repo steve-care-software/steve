@@ -1,7 +1,6 @@
 package points
 
 import (
-	"github.com/steve-care-software/steve/domain/connections"
 	"github.com/steve-care-software/steve/domain/points/bridges"
 )
 
@@ -30,7 +29,6 @@ type Points interface {
 // PointBuilder represents the point builder
 type PointBuilder interface {
 	Create() PointBuilder
-	WithConnection(connection connections.Connection) PointBuilder
 	WithBridge(bridge bridges.Bridge) PointBuilder
 	From(from []byte) PointBuilder
 	Now() (Point, error)
@@ -38,8 +36,6 @@ type PointBuilder interface {
 
 // Point represents a point
 type Point interface {
-	Connection() connections.Connection
-	From() []byte
-	HasBridge() bool
 	Bridge() bridges.Bridge
+	From() []byte
 }
