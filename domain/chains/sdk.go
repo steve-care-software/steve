@@ -5,6 +5,12 @@ import (
 	"github.com/steve-care-software/steve/domain/hash"
 )
 
+// Adapter represents a chain adapter
+type Adapter interface {
+	ToNFT(ins Chain) (Chain, error)
+	ToInstance(nft nfts.NFT) (Chain, error)
+}
+
 // Builder represents a chain builder
 type Builder interface {
 	Create() Builder
