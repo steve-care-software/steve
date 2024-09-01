@@ -1,20 +1,24 @@
 package actions
 
-import "github.com/steve-care-software/steve/domain/actions/nfts"
+import (
+	"github.com/steve-care-software/steve/domain/actions/nfts"
+	"github.com/steve-care-software/steve/domain/hash"
+)
 
 // Builder represents a chain builder
 type Builder interface {
 	Create() Builder
-	WithInput(input []byte) Builder
 	WithGrammar(grammar []byte) Builder
+	WithProgram(input []byte) Builder
 	WithAction(action Action) Builder
 	Now() (Chain, error)
 }
 
 // Chain represents a chain of action
 type Chain interface {
-	Input() nfts.NFT   // contains my program code
+	Hash() hash.Hash
 	Grammar() nfts.NFT // contain my grammar code
+	Program() nfts.NFT // contains my program code
 	Action() Action
 }
 
@@ -28,6 +32,7 @@ type ActionBuilder interface {
 
 // Action represents a program action
 type Action interface {
+	Hash() hash.Hash
 	IsInterpret() bool
 	Interpret() Next
 	IsTranspile() bool
@@ -45,6 +50,7 @@ type TranspileBuilder interface {
 
 // Transpile represents a transpile
 type Transpile interface {
+	Hash() hash.Hash
 	Source() nfts.NFT // grammar code
 	Bridge() nfts.NFT // bridge code
 	HasNext() bool
@@ -61,6 +67,7 @@ type NextBuilder interface {
 
 // Next represents the next step
 type Next interface {
+	Hash() hash.Hash
 	IsOutput() bool
 	IsChain() bool
 	Chain() Chain

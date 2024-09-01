@@ -79,7 +79,6 @@ func (app *parserAdapter) ToProgram(grammar grammars.Grammar, input []byte) (Pro
 	}
 
 	program, err := app.builder.Create().
-		WithGrammar(grammar).
 		WithRoot(retElement).
 		Now()
 
@@ -116,7 +115,6 @@ func (app *parserAdapter) ToProgramWithRoot(grammar grammars.Grammar, rootBlockN
 	}
 
 	program, err := app.builder.Create().
-		WithGrammar(grammar).
 		WithRoot(element).
 		Now()
 

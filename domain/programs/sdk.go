@@ -57,13 +57,11 @@ type ParserAdapter interface {
 // Builder represents the program builder
 type Builder interface {
 	Create() Builder
-	WithGrammar(grammar grammars.Grammar) Builder
 	WithRoot(root instructions.Element) Builder
 	Now() (Program, error)
 }
 
 // Program represents a program
 type Program interface {
-	Grammar() grammars.Grammar
 	Root() instructions.Element
 }
