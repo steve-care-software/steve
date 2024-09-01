@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
-	applications_connections "github.com/steve-care-software/steve/applications/graphs/connections"
+	applications_connections "github.com/steve-care-software/steve/applications/chains/interpreters/graphs/connections"
 	"github.com/steve-care-software/steve/domain/graphs/connections"
 	"github.com/steve-care-software/steve/domain/graphs/connections/links"
 )

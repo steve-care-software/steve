@@ -6,8 +6,8 @@ import (
 	"math/big"
 	"strconv"
 
-	"github.com/steve-care-software/steve/applications/stackframes"
-	"github.com/steve-care-software/steve/applications/stackframes/cursors"
+	"github.com/steve-care-software/steve/applications/chains/interpreters/cursors"
+	"github.com/steve-care-software/steve/applications/chains/interpreters/stackframes"
 	"github.com/steve-care-software/steve/domain/programs"
 	"github.com/steve-care-software/steve/domain/programs/grammars"
 	"github.com/steve-care-software/steve/domain/programs/instructions"
