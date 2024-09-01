@@ -1,6 +1,7 @@
 package points
 
 import (
+	"github.com/steve-care-software/steve/domain/hash"
 	"github.com/steve-care-software/steve/domain/points/bridges"
 	"github.com/steve-care-software/steve/domain/points/contexts"
 )
@@ -12,7 +13,10 @@ func NewBuilder() Builder {
 
 // NewPointBuilder creates a new point builder
 func NewPointBuilder() PointBuilder {
-	return createPointBuilder()
+	hashAdapter := hash.NewAdapter()
+	return createPointBuilder(
+		hashAdapter,
+	)
 }
 
 // Builder represents the points builder
@@ -38,6 +42,7 @@ type PointBuilder interface {
 
 // Point represents a point
 type Point interface {
+	Hash() hash.Hash
 	Context() contexts.Context
 	Bridge() bridges.Bridge
 	From() []byte

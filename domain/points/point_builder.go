@@ -3,21 +3,26 @@ package points
 import (
 	"errors"
 
+	"github.com/steve-care-software/steve/domain/hash"
 	"github.com/steve-care-software/steve/domain/points/bridges"
 	"github.com/steve-care-software/steve/domain/points/contexts"
 )
 
 type pointBuilder struct {
-	context contexts.Context
-	bridge  bridges.Bridge
-	from    []byte
+	hashAdapter hash.Adapter
+	context     contexts.Context
+	bridge      bridges.Bridge
+	from        []byte
 }
 
-func createPointBuilder() PointBuilder {
+func createPointBuilder(
+	hashAdapter hash.Adapter,
+) PointBuilder {
 	out := pointBuilder{
-		context: nil,
-		bridge:  nil,
-		from:    nil,
+		hashAdapter: hashAdapter,
+		context:     nil,
+		bridge:      nil,
+		from:        nil,
 	}
 
 	return &out
@@ -25,7 +30,9 @@ func createPointBuilder() PointBuilder {
 
 // Create initializes the builder
 func (app *pointBuilder) Create() PointBuilder {
-	return createPointBuilder()
+	return createPointBuilder(
+		app.hashAdapter,
+	)
 }
 
 // WithContext adds a context to the builder
@@ -64,5 +71,15 @@ func (app *pointBuilder) Now() (Point, error) {
 		return nil, errors.New("the from data is mandatory in order to build a Point instance")
 	}
 
-	return createPoint(app.context, app.bridge, app.from), nil
+	pHash, err := app.hashAdapter.FromMultiBytes([][]byte{
+		app.context.Hash().Bytes(),
+		app.bridge.Hash().Bytes(),
+		[]byte(app.from),
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return createPoint(*pHash, app.context, app.bridge, app.from), nil
 }
