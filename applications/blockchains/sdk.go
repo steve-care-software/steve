@@ -51,4 +51,7 @@ type Application interface {
 
 	// Blockchain returns the blochain by id
 	Blockchain(identifier uuid.UUID) (blockchains.Blockchain, error)
+
+	// Script returns the script by its hash
+	Script(hash hash.Hash) ([]byte, error)
 }
