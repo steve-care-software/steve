@@ -43,6 +43,14 @@ type Action interface {
 	Transpile() Transpile
 }
 
+// InterpreterBuilder represents the interpreter builder
+type InterpreterBuilder interface {
+	Create() InterpreterBuilder
+	WithVariable(variable string) InterpreterBuilder
+	WithNext(next Chain) InterpreterBuilder
+	Now() (Interpreter, error)
+}
+
 // Interpreter represents the interpreter
 type Interpreter interface {
 	Variable() string
