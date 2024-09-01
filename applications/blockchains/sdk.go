@@ -22,7 +22,7 @@ type Application interface {
 	// Recover recovers an identity using the seed phrases
 	Recover(name string, words []string, newPassword []byte) error
 
-	// Authenticated returns the authenticated identity, if any
+	// Authenticated returns the authenticated idgentity, if any
 	Authenticated() (string, error)
 
 	// Units returns the amount of units the authenticated identity has
