@@ -1,7 +1,6 @@
 package links
 
 import (
-	"github.com/steve-care-software/steve/domain/connections/links/contexts"
 	"github.com/steve-care-software/steve/domain/hash"
 )
 
@@ -33,7 +32,6 @@ type Links interface {
 // LinkBuilder represents the link builder
 type LinkBuilder interface {
 	Create() LinkBuilder
-	WithContext(context contexts.Context) LinkBuilder
 	WithName(name string) LinkBuilder
 	WithReverse(reverse string) LinkBuilder
 	WithWeight(weight float32) LinkBuilder
@@ -43,7 +41,6 @@ type LinkBuilder interface {
 // Link represents a link
 type Link interface {
 	Hash() hash.Hash
-	Context() contexts.Context
 	Name() string
 	Weight() float32
 	Debug() string

@@ -7,14 +7,10 @@ import (
 	applications_connections "github.com/steve-care-software/steve/applications/connections"
 	"github.com/steve-care-software/steve/domain/connections"
 	"github.com/steve-care-software/steve/domain/connections/links"
-	"github.com/steve-care-software/steve/domain/connections/links/contexts"
 	"github.com/steve-care-software/steve/domain/queries"
 )
 
 func TestApplication_Success(t *testing.T) {
-
-	context := contexts.NewContextForTests("family")
-
 	son, _ := uuid.NewRandom()
 	father, _ := uuid.NewRandom()
 	grandFather, _ := uuid.NewRandom()
@@ -25,42 +21,42 @@ func TestApplication_Success(t *testing.T) {
 	connections := connections.NewConnectionsForTests([]connections.Connection{
 		connections.NewConnectionForTests(
 			son,
-			links.NewLinkWithReverseForTests(context, "son - father", 1.0, "father - son"),
+			links.NewLinkWithReverseForTests("son - father", 1.0, "father - son"),
 			father,
 		),
 		connections.NewConnectionForTests(
 			son,
-			links.NewLinkWithReverseForTests(context, "son - grand-father", 1.0, "grand-father - son"),
+			links.NewLinkWithReverseForTests("son - grand-father", 1.0, "grand-father - son"),
 			grandFather,
 		),
 		connections.NewConnectionForTests(
 			son,
-			links.NewLinkWithReverseForTests(context, "son - grand-grand father", 1.0, "grand-grand father - son"),
+			links.NewLinkWithReverseForTests("son - grand-grand father", 1.0, "grand-grand father - son"),
 			grandGrandFather,
 		),
 		connections.NewConnectionForTests(
 			father,
-			links.NewLinkWithReverseForTests(context, "father - grandfather", 1.0, "grandfather, father"),
+			links.NewLinkWithReverseForTests("father - grandfather", 1.0, "grandfather, father"),
 			grandFather,
 		),
 		connections.NewConnectionForTests(
 			father,
-			links.NewLinkWithReverseForTests(context, "father - great-grand-father", 1.0, "great-grand-father - father"),
+			links.NewLinkWithReverseForTests("father - great-grand-father", 1.0, "great-grand-father - father"),
 			grandGrandFather,
 		),
 		connections.NewConnectionForTests(
 			grandFather,
-			links.NewLinkWithReverseForTests(context, "grand-father - great-grand-father", 1.0, "great-grand-father - grand-father"),
+			links.NewLinkWithReverseForTests("grand-father - great-grand-father", 1.0, "great-grand-father - grand-father"),
 			grandGrandFather,
 		),
 		connections.NewConnectionForTests(
 			son,
-			links.NewLinkWithReverseForTests(context, "son - nowhere", 1.0, "nowhere - son"),
+			links.NewLinkWithReverseForTests("son - nowhere", 1.0, "nowhere - son"),
 			noWhereID,
 		),
 		connections.NewConnectionForTests(
 			anotherNoWhereID,
-			links.NewLinkWithReverseForTests(context, "another no-where - great-grand-father", 1.0, "great-grand-father - another no-where"),
+			links.NewLinkWithReverseForTests("another no-where - great-grand-father", 1.0, "great-grand-father - another no-where"),
 			grandGrandFather,
 		),
 	})

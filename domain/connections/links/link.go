@@ -3,13 +3,11 @@ package links
 import (
 	"fmt"
 
-	"github.com/steve-care-software/steve/domain/connections/links/contexts"
 	"github.com/steve-care-software/steve/domain/hash"
 )
 
 type link struct {
 	hash    hash.Hash
-	context contexts.Context
 	name    string
 	weight  float32
 	reverse string
@@ -17,33 +15,29 @@ type link struct {
 
 func createLink(
 	hash hash.Hash,
-	context contexts.Context,
 	name string,
 	weight float32,
 ) Link {
-	return createLinkInternally(hash, context, name, weight, "")
+	return createLinkInternally(hash, name, weight, "")
 }
 
 func createLinkWithReverse(
 	hash hash.Hash,
-	context contexts.Context,
 	name string,
 	weight float32,
 	reverse string,
 ) Link {
-	return createLinkInternally(hash, context, name, weight, reverse)
+	return createLinkInternally(hash, name, weight, reverse)
 }
 
 func createLinkInternally(
 	hash hash.Hash,
-	context contexts.Context,
 	name string,
 	weight float32,
 	reverse string,
 ) Link {
 	out := link{
 		hash:    hash,
-		context: context,
 		name:    name,
 		weight:  weight,
 		reverse: reverse,
@@ -55,11 +49,6 @@ func createLinkInternally(
 // Hash returns the hash, if any
 func (obj *link) Hash() hash.Hash {
 	return obj.hash
-}
-
-// Contexts returns the context, if any
-func (obj *link) Context() contexts.Context {
-	return obj.context
 }
 
 // Name returns the name

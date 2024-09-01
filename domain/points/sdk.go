@@ -2,7 +2,6 @@ package points
 
 import (
 	"github.com/steve-care-software/steve/domain/connections"
-	"github.com/steve-care-software/steve/domain/points/programs"
 )
 
 // NewBuilder creates a new builder
@@ -39,36 +38,4 @@ type PointBuilder interface {
 type Point interface {
 	Connection() connections.Connection
 	From() []byte
-	//HasNode() bool
-	//Node() Node
-}
-
-// NodeBuilder represents a node builder
-type NodeBuilder interface {
-	Create() NodeBuilder
-	WithParameter(parameter Parameter) NodeBuilder
-	WithProgram(program programs.Program) NodeBuilder
-	Now() (Node, error)
-}
-
-// Node represents a node
-type Node interface {
-	IsParameter() bool
-	Parameter() Parameter
-	IsProgram() bool
-	Program() programs.Program
-}
-
-// ParameterBuilder represents the parameter builder
-type ParameterBuilder interface {
-	Create() ParameterBuilder
-	WithContent(content []byte) ParameterBuilder
-	WithProgram(program Point) ParameterBuilder
-	Now() (Parameter, error)
-}
-
-// Parameter represents a parameter
-type Parameter interface {
-	Content() []byte
-	Program() Point
 }
