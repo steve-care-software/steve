@@ -3,6 +3,7 @@ package connections
 import (
 	"errors"
 
+	"github.com/google/uuid"
 	"github.com/steve-care-software/steve/domain/connections"
 	"github.com/steve-care-software/steve/domain/connections/links"
 	"github.com/steve-care-software/steve/domain/points"
@@ -59,6 +60,7 @@ func (app *inMemoryBuilder) Now() (Application, error) {
 		return nil, errors.New("the Connections is mandatory in order to build an Application instance")
 	}
 
+	mpPointsToLinkNameEdges := map[string][]uuid.UUID{}
 	mpFromList := map[string][]connections.Connection{}
 	list := app.connections.List()
 	for _, oneConnection := range list {
@@ -69,8 +71,16 @@ func (app *inMemoryBuilder) Now() (Application, error) {
 
 		mpFromList[keyname] = append(mpFromList[keyname], oneConnection)
 
-		// if there is a reverse, add the to as the from:
+		// link names:
 		link := oneConnection.Link()
+		linkName := link.Name()
+		if _, ok := mpPointsToLinkNameEdges[linkName]; !ok {
+			mpPointsToLinkNameEdges[linkName] = []uuid.UUID{}
+		}
+
+		mpPointsToLinkNameEdges[linkName] = append(mpPointsToLinkNameEdges[linkName], oneConnection.From())
+
+		// if there is a reverse, add the to as the from:
 		if !link.HasReverse() {
 			continue
 		}
@@ -94,6 +104,14 @@ func (app *inMemoryBuilder) Now() (Application, error) {
 		}
 
 		mpFromList[keyname] = append(mpFromList[keyname], newConnection)
+
+		// reverse names:
+		reverseLinkName := newLink.Name()
+		if _, ok := mpPointsToLinkNameEdges[reverseLinkName]; !ok {
+			mpPointsToLinkNameEdges[reverseLinkName] = []uuid.UUID{}
+		}
+
+		mpPointsToLinkNameEdges[reverseLinkName] = append(mpPointsToLinkNameEdges[reverseLinkName], oneConnection.From())
 	}
 
 	mpFromConns := map[string]connections.Connections{}
@@ -108,5 +126,6 @@ func (app *inMemoryBuilder) Now() (Application, error) {
 
 	return createApplication(
 		mpFromConns,
+		mpPointsToLinkNameEdges,
 	), nil
 }

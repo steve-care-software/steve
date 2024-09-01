@@ -26,4 +26,7 @@ func NewApplication(
 type Application interface {
 	// Route returns the possible routes between 2 points
 	Route(from uuid.UUID, to uuid.UUID) (routes.Route, error)
+
+	// LinkIntersect intersects the link names and discover their edges
+	LinkIntersect(names []string) ([]uuid.UUID, error)
 }

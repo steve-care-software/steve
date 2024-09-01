@@ -20,32 +20,32 @@ func TestApplication_Success(t *testing.T) {
 	connections := connections.NewConnectionsForTests([]connections.Connection{
 		connections.NewConnectionForTests(
 			son,
-			links.NewLinkWithReverseForTests("son - father", "father - son"),
+			links.NewLinkWithReverseForTests("father", "son"),
 			father,
 		),
 		connections.NewConnectionForTests(
 			son,
-			links.NewLinkWithReverseForTests("son - grand-father", "grand-father - son"),
+			links.NewLinkWithReverseForTests("grand-father", "grand-son"),
 			grandFather,
 		),
 		connections.NewConnectionForTests(
 			son,
-			links.NewLinkWithReverseForTests("son - grand-grand father", "grand-grand father - son"),
+			links.NewLinkWithReverseForTests("grand-grand-father", "grand-grand-son"),
 			grandGrandFather,
 		),
 		connections.NewConnectionForTests(
 			father,
-			links.NewLinkWithReverseForTests("father - grandfather", "grandfather, father"),
+			links.NewLinkWithReverseForTests("father", "son"),
 			grandFather,
 		),
 		connections.NewConnectionForTests(
 			father,
-			links.NewLinkWithReverseForTests("father - great-grand-father", "great-grand-father - father"),
+			links.NewLinkWithReverseForTests("grand-father", "grand-son"),
 			grandGrandFather,
 		),
 		connections.NewConnectionForTests(
 			grandFather,
-			links.NewLinkWithReverseForTests("grand-father - great-grand-father", "great-grand-father - grand-father"),
+			links.NewLinkWithReverseForTests("father", "son"),
 			grandGrandFather,
 		),
 		connections.NewConnectionForTests(
@@ -80,6 +80,22 @@ func TestApplication_Success(t *testing.T) {
 	possibilities := retRoute.Possibilities()
 	if len(possibilities) != 5 {
 		t.Errorf("the Route was expected to contain %d possibilities, %d returned", 5, len(possibilities))
+		return
+	}
+
+	list, err := application.LinkIntersect([]string{"son", "grand-son", "grand-grand-son"})
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	if len(list) != 1 {
+		t.Errorf("the list was expected to contain %d edge, %d returned", 1, len(list))
+		return
+	}
+
+	if list[0].String() != son.String() {
+		t.Errorf("the son (id: %s) was expected to be contained in the list, %s returned", son.String(), list[0].String())
 		return
 	}
 

@@ -30,4 +30,5 @@ type InMemoryBuilder interface {
 // Application represents a connection application
 type Application interface {
 	ListFrom(from uuid.UUID) (connections.Connections, error)
+	ListFromLinkName(name string) ([]uuid.UUID, error)
 }

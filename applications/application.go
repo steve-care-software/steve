@@ -47,6 +47,58 @@ func (app *application) Route(from uuid.UUID, to uuid.UUID) (routes.Route, error
 		Now()
 }
 
+// LinkIntersect intersects the link names and discover their edges
+func (app *application) LinkIntersect(names []string) ([]uuid.UUID, error) {
+	values := map[string][]uuid.UUID{}
+	for _, oneName := range names {
+		retIDs, err := app.connApp.ListFromLinkName(oneName)
+		if err != nil {
+			return nil, err
+		}
+
+		values[oneName] = retIDs
+	}
+
+	return app.intersect(values)
+}
+
+func (app *application) intersect(values map[string][]uuid.UUID) ([]uuid.UUID, error) {
+	output := []uuid.UUID{}
+	joined := app.join(values)
+	expectedLength := uint(len(values))
+	for idAsStr, amount := range joined {
+		if amount != expectedLength {
+			continue
+		}
+
+		id, err := uuid.Parse(idAsStr)
+		if err != nil {
+			return nil, err
+		}
+
+		output = append(output, id)
+	}
+
+	return output, nil
+}
+
+func (app *application) join(values map[string][]uuid.UUID) map[string]uint {
+	output := map[string]uint{}
+	for _, oneList := range values {
+		for _, oneID := range oneList {
+			keyname := oneID.String()
+			if _, ok := output[keyname]; ok {
+				output[keyname]++
+				continue
+			}
+
+			output[keyname] = 1
+		}
+	}
+
+	return output
+}
+
 func (app *application) followUntilReached(
 	start uuid.UUID,
 	destination uuid.UUID,
