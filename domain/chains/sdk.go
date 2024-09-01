@@ -15,7 +15,6 @@ type Adapter interface {
 type Builder interface {
 	Create() Builder
 	WithGrammar(grammar nfts.NFT) Builder
-	WithProgram(input nfts.NFT) Builder
 	WithAction(action Action) Builder
 	Now() (Chain, error)
 }
@@ -24,7 +23,6 @@ type Builder interface {
 type Chain interface {
 	Hash() hash.Hash
 	Grammar() nfts.NFT // contain my grammar code
-	Program() nfts.NFT // contains my program code
 	Action() Action
 }
 
