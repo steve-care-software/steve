@@ -2,6 +2,7 @@ package points
 
 import (
 	"github.com/steve-care-software/steve/domain/points/bridges"
+	"github.com/steve-care-software/steve/domain/points/contexts"
 )
 
 // NewBuilder creates a new builder
@@ -29,6 +30,7 @@ type Points interface {
 // PointBuilder represents the point builder
 type PointBuilder interface {
 	Create() PointBuilder
+	WithContext(context contexts.Context) PointBuilder
 	WithBridge(bridge bridges.Bridge) PointBuilder
 	From(from []byte) PointBuilder
 	Now() (Point, error)
@@ -36,6 +38,7 @@ type PointBuilder interface {
 
 // Point represents a point
 type Point interface {
+	Context() contexts.Context
 	Bridge() bridges.Bridge
 	From() []byte
 }

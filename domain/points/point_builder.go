@@ -4,17 +4,20 @@ import (
 	"errors"
 
 	"github.com/steve-care-software/steve/domain/points/bridges"
+	"github.com/steve-care-software/steve/domain/points/contexts"
 )
 
 type pointBuilder struct {
-	bridge bridges.Bridge
-	from   []byte
+	context contexts.Context
+	bridge  bridges.Bridge
+	from    []byte
 }
 
 func createPointBuilder() PointBuilder {
 	out := pointBuilder{
-		bridge: nil,
-		from:   nil,
+		context: nil,
+		bridge:  nil,
+		from:    nil,
 	}
 
 	return &out
@@ -23,6 +26,12 @@ func createPointBuilder() PointBuilder {
 // Create initializes the builder
 func (app *pointBuilder) Create() PointBuilder {
 	return createPointBuilder()
+}
+
+// WithContext adds a context to the builder
+func (app *pointBuilder) WithContext(context contexts.Context) PointBuilder {
+	app.context = context
+	return app
 }
 
 // WithBridge adds a bridge to the builder
@@ -39,6 +48,10 @@ func (app *pointBuilder) From(from []byte) PointBuilder {
 
 // Now builds a new Point instance
 func (app *pointBuilder) Now() (Point, error) {
+	if app.context == nil {
+		return nil, errors.New("the context is mandatory in order to build a Point instance")
+	}
+
 	if app.bridge == nil {
 		return nil, errors.New("the bridge is mandatory in order to build a Point instance")
 	}
@@ -51,5 +64,5 @@ func (app *pointBuilder) Now() (Point, error) {
 		return nil, errors.New("the from data is mandatory in order to build a Point instance")
 	}
 
-	return createPoint(app.bridge, app.from), nil
+	return createPoint(app.context, app.bridge, app.from), nil
 }
