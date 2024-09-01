@@ -2,10 +2,9 @@ package chains
 
 import (
 	"github.com/steve-care-software/steve/domain/chains/nfts"
-	"github.com/steve-care-software/steve/domain/hash"
 )
 
-// Adapter represents a chain adapter
+// Adapter represents a chain adapterg
 type Adapter interface {
 	ToNFT(ins Chain) (Chain, error)
 	ToInstance(nft nfts.NFT) (Chain, error)
@@ -22,7 +21,6 @@ type Builder interface {
 
 // Chain represents a chain of action
 type Chain interface {
-	Hash() hash.Hash
 	Grammar() nfts.NFT // contain my grammar code
 	Program() nfts.NFT // contains my program code
 	Action() Action
@@ -38,7 +36,6 @@ type ActionBuilder interface {
 
 // Action represents a program action
 type Action interface {
-	Hash() hash.Hash
 	IsInterpret() bool
 	Interpret() Next
 	IsTranspile() bool
@@ -56,7 +53,6 @@ type TranspileBuilder interface {
 
 // Transpile represents a transpile
 type Transpile interface {
-	Hash() hash.Hash
 	Bridge() nfts.NFT // bridge code
 	Target() nfts.NFT // grammar code
 	HasNext() bool
@@ -73,7 +69,6 @@ type NextBuilder interface {
 
 // Next represents the next step
 type Next interface {
-	Hash() hash.Hash
 	IsOutput() bool
 	IsChain() bool
 	Chain() Chain
