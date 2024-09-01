@@ -1,15 +1,15 @@
-package actions
+package chains
 
 import (
-	"github.com/steve-care-software/steve/domain/actions/nfts"
+	"github.com/steve-care-software/steve/domain/chains/nfts"
 	"github.com/steve-care-software/steve/domain/hash"
 )
 
 // Builder represents a chain builder
 type Builder interface {
 	Create() Builder
-	WithGrammar(grammar []byte) Builder
-	WithProgram(input []byte) Builder
+	WithGrammar(grammar nfts.NFT) Builder
+	WithProgram(input nfts.NFT) Builder
 	WithAction(action Action) Builder
 	Now() (Chain, error)
 }
@@ -42,8 +42,8 @@ type Action interface {
 // TranspileBuilder represents a transpile builder
 type TranspileBuilder interface {
 	Create() TranspileBuilder
-	WithSource(source []byte) TranspileBuilder
-	WithBridge(bridge []byte) TranspileBuilder
+	WithBridge(bridge nfts.NFT) TranspileBuilder
+	WithTarget(target nfts.NFT) TranspileBuilder
 	WithNext(next Next) TranspileBuilder
 	Now() (Transpile, error)
 }
@@ -51,8 +51,8 @@ type TranspileBuilder interface {
 // Transpile represents a transpile
 type Transpile interface {
 	Hash() hash.Hash
-	Source() nfts.NFT // grammar code
 	Bridge() nfts.NFT // bridge code
+	Target() nfts.NFT // grammar code
 	HasNext() bool
 	Next() Next
 }
