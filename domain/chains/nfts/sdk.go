@@ -20,6 +20,12 @@ func NewNFTBuilder() NFTBuilder {
 	)
 }
 
+// Adapter represents the nft adapter
+type Adapter interface {
+	ToNFT(bytes []byte) (NFT, error)
+	ToInstance(ins NFT) ([]byte, error)
+}
+
 // Builder represents an nfts builder
 type Builder interface {
 	Create() Builder

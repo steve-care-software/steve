@@ -4,5 +4,5 @@ import "github.com/steve-care-software/steve/domain/chains"
 
 // Application represents the chain application
 type Application interface {
-	Execute(chain chains.Chain) ([]byte, error)
+	Execute(chain chains.Chain, input []byte) ([]byte, error)
 }
