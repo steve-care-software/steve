@@ -21,8 +21,8 @@ type Action interface {
 
 // Transpile represents a transpile
 type Transpile interface {
-	To()     // grammar code
-	Bridge() // bridge code
+	To() []byte     // grammar code
+	Bridge() []byte // bridge code
 	HasNext() bool
 	Next() Chain
 }
