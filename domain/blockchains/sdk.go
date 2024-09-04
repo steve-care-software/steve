@@ -14,6 +14,12 @@ func NewBuilder() Builder {
 	return createBuilder()
 }
 
+// Adapter represents the blockchain adapter
+type Adapter interface {
+	ToBytes(ins Blockchain) ([]byte, error)
+	ToInstance(data []byte) (Blockchain, error)
+}
+
 // Builder represents the builder
 type Builder interface {
 	Create() Builder

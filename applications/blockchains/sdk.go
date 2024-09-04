@@ -8,6 +8,8 @@ import (
 	"github.com/steve-care-software/steve/domain/hash"
 )
 
+const maxDifficulty = 64
+
 // Application represents the blockchain application
 type Application interface {
 	// Identities lists the identity names:
@@ -29,16 +31,16 @@ type Application interface {
 	Units() (*uint64, error)
 
 	// Transact creates a new transaction and adds it to our queue list
-	Transact(blockchain uuid.UUID, script []byte, fees uint64, flag hash.Hash) error
+	Transact(script []byte, fees uint64, flag hash.Hash) error
 
 	// Queue returns the transactions ready to be put in a block
 	Queue() (transactions.Transactions, error)
 
 	// Difficulty speculates the difficulty based on the amount of trx
-	Difficulty(amountTrx uint) (*uint, error)
+	Difficulty(blockchainID uuid.UUID, amountTrx uint) (*uint8, error)
 
 	// Mine mines a block using the queued transaction, with the specified max amount of trx
-	Mine(maxAmountTrx uint) (blocks.Block, error)
+	Mine(blockchain uuid.UUID, maxAmountTrx uint) (blocks.Block, error)
 
 	// Blocks returns the mined blocks
 	Blocks() ([]hash.Hash, error)

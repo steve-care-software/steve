@@ -28,6 +28,7 @@ type application struct {
 	resourceApp                  resources.Application
 	identityAdapter              identities.Adapter
 	identityBuilder              identities.Builder
+	blockchainAdapter            blockchains.Adapter
 	blockchainBuilder            blockchains.Builder
 	rootBuilder                  roots.Builder
 	rulesBuilder                 rules.Builder
@@ -50,6 +51,7 @@ func createApplication(
 	resourceApp resources.Application,
 	identityAdapter identities.Adapter,
 	identityBuilder identities.Builder,
+	blockchainAdapter blockchains.Adapter,
 	blockchainBuilder blockchains.Builder,
 	rootBuilder roots.Builder,
 	rulesBuilder rules.Builder,
@@ -69,6 +71,7 @@ func createApplication(
 		resourceApp:                  resourceApp,
 		identityAdapter:              identityAdapter,
 		identityBuilder:              identityBuilder,
+		blockchainAdapter:            blockchainAdapter,
 		blockchainBuilder:            blockchainBuilder,
 		rootBuilder:                  rootBuilder,
 		rulesBuilder:                 rulesBuilder,
@@ -169,15 +172,9 @@ func (app *application) Units() (*uint64, error) {
 }
 
 // Transact creates a new transaction and adds it to our queue list
-func (app *application) Transact(blockchain uuid.UUID, script []byte, fees uint64, flag hash.Hash) error {
+func (app *application) Transact(script []byte, fees uint64, flag hash.Hash) error {
 	if app.currentAuthenticatedIdentity != nil {
 		return errors.New("there is no authenticated identity")
-	}
-
-	keyname := fmt.Sprintf("%s%s", app.blockchainKeynamePrefix, blockchain.String())
-	_, err := app.resourceApp.Retrieve(keyname)
-	if err != nil {
-		return err
 	}
 
 	entry, err := app.entryBuilder.Create().
@@ -217,12 +214,28 @@ func (app *application) Queue() (transactions.Transactions, error) {
 }
 
 // Difficulty speculates the difficulty based on the amount of trx
-func (app *application) Difficulty(amountTrx uint) (*uint, error) {
-	return nil, nil
+func (app *application) Difficulty(blockchainID uuid.UUID, amountTrx uint) (*uint8, error) {
+	blockchain, err := app.retrieveBlockchainFromID(blockchainID)
+	if err != nil {
+		return nil, err
+	}
+
+	rules := blockchain.Rules()
+	baseDifficulty := uint64(rules.BaseDifficulty())
+	increateDiffPerTrx := rules.IncreaseDifficultyPerTrx()
+	incrAmount := uint64(increateDiffPerTrx * float64(amountTrx))
+	difficulty := baseDifficulty + incrAmount
+	if difficulty > maxDifficulty {
+		str := fmt.Sprintf("the max difficulty amount was expected to at max %d, %d calculated", maxDifficulty, difficulty)
+		return nil, errors.New(str)
+	}
+
+	casted := uint8(difficulty)
+	return &casted, nil
 }
 
 // Mine mines a block using the queued transaction, with the specified max amount of trx
-func (app *application) Mine(maxAmountTrx uint) (blocks.Block, error) {
+func (app *application) Mine(blockchain uuid.UUID, maxAmountTrx uint) (blocks.Block, error) {
 	return nil, nil
 }
 
@@ -278,4 +291,14 @@ func (app *application) generateIdentityFromSeedWordsThenEncrypt(name string, pa
 	}
 
 	return app.cryptographyApp.Encrypt(data, password)
+}
+
+func (app *application) retrieveBlockchainFromID(id uuid.UUID) (blockchains.Blockchain, error) {
+	keyname := fmt.Sprintf("%s%s", app.blockchainKeynamePrefix, id.String())
+	retData, err := app.resourceApp.Retrieve(keyname)
+	if err != nil {
+		return nil, err
+	}
+
+	return app.blockchainAdapter.ToInstance(retData)
 }
