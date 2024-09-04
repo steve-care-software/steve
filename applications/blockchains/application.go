@@ -21,6 +21,7 @@ import (
 	"github.com/steve-care-software/steve/domain/blockchains/roots"
 	"github.com/steve-care-software/steve/domain/blockchains/rules"
 	"github.com/steve-care-software/steve/domain/hash"
+	"github.com/steve-care-software/steve/domain/uuids"
 )
 
 type application struct {
@@ -39,7 +40,9 @@ type application struct {
 	transactionBuilder           transactions.TransactionBuilder
 	entryBuilder                 entries.Builder
 	hashAdapter                  hash.Adapter
+	uuidAdapter                  uuids.Adapter
 	identityNamesList            string
+	blockchainListKeyname        string
 	identityKeynamePrefix        string
 	identityUnitsKeynamePrefix   string
 	blockchainKeynamePrefix      string
@@ -64,7 +67,9 @@ func createApplication(
 	transactionBuilder transactions.TransactionBuilder,
 	entryBuilder entries.Builder,
 	hashAdapter hash.Adapter,
+	uuidAdapter uuids.Adapter,
 	identityNamesList string,
+	blockchainListKeyname string,
 	identityKeynamePrefix string,
 	identityUnitsKeynamePrefix string,
 	blockchainKeynamePrefix string,
@@ -85,7 +90,9 @@ func createApplication(
 		transactionBuilder:           transactionBuilder,
 		entryBuilder:                 entryBuilder,
 		hashAdapter:                  hashAdapter,
+		uuidAdapter:                  uuidAdapter,
 		identityNamesList:            identityNamesList,
+		blockchainListKeyname:        blockchainListKeyname,
 		identityKeynamePrefix:        identityKeynamePrefix,
 		identityUnitsKeynamePrefix:   identityUnitsKeynamePrefix,
 		blockchainKeynamePrefix:      blockchainKeynamePrefix,
@@ -359,7 +366,12 @@ func (app *application) Create(name string, description string, unitAmount uint6
 
 // Blockchains returns the list of blockchains
 func (app *application) Blockchains() ([]uuid.UUID, error) {
-	return nil, nil
+	retBytes, err := app.resourceApp.Retrieve(app.blockchainListKeyname)
+	if err != nil {
+		return nil, err
+	}
+
+	return app.uuidAdapter.FromBytes(retBytes)
 }
 
 // Blockchain returns the blochain by id
