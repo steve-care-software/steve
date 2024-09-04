@@ -12,7 +12,7 @@ type builder struct {
 	hashAdapter hash.Adapter
 	content     contents.Content
 	result      []byte
-	difficulty  uint
+	difficulty  uint8
 }
 
 func createBuilder(
@@ -48,7 +48,7 @@ func (app *builder) WithResult(result []byte) Builder {
 }
 
 // WithDifficulty adds a difficulty to the builder
-func (app *builder) WithDifficulty(difficulty uint) Builder {
+func (app *builder) WithDifficulty(difficulty uint8) Builder {
 	app.difficulty = difficulty
 	return app
 }

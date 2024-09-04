@@ -43,6 +43,7 @@ type application struct {
 	blockchainKeynamePrefix      string
 	currentAuthenticatedIdentity identities.Identity
 	trxQueue                     []transactions.Transaction
+	minedBlocksQueue             []blocks.Block
 }
 
 func createApplication(
@@ -86,6 +87,7 @@ func createApplication(
 		blockchainKeynamePrefix:      blockchainKeynamePrefix,
 		currentAuthenticatedIdentity: nil,
 		trxQueue:                     []transactions.Transaction{},
+		minedBlocksQueue:             []blocks.Block{},
 	}
 
 	return &out
@@ -202,8 +204,8 @@ func (app *application) Transact(script []byte, fees uint64, flag hash.Hash) err
 	return nil
 }
 
-// Queue returns the transactions ready to be put in a block
-func (app *application) Queue() (transactions.Transactions, error) {
+// TrxQueue returns the transactions ready to be put in a block
+func (app *application) TrxQueue() (transactions.Transactions, error) {
 	if len(app.trxQueue) <= 0 {
 		return nil, errors.New("there is currently no transaction in queue")
 	}
@@ -220,28 +222,71 @@ func (app *application) Difficulty(blockchainID uuid.UUID, amountTrx uint) (*uin
 		return nil, err
 	}
 
-	rules := blockchain.Rules()
-	baseDifficulty := uint64(rules.BaseDifficulty())
-	increateDiffPerTrx := rules.IncreaseDifficultyPerTrx()
-	incrAmount := uint64(increateDiffPerTrx * float64(amountTrx))
-	difficulty := baseDifficulty + incrAmount
-	if difficulty > maxDifficulty {
-		str := fmt.Sprintf("the max difficulty amount was expected to at max %d, %d calculated", maxDifficulty, difficulty)
-		return nil, errors.New(str)
-	}
-
-	casted := uint8(difficulty)
-	return &casted, nil
+	return app.difficulty(blockchain, amountTrx)
 }
 
 // Mine mines a block using the queued transaction, with the specified max amount of trx
-func (app *application) Mine(blockchain uuid.UUID, maxAmountTrx uint) (blocks.Block, error) {
-	return nil, nil
+func (app *application) Mine(blockchainID uuid.UUID, maxAmountTrx uint) error {
+	blockchain, err := app.retrieveBlockchainFromID(blockchainID)
+	if err != nil {
+		return err
+	}
+
+	trxList := app.trxQueue
+	remaining := []transactions.Transaction{}
+	length := uint(len(app.trxQueue))
+	if length > maxAmountTrx {
+		trxList = app.trxQueue[0:maxAmountTrx]
+		remaining = app.trxQueue[maxAmountTrx:]
+	}
+
+	pDifficulty, err := app.difficulty(blockchain, uint(len(trxList)))
+	if err != nil {
+		return err
+	}
+
+	result, err := mine(trxList, *pDifficulty)
+	if err != nil {
+		return err
+	}
+
+	parent := blockchain.Root().Hash()
+	if blockchain.HasHead() {
+		parent = blockchain.Head().Hash()
+	}
+
+	transactions, err := app.transactionsBuilder.Create().WithList(trxList).Now()
+	if err != nil {
+		return err
+	}
+
+	content, err := app.contentBuilder.Create().
+		WithParent(parent).
+		WithTransactions(transactions).
+		Now()
+
+	if err != nil {
+		return err
+	}
+
+	block, err := app.blockBuilder.Create().
+		WithContent(content).
+		WithDifficulty(*pDifficulty).
+		WithResult(result).
+		Now()
+
+	if err != nil {
+		return err
+	}
+
+	app.minedBlocksQueue = append(app.minedBlocksQueue, block)
+	app.trxQueue = remaining
+	return nil
 }
 
-// Blocks returns the mined blocks
-func (app *application) Blocks() ([]hash.Hash, error) {
-	return nil, nil
+// BlocksQueue returns the mined blocks
+func (app *application) BlocksQueue() []blocks.Block {
+	return app.minedBlocksQueue
 }
 
 // Sync syncs the mined blocks with the network
@@ -301,4 +346,19 @@ func (app *application) retrieveBlockchainFromID(id uuid.UUID) (blockchains.Bloc
 	}
 
 	return app.blockchainAdapter.ToInstance(retData)
+}
+
+func (app *application) difficulty(blockchain blockchains.Blockchain, amountTrx uint) (*uint8, error) {
+	rules := blockchain.Rules()
+	baseDifficulty := uint64(rules.BaseDifficulty())
+	increateDiffPerTrx := rules.IncreaseDifficultyPerTrx()
+	incrAmount := uint64(increateDiffPerTrx * float64(amountTrx))
+	difficulty := baseDifficulty + incrAmount
+	if difficulty > maxDifficulty {
+		str := fmt.Sprintf("the max difficulty amount was expected to at max %d, %d calculated", maxDifficulty, difficulty)
+		return nil, errors.New(str)
+	}
+
+	casted := uint8(difficulty)
+	return &casted, nil
 }

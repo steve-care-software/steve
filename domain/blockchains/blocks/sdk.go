@@ -18,7 +18,7 @@ type Builder interface {
 	Create() Builder
 	WithContent(content contents.Content) Builder
 	WithResult(result []byte) Builder
-	WithDifficulty(difficulty uint) Builder
+	WithDifficulty(difficulty uint8) Builder
 	Now() (Block, error)
 }
 
@@ -27,5 +27,5 @@ type Block interface {
 	Hash() hash.Hash
 	Content() contents.Content
 	Result() []byte
-	Difficulty() uint
+	Difficulty() uint8
 }

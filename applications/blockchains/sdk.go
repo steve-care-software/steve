@@ -33,17 +33,17 @@ type Application interface {
 	// Transact creates a new transaction and adds it to our queue list
 	Transact(script []byte, fees uint64, flag hash.Hash) error
 
-	// Queue returns the transactions ready to be put in a block
-	Queue() (transactions.Transactions, error)
+	// TrxQueue returns the transactions ready to be put in a block
+	TrxQueue() (transactions.Transactions, error)
 
 	// Difficulty speculates the difficulty based on the amount of trx
 	Difficulty(blockchainID uuid.UUID, amountTrx uint) (*uint8, error)
 
 	// Mine mines a block using the queued transaction, with the specified max amount of trx
-	Mine(blockchain uuid.UUID, maxAmountTrx uint) (blocks.Block, error)
+	Mine(blockchain uuid.UUID, maxAmountTrx uint) error
 
-	// Blocks returns the mined blocks
-	Blocks() ([]hash.Hash, error)
+	// BlocksQueue returns the mined blocks queue
+	BlocksQueue() []blocks.Block
 
 	// Sync syncs the mined blocks with the network
 	Sync(blockHash hash.Hash) error

@@ -9,14 +9,14 @@ type block struct {
 	hash       hash.Hash
 	content    contents.Content
 	result     []byte
-	difficulty uint
+	difficulty uint8
 }
 
 func createBlock(
 	hash hash.Hash,
 	content contents.Content,
 	result []byte,
-	difficulty uint,
+	difficulty uint8,
 ) Block {
 	out := block{
 		hash:       hash,
@@ -44,6 +44,6 @@ func (obj *block) Result() []byte {
 }
 
 // Difficulty returns the difficulty
-func (obj *block) Difficulty() uint {
+func (obj *block) Difficulty() uint8 {
 	return obj.difficulty
 }
