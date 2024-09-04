@@ -46,6 +46,7 @@ type application struct {
 	identityKeynamePrefix        string
 	identityUnitsKeynamePrefix   string
 	blockchainKeynamePrefix      string
+	scriptKeynamePrefix          string
 	currentAuthenticatedIdentity identities.Identity
 	trxQueue                     []transactions.Transaction
 	minedBlocksQueue             []blocks.Block
@@ -73,6 +74,7 @@ func createApplication(
 	identityKeynamePrefix string,
 	identityUnitsKeynamePrefix string,
 	blockchainKeynamePrefix string,
+	scriptKeynamePrefix string,
 ) Application {
 	out := application{
 		cryptographyApp:              cryptographyApp,
@@ -96,6 +98,7 @@ func createApplication(
 		identityKeynamePrefix:        identityKeynamePrefix,
 		identityUnitsKeynamePrefix:   identityUnitsKeynamePrefix,
 		blockchainKeynamePrefix:      blockchainKeynamePrefix,
+		scriptKeynamePrefix:          scriptKeynamePrefix,
 		currentAuthenticatedIdentity: nil,
 		trxQueue:                     []transactions.Transaction{},
 		minedBlocksQueue:             []blocks.Block{},
@@ -387,7 +390,8 @@ func (app *application) Blockchain(identifier uuid.UUID) (blockchains.Blockchain
 
 // Script returns the script by its hash
 func (app *application) Script(hash hash.Hash) ([]byte, error) {
-	return nil, nil
+	keyname := fmt.Sprintf("%s%s", app.scriptKeynamePrefix, hash.String())
+	return app.resourceApp.Retrieve(keyname)
 }
 
 func (app *application) generateIdentityFromSeedWordsThenEncrypt(name string, password []byte, seedWords []string) ([]byte, error) {
