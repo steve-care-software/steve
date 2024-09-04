@@ -20,21 +20,22 @@ import (
 )
 
 type application struct {
-	cryptographyApp       cryptography.Application
-	storeListApp          lists.Application
-	resourceApp           resources.Application
-	identityAdapter       identities.Adapter
-	identityBuilder       identities.Builder
-	blockchainBuilder     blockchains.Builder
-	rootBuilder           roots.Builder
-	rulesBuilder          rules.Builder
-	blockBuilder          blocks.Builder
-	contentBuilder        contents.Builder
-	transactionsBuilder   transactions.Builder
-	transactionBuilder    transactions.TransactionBuilder
-	entryBuilder          entries.Builder
-	identityNamesList     string
-	identityKeynamePrefix string
+	cryptographyApp              cryptography.Application
+	storeListApp                 lists.Application
+	resourceApp                  resources.Application
+	identityAdapter              identities.Adapter
+	identityBuilder              identities.Builder
+	blockchainBuilder            blockchains.Builder
+	rootBuilder                  roots.Builder
+	rulesBuilder                 rules.Builder
+	blockBuilder                 blocks.Builder
+	contentBuilder               contents.Builder
+	transactionsBuilder          transactions.Builder
+	transactionBuilder           transactions.TransactionBuilder
+	entryBuilder                 entries.Builder
+	identityNamesList            string
+	identityKeynamePrefix        string
+	currentAuthenticatedIdentity identities.Identity
 }
 
 func createApplication(
@@ -55,21 +56,22 @@ func createApplication(
 	identityKeynamePrefix string,
 ) Application {
 	out := application{
-		cryptographyApp:       cryptographyApp,
-		storeListApp:          storeListApp,
-		resourceApp:           resourceApp,
-		identityAdapter:       identityAdapter,
-		identityBuilder:       identityBuilder,
-		blockchainBuilder:     blockchainBuilder,
-		rootBuilder:           rootBuilder,
-		rulesBuilder:          rulesBuilder,
-		blockBuilder:          blockBuilder,
-		contentBuilder:        contentBuilder,
-		transactionsBuilder:   transactionsBuilder,
-		transactionBuilder:    transactionBuilder,
-		entryBuilder:          entryBuilder,
-		identityNamesList:     identityNamesList,
-		identityKeynamePrefix: identityKeynamePrefix,
+		cryptographyApp:              cryptographyApp,
+		storeListApp:                 storeListApp,
+		resourceApp:                  resourceApp,
+		identityAdapter:              identityAdapter,
+		identityBuilder:              identityBuilder,
+		blockchainBuilder:            blockchainBuilder,
+		rootBuilder:                  rootBuilder,
+		rulesBuilder:                 rulesBuilder,
+		blockBuilder:                 blockBuilder,
+		contentBuilder:               contentBuilder,
+		transactionsBuilder:          transactionsBuilder,
+		transactionBuilder:           transactionBuilder,
+		entryBuilder:                 entryBuilder,
+		identityNamesList:            identityNamesList,
+		identityKeynamePrefix:        identityKeynamePrefix,
+		currentAuthenticatedIdentity: nil,
 	}
 
 	return &out
@@ -119,6 +121,23 @@ func (app *application) Register(name string, password []byte, seedWords []strin
 
 // Authenticate authenticates in an identity:
 func (app *application) Authenticate(name string, password []byte) error {
+	keyname := fmt.Sprintf("%s%s", app.identityKeynamePrefix, name)
+	cipher, err := app.resourceApp.Retrieve(keyname)
+	if err != nil {
+		return err
+	}
+
+	data, err := app.cryptographyApp.Decrypt(cipher, password)
+	if err != nil {
+		return err
+	}
+
+	identity, err := app.identityAdapter.ToInstance(data)
+	if err != nil {
+		return err
+	}
+
+	app.currentAuthenticatedIdentity = identity
 	return nil
 }
 
