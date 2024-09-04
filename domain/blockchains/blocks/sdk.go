@@ -5,6 +5,23 @@ import (
 	"github.com/steve-care-software/steve/domain/hash"
 )
 
+// NewBuilder creates a new builder
+func NewBuilder() Builder {
+	hashAdapter := hash.NewAdapter()
+	return createBuilder(
+		hashAdapter,
+	)
+}
+
+// Builder represnets the builder
+type Builder interface {
+	Create() Builder
+	WithContent(content contents.Content) Builder
+	WithResult(result []byte) Builder
+	WithDifficulty(difficulty uint) Builder
+	Now() (Block, error)
+}
+
 // Block represents a block
 type Block interface {
 	Hash() hash.Hash
