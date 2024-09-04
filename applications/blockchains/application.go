@@ -356,7 +356,14 @@ func (app *application) Sync(blockHash hash.Hash) error {
 }
 
 // Create a new blockchain
-func (app *application) Create(name string, description string, unitAmount uint64, miningValue uint8, baseDifficulty uint8, increaseDiffPerrx float64) error {
+func (app *application) Create(
+	name string,
+	description string,
+	unitAmount uint64,
+	miningValue uint8,
+	baseDifficulty uint8,
+	increaseDiffPerrx float64,
+) error {
 	if app.currentAuthenticatedIdentity != nil {
 		return errors.New("there is no authenticated identity")
 	}
