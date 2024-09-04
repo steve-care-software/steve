@@ -376,7 +376,13 @@ func (app *application) Blockchains() ([]uuid.UUID, error) {
 
 // Blockchain returns the blochain by id
 func (app *application) Blockchain(identifier uuid.UUID) (blockchains.Blockchain, error) {
-	return nil, nil
+	keyname := fmt.Sprintf("%s%s", app.blockchainKeynamePrefix, identifier.String())
+	retBytes, err := app.resourceApp.Retrieve(keyname)
+	if err != nil {
+		return nil, err
+	}
+
+	return app.blockchainAdapter.ToInstance(retBytes)
 }
 
 // Script returns the script by its hash
