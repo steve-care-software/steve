@@ -6,6 +6,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/steve-care-software/steve/applications/cryptography"
@@ -37,6 +38,7 @@ type application struct {
 	transactionsBuilder          transactions.Builder
 	transactionBuilder           transactions.TransactionBuilder
 	entryBuilder                 entries.Builder
+	hashAdapter                  hash.Adapter
 	identityNamesList            string
 	identityKeynamePrefix        string
 	identityUnitsKeynamePrefix   string
@@ -61,6 +63,7 @@ func createApplication(
 	transactionsBuilder transactions.Builder,
 	transactionBuilder transactions.TransactionBuilder,
 	entryBuilder entries.Builder,
+	hashAdapter hash.Adapter,
 	identityNamesList string,
 	identityKeynamePrefix string,
 	identityUnitsKeynamePrefix string,
@@ -81,6 +84,7 @@ func createApplication(
 		transactionsBuilder:          transactionsBuilder,
 		transactionBuilder:           transactionBuilder,
 		entryBuilder:                 entryBuilder,
+		hashAdapter:                  hashAdapter,
 		identityNamesList:            identityNamesList,
 		identityKeynamePrefix:        identityKeynamePrefix,
 		identityUnitsKeynamePrefix:   identityUnitsKeynamePrefix,
@@ -296,7 +300,61 @@ func (app *application) Sync(blockHash hash.Hash) error {
 
 // Create a new blockchain
 func (app *application) Create(name string, description string, unitAmount uint64, miningValue uint8, baseDifficulty uint8, increaseDiffPerrx float64) error {
-	return nil
+	if app.currentAuthenticatedIdentity != nil {
+		return errors.New("there is no authenticated identity")
+	}
+
+	rules, err := app.rulesBuilder.Create().
+		WithBaseDifficulty(baseDifficulty).
+		WithIncreaseDifficultyPerTrx(increaseDiffPerrx).
+		WithMiningValue(miningValue).
+		Now()
+
+	if err != nil {
+		return err
+	}
+
+	pubKey := app.currentAuthenticatedIdentity.PK().Public().(ed25519.PublicKey)
+	pPubKeyHash, err := app.hashAdapter.FromBytes(pubKey)
+	if err != nil {
+		return err
+	}
+
+	root, err := app.rootBuilder.Create().
+		WithAmount(unitAmount).
+		WithOwner(*pPubKeyHash).
+		Now()
+
+	if err != nil {
+		return err
+	}
+
+	uuid, err := uuid.NewRandom()
+	if err != nil {
+		return err
+	}
+
+	createdOn := time.Now().UTC()
+	blockchain, err := app.blockchainBuilder.Create().
+		WithIdentifier(uuid).
+		WithName(name).
+		WithDescription(description).
+		WithRules(rules).
+		WithRoot(root).
+		CreatedOn(createdOn).
+		Now()
+
+	if err != nil {
+		return err
+	}
+
+	retBytes, err := app.blockchainAdapter.ToBytes(blockchain)
+	if err != nil {
+		return err
+	}
+
+	keyname := fmt.Sprintf("%s%s", app.blockchainKeynamePrefix, blockchain.Identifier().String())
+	return app.resourceApp.Insert(keyname, retBytes)
 }
 
 // Blockchains returns the list of blockchains
