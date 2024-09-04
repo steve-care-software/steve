@@ -1,6 +1,7 @@
 package blockchains
 
 import (
+	"crypto"
 	"crypto/ed25519"
 	"encoding/binary"
 	"errors"
@@ -38,7 +39,9 @@ type application struct {
 	identityNamesList            string
 	identityKeynamePrefix        string
 	identityUnitsKeynamePrefix   string
+	blockchainKeynamePrefix      string
 	currentAuthenticatedIdentity identities.Identity
+	trxQueue                     []transactions.Transaction
 }
 
 func createApplication(
@@ -58,6 +61,7 @@ func createApplication(
 	identityNamesList string,
 	identityKeynamePrefix string,
 	identityUnitsKeynamePrefix string,
+	blockchainKeynamePrefix string,
 ) Application {
 	out := application{
 		cryptographyApp:              cryptographyApp,
@@ -76,7 +80,9 @@ func createApplication(
 		identityNamesList:            identityNamesList,
 		identityKeynamePrefix:        identityKeynamePrefix,
 		identityUnitsKeynamePrefix:   identityUnitsKeynamePrefix,
+		blockchainKeynamePrefix:      blockchainKeynamePrefix,
 		currentAuthenticatedIdentity: nil,
+		trxQueue:                     []transactions.Transaction{},
 	}
 
 	return &out
@@ -146,7 +152,7 @@ func (app *application) Authenticated() (string, error) {
 	return app.currentAuthenticatedIdentity.Name(), nil
 }
 
-// Units returns the amount of units the authenticated identity has
+// Units returns the amount of units the authenticated identity hasg
 func (app *application) Units() (*uint64, error) {
 	if app.currentAuthenticatedIdentity != nil {
 		return nil, errors.New("there is no authenticated identity")
@@ -163,13 +169,51 @@ func (app *application) Units() (*uint64, error) {
 }
 
 // Transact creates a new transaction and adds it to our queue list
-func (app *application) Transact(blockchain uuid.UUID, script []byte, fees uint64) error {
+func (app *application) Transact(blockchain uuid.UUID, script []byte, fees uint64, flag hash.Hash) error {
+	if app.currentAuthenticatedIdentity != nil {
+		return errors.New("there is no authenticated identity")
+	}
+
+	keyname := fmt.Sprintf("%s%s", app.blockchainKeynamePrefix, blockchain.String())
+	_, err := app.resourceApp.Retrieve(keyname)
+	if err != nil {
+		return err
+	}
+
+	entry, err := app.entryBuilder.Create().
+		WithFees(fees).
+		WithFlag(flag).
+		WithScript(script).
+		Now()
+
+	if err != nil {
+		return err
+	}
+
+	message := entry.Hash().Bytes()
+	signature, err := app.currentAuthenticatedIdentity.PK().Sign(nil, message, crypto.SHA512)
+	if err != nil {
+		return err
+	}
+
+	trx, err := app.transactionBuilder.Create().WithEntry(entry).WithSignature(signature).Now()
+	if err != nil {
+		return err
+	}
+
+	app.trxQueue = append(app.trxQueue, trx)
 	return nil
 }
 
 // Queue returns the transactions ready to be put in a block
 func (app *application) Queue() (transactions.Transactions, error) {
-	return nil, nil
+	if len(app.trxQueue) <= 0 {
+		return nil, errors.New("there is currently no transaction in queue")
+	}
+
+	return app.transactionsBuilder.Create().
+		WithList(app.trxQueue).
+		Now()
 }
 
 // Difficulty speculates the difficulty based on the amount of trx

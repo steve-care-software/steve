@@ -29,7 +29,7 @@ type Application interface {
 	Units() (*uint64, error)
 
 	// Transact creates a new transaction and adds it to our queue list
-	Transact(blockchain uuid.UUID, script []byte, fees uint64) error
+	Transact(blockchain uuid.UUID, script []byte, fees uint64, flag hash.Hash) error
 
 	// Queue returns the transactions ready to be put in a block
 	Queue() (transactions.Transactions, error)
