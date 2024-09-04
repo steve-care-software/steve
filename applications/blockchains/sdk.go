@@ -43,7 +43,7 @@ type Application interface {
 	Mine(blockchain uuid.UUID, maxAmountTrx uint) error
 
 	// BlocksQueue returns the mined blocks queue
-	BlocksQueue() []blocks.Block
+	BlocksQueue() (blocks.Blocks, error)
 
 	// Sync syncs the mined blocks with the network
 	Sync(blockHash hash.Hash) error

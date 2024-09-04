@@ -8,17 +8,17 @@ import (
 	"github.com/steve-care-software/steve/domain/hash"
 )
 
-type builder struct {
+type blockBuilder struct {
 	hashAdapter hash.Adapter
 	content     contents.Content
 	result      []byte
 	difficulty  uint8
 }
 
-func createBuilder(
+func createBlockBuilder(
 	hashAdapter hash.Adapter,
-) Builder {
-	out := builder{
+) BlockBuilder {
+	out := blockBuilder{
 		hashAdapter: hashAdapter,
 		content:     nil,
 		result:      nil,
@@ -28,33 +28,33 @@ func createBuilder(
 	return &out
 }
 
-// Create initializes the builder
-func (app *builder) Create() Builder {
-	return createBuilder(
+// Create initializes the blockBuilder
+func (app *blockBuilder) Create() BlockBuilder {
+	return createBlockBuilder(
 		app.hashAdapter,
 	)
 }
 
-// WithContent adds content to the builder
-func (app *builder) WithContent(content contents.Content) Builder {
+// WithContent adds content to the blockBuilder
+func (app *blockBuilder) WithContent(content contents.Content) BlockBuilder {
 	app.content = content
 	return app
 }
 
-// WithResult adds result to the builder
-func (app *builder) WithResult(result []byte) Builder {
+// WithResult adds result to the blockBuilder
+func (app *blockBuilder) WithResult(result []byte) BlockBuilder {
 	app.result = result
 	return app
 }
 
-// WithDifficulty adds a difficulty to the builder
-func (app *builder) WithDifficulty(difficulty uint8) Builder {
+// WithDifficulty adds a difficulty to the blockBuilder
+func (app *blockBuilder) WithDifficulty(difficulty uint8) BlockBuilder {
 	app.difficulty = difficulty
 	return app
 }
 
 // Now builds a new BLock instance
-func (app *builder) Now() (Block, error) {
+func (app *blockBuilder) Now() (Block, error) {
 	if app.content == nil {
 		return nil, errors.New("the content is mandatory in order to build a Block instance")
 	}

@@ -34,7 +34,9 @@ type application struct {
 	blockchainBuilder            blockchains.Builder
 	rootBuilder                  roots.Builder
 	rulesBuilder                 rules.Builder
-	blockBuilder                 blocks.Builder
+	blocksAdapter                blocks.Adapter
+	blocksBuilder                blocks.Builder
+	blockBuilder                 blocks.BlockBuilder
 	contentBuilder               contents.Builder
 	transactionsBuilder          transactions.Builder
 	transactionBuilder           transactions.TransactionBuilder
@@ -47,9 +49,10 @@ type application struct {
 	identityUnitsKeynamePrefix   string
 	blockchainKeynamePrefix      string
 	scriptKeynamePrefix          string
+	blockKeynamePrefix           string
+	blockQueueKeyname            string
 	currentAuthenticatedIdentity identities.Identity
 	trxQueue                     []transactions.Transaction
-	minedBlocksQueue             []blocks.Block
 }
 
 func createApplication(
@@ -62,7 +65,9 @@ func createApplication(
 	blockchainBuilder blockchains.Builder,
 	rootBuilder roots.Builder,
 	rulesBuilder rules.Builder,
-	blockBuilder blocks.Builder,
+	blocksAdapter blocks.Adapter,
+	blocksBuilder blocks.Builder,
+	blockBuilder blocks.BlockBuilder,
 	contentBuilder contents.Builder,
 	transactionsBuilder transactions.Builder,
 	transactionBuilder transactions.TransactionBuilder,
@@ -75,6 +80,8 @@ func createApplication(
 	identityUnitsKeynamePrefix string,
 	blockchainKeynamePrefix string,
 	scriptKeynamePrefix string,
+	blockKeynamePrefix string,
+	blockQueueKeyname string,
 ) Application {
 	out := application{
 		cryptographyApp:              cryptographyApp,
@@ -86,6 +93,8 @@ func createApplication(
 		blockchainBuilder:            blockchainBuilder,
 		rootBuilder:                  rootBuilder,
 		rulesBuilder:                 rulesBuilder,
+		blocksAdapter:                blocksAdapter,
+		blocksBuilder:                blocksBuilder,
 		blockBuilder:                 blockBuilder,
 		contentBuilder:               contentBuilder,
 		transactionsBuilder:          transactionsBuilder,
@@ -99,9 +108,10 @@ func createApplication(
 		identityUnitsKeynamePrefix:   identityUnitsKeynamePrefix,
 		blockchainKeynamePrefix:      blockchainKeynamePrefix,
 		scriptKeynamePrefix:          scriptKeynamePrefix,
+		blockKeynamePrefix:           blockKeynamePrefix,
+		blockQueueKeyname:            blockQueueKeyname,
 		currentAuthenticatedIdentity: nil,
 		trxQueue:                     []transactions.Transaction{},
-		minedBlocksQueue:             []blocks.Block{},
 	}
 
 	return &out
@@ -293,14 +303,51 @@ func (app *application) Mine(blockchainID uuid.UUID, maxAmountTrx uint) error {
 		return err
 	}
 
-	app.minedBlocksQueue = append(app.minedBlocksQueue, block)
+	retBytes, err := app.blocksAdapter.BlockToBytes(block)
+	if err != nil {
+		return err
+	}
+
+	keyname := fmt.Sprintf("%s%s", app.blockKeynamePrefix, block.Hash().String())
+	err = app.resourceApp.Insert(keyname, retBytes)
+	if err != nil {
+		return err
+	}
+
+	retQueueBytes, err := app.resourceApp.Retrieve(app.blockQueueKeyname)
+	if err != nil {
+		return err
+	}
+
+	retQueue, err := app.blocksAdapter.BytesToInstances(retQueueBytes)
+	if err != nil {
+		return err
+	}
+
+	queueList := retQueue.List()
+	queueList = append(queueList, block)
+	blocks, err := app.blocksBuilder.Create().WithList(queueList).Now()
+	if err != nil {
+		return err
+	}
+
+	retBlocksBytes, err := app.blocksAdapter.BlocksToBytes(blocks)
+	if err != nil {
+		return err
+	}
+
 	app.trxQueue = remaining
-	return nil
+	return app.resourceApp.Insert(app.blockQueueKeyname, retBlocksBytes)
 }
 
 // BlocksQueue returns the mined blocks
-func (app *application) BlocksQueue() []blocks.Block {
-	return app.minedBlocksQueue
+func (app *application) BlocksQueue() (blocks.Blocks, error) {
+	retBytes, err := app.resourceApp.Retrieve(app.blockQueueKeyname)
+	if err != nil {
+		return nil, err
+	}
+
+	return app.blocksAdapter.BytesToInstances(retBytes)
 }
 
 // Sync syncs the mined blocks with the network
