@@ -14,7 +14,7 @@ type Application interface {
 	Identities() ([]string, error)
 
 	// Register registers a new identity:
-	Register(name string, password []byte) ([]string, error)
+	Register(name string, password []byte, seedWords []string) error
 
 	// Authenticate authenticates in an identity:
 	Authenticate(name string, password []byte) error

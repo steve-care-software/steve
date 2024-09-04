@@ -1,29 +1,120 @@
 package blockchains
 
 import (
+	"crypto/ed25519"
+	"fmt"
+
 	"github.com/google/uuid"
+	"github.com/steve-care-software/steve/applications/cryptography"
+	"github.com/steve-care-software/steve/applications/stores/lists"
+	"github.com/steve-care-software/steve/applications/stores/resources"
 	"github.com/steve-care-software/steve/domain/blockchains"
 	"github.com/steve-care-software/steve/domain/blockchains/blocks"
+	"github.com/steve-care-software/steve/domain/blockchains/blocks/contents"
 	"github.com/steve-care-software/steve/domain/blockchains/blocks/contents/transactions"
+	"github.com/steve-care-software/steve/domain/blockchains/blocks/contents/transactions/entries"
+	"github.com/steve-care-software/steve/domain/blockchains/identities"
+	"github.com/steve-care-software/steve/domain/blockchains/roots"
+	"github.com/steve-care-software/steve/domain/blockchains/rules"
 	"github.com/steve-care-software/steve/domain/hash"
 )
 
 type application struct {
+	cryptographyApp       cryptography.Application
+	storeListApp          lists.Application
+	resourceApp           resources.Application
+	identityAdapter       identities.Adapter
+	identityBuilder       identities.Builder
+	blockchainBuilder     blockchains.Builder
+	rootBuilder           roots.Builder
+	rulesBuilder          rules.Builder
+	blockBuilder          blocks.Builder
+	contentBuilder        contents.Builder
+	transactionsBuilder   transactions.Builder
+	transactionBuilder    transactions.TransactionBuilder
+	entryBuilder          entries.Builder
+	identityNamesList     string
+	identityKeynamePrefix string
 }
 
-func createApplication() Application {
-	out := application{}
+func createApplication(
+	cryptographyApp cryptography.Application,
+	storeListApp lists.Application,
+	resourceApp resources.Application,
+	identityAdapter identities.Adapter,
+	identityBuilder identities.Builder,
+	blockchainBuilder blockchains.Builder,
+	rootBuilder roots.Builder,
+	rulesBuilder rules.Builder,
+	blockBuilder blocks.Builder,
+	contentBuilder contents.Builder,
+	transactionsBuilder transactions.Builder,
+	transactionBuilder transactions.TransactionBuilder,
+	entryBuilder entries.Builder,
+	identityNamesList string,
+	identityKeynamePrefix string,
+) Application {
+	out := application{
+		cryptographyApp:       cryptographyApp,
+		storeListApp:          storeListApp,
+		resourceApp:           resourceApp,
+		identityAdapter:       identityAdapter,
+		identityBuilder:       identityBuilder,
+		blockchainBuilder:     blockchainBuilder,
+		rootBuilder:           rootBuilder,
+		rulesBuilder:          rulesBuilder,
+		blockBuilder:          blockBuilder,
+		contentBuilder:        contentBuilder,
+		transactionsBuilder:   transactionsBuilder,
+		transactionBuilder:    transactionBuilder,
+		entryBuilder:          entryBuilder,
+		identityNamesList:     identityNamesList,
+		identityKeynamePrefix: identityKeynamePrefix,
+	}
+
 	return &out
 }
 
 // Identities lists the identity names:
 func (app *application) Identities() ([]string, error) {
-	return nil, nil
+	list, err := app.storeListApp.RetrieveAll(app.identityNamesList)
+	if err != nil {
+		return nil, err
+	}
+
+	output := []string{}
+	for _, oneName := range list {
+		output = append(output, string(oneName))
+	}
+
+	return output, nil
 }
 
 // Register registers a new identity:
-func (app *application) Register(name string, password []byte) ([]string, error) {
-	return nil, nil
+func (app *application) Register(name string, password []byte, seedWords []string) error {
+	seed := []byte{}
+	for _, oneWord := range seedWords {
+		seed = append(seed, []byte(oneWord)...)
+	}
+
+	pk := ed25519.NewKeyFromSeed(seed)
+	identity, err := app.identityBuilder.Create().WithName(name).WithPK(pk).Now()
+	if err != nil {
+		return err
+	}
+
+	data, err := app.identityAdapter.ToBytes(identity)
+	if err != nil {
+		return err
+	}
+
+	cipher, err := app.cryptographyApp.Encrypt(data, password)
+	if err != nil {
+		return err
+	}
+
+	keyname := fmt.Sprintf("%s%s", app.identityKeynamePrefix, name)
+	return app.resourceApp.Save(keyname, cipher)
 }
 
 // Authenticate authenticates in an identity:

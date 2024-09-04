@@ -11,6 +11,12 @@ func NewBuilder() Builder {
 	return createBuilder()
 }
 
+// Adapter represents an identity adapter
+type Adapter interface {
+	ToBytes(ins Identity) ([]byte, error)
+	ToInstance(bytes []byte) (Identity, error)
+}
+
 // Builder represents the builder
 type Builder interface {
 	Create() Builder
