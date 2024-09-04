@@ -20,7 +20,7 @@ type Application interface {
 	Authenticate(name string, password []byte) error
 
 	// Recover recovers an identity using the seed phrases
-	Recover(name string, words []string, newPassword []byte) error
+	Recover(name string, newPassword []byte, words []string) error
 
 	// Authenticated returns the authenticated idgentity, if any
 	Authenticated() (string, error)

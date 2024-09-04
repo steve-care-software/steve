@@ -2,6 +2,8 @@ package blockchains
 
 import (
 	"crypto/ed25519"
+	"encoding/binary"
+	"errors"
 	"fmt"
 
 	"github.com/google/uuid"
@@ -35,6 +37,7 @@ type application struct {
 	entryBuilder                 entries.Builder
 	identityNamesList            string
 	identityKeynamePrefix        string
+	identityUnitsKeynamePrefix   string
 	currentAuthenticatedIdentity identities.Identity
 }
 
@@ -54,6 +57,7 @@ func createApplication(
 	entryBuilder entries.Builder,
 	identityNamesList string,
 	identityKeynamePrefix string,
+	identityUnitsKeynamePrefix string,
 ) Application {
 	out := application{
 		cryptographyApp:              cryptographyApp,
@@ -71,6 +75,7 @@ func createApplication(
 		entryBuilder:                 entryBuilder,
 		identityNamesList:            identityNamesList,
 		identityKeynamePrefix:        identityKeynamePrefix,
+		identityUnitsKeynamePrefix:   identityUnitsKeynamePrefix,
 		currentAuthenticatedIdentity: nil,
 	}
 
@@ -94,29 +99,13 @@ func (app *application) Identities() ([]string, error) {
 
 // Register registers a new identity:
 func (app *application) Register(name string, password []byte, seedWords []string) error {
-	seed := []byte{}
-	for _, oneWord := range seedWords {
-		seed = append(seed, []byte(oneWord)...)
-	}
-
-	pk := ed25519.NewKeyFromSeed(seed)
-	identity, err := app.identityBuilder.Create().WithName(name).WithPK(pk).Now()
-	if err != nil {
-		return err
-	}
-
-	data, err := app.identityAdapter.ToBytes(identity)
-	if err != nil {
-		return err
-	}
-
-	cipher, err := app.cryptographyApp.Encrypt(data, password)
+	cipher, err := app.generateIdentityFromSeedWordsThenEncrypt(name, password, seedWords)
 	if err != nil {
 		return err
 	}
 
 	keyname := fmt.Sprintf("%s%s", app.identityKeynamePrefix, name)
-	return app.resourceApp.Save(keyname, cipher)
+	return app.resourceApp.Insert(keyname, cipher)
 }
 
 // Authenticate authenticates in an identity:
@@ -142,18 +131,35 @@ func (app *application) Authenticate(name string, password []byte) error {
 }
 
 // Recover recovers an identity using the seed phrases
-func (app *application) Recover(name string, words []string, newPassword []byte) error {
-	return nil
+func (app *application) Recover(name string, newPassword []byte, words []string) error {
+	cipher, err := app.generateIdentityFromSeedWordsThenEncrypt(name, newPassword, words)
+	if err != nil {
+		return err
+	}
+
+	keyname := fmt.Sprintf("%s%s", app.identityKeynamePrefix, name)
+	return app.resourceApp.Insert(keyname, cipher)
 }
 
 // Authenticated returns the authenticated idgentity, if any
 func (app *application) Authenticated() (string, error) {
-	return "", nil
+	return app.currentAuthenticatedIdentity.Name(), nil
 }
 
 // Units returns the amount of units the authenticated identity has
 func (app *application) Units() (*uint64, error) {
-	return nil, nil
+	if app.currentAuthenticatedIdentity != nil {
+		return nil, errors.New("there is no authenticated identity")
+	}
+
+	keyname := fmt.Sprintf("%s%s", app.identityUnitsKeynamePrefix, app.currentAuthenticatedIdentity.Name())
+	data, err := app.resourceApp.Retrieve(keyname)
+	if err != nil {
+		return nil, err
+	}
+
+	amount := binary.LittleEndian.Uint64(data)
+	return &amount, nil
 }
 
 // Transact creates a new transaction and adds it to our queue list
@@ -204,4 +210,28 @@ func (app *application) Blockchain(identifier uuid.UUID) (blockchains.Blockchain
 // Script returns the script by its hash
 func (app *application) Script(hash hash.Hash) ([]byte, error) {
 	return nil, nil
+}
+
+func (app *application) generateIdentityFromSeedWordsThenEncrypt(name string, password []byte, seedWords []string) ([]byte, error) {
+	seed := []byte{}
+	for _, oneWord := range seedWords {
+		seed = append(seed, []byte(oneWord)...)
+	}
+
+	pk := ed25519.NewKeyFromSeed(seed)
+	identity, err := app.identityBuilder.Create().
+		WithName(name).
+		WithPK(pk).
+		Now()
+
+	if err != nil {
+		return nil, err
+	}
+
+	data, err := app.identityAdapter.ToBytes(identity)
+	if err != nil {
+		return nil, err
+	}
+
+	return app.cryptographyApp.Encrypt(data, password)
 }
