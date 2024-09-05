@@ -214,7 +214,7 @@ func (app *application) Transact(script []byte, fees uint64, flag hash.Hash) err
 	}
 
 	message := entry.Hash().Bytes()
-	signature, err := app.currentAuthenticatedIdentity.PK().Sign(nil, message, crypto.SHA512)
+	signature, err := app.currentAuthenticatedIdentity.PK().(ed25519.PrivateKey).Sign(nil, message, crypto.SHA512)
 	if err != nil {
 		return err
 	}
@@ -378,7 +378,7 @@ func (app *application) Create(
 		return err
 	}
 
-	pubKey := app.currentAuthenticatedIdentity.PK().Public().(ed25519.PublicKey)
+	pubKey := app.currentAuthenticatedIdentity.PK().(ed25519.PrivateKey).Public().(ed25519.PublicKey)
 	pPubKeyHash, err := app.hashAdapter.FromBytes(pubKey)
 	if err != nil {
 		return err
@@ -449,12 +449,7 @@ func (app *application) Script(hash hash.Hash) ([]byte, error) {
 }
 
 func (app *application) generateIdentityFromSeedWordsThenEncrypt(name string, password []byte, seedWords []string) ([]byte, error) {
-	seed := []byte{}
-	for _, oneWord := range seedWords {
-		seed = append(seed, []byte(oneWord)...)
-	}
-
-	pk := ed25519.NewKeyFromSeed(seed)
+	pk := app.cryptographyApp.GeneratePrivateKey(seedWords)
 	identity, err := app.identityBuilder.Create().
 		WithName(name).
 		WithPK(pk).

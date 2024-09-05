@@ -1,7 +1,7 @@
 package identities
 
 import (
-	"crypto/ed25519"
+	"crypto"
 
 	"github.com/steve-care-software/steve/domain/hash"
 )
@@ -21,7 +21,7 @@ type Adapter interface {
 type Builder interface {
 	Create() Builder
 	WithName(name string) Builder
-	WithPK(pk ed25519.PrivateKey) Builder
+	WithPK(pk crypto.PrivateKey) Builder
 	WithFlags(flags []hash.Hash) Builder
 	Now() (Identity, error)
 }
@@ -29,7 +29,7 @@ type Builder interface {
 // Identity represents an identity
 type Identity interface {
 	Name() string
-	PK() ed25519.PrivateKey
+	PK() crypto.PrivateKey
 	HasFlags() bool
 	Flags() []hash.Hash
 }
