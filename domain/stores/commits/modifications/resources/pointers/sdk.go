@@ -4,6 +4,8 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+
+	"github.com/steve-care-software/steve/domain/hash"
 )
 
 // Uint64Size represents the uint64 byte size
@@ -19,7 +21,10 @@ func NewAdapter() Adapter {
 
 // NewBuilder creates a new pointer builder
 func NewBuilder() Builder {
-	return createBuilder()
+	hashAdapter := hash.NewAdapter()
+	return createBuilder(
+		hashAdapter,
+	)
 }
 
 // Adapter represents a pointer adapter
@@ -38,6 +43,7 @@ type Builder interface {
 
 // Pointer represents a pointer
 type Pointer interface {
+	Hash() hash.Hash
 	Index() uint
 	Length() uint
 }

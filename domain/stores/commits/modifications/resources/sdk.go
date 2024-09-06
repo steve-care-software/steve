@@ -1,6 +1,9 @@
 package resources
 
-import "github.com/steve-care-software/steve/domain/stores/resources/pointers"
+import (
+	"github.com/steve-care-software/steve/domain/hash"
+	"github.com/steve-care-software/steve/domain/stores/commits/modifications/resources/pointers"
+)
 
 // NewAdapter creates a new adapter
 func NewAdapter() Adapter {
@@ -16,12 +19,18 @@ func NewAdapter() Adapter {
 
 // NewBuilder creates a new builder
 func NewBuilder() Builder {
-	return createBuilder()
+	hashAdapter := hash.NewAdapter()
+	return createBuilder(
+		hashAdapter,
+	)
 }
 
 // NewResourceBuilder creates a new resource builder
 func NewResourceBuilder() ResourceBuilder {
-	return createResourceBuilder()
+	hashAdapter := hash.NewAdapter()
+	return createResourceBuilder(
+		hashAdapter,
+	)
 }
 
 // Adapter represents a resource adapter
@@ -41,6 +50,7 @@ type Builder interface {
 
 // Resources represents resources
 type Resources interface {
+	Hash() hash.Hash
 	List() []Resource
 }
 
@@ -54,6 +64,7 @@ type ResourceBuilder interface {
 
 // Resource represents a resource
 type Resource interface {
+	Hash() hash.Hash
 	Identifier() string
 	Pointer() pointers.Pointer
 }

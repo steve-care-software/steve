@@ -1,6 +1,6 @@
 package resources
 
-import "github.com/steve-care-software/steve/domain/stores/resources/pointers"
+import "github.com/steve-care-software/steve/domain/stores/commits/modifications/resources/pointers"
 
 // NewResourcesForTests creates a new resources for tests
 func NewResourcesForTests(list []Resource) Resources {

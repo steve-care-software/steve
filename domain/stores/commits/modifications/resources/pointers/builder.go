@@ -1,16 +1,25 @@
 package pointers
 
-import "errors"
+import (
+	"errors"
+	"strconv"
+
+	"github.com/steve-care-software/steve/domain/hash"
+)
 
 type builder struct {
-	pIndex *uint
-	length uint
+	hashAdapter hash.Adapter
+	pIndex      *uint
+	length      uint
 }
 
-func createBuilder() Builder {
+func createBuilder(
+	hashAdapter hash.Adapter,
+) Builder {
 	out := builder{
-		pIndex: nil,
-		length: 0,
+		hashAdapter: hashAdapter,
+		pIndex:      nil,
+		length:      0,
 	}
 
 	return &out
@@ -18,7 +27,9 @@ func createBuilder() Builder {
 
 // Create initializes the builder
 func (app *builder) Create() Builder {
-	return createBuilder()
+	return createBuilder(
+		app.hashAdapter,
+	)
 }
 
 // WithIndex adds an index to the builder
@@ -43,5 +54,18 @@ func (app *builder) Now() (Pointer, error) {
 		return nil, errors.New("the length is mandatory in order to build a Pointer instance")
 	}
 
-	return createPointer(*app.pIndex, app.length), nil
+	pHash, err := app.hashAdapter.FromMultiBytes([][]byte{
+		[]byte(strconv.Itoa(int(*app.pIndex))),
+		[]byte(strconv.Itoa(int(app.length))),
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return createPointer(
+		*pHash,
+		*app.pIndex,
+		app.length,
+	), nil
 }

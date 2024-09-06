@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/steve-care-software/steve/domain/stores/resources/pointers"
+	"github.com/steve-care-software/steve/domain/stores/commits/modifications/resources/pointers"
 )
 
 func TestAdapter_single_Success(t *testing.T) {
