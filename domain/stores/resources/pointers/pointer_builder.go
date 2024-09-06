@@ -35,7 +35,7 @@ func (app *pointerBuilder) WithLength(length uint) PointerBuilder {
 
 // Now builds a new Pointer instance
 func (app *pointerBuilder) Now() (Pointer, error) {
-	if app.pIndex != nil {
+	if app.pIndex == nil {
 		return nil, errors.New("the index is mandatory in order to build a Pointer instance")
 	}
 
