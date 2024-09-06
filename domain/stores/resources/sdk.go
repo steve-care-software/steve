@@ -2,6 +2,18 @@ package resources
 
 import "github.com/steve-care-software/steve/domain/stores/resources/pointers"
 
+// NewAdapter creates a new adapter
+func NewAdapter() Adapter {
+	pointersAdapter := pointers.NewAdapter()
+	builder := NewBuilder()
+	resourceBuilder := NewResourceBuilder()
+	return createAdapter(
+		pointersAdapter,
+		builder,
+		resourceBuilder,
+	)
+}
+
 // NewBuilder creates a new builder
 func NewBuilder() Builder {
 	return createBuilder()
@@ -15,9 +27,9 @@ func NewResourceBuilder() ResourceBuilder {
 // Adapter represents a resource adapter
 type Adapter interface {
 	InstancesToBytes(ins Resources) ([]byte, error)
-	BytesToInstances(data []byte) (Resources, error)
+	BytesToInstances(data []byte) (Resources, []byte, error)
 	InstanceToBytes(ins Resource) ([]byte, error)
-	BytesToInstance(data []byte) (Resource, error)
+	BytesToInstance(data []byte) (Resource, []byte, error)
 }
 
 // Builder represents the builder

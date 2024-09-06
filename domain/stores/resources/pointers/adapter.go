@@ -26,7 +26,7 @@ func createAdapter(
 func (app *adapter) InstancesToBytes(ins Pointers) ([]byte, error) {
 	list := ins.List()
 	amount := uint64(len(list))
-	output := uint64ToBytes(amount)
+	output := Uint64ToBytes(amount)
 
 	for _, onePointer := range list {
 		retBytes, err := app.InstanceToBytes(onePointer)
@@ -42,13 +42,13 @@ func (app *adapter) InstancesToBytes(ins Pointers) ([]byte, error) {
 
 // BytesToInstances converts bytes to instances
 func (app *adapter) BytesToInstances(data []byte) (Pointers, []byte, error) {
-	pAmount, err := bytesToUint64(data[0:uint64Size])
+	pAmount, err := BytesToUint64(data[0:Uint64Size])
 	if err != nil {
 		return nil, nil, err
 	}
 
 	amount := int(*pAmount)
-	remaining := data[uint64Size:]
+	remaining := data[Uint64Size:]
 	list := []Pointer{}
 	for i := 0; i < amount; i++ {
 		retPointer, retRemaining, err := app.BytesToInstance(remaining)
@@ -73,25 +73,25 @@ func (app *adapter) BytesToInstances(data []byte) (Pointers, []byte, error) {
 
 // InstanceToBytes converts instance to bytes
 func (app *adapter) InstanceToBytes(ins Pointer) ([]byte, error) {
-	output := uint64ToBytes(uint64(ins.Index()))
-	lengthBytes := uint64ToBytes(uint64(ins.Length()))
+	output := Uint64ToBytes(uint64(ins.Index()))
+	lengthBytes := Uint64ToBytes(uint64(ins.Length()))
 	return append(output, lengthBytes...), nil
 }
 
 // BytesToInstance converts bytes to instance
 func (app *adapter) BytesToInstance(data []byte) (Pointer, []byte, error) {
-	expectation := uint64Size * 2
+	expectation := Uint64Size * 2
 	if len(data) < expectation {
 		str := fmt.Sprintf("there must be at least %d bytes in order to convert them to a Pointer instance", expectation)
 		return nil, nil, errors.New(str)
 	}
 
-	pIndex, err := bytesToUint64(data[0:uint64Size])
+	pIndex, err := BytesToUint64(data[0:Uint64Size])
 	if err != nil {
 		return nil, nil, err
 	}
 
-	pLength, err := bytesToUint64(data[uint64Size:expectation])
+	pLength, err := BytesToUint64(data[Uint64Size:expectation])
 	if err != nil {
 		return nil, nil, err
 	}
