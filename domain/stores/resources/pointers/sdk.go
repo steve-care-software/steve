@@ -1,5 +1,17 @@
 package pointers
 
+const uint64Size = 8
+
+// NewAdapter creates a new adapter
+func NewAdapter() Adapter {
+	builder := NewBuilder()
+	pointerBuilder := NewPointerBuilder()
+	return createAdapter(
+		builder,
+		pointerBuilder,
+	)
+}
+
 // NewBuilder creates a new builder
 func NewBuilder() Builder {
 	return createBuilder()
@@ -13,9 +25,9 @@ func NewPointerBuilder() PointerBuilder {
 // Adapter represents a pointer adapter
 type Adapter interface {
 	InstancesToBytes(ins Pointers) ([]byte, error)
-	BytesToInstances(data []byte) (Pointers, error)
+	BytesToInstances(data []byte) (Pointers, []byte, error)
 	InstanceToBytes(ins Pointer) ([]byte, error)
-	BytesToInstance(data []byte) (Pointer, error)
+	BytesToInstance(data []byte) (Pointer, []byte, error)
 }
 
 // Builder represents the pointers builder
