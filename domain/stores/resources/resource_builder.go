@@ -8,7 +8,7 @@ import (
 
 type resourceBuilder struct {
 	identifier string
-	pointers   pointers.Pointers
+	pointers   pointers.Pointer
 }
 
 func createResourceBuilder() ResourceBuilder {
@@ -31,8 +31,8 @@ func (app *resourceBuilder) WithIdentifier(identifier string) ResourceBuilder {
 	return app
 }
 
-// WithPointers add pointers to the builder
-func (app *resourceBuilder) WithPointers(pointers pointers.Pointers) ResourceBuilder {
+// WithPointer add pointers to the builder
+func (app *resourceBuilder) WithPointer(pointers pointers.Pointer) ResourceBuilder {
 	app.pointers = pointers
 	return app
 }

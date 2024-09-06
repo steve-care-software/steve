@@ -8,18 +8,18 @@ import (
 )
 
 type adapter struct {
-	pointersAdapter pointers.Adapter
+	pointerAdapter  pointers.Adapter
 	builder         Builder
 	resourceBuilder ResourceBuilder
 }
 
 func createAdapter(
-	pointersAdapter pointers.Adapter,
+	pointerAdapter pointers.Adapter,
 	builder Builder,
 	resourceBuilder ResourceBuilder,
 ) Adapter {
 	out := adapter{
-		pointersAdapter: pointersAdapter,
+		pointerAdapter:  pointerAdapter,
 		builder:         builder,
 		resourceBuilder: resourceBuilder,
 	}
@@ -83,8 +83,8 @@ func (app *adapter) InstanceToBytes(ins Resource) ([]byte, error) {
 	output := pointers.Uint64ToBytes(uint64(length))
 	output = append(output, identifierBytes...)
 
-	pointers := ins.Pointers()
-	retBytes, err := app.pointersAdapter.InstancesToBytes(pointers)
+	pointers := ins.Pointer()
+	retBytes, err := app.pointerAdapter.InstanceToBytes(pointers)
 	if err != nil {
 		return nil, err
 	}
@@ -112,14 +112,14 @@ func (app *adapter) BytesToInstance(data []byte) (Resource, []byte, error) {
 	}
 
 	identifier := string(remaining[0:length])
-	retPointers, retRemaining, err := app.pointersAdapter.BytesToInstances(remaining[length:])
+	retPointer, retRemaining, err := app.pointerAdapter.BytesToInstance(remaining[length:])
 	if err != nil {
 		return nil, nil, err
 	}
 
 	resource, err := app.resourceBuilder.Create().
 		WithIdentifier(identifier).
-		WithPointers(retPointers).
+		WithPointer(retPointer).
 		Now()
 
 	if err != nil {

@@ -48,12 +48,12 @@ type Resources interface {
 type ResourceBuilder interface {
 	Create() ResourceBuilder
 	WithIdentifier(identifier string) ResourceBuilder
-	WithPointers(pointers pointers.Pointers) ResourceBuilder
+	WithPointer(pointers pointers.Pointer) ResourceBuilder
 	Now() (Resource, error)
 }
 
 // Resource represents a resource
 type Resource interface {
 	Identifier() string
-	Pointers() pointers.Pointers
+	Pointer() pointers.Pointer
 }
