@@ -84,7 +84,7 @@ func (app *adapter) InstanceToBytes(ins Resource) ([]byte, error) {
 	output = append(output, identifierBytes...)
 
 	pointers := ins.Pointer()
-	retBytes, err := app.pointerAdapter.InstanceToBytes(pointers)
+	retBytes, err := app.pointerAdapter.ToBytes(pointers)
 	if err != nil {
 		return nil, err
 	}
@@ -112,7 +112,7 @@ func (app *adapter) BytesToInstance(data []byte) (Resource, []byte, error) {
 	}
 
 	identifier := string(remaining[0:length])
-	retPointer, retRemaining, err := app.pointerAdapter.BytesToInstance(remaining[length:])
+	retPointer, retRemaining, err := app.pointerAdapter.ToInstance(remaining[length:])
 	if err != nil {
 		return nil, nil, err
 	}

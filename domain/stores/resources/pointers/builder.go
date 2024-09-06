@@ -1,17 +1,16 @@
 package pointers
 
-import (
-	"errors"
-	"fmt"
-)
+import "errors"
 
 type builder struct {
-	list []Pointer
+	pIndex *uint
+	length uint
 }
 
 func createBuilder() Builder {
 	out := builder{
-		list: nil,
+		pIndex: nil,
+		length: 0,
 	}
 
 	return &out
@@ -22,35 +21,27 @@ func (app *builder) Create() Builder {
 	return createBuilder()
 }
 
-// WithList adds a list to the builder
-func (app *builder) WithList(list []Pointer) Builder {
-	app.list = list
+// WithIndex adds an index to the builder
+func (app *builder) WithIndex(index uint) Builder {
+	app.pIndex = &index
 	return app
 }
 
-// Now builds a new Pointers instance
-func (app *builder) Now() (Pointers, error) {
-	if app.list != nil && len(app.list) <= 0 {
-		app.list = nil
+// WithLength adds a length to the builder
+func (app *builder) WithLength(length uint) Builder {
+	app.length = length
+	return app
+}
+
+// Now builds a new Pointer instance
+func (app *builder) Now() (Pointer, error) {
+	if app.pIndex == nil {
+		return nil, errors.New("the index is mandatory in order to build a Pointer instance")
 	}
 
-	if app.list == nil {
-		return nil, errors.New("there must be at least 1 Pointer in order to build a Pointers instance")
+	if app.length <= 0 {
+		return nil, errors.New("the length is mandatory in order to build a Pointer instance")
 	}
 
-	nextIndex := -1
-	for _, onePointer := range app.list {
-		index := onePointer.Index()
-		if nextIndex != -1 && index != uint(nextIndex) {
-			str := fmt.Sprintf("the pointer's index was expected to be %d, %d provided", nextIndex, index)
-			return nil, errors.New(str)
-		}
-
-		length := onePointer.Length()
-		nextIndex = int(index + length)
-	}
-
-	return createPointers(
-		app.list,
-	), nil
+	return createPointer(*app.pIndex, app.length), nil
 }
