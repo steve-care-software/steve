@@ -6,6 +6,12 @@ import (
 	"github.com/steve-care-software/steve/domain/stores/headers/commits/modifications/resources"
 )
 
+// Adapter represents the header adapter
+type Adapter interface {
+	ToBytes(ins Header) ([]byte, error)
+	ToInstance(data []byte) (Header, error)
+}
+
 // Builder represents the header builder
 type Builder interface {
 	Create() Builder
