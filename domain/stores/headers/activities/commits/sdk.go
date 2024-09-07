@@ -5,6 +5,20 @@ import (
 	"github.com/steve-care-software/steve/domain/stores/headers/activities/commits/modifications"
 )
 
+// NewAdapter creates a new adapter
+func NewAdapter() Adapter {
+	modificationsAdapter := modifications.NewAdapter()
+	hashAdapter := hash.NewAdapter()
+	builder := NewBuilder()
+	commitBuilder := NewCommitBuilder()
+	return createAdapter(
+		modificationsAdapter,
+		hashAdapter,
+		builder,
+		commitBuilder,
+	)
+}
+
 // NewBuilder creates a new builder
 func NewBuilder() Builder {
 	hashAdapter := hash.NewAdapter()
@@ -24,9 +38,9 @@ func NewCommitBuilder() CommitBuilder {
 // Adapter represents the commits adapter
 type Adapter interface {
 	InstancesToBytes(ins Commits) ([]byte, error)
-	BytesToInstances(data []byte) (Commits, error)
+	BytesToInstances(data []byte) (Commits, []byte, error)
 	InstanceToBytes(ins Commit) ([]byte, error)
-	BytesToInstance(data []byte) (Commit, error)
+	BytesToInstance(data []byte) (Commit, []byte, error)
 }
 
 // Builder represents the commits builder
