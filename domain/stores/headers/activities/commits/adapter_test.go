@@ -48,7 +48,7 @@ func TestAdapter_single_Success(t *testing.T) {
 	}
 
 	if !reflect.DeepEqual(commit, retInstance) {
-		t.Errorf("the returned modification is invalid")
+		t.Errorf("the returned commit is invalid")
 		return
 	}
 }
@@ -92,7 +92,7 @@ func TestAdapter_single_withRemaining_Success(t *testing.T) {
 	}
 
 	if !reflect.DeepEqual(commit, retInstance) {
-		t.Errorf("the returned modification is invalid")
+		t.Errorf("the returned commit is invalid")
 		return
 	}
 }
@@ -141,7 +141,7 @@ func TestAdapter_multiple_Success(t *testing.T) {
 	}
 
 	if !reflect.DeepEqual(commits, retInstance) {
-		t.Errorf("the returned modification is invalid")
+		t.Errorf("the returned commit is invalid")
 		return
 	}
 }
@@ -194,7 +194,7 @@ func TestAdapter_multiple_withRemaining_Success(t *testing.T) {
 	}
 
 	if !reflect.DeepEqual(commits, retInstance) {
-		t.Errorf("the returned modification is invalid")
+		t.Errorf("the returned commit is invalid")
 		return
 	}
 }

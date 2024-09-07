@@ -5,6 +5,18 @@ import (
 	"github.com/steve-care-software/steve/domain/stores/headers/activities/commits"
 )
 
+// NewAdapter creates a new adapter
+func NewAdapter() Adapter {
+	commitsAdapter := commits.NewAdapter()
+	hashAdapter := hash.NewAdapter()
+	builder := NewBuilder()
+	return createAdapter(
+		commitsAdapter,
+		hashAdapter,
+		builder,
+	)
+}
+
 // NewBuilder creates a new builder
 func NewBuilder() Builder {
 	hashAdapter := hash.NewAdapter()
@@ -16,7 +28,7 @@ func NewBuilder() Builder {
 // Adapter represents the activity adapter
 type Adapter interface {
 	ToBytes(ins Activity) ([]byte, error)
-	ToInstance(data []byte) (Activity, error)
+	ToInstance(data []byte) (Activity, []byte, error)
 }
 
 // Builder represents the header builder
