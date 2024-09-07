@@ -4,19 +4,19 @@ import (
 	"errors"
 
 	"github.com/steve-care-software/steve/domain/hash"
-	"github.com/steve-care-software/steve/domain/stores/commits/modifications"
+	"github.com/steve-care-software/steve/domain/stores/headers/commits/modifications"
 )
 
-type builder struct {
+type commitBuilder struct {
 	hashAdapter   hash.Adapter
 	modifications modifications.Modifications
 	parent        hash.Hash
 }
 
-func createBuilder(
+func createCommitBuilder(
 	hashAdapter hash.Adapter,
-) Builder {
-	out := builder{
+) CommitBuilder {
+	out := commitBuilder{
 		hashAdapter:   hashAdapter,
 		modifications: nil,
 		parent:        nil,
@@ -25,27 +25,27 @@ func createBuilder(
 	return &out
 }
 
-// Create initializes the builder
-func (app *builder) Create() Builder {
-	return createBuilder(
+// Create initializes the commitBuilder
+func (app *commitBuilder) Create() CommitBuilder {
+	return createCommitBuilder(
 		app.hashAdapter,
 	)
 }
 
-// WithModifications add modifications to the builder
-func (app *builder) WithModifications(modifications modifications.Modifications) Builder {
+// WithModifications add modifications to the commitBuilder
+func (app *commitBuilder) WithModifications(modifications modifications.Modifications) CommitBuilder {
 	app.modifications = modifications
 	return app
 }
 
-// WithParent add parent to the builder
-func (app *builder) WithParent(parent hash.Hash) Builder {
+// WithParent add parent to the commitBuilder
+func (app *commitBuilder) WithParent(parent hash.Hash) CommitBuilder {
 	app.parent = parent
 	return app
 }
 
 // Now builds a new Commit instance
-func (app *builder) Now() (Commit, error) {
+func (app *commitBuilder) Now() (Commit, error) {
 	if app.modifications == nil {
 		return nil, errors.New("the modifications is mandatory in order to build a Commit instance")
 	}

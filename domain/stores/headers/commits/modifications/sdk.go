@@ -2,7 +2,7 @@ package modifications
 
 import (
 	"github.com/steve-care-software/steve/domain/hash"
-	"github.com/steve-care-software/steve/domain/stores/commits/modifications/resources"
+	"github.com/steve-care-software/steve/domain/stores/headers/commits/modifications/resources"
 )
 
 // NewBuilder creates a new builder
