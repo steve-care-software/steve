@@ -5,6 +5,14 @@ import (
 	"github.com/steve-care-software/steve/domain/stores/headers/commits"
 )
 
+// NewBuilder creates a new builder
+func NewBuilder() Builder {
+	hashAdapter := hash.NewAdapter()
+	return createBuilder(
+		hashAdapter,
+	)
+}
+
 // Builder represents the header builder
 type Builder interface {
 	Create() Builder
