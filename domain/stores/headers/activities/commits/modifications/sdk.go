@@ -5,6 +5,24 @@ import (
 	"github.com/steve-care-software/steve/domain/stores/headers/activities/commits/modifications/resources"
 )
 
+const (
+	flagInsert (uint8) = iota
+	flagSave
+	flagDelete
+)
+
+// NewAdapter creates a new adapter
+func NewAdapter() Adapter {
+	resourcesAdapter := resources.NewAdapter()
+	builder := NewBuilder()
+	modificationBuilder := NewModificationBuilder()
+	return createAdapter(
+		resourcesAdapter,
+		builder,
+		modificationBuilder,
+	)
+}
+
 // NewBuilder creates a new builder
 func NewBuilder() Builder {
 	hashAdapter := hash.NewAdapter()
@@ -24,9 +42,9 @@ func NewModificationBuilder() ModificationBuilder {
 // Adapter represents the modifications adapter
 type Adapter interface {
 	InstancesToBytes(ins Modifications) ([]byte, error)
-	BytesToInstances(data []byte) (Modifications, error)
+	BytesToInstances(data []byte) (Modifications, []byte, error)
 	InstanceToBytes(ins Modification) ([]byte, error)
-	BytesToInstance(data []byte) (Modification, error)
+	BytesToInstance(data []byte) (Modification, []byte, error)
 }
 
 // Builder represents the modifications builder
