@@ -2,7 +2,7 @@ package resources
 
 import (
 	"github.com/steve-care-software/steve/domain/hash"
-	"github.com/steve-care-software/steve/domain/stores/headers/commits/modifications/resources/pointers"
+	"github.com/steve-care-software/steve/domain/stores/headers/activities/commits/modifications/resources/pointers"
 )
 
 // NewAdapter creates a new adapter

@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"github.com/steve-care-software/steve/domain/hash"
-	"github.com/steve-care-software/steve/domain/stores/headers/commits"
+	"github.com/steve-care-software/steve/domain/stores/headers/activities/commits"
 )
 
 type builder struct {

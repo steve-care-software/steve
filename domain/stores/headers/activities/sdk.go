@@ -2,7 +2,7 @@ package activities
 
 import (
 	"github.com/steve-care-software/steve/domain/hash"
-	"github.com/steve-care-software/steve/domain/stores/headers/commits"
+	"github.com/steve-care-software/steve/domain/stores/headers/activities/commits"
 )
 
 // NewBuilder creates a new builder
@@ -11,6 +11,12 @@ func NewBuilder() Builder {
 	return createBuilder(
 		hashAdapter,
 	)
+}
+
+// Adapter represents the activity adapter
+type Adapter interface {
+	ToBytes(ins Activity) ([]byte, error)
+	ToInstance(data []byte) (Activity, error)
 }
 
 // Builder represents the header builder

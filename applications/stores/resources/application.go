@@ -1,8 +1,8 @@
 package resources
 
 import (
-	"github.com/steve-care-software/steve/domain/stores/headers/commits/modifications/resources"
-	"github.com/steve-care-software/steve/domain/stores/headers/commits/modifications/resources/pointers"
+	"github.com/steve-care-software/steve/domain/stores/headers/activities/commits/modifications/resources"
+	"github.com/steve-care-software/steve/domain/stores/headers/activities/commits/modifications/resources/pointers"
 )
 
 type application struct {
