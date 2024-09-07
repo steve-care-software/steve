@@ -2,9 +2,17 @@ package headers
 
 import (
 	"github.com/steve-care-software/steve/domain/hash"
-	"github.com/steve-care-software/steve/domain/stores/headers/commits"
+	"github.com/steve-care-software/steve/domain/stores/headers/activities"
 	"github.com/steve-care-software/steve/domain/stores/headers/commits/modifications/resources"
 )
+
+// NewBuilder creates a new builder
+func NewBuilder() Builder {
+	hashAdapter := hash.NewAdapter()
+	return createBuilder(
+		hashAdapter,
+	)
+}
 
 // Adapter represents the header adapter
 type Adapter interface {
@@ -16,8 +24,7 @@ type Adapter interface {
 type Builder interface {
 	Create() Builder
 	WithRoot(root resources.Resources) Builder
-	WithCommits(commits commits.Commits) Builder
-	WithHead(head hash.Hash) Builder
+	WithActivity(activity activities.Activity) Builder
 	Now() (Header, error)
 }
 
@@ -25,6 +32,6 @@ type Builder interface {
 type Header interface {
 	Hash() hash.Hash
 	Root() resources.Resources
-	Commits() commits.Commits
-	Head() hash.Hash
+	HasActivity() bool
+	Activity() activities.Activity
 }
