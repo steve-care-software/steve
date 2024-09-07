@@ -54,6 +54,7 @@ type Builder interface {
 type Commits interface {
 	Hash() hash.Hash
 	List() []Commit
+	Fetch(hash hash.Hash) (Commit, error)
 }
 
 // CommitBuilder represents a commit builder

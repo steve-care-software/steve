@@ -2,6 +2,7 @@ package activities
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/steve-care-software/steve/domain/hash"
 	"github.com/steve-care-software/steve/domain/stores/headers/activities/commits"
@@ -52,6 +53,12 @@ func (app *builder) Now() (Activity, error) {
 
 	if app.head == nil {
 		return nil, errors.New("the head is mandatory in order to build an Activity instance")
+	}
+
+	_, err := app.commits.Fetch(app.head)
+	if err != nil {
+		str := fmt.Sprintf("the head commit (hash: %s) could not be found in the commits", app.head.String())
+		return nil, errors.New(str)
 	}
 
 	pHash, err := app.hashAdapter.FromMultiBytes([][]byte{

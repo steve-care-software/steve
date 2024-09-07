@@ -46,8 +46,10 @@ func (app *builder) Now() (Commits, error) {
 	}
 
 	data := [][]byte{}
+	mp := map[string]Commit{}
 	for _, oneCommit := range app.list {
 		data = append(data, oneCommit.Hash().Bytes())
+		mp[oneCommit.Hash().String()] = oneCommit
 	}
 
 	pHash, err := app.hashAdapter.FromMultiBytes(data)
@@ -58,5 +60,6 @@ func (app *builder) Now() (Commits, error) {
 	return createCommits(
 		*pHash,
 		app.list,
+		mp,
 	), nil
 }
