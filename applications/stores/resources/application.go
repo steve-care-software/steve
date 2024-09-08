@@ -136,6 +136,17 @@ func (app *application) Commit() error {
 
 // Cancel cancels the modifications
 func (app *application) Cancel() error {
+	err := app.pFile.Close()
+	if err != nil {
+		return err
+	}
+
+	app.pFile = nil
+	app.inserts = nil
+	app.saves = nil
+	app.deletes = nil
+	app.loadedPointers = nil
+	app.pBodyIndex = nil
 	return nil
 }
 
