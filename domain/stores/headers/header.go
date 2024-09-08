@@ -4,6 +4,7 @@ import (
 	"github.com/steve-care-software/steve/domain/hash"
 	"github.com/steve-care-software/steve/domain/stores/headers/activities"
 	"github.com/steve-care-software/steve/domain/stores/headers/activities/commits/modifications/resources"
+	"github.com/steve-care-software/steve/domain/stores/headers/activities/commits/modifications/resources/pointers"
 )
 
 type header struct {
@@ -59,4 +60,28 @@ func (obj *header) HasActivity() bool {
 // Activity returns the activity, if any
 func (obj *header) Activity() activities.Activity {
 	return obj.activity
+}
+
+// Map returns the pointer map
+func (obj *header) Map() (map[string]pointers.Pointer, error) {
+	mp := obj.root.Map()
+	if obj.HasActivity() {
+		retPointers, retDeleted, err := obj.activity.Map()
+		if err != nil {
+			return nil, err
+		}
+
+		for _, oneDeleted := range retDeleted {
+			if _, ok := mp[oneDeleted]; ok {
+				delete(mp, oneDeleted)
+				continue
+			}
+		}
+
+		for identifier, ptr := range retPointers {
+			mp[identifier] = ptr
+		}
+	}
+
+	return mp, nil
 }

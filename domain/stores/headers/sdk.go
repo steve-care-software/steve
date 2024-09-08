@@ -4,6 +4,7 @@ import (
 	"github.com/steve-care-software/steve/domain/hash"
 	"github.com/steve-care-software/steve/domain/stores/headers/activities"
 	"github.com/steve-care-software/steve/domain/stores/headers/activities/commits/modifications/resources"
+	"github.com/steve-care-software/steve/domain/stores/headers/activities/commits/modifications/resources/pointers"
 )
 
 // NewAdapter creates a new adapter
@@ -46,4 +47,5 @@ type Header interface {
 	Root() resources.Resources
 	HasActivity() bool
 	Activity() activities.Activity
+	Map() (map[string]pointers.Pointer, error)
 }

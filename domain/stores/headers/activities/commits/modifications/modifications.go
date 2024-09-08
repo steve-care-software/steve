@@ -1,6 +1,9 @@
 package modifications
 
-import "github.com/steve-care-software/steve/domain/hash"
+import (
+	"github.com/steve-care-software/steve/domain/hash"
+	"github.com/steve-care-software/steve/domain/stores/headers/activities/commits/modifications/resources/pointers"
+)
 
 type modifications struct {
 	hash hash.Hash
@@ -27,4 +30,26 @@ func (obj *modifications) Hash() hash.Hash {
 // List returns the list
 func (obj *modifications) List() []Modification {
 	return obj.list
+}
+
+// Fetch fetches a pointer
+func (obj *modifications) Map() (map[string]pointers.Pointer, []string) {
+	deleted := []string{}
+	ptrMap := map[string]pointers.Pointer{}
+	for _, oneModification := range obj.list {
+		if oneModification.IsDelete() {
+			deleted = append(deleted, oneModification.Delete())
+			continue
+		}
+
+		resource := oneModification.Insert()
+		if oneModification.IsSave() {
+			resource = oneModification.Save()
+		}
+
+		identifier := resource.Identifier()
+		ptrMap[identifier] = resource.Pointer()
+	}
+
+	return ptrMap, deleted
 }

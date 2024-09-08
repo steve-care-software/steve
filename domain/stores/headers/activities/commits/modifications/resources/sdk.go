@@ -52,6 +52,7 @@ type Builder interface {
 type Resources interface {
 	Hash() hash.Hash
 	List() []Resource
+	Map() map[string]pointers.Pointer
 }
 
 // ResourceBuilder represents a resource builder

@@ -3,6 +3,7 @@ package modifications
 import (
 	"github.com/steve-care-software/steve/domain/hash"
 	"github.com/steve-care-software/steve/domain/stores/headers/activities/commits/modifications/resources"
+	"github.com/steve-care-software/steve/domain/stores/headers/activities/commits/modifications/resources/pointers"
 )
 
 const (
@@ -58,6 +59,7 @@ type Builder interface {
 type Modifications interface {
 	Hash() hash.Hash
 	List() []Modification
+	Map() (map[string]pointers.Pointer, []string)
 }
 
 // ModificationBuilder represents the modification builder
