@@ -3,6 +3,8 @@ package resources
 import (
 	"errors"
 	"fmt"
+	"io"
+	"io/fs"
 	"os"
 	"path/filepath"
 
@@ -27,13 +29,16 @@ type application struct {
 	resourceBuilder      resources.ResourceBuilder
 	pointerBuilder       pointers.Builder
 	headerAdapter        headers.Adapter
+	readChunkSize        uint64
 	basePath             string
+	tmpIdentifier        string
 	loadedPointers       map[string]pointers.Pointer
 	header               headers.Header
 	pBodyIndex           *uint64
 	pFile                *os.File
+	filePath             string
 	updates              map[string]modifications.Modification
-	additions            map[string]contents.Content
+	additions            []contents.Content
 }
 
 func createApplication(
@@ -48,6 +53,9 @@ func createApplication(
 	resourceBuilder resources.ResourceBuilder,
 	pointerBuilder pointers.Builder,
 	headerAdapter headers.Adapter,
+	readChunkSize uint64,
+	basePath string,
+	tmpIdentifier string,
 ) Application {
 	out := application{
 		contentBuilder:       contentBuilder,
@@ -61,13 +69,16 @@ func createApplication(
 		resourceBuilder:      resourceBuilder,
 		pointerBuilder:       pointerBuilder,
 		headerAdapter:        headerAdapter,
-		basePath:             "",
+		readChunkSize:        readChunkSize,
+		tmpIdentifier:        tmpIdentifier,
+		basePath:             basePath,
 		loadedPointers:       nil,
 		header:               nil,
 		pBodyIndex:           nil,
 		pFile:                nil,
+		filePath:             "",
 		updates:              map[string]modifications.Modification{},
-		additions:            map[string]contents.Content{},
+		additions:            []contents.Content{},
 	}
 
 	return &out
@@ -114,6 +125,7 @@ func (app *application) Init(dbIdentifier string) error {
 	bodyIndex := uint64(0)
 	app.pBodyIndex = &bodyIndex
 	app.pFile = pFile
+	app.filePath = file
 	return nil
 }
 
@@ -166,7 +178,7 @@ func (app *application) Insert(identifier string, data []byte) error {
 	}
 
 	app.updates[identifier] = modification
-	app.additions[identifier] = content
+	app.additions = append(app.additions, content)
 	return nil
 }
 
@@ -195,7 +207,7 @@ func (app *application) Save(identifier string, data []byte) error {
 	}
 
 	app.updates[identifier] = modification
-	app.additions[identifier] = content
+	app.additions = append(app.additions, content)
 	return nil
 }
 
@@ -255,7 +267,19 @@ func (app *application) Commit() error {
 			return err
 		}
 
-		return app.updateSource(app.pFile, header, app.additions)
+		err = app.updateSource(
+			app.filePath,
+			app.pFile,
+			header,
+			app.additions,
+		)
+
+		if err != nil {
+			return err
+		}
+
+		// cleanup:
+		return app.Cancel()
 	}
 
 	modificationsList := []modifications.Modification{}
@@ -310,16 +334,24 @@ func (app *application) Commit() error {
 		return err
 	}
 
-	return app.updateSource(app.pFile, updatedHeader, app.additions)
-}
+	err = app.updateSource(
+		app.filePath,
+		app.pFile,
+		updatedHeader,
+		app.additions,
+	)
 
-// Cancel cancels the modifications
-func (app *application) Cancel() error {
-	err := app.pFile.Close()
 	if err != nil {
 		return err
 	}
 
+	// cleanup:
+	return app.Cancel()
+}
+
+// Cancel cancels the modifications
+func (app *application) Cancel() error {
+	defer app.pFile.Close()
 	app.pFile = nil
 	app.updates = nil
 	app.loadedPointers = nil
@@ -384,11 +416,19 @@ func (app *application) Rollback(amount uint) error {
 		return err
 	}
 
-	return app.updateSource(
+	err = app.updateSource(
+		app.filePath,
 		app.pFile,
 		retHeader,
-		map[string]contents.Content{},
+		[]contents.Content{},
 	)
+
+	if err != nil {
+		return err
+	}
+
+	// cleanup:
+	return app.Cancel()
 }
 
 func (app *application) readPointer(pointer pointers.Pointer) ([]byte, error) {
@@ -396,7 +436,7 @@ func (app *application) readPointer(pointer pointers.Pointer) ([]byte, error) {
 	length := pointer.Length()
 
 	// seek to the index
-	_, err := app.pFile.Seek(int64(index), 0)
+	_, err := app.pFile.Seek(int64(index), io.SeekStart)
 	if err != nil {
 		return nil, err
 	}
@@ -413,7 +453,7 @@ func (app *application) readPointer(pointer pointers.Pointer) ([]byte, error) {
 
 func (app *application) readHeader(pFile *os.File) (headers.Header, *uint64, error) {
 	// seek at the beginning:
-	_, err := pFile.Seek(0, 0)
+	_, err := pFile.Seek(0, io.SeekStart)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -471,9 +511,110 @@ func (app *application) buildResource(identifier string, data []byte) (resources
 }
 
 func (app *application) updateSource(
-	pFile *os.File,
+	originalFilePath string,
+	pOriginalFile *os.File,
 	header headers.Header,
-	additions map[string]contents.Content,
+	additions []contents.Content,
 ) error {
+	// create the header bytes:
+	headerBytes, err := app.headerToBytes(header)
+	if err != nil {
+		return err
+	}
+
+	// open the temporary file:
+	file := filepath.Join(app.basePath, app.tmpIdentifier)
+	pTmpFile, err := os.OpenFile(file, os.O_RDWR|os.O_APPEND, fs.ModePerm)
+	if err != nil {
+		return err
+	}
+
+	// close the file at the end:
+	defer pTmpFile.Close()
+
+	//seek to the beginning:
+	_, err = pTmpFile.Seek(0, io.SeekStart)
+	if err != nil {
+		return err
+	}
+
+	// write the header bytes:
+	_, err = pTmpFile.Write(headerBytes)
+	if err != nil {
+		return err
+	}
+
+	// copy the body:
+	err = app.copyBody(pOriginalFile, pTmpFile, *app.pBodyIndex)
+	if err != nil {
+		return err
+	}
+
+	// close the original file:
+	err = pOriginalFile.Close()
+	if err != nil {
+		return err
+	}
+
+	// write the additions to the body:
+	for _, oneAddition := range additions {
+		data := oneAddition.Data()
+		_, writeErr := pTmpFile.Write(data)
+		if writeErr != nil {
+			return fmt.Errorf("failed to write to destination file: %w", writeErr)
+		}
+	}
+
+	// rename the file:
+	return os.Rename(file, originalFilePath)
+}
+
+func (app *application) copyBody(
+	pSourceFile *os.File,
+	pTargetFile *os.File,
+	indexInSource uint64,
+) error {
+	//seek to the body:
+	_, err := pSourceFile.Seek(int64(indexInSource), io.SeekStart)
+	if err != nil {
+		return err
+	}
+
+	// Create a buffer to hold the chunks
+	buf := make([]byte, app.readChunkSize)
+
+	// Read and write in chunks
+	for {
+		// Read a chunk from the source file
+		n, readErr := pSourceFile.Read(buf)
+		if readErr != nil && readErr != io.EOF {
+			return fmt.Errorf("failed to read from source file: %w", readErr)
+		}
+
+		// Break if we've reached the end of the file
+		if n == 0 {
+			break
+		}
+
+		// Write the chunk to the destination file
+		_, writeErr := pTargetFile.Write(buf[:n])
+		if writeErr != nil {
+			return fmt.Errorf("failed to write to destination file: %w", writeErr)
+		}
+	}
+
 	return nil
+}
+
+func (app *application) headerToBytes(header headers.Header) ([]byte, error) {
+	headerBytes, err := app.headerAdapter.ToBytes(header)
+	if err != nil {
+		return nil, err
+	}
+
+	length := uint64(len(headerBytes))
+	lengthBytes := pointers.Uint64ToBytes(length)
+	headerWithBytes := []byte{}
+	headerWithBytes = append(headerWithBytes, lengthBytes...)
+	return append(headerWithBytes, headerBytes...), nil
 }
