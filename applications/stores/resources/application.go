@@ -31,7 +31,7 @@ type application struct {
 	headerAdapter        headers.Adapter
 	readChunkSize        uint64
 	basePath             string
-	tmpIdentifier        string
+	targetIdentifier     string
 	loadedPointers       map[string]pointers.Pointer
 	header               headers.Header
 	pBodyIndex           *uint64
@@ -55,7 +55,7 @@ func createApplication(
 	headerAdapter headers.Adapter,
 	readChunkSize uint64,
 	basePath string,
-	tmpIdentifier string,
+	targetIdentifier string,
 ) Application {
 	out := application{
 		contentBuilder:       contentBuilder,
@@ -70,7 +70,7 @@ func createApplication(
 		pointerBuilder:       pointerBuilder,
 		headerAdapter:        headerAdapter,
 		readChunkSize:        readChunkSize,
-		tmpIdentifier:        tmpIdentifier,
+		targetIdentifier:     targetIdentifier,
 		basePath:             basePath,
 		loadedPointers:       nil,
 		header:               nil,
@@ -523,7 +523,7 @@ func (app *application) updateSource(
 	}
 
 	// open the temporary file:
-	file := filepath.Join(app.basePath, app.tmpIdentifier)
+	file := filepath.Join(app.basePath, app.targetIdentifier)
 	pTmpFile, err := os.OpenFile(file, os.O_RDWR|os.O_APPEND, fs.ModePerm)
 	if err != nil {
 		return err
