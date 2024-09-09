@@ -85,3 +85,8 @@ func (obj *header) Map() (map[string]pointers.Pointer, error) {
 
 	return mp, nil
 }
+
+// NextPointerIndex returns the next pointer index, if any
+func (obj *header) NextPointerIndex() uint64 {
+	return uint64(0)
+}

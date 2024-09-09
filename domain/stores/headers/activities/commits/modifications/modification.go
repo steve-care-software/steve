@@ -54,6 +54,19 @@ func (obj *modification) Hash() hash.Hash {
 	return obj.hash
 }
 
+// Identifier returns the identifier
+func (obj *modification) Identifier() string {
+	if obj.IsInsert() {
+		return obj.insert.Identifier()
+	}
+
+	if obj.IsSave() {
+		return obj.save.Identifier()
+	}
+
+	return obj.delete
+}
+
 // IsInsert returns true if there is an insert, false otherwise
 func (obj *modification) IsInsert() bool {
 	return obj.insert != nil

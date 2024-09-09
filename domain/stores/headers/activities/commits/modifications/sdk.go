@@ -74,6 +74,7 @@ type ModificationBuilder interface {
 // Modification represents a modification
 type Modification interface {
 	Hash() hash.Hash
+	Identifier() string
 	IsInsert() bool
 	Insert() resources.Resource
 	IsSave() bool
