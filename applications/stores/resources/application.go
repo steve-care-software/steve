@@ -329,7 +329,66 @@ func (app *application) Cancel() error {
 
 // Rollback remove the last commits
 func (app *application) Rollback(amount uint) error {
-	return nil
+	if app.header == nil {
+		return errors.New("there is no header, which means that the database cannot be rollbacked (not enough past commits) or it has never been initialized")
+	}
+
+	if !app.header.HasActivity() {
+		return errors.New("there is no activity, which means that the database cannot be rollbacked (not enough past commits)")
+	}
+
+	activity := app.header.Activity()
+	head := activity.Head()
+	commits := activity.Commits()
+	currentHeadCommit, err := commits.Fetch(head)
+	if err != nil {
+		return err
+	}
+
+	keepOnlyRoot := false
+	castedAmount := int(amount)
+	for i := 0; i < castedAmount; i++ {
+		isLast := (i + 1) == castedAmount
+		parent := currentHeadCommit.Parent()
+		retCommit, err := commits.Fetch(parent)
+		if err != nil {
+			if !isLast {
+				return err
+			}
+
+			keepOnlyRoot = true
+			break
+		}
+
+		currentHeadCommit = retCommit
+	}
+
+	root := app.header.Root()
+	builder := app.headerBuilder.Create().WithRoot(root)
+	if !keepOnlyRoot {
+		head := currentHeadCommit.Hash()
+		activity, err := app.activityBuilder.Create().
+			WithHead(head).
+			WithCommits(commits).
+			Now()
+
+		if err != nil {
+			return err
+		}
+
+		builder.WithActivity(activity)
+	}
+
+	retHeader, err := builder.Now()
+	if err != nil {
+		return err
+	}
+
+	return app.updateSource(
+		app.pFile,
+		retHeader,
+		map[string]contents.Content{},
+	)
 }
 
 func (app *application) readPointer(pointer pointers.Pointer) ([]byte, error) {
