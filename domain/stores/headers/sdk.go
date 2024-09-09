@@ -48,5 +48,5 @@ type Header interface {
 	HasActivity() bool
 	Activity() activities.Activity
 	Map() (map[string]pointers.Pointer, error)
-	NextPointerIndex() uint64
+	NextPointerIndex() (*uint, error)
 }

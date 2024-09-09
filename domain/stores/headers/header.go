@@ -1,6 +1,8 @@
 package headers
 
 import (
+	"errors"
+
 	"github.com/steve-care-software/steve/domain/hash"
 	"github.com/steve-care-software/steve/domain/stores/headers/activities"
 	"github.com/steve-care-software/steve/domain/stores/headers/activities/commits/modifications/resources"
@@ -87,6 +89,37 @@ func (obj *header) Map() (map[string]pointers.Pointer, error) {
 }
 
 // NextPointerIndex returns the next pointer index, if any
-func (obj *header) NextPointerIndex() uint64 {
-	return uint64(0)
+func (obj *header) NextPointerIndex() (*uint, error) {
+	if !obj.HasActivity() {
+		list := obj.Root().List()
+		pointer := list[len(list)-1].Pointer()
+		value := pointer.Index() + pointer.Length()
+		return &value, nil
+	}
+
+	head := obj.activity.Head()
+	commit, err := obj.activity.Commits().Fetch(head)
+	if err != nil {
+		return nil, err
+	}
+
+	list := commit.Modifications().List()
+	length := len(list)
+	for i := 0; i < length; i++ {
+		index := len(list) - (i + 1)
+		last := list[index]
+		if last.IsInsert() {
+			pointer := last.Insert().Pointer()
+			value := pointer.Index() + pointer.Length()
+			return &value, nil
+		}
+
+		if last.IsSave() {
+			pointer := last.Save().Pointer()
+			value := pointer.Index() + pointer.Length()
+			return &value, nil
+		}
+	}
+
+	return nil, errors.New("the header is invalid and therefore the nextPointerIndex could not be fetched")
 }

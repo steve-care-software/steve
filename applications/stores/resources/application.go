@@ -492,7 +492,12 @@ func (app *application) readHeader(pFile *os.File) (headers.Header, *uint64, err
 func (app *application) buildResource(identifier string, data []byte) (resources.Resource, error) {
 	nextIndex := 0
 	if app.header != nil {
-		nextIndex = int(app.header.NextPointerIndex())
+		pNextPointerIndex, err := app.header.NextPointerIndex()
+		if err != nil {
+			return nil, err
+		}
+
+		nextIndex = int(*pNextPointerIndex)
 	}
 
 	pointer, err := app.pointerBuilder.Create().
