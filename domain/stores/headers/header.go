@@ -68,7 +68,7 @@ func (obj *header) Activity() activities.Activity {
 func (obj *header) Map() (map[string]pointers.Pointer, error) {
 	mp := obj.root.Map()
 	if obj.HasActivity() {
-		retPointers, retDeleted, err := obj.activity.Map()
+		retPointers, retDeleted, err := obj.activity.Map(obj.root.Hash())
 		if err != nil {
 			return nil, err
 		}

@@ -50,8 +50,8 @@ func (app *builder) Now() (Resources, error) {
 	for _, oneResource := range app.list {
 		pointer := oneResource.Pointer()
 		index := pointer.Index()
-		if nextIndex != -1 && index != uint(nextIndex) {
-			str := fmt.Sprintf("the resource's (identifier: %s) pointer's index was expected to be %d, %d provided", oneResource.Identifier(), nextIndex, index)
+		if nextIndex != -1 && index < uint(nextIndex) {
+			str := fmt.Sprintf("the resource's (identifier: %s) pointer's index was expected to be at least %d, %d provided", oneResource.Identifier(), nextIndex, index)
 			return nil, errors.New(str)
 		}
 

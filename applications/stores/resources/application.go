@@ -89,17 +89,13 @@ func (app *application) Init(dbIdentifier string) error {
 	// create the path:
 	loadedPointers := map[string]pointers.Pointer{}
 	file := filepath.Join(app.basePath, dbIdentifier)
-	fileInfo, err := os.Stat(file)
+	fileInfo, err := app.createIfNotExists(file)
 	if err != nil {
-		if errors.Is(err, os.ErrNotExist) {
-			err := os.MkdirAll(file, os.ModePerm)
-			if err != nil {
-				return err
-			}
-		}
+		return err
 	}
 
 	// open the file:
+	bodyIndex := uint64(0)
 	pFile, err := os.Open(file)
 	if err != nil {
 		return err
@@ -117,21 +113,22 @@ func (app *application) Init(dbIdentifier string) error {
 		}
 
 		loadedPointers = retLoadedPointers
-		app.pBodyIndex = pBodyIndex
+		bodyIndex = *pBodyIndex
 		app.header = retHeader
 	}
 
 	app.loadedPointers = loadedPointers
-	bodyIndex := uint64(0)
 	app.pBodyIndex = &bodyIndex
 	app.pFile = pFile
 	app.filePath = file
+	app.updates = map[string]modifications.Modification{}
+	app.additions = []contents.Content{}
 	return nil
 }
 
 // Retrieve retrieves bytes from an identifier
 func (app *application) Retrieve(identifier string) ([]byte, error) {
-	if app.loadedPointers != nil {
+	if app.loadedPointers == nil {
 		return nil, errors.New(appNotInitErr)
 	}
 
@@ -155,7 +152,12 @@ func (app *application) Insert(identifier string, data []byte) error {
 		return errors.New(str)
 	}
 
-	resource, err := app.buildResource(identifier, data)
+	var lastUpdate contents.Content
+	if len(app.additions) > 0 {
+		lastUpdate = app.additions[len(app.additions)-1]
+	}
+
+	resource, err := app.buildResource(identifier, data, lastUpdate)
 	if err != nil {
 		return err
 	}
@@ -184,7 +186,12 @@ func (app *application) Insert(identifier string, data []byte) error {
 
 // Save saves data into an identifier
 func (app *application) Save(identifier string, data []byte) error {
-	resource, err := app.buildResource(identifier, data)
+	var lastUpdate contents.Content
+	if len(app.additions) > 0 {
+		lastUpdate = app.additions[len(app.additions)-1]
+	}
+
+	resource, err := app.buildResource(identifier, data, lastUpdate)
 	if err != nil {
 		return err
 	}
@@ -243,18 +250,19 @@ func (app *application) Commit() error {
 
 	if app.header == nil {
 		resourcesList := []resources.Resource{}
-		for _, oneResource := range app.updates {
-			if oneResource.IsDelete() {
-				str := fmt.Sprintf("the resource (identifier: %s) could not be deleted because there is no resource to delete yet", oneResource.Delete())
+		for _, oneResource := range app.additions {
+			modification := oneResource.Modification()
+			if modification.IsDelete() {
+				str := fmt.Sprintf("the resource (identifier: %s) could not be deleted because there is no resource to delete yet", modification.Delete())
 				return errors.New(str)
 			}
 
-			if oneResource.IsSave() {
-				resourcesList = append(resourcesList, oneResource.Save())
+			if modification.IsSave() {
+				resourcesList = append(resourcesList, modification.Save())
 				continue
 			}
 
-			resourcesList = append(resourcesList, oneResource.Insert())
+			resourcesList = append(resourcesList, modification.Insert())
 		}
 
 		resources, err := app.resourcesBuilder.Create().WithList(resourcesList).Now()
@@ -308,7 +316,11 @@ func (app *application) Commit() error {
 		return err
 	}
 
-	commitsList := app.header.Activity().Commits().List()
+	commitsList := []commits.Commit{}
+	if app.header.HasActivity() {
+		commitsList = app.header.Activity().Commits().List()
+	}
+
 	commitsList = append(commitsList, commit)
 	updatedCommits, err := app.commitsBuilder.Create().WithList(commitsList).Now()
 	if err != nil {
@@ -489,19 +501,14 @@ func (app *application) readHeader(pFile *os.File) (headers.Header, *uint64, err
 	return ins, &index, nil
 }
 
-func (app *application) buildResource(identifier string, data []byte) (resources.Resource, error) {
-	nextIndex := 0
-	if app.header != nil {
-		pNextPointerIndex, err := app.header.NextPointerIndex()
-		if err != nil {
-			return nil, err
-		}
-
-		nextIndex = int(*pNextPointerIndex)
+func (app *application) buildResource(identifier string, data []byte, lastUpdate contents.Content) (resources.Resource, error) {
+	pNextIndex, err := app.nextIndex(lastUpdate)
+	if err != nil {
+		return nil, err
 	}
 
 	pointer, err := app.pointerBuilder.Create().
-		WithIndex(uint(nextIndex)).
+		WithIndex(uint(*pNextIndex)).
 		WithLength(uint(len(data))).
 		Now()
 
@@ -513,6 +520,35 @@ func (app *application) buildResource(identifier string, data []byte) (resources
 		WithIdentifier(identifier).
 		WithPointer(pointer).
 		Now()
+}
+
+func (app *application) nextIndex(lastUpdate contents.Content) (*uint, error) {
+	if lastUpdate != nil {
+		modification := lastUpdate.Modification()
+		if modification.IsInsert() {
+			pointer := modification.Insert().Pointer()
+			value := uint(pointer.Index() + pointer.Length())
+			return &value, nil
+		}
+
+		if modification.IsSave() {
+			pointer := modification.Save().Pointer()
+			value := uint(pointer.Index() + pointer.Length())
+			return &value, nil
+		}
+	}
+
+	nextIndex := uint(0)
+	if app.header != nil {
+		pNextPointerIndex, err := app.header.NextPointerIndex()
+		if err != nil {
+			return nil, err
+		}
+
+		nextIndex = uint(*pNextPointerIndex)
+	}
+
+	return &nextIndex, nil
 }
 
 func (app *application) updateSource(
@@ -529,7 +565,13 @@ func (app *application) updateSource(
 
 	// open the temporary file:
 	file := filepath.Join(app.basePath, app.targetIdentifier)
-	pTmpFile, err := os.OpenFile(file, os.O_RDWR|os.O_APPEND, fs.ModePerm)
+	_, err = app.createIfNotExists(file)
+	if err != nil {
+		return err
+	}
+
+	// open the file:
+	pTmpFile, err := os.OpenFile(file, os.O_RDWR|os.O_APPEND, fs.ModeAppend)
 	if err != nil {
 		return err
 	}
@@ -622,4 +664,38 @@ func (app *application) headerToBytes(header headers.Header) ([]byte, error) {
 	headerWithBytes := []byte{}
 	headerWithBytes = append(headerWithBytes, lengthBytes...)
 	return append(headerWithBytes, headerBytes...), nil
+}
+
+func (app *application) createIfNotExists(
+	filePath string,
+) (os.FileInfo, error) {
+	fileInfo, err := os.Stat(filePath)
+	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			dirPath := filepath.Dir(filePath)
+			err := os.MkdirAll(dirPath, os.ModePerm)
+			if err != nil {
+				return nil, err
+			}
+
+			pCreatedFile, err := os.Create(filePath)
+			if err != nil {
+				return nil, err
+			}
+
+			err = pCreatedFile.Close()
+			if err != nil {
+				return nil, err
+			}
+		}
+
+		retFileInfo, err := os.Stat(filePath)
+		if err != nil {
+			return nil, err
+		}
+
+		fileInfo = retFileInfo
+	}
+
+	return fileInfo, nil
 }

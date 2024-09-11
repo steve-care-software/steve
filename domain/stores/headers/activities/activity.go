@@ -42,11 +42,15 @@ func (obj *activity) Head() hash.Hash {
 }
 
 // Map returns the map
-func (obj *activity) Map() (map[string]pointers.Pointer, []string, error) {
-	return obj.fetchRecursively(obj.head, obj.commits, []string{})
+func (obj *activity) Map(rootHash hash.Hash) (map[string]pointers.Pointer, []string, error) {
+	return obj.fetchRecursively(rootHash, obj.head, obj.commits, []string{})
 }
 
-func (obj *activity) fetchRecursively(head hash.Hash, commits commits.Commits, deleted []string) (map[string]pointers.Pointer, []string, error) {
+func (obj *activity) fetchRecursively(rootHash hash.Hash, head hash.Hash, commits commits.Commits, deleted []string) (map[string]pointers.Pointer, []string, error) {
+	if rootHash.Compare(head) {
+		return map[string]pointers.Pointer{}, []string{}, nil
+	}
+
 	retCommit, err := commits.Fetch(head)
 	if err != nil {
 		return nil, nil, err
@@ -56,7 +60,7 @@ func (obj *activity) fetchRecursively(head hash.Hash, commits commits.Commits, d
 	deleted = append(deleted, commitDeleted...)
 	if retCommit.HasParent() {
 		parent := retCommit.Parent()
-		retMap, retDeleted, err := obj.fetchRecursively(parent, commits, deleted)
+		retMap, retDeleted, err := obj.fetchRecursively(rootHash, parent, commits, deleted)
 		if err != nil {
 			return nil, nil, err
 		}

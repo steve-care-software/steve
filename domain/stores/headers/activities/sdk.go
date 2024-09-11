@@ -45,5 +45,5 @@ type Activity interface {
 	Hash() hash.Hash
 	Commits() commits.Commits
 	Head() hash.Hash
-	Map() (map[string]pointers.Pointer, []string, error)
+	Map(rootHash hash.Hash) (map[string]pointers.Pointer, []string, error)
 }
