@@ -46,7 +46,7 @@ func (app *transactionBuilder) WithSignature(signature []byte) TransactionBuilde
 
 // Now builds a new transaction instance
 func (app *transactionBuilder) Now() (Transaction, error) {
-	if app.entry != nil {
+	if app.entry == nil {
 		return nil, errors.New("the entry is mandatory in ordder to build a Transaction instance")
 	}
 
@@ -54,7 +54,7 @@ func (app *transactionBuilder) Now() (Transaction, error) {
 		app.signature = nil
 	}
 
-	if app.signature != nil {
+	if app.signature == nil {
 		return nil, errors.New("the signature is mandatory in order to build a Transaction instance")
 	}
 

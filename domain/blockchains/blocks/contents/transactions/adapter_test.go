@@ -1,14 +1,15 @@
-package entries
+package transactions
 
 import (
 	"bytes"
 	"reflect"
 	"testing"
 
+	"github.com/steve-care-software/steve/domain/blockchains/blocks/contents/transactions/entries"
 	"github.com/steve-care-software/steve/domain/hash"
 )
 
-func TestAdapter_Success(t *testing.T) {
+func TestAdapter_single_Success(t *testing.T) {
 	hashAdapter := hash.NewAdapter()
 	pFlag, err := hashAdapter.FromBytes([]byte("flag"))
 	if err != nil {
@@ -22,15 +23,19 @@ func TestAdapter_Success(t *testing.T) {
 		return
 	}
 
-	entry := NewEntryForTests(*pFlag, *pScript, 34)
+	trx := NewTransactionForTests(
+		entries.NewEntryForTests(*pFlag, *pScript, 34),
+		[]byte("lets say this is a signature"),
+	)
+
 	adapter := NewAdapter()
-	retBytes, err := adapter.ToBytes(entry)
+	retBytes, err := adapter.InstanceToBytes(trx)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
 	}
 
-	retEntry, retRemaining, err := adapter.ToInstance(retBytes)
+	retTrx, retRemaining, err := adapter.BytesToInstance(retBytes)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
@@ -41,13 +46,13 @@ func TestAdapter_Success(t *testing.T) {
 		return
 	}
 
-	if !reflect.DeepEqual(entry, retEntry) {
-		t.Errorf("the returned entry is invalid")
+	if !reflect.DeepEqual(trx, retTrx) {
+		t.Errorf("the returned transaction is invalid")
 		return
 	}
 }
 
-func TestAdapter_withRemaining_Success(t *testing.T) {
+func TestAdapter_multiple_withRemaining_Success(t *testing.T) {
 	hashAdapter := hash.NewAdapter()
 	pFlag, err := hashAdapter.FromBytes([]byte("flag"))
 	if err != nil {
@@ -61,28 +66,44 @@ func TestAdapter_withRemaining_Success(t *testing.T) {
 		return
 	}
 
-	entry := NewEntryForTests(*pFlag, *pScript, 34)
+	pOtherScript, err := hashAdapter.FromBytes([]byte("other script"))
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	trx := NewTransactionsForTests([]Transaction{
+		NewTransactionForTests(
+			entries.NewEntryForTests(*pFlag, *pScript, 22),
+			[]byte("lets say this is a signature"),
+		),
+		NewTransactionForTests(
+			entries.NewEntryForTests(*pFlag, *pOtherScript, 34),
+			[]byte("lets say this is a signature"),
+		),
+	})
+
 	adapter := NewAdapter()
-	retBytes, err := adapter.ToBytes(entry)
+	retBytes, err := adapter.InstancesToBytes(trx)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
 	}
 
 	remaining := []byte("this is some remaining")
-	retEntry, retRemaining, err := adapter.ToInstance(append(retBytes, remaining...))
+	retTrx, retRemaining, err := adapter.BytesToInstances(append(retBytes, remaining...))
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
 	}
 
-	if !bytes.Equal(retRemaining, retRemaining) {
+	if !bytes.Equal(remaining, retRemaining) {
 		t.Errorf("the returned remaining is invalid")
 		return
 	}
 
-	if !reflect.DeepEqual(entry, retEntry) {
-		t.Errorf("the returned entry is invalid")
+	if !reflect.DeepEqual(trx, retTrx) {
+		t.Errorf("the returned transaction is invalid")
 		return
 	}
 }

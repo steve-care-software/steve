@@ -25,7 +25,7 @@ func NewBuilder() Builder {
 // Adapter represents the entry adapter
 type Adapter interface {
 	ToBytes(ins Entry) ([]byte, error)
-	ToInstance(data []byte) (Entry, error)
+	ToInstance(data []byte) (Entry, []byte, error)
 }
 
 // Builder represents the entry builder

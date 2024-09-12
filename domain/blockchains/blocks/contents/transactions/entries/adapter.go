@@ -34,42 +34,48 @@ func (app *adapter) ToBytes(ins Entry) ([]byte, error) {
 }
 
 // ToInstance converts bytes to instance
-func (app *adapter) ToInstance(data []byte) (Entry, error) {
+func (app *adapter) ToInstance(data []byte) (Entry, []byte, error) {
 	if len(data) < hash.Size {
 		str := fmt.Sprintf(dataLengthTooSmallErrPattern, hash.Size, len(data))
-		return nil, errors.New(str)
+		return nil, nil, errors.New(str)
 	}
 
 	pFlag, err := app.hashAdapter.FromBytes(data[:hash.Size])
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	remaining := data[hash.Size:]
 	if len(data) < hash.Size {
 		str := fmt.Sprintf(dataLengthTooSmallErrPattern, hash.Size, len(remaining))
-		return nil, errors.New(str)
+		return nil, nil, errors.New(str)
 	}
 
 	pScript, err := app.hashAdapter.FromBytes(remaining[:hash.Size])
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	remaining = remaining[hash.Size:]
 	if len(data) < pointers.Uint64Size {
 		str := fmt.Sprintf(dataLengthTooSmallErrPattern, pointers.Uint64Size, len(remaining))
-		return nil, errors.New(str)
+		return nil, nil, errors.New(str)
 	}
 
 	pFees, err := pointers.BytesToUint64(remaining[:pointers.Uint64Size])
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return app.builder.Create().
+	ins, err := app.builder.Create().
 		WithFlag(*pFlag).
 		WithScript(*pScript).
 		WithFees(*pFees).
 		Now()
+
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return ins, remaining[pointers.Uint64Size:], nil
 }

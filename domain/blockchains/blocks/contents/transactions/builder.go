@@ -2,6 +2,7 @@ package transactions
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/steve-care-software/steve/domain/hash"
 )
@@ -43,6 +44,17 @@ func (app *builder) Now() (Transactions, error) {
 
 	if app.list == nil {
 		return nil, errors.New("there must be at least 1 Transaction in order to build a Transactions instance")
+	}
+
+	scriptMap := map[string]Transaction{}
+	for _, oneTrx := range app.list {
+		keyname := oneTrx.Entry().Script().String()
+		if _, ok := scriptMap[keyname]; ok {
+			str := fmt.Sprintf("the script (hash: %s) has already been added in a previous transaction", keyname)
+			return nil, errors.New(str)
+		}
+
+		scriptMap[keyname] = oneTrx
 	}
 
 	data := [][]byte{}
