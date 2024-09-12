@@ -6,23 +6,20 @@ import (
 )
 
 type block struct {
-	hash       hash.Hash
-	content    contents.Content
-	result     []byte
-	difficulty uint8
+	hash    hash.Hash
+	content contents.Content
+	result  []byte
 }
 
 func createBlock(
 	hash hash.Hash,
 	content contents.Content,
 	result []byte,
-	difficulty uint8,
 ) Block {
 	out := block{
-		hash:       hash,
-		content:    content,
-		result:     result,
-		difficulty: difficulty,
+		hash:    hash,
+		content: content,
+		result:  result,
 	}
 
 	return &out
@@ -41,9 +38,4 @@ func (obj *block) Content() contents.Content {
 // Result returns the result
 func (obj *block) Result() []byte {
 	return obj.result
-}
-
-// Difficulty returns the difficulty
-func (obj *block) Difficulty() uint8 {
-	return obj.difficulty
 }

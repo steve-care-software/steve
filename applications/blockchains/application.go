@@ -295,7 +295,6 @@ func (app *application) Mine(blockchainID uuid.UUID, maxAmountTrx uint) error {
 
 	block, err := app.blockBuilder.Create().
 		WithContent(content).
-		WithDifficulty(*pDifficulty).
 		WithResult(result).
 		Now()
 
@@ -303,7 +302,7 @@ func (app *application) Mine(blockchainID uuid.UUID, maxAmountTrx uint) error {
 		return err
 	}
 
-	retBytes, err := app.blocksAdapter.BlockToBytes(block)
+	retBytes, err := app.blocksAdapter.InstanceToBytes(block)
 	if err != nil {
 		return err
 	}
@@ -319,7 +318,7 @@ func (app *application) Mine(blockchainID uuid.UUID, maxAmountTrx uint) error {
 		return err
 	}
 
-	retQueue, err := app.blocksAdapter.BytesToInstances(retQueueBytes)
+	retQueue, _, err := app.blocksAdapter.BytesToInstances(retQueueBytes)
 	if err != nil {
 		return err
 	}
@@ -331,7 +330,7 @@ func (app *application) Mine(blockchainID uuid.UUID, maxAmountTrx uint) error {
 		return err
 	}
 
-	retBlocksBytes, err := app.blocksAdapter.BlocksToBytes(blocks)
+	retBlocksBytes, err := app.blocksAdapter.InstancesToBytes(blocks)
 	if err != nil {
 		return err
 	}
@@ -347,7 +346,12 @@ func (app *application) BlocksQueue() (blocks.Blocks, error) {
 		return nil, err
 	}
 
-	return app.blocksAdapter.BytesToInstances(retBytes)
+	ins, _, err := app.blocksAdapter.BytesToInstances(retBytes)
+	if err != nil {
+		return nil, err
+	}
+
+	return ins, nil
 }
 
 // Sync syncs the mined blocks with the network

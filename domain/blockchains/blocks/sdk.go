@@ -5,6 +5,20 @@ import (
 	"github.com/steve-care-software/steve/domain/hash"
 )
 
+const dataLengthTooSmallErrPattern = "the data length was expected to be at least %d bytes, %d returned"
+
+// NewAdapter creates a new adapter
+func NewAdapter() Adapter {
+	contentAdapter := contents.NewAdapter()
+	builder := NewBuilder()
+	blockBuilder := NewBlockBuilder()
+	return createAdapter(
+		contentAdapter,
+		builder,
+		blockBuilder,
+	)
+}
+
 // NewBuilder creates a new builder
 func NewBuilder() Builder {
 	hashAdapter := hash.NewAdapter()
@@ -23,10 +37,10 @@ func NewBlockBuilder() BlockBuilder {
 
 // Adapter represents the block adapter
 type Adapter interface {
-	BlocksToBytes(ins Blocks) ([]byte, error)
-	BytesToInstances(data []byte) (Blocks, error)
-	BlockToBytes(ins Block) ([]byte, error)
-	BytesToInstance(data []byte) (Block, error)
+	InstancesToBytes(ins Blocks) ([]byte, error)
+	BytesToInstances(data []byte) (Blocks, []byte, error)
+	InstanceToBytes(ins Block) ([]byte, error)
+	BytesToInstance(data []byte) (Block, []byte, error)
 }
 
 // Builder represents the blocks builder
@@ -47,7 +61,6 @@ type BlockBuilder interface {
 	Create() BlockBuilder
 	WithContent(content contents.Content) BlockBuilder
 	WithResult(result []byte) BlockBuilder
-	WithDifficulty(difficulty uint8) BlockBuilder
 	Now() (Block, error)
 }
 
@@ -56,5 +69,4 @@ type Block interface {
 	Hash() hash.Hash
 	Content() contents.Content
 	Result() []byte
-	Difficulty() uint8
 }
