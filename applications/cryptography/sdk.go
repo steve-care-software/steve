@@ -1,6 +1,6 @@
 package cryptography
 
-import "crypto"
+import "crypto/ed25519"
 
 // NewApplication creates a new application
 func NewApplication() Application {
@@ -11,5 +11,5 @@ func NewApplication() Application {
 type Application interface {
 	Encrypt(message []byte, password []byte) ([]byte, error) // encrypt data using a password
 	Decrypt(cipher []byte, password []byte) ([]byte, error)  // decrypt a cipher using a password
-	GeneratePrivateKey(words []string) crypto.PrivateKey     // generate a private key and returns it
+	GeneratePrivateKey(words []string) ed25519.PrivateKey    // generate a private key and returns it
 }

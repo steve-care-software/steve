@@ -156,7 +156,7 @@ func (app *application) Authenticate(name string, password []byte) error {
 		return err
 	}
 
-	identity, err := app.identityAdapter.ToInstance(data)
+	identity, _, err := app.identityAdapter.ToInstance(data)
 	if err != nil {
 		return err
 	}
@@ -214,7 +214,7 @@ func (app *application) Transact(script []byte, fees uint64, flag hash.Hash) err
 	}
 
 	message := entry.Hash().Bytes()
-	signature, err := app.currentAuthenticatedIdentity.PK().(ed25519.PrivateKey).Sign(nil, message, crypto.SHA512)
+	signature, err := app.currentAuthenticatedIdentity.PK().Sign(nil, message, crypto.SHA512)
 	if err != nil {
 		return err
 	}
@@ -382,7 +382,7 @@ func (app *application) Create(
 		return err
 	}
 
-	pubKey := app.currentAuthenticatedIdentity.PK().(ed25519.PrivateKey).Public().(ed25519.PublicKey)
+	pubKey := app.currentAuthenticatedIdentity.PK().Public().(ed25519.PublicKey)
 	pPubKeyHash, err := app.hashAdapter.FromBytes(pubKey)
 	if err != nil {
 		return err

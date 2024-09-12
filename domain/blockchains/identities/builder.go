@@ -1,7 +1,7 @@
 package identities
 
 import (
-	"crypto"
+	"crypto/ed25519"
 	"errors"
 
 	"github.com/steve-care-software/steve/domain/hash"
@@ -9,7 +9,7 @@ import (
 
 type builder struct {
 	name  string
-	pk    crypto.PrivateKey
+	pk    ed25519.PrivateKey
 	flags []hash.Hash
 }
 
@@ -35,7 +35,7 @@ func (app *builder) WithName(name string) Builder {
 }
 
 // WithPK adds a pk to the builder
-func (app *builder) WithPK(pk crypto.PrivateKey) Builder {
+func (app *builder) WithPK(pk ed25519.PrivateKey) Builder {
 	app.pk = pk
 	return app
 }

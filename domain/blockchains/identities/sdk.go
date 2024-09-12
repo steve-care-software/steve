@@ -1,10 +1,22 @@
 package identities
 
 import (
-	"crypto"
+	"crypto/ed25519"
 
 	"github.com/steve-care-software/steve/domain/hash"
 )
+
+const dataLengthTooSmallErrPattern = "the data length was expected to be at least %d bytes, %d returned"
+
+// NewAdapter creates a new adapter
+func NewAdapter() Adapter {
+	hashAdapter := hash.NewAdapter()
+	builder := NewBuilder()
+	return createAdapter(
+		hashAdapter,
+		builder,
+	)
+}
 
 // NewBuilder creates a new builder
 func NewBuilder() Builder {
@@ -14,14 +26,14 @@ func NewBuilder() Builder {
 // Adapter represents an identity adapter
 type Adapter interface {
 	ToBytes(ins Identity) ([]byte, error)
-	ToInstance(bytes []byte) (Identity, error)
+	ToInstance(bytes []byte) (Identity, []byte, error)
 }
 
 // Builder represents the builder
 type Builder interface {
 	Create() Builder
 	WithName(name string) Builder
-	WithPK(pk crypto.PrivateKey) Builder
+	WithPK(pk ed25519.PrivateKey) Builder
 	WithFlags(flags []hash.Hash) Builder
 	Now() (Identity, error)
 }
@@ -29,7 +41,7 @@ type Builder interface {
 // Identity represents an identity
 type Identity interface {
 	Name() string
-	PK() crypto.PrivateKey
+	PK() ed25519.PrivateKey
 	HasFlags() bool
 	Flags() []hash.Hash
 }

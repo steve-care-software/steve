@@ -1,7 +1,6 @@
 package cryptography
 
 import (
-	"crypto"
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/ed25519"
@@ -92,7 +91,7 @@ func (app *application) Decrypt(encrypted []byte, password []byte) ([]byte, erro
 }
 
 // GeneratePrivateKey generates a private key and returns it
-func (app *application) GeneratePrivateKey(seedWords []string) crypto.PrivateKey {
+func (app *application) GeneratePrivateKey(seedWords []string) ed25519.PrivateKey {
 	seed := []byte{}
 	for _, oneWord := range seedWords {
 		seed = append(seed, []byte(oneWord)...)

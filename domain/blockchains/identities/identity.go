@@ -1,27 +1,27 @@
 package identities
 
 import (
-	"crypto"
+	"crypto/ed25519"
 
 	"github.com/steve-care-software/steve/domain/hash"
 )
 
 type identity struct {
 	name  string
-	pk    crypto.PrivateKey
+	pk    ed25519.PrivateKey
 	flags []hash.Hash
 }
 
 func createIdentity(
 	name string,
-	pk crypto.PrivateKey,
+	pk ed25519.PrivateKey,
 ) Identity {
 	return createIdentityInternally(name, pk, nil)
 }
 
 func createIdentityWithFlags(
 	name string,
-	pk crypto.PrivateKey,
+	pk ed25519.PrivateKey,
 	flags []hash.Hash,
 ) Identity {
 	return createIdentityInternally(name, pk, flags)
@@ -29,7 +29,7 @@ func createIdentityWithFlags(
 
 func createIdentityInternally(
 	name string,
-	pk crypto.PrivateKey,
+	pk ed25519.PrivateKey,
 	flags []hash.Hash,
 ) Identity {
 	out := identity{
@@ -47,7 +47,7 @@ func (obj *identity) Name() string {
 }
 
 // PK returns the pk
-func (obj *identity) PK() crypto.PrivateKey {
+func (obj *identity) PK() ed25519.PrivateKey {
 	return obj.pk
 }
 
