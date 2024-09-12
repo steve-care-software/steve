@@ -1,5 +1,15 @@
 package rules
 
+const floatSize = 8
+
+// NewAdapter creates a new adapter
+func NewAdapter() Adapter {
+	builder := NewBuilder()
+	return createAdapter(
+		builder,
+	)
+}
+
 // NewBuilder creates a new builder
 func NewBuilder() Builder {
 	return createBuilder()
@@ -8,7 +18,7 @@ func NewBuilder() Builder {
 // Adapter represents the rules adapter
 type Adapter interface {
 	ToBytes(ins Rules) ([]byte, error)
-	ToInstance(data []byte) (Rules, error)
+	ToInstance(data []byte) (Rules, []byte, error)
 }
 
 // Builder represents the builder

@@ -43,7 +43,7 @@ func (app *builder) WithIncreaseDifficultyPerTrx(incrDiffPerTrx float64) Builder
 
 // Now builds a new Rules instance
 func (app *builder) Now() (Rules, error) {
-	if app.pMiningValue != nil {
+	if app.pMiningValue == nil {
 		return nil, errors.New("the mining value is mandatory in order to build a Rules instance")
 	}
 
