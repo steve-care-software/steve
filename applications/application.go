@@ -4,8 +4,8 @@ import (
 	"errors"
 
 	chains_applications "github.com/steve-care-software/steve/applications/chains"
-	"github.com/steve-care-software/steve/applications/stores/lists"
-	"github.com/steve-care-software/steve/applications/stores/resources"
+	"github.com/steve-care-software/steve/applications/resources"
+	"github.com/steve-care-software/steve/applications/resources/lists"
 	"github.com/steve-care-software/steve/domain/chains"
 	"github.com/steve-care-software/steve/domain/chains/nfts"
 )

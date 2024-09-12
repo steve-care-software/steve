@@ -10,8 +10,8 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/steve-care-software/steve/applications/cryptography"
-	"github.com/steve-care-software/steve/applications/stores/lists"
-	"github.com/steve-care-software/steve/applications/stores/resources"
+	resources "github.com/steve-care-software/steve/applications/resources"
+	"github.com/steve-care-software/steve/applications/resources/lists"
 	"github.com/steve-care-software/steve/domain/blockchains"
 	"github.com/steve-care-software/steve/domain/blockchains/blocks"
 	"github.com/steve-care-software/steve/domain/blockchains/blocks/contents"
