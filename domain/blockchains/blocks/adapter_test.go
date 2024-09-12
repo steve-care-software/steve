@@ -62,7 +62,7 @@ func TestAdapter_single_withRemaining_Success(t *testing.T) {
 	}
 
 	remaining := []byte("this is some remaining data")
-	retTrx, retRemaining, err := adapter.BytesToInstance(append(retBytes, remaining...))
+	retBlock, retRemaining, err := adapter.BytesToInstance(append(retBytes, remaining...))
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
@@ -73,7 +73,7 @@ func TestAdapter_single_withRemaining_Success(t *testing.T) {
 		return
 	}
 
-	if !reflect.DeepEqual(block, retTrx) {
+	if !reflect.DeepEqual(block, retBlock) {
 		t.Errorf("the returned block is invalid")
 		return
 	}
@@ -132,7 +132,7 @@ func TestAdapter_multiple_withRemaining_Success(t *testing.T) {
 	}
 
 	remaining := []byte("this is some remaining data")
-	retTrx, retRemaining, err := adapter.BytesToInstances(append(retBytes, remaining...))
+	retBlock, retRemaining, err := adapter.BytesToInstances(append(retBytes, remaining...))
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
@@ -143,7 +143,7 @@ func TestAdapter_multiple_withRemaining_Success(t *testing.T) {
 		return
 	}
 
-	if !reflect.DeepEqual(blocks, retTrx) {
+	if !reflect.DeepEqual(blocks, retBlock) {
 		t.Errorf("the returned blocsk is invalid")
 		return
 	}
