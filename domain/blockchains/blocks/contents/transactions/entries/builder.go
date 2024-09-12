@@ -54,15 +54,15 @@ func (app *builder) WithFees(fees uint64) Builder {
 
 // Now builds a new Entry
 func (app *builder) Now() (Entry, error) {
-	if app.flag != nil {
+	if app.flag == nil {
 		return nil, errors.New("the flag is mandatory in order to build an Entry instance")
 	}
 
-	if app.script != nil {
+	if app.script == nil {
 		return nil, errors.New("the script is mandatory in order to build an Entry instance")
 	}
 
-	if app.pFees != nil {
+	if app.pFees == nil {
 		return nil, errors.New("the fees is mandatory in order to build an Entry instance")
 	}
 

@@ -2,6 +2,18 @@ package entries
 
 import "github.com/steve-care-software/steve/domain/hash"
 
+const dataLengthTooSmallErrPattern = "the data length was expected to be at least %d bytes, %d returned"
+
+// NewAdapter creates a new adapter
+func NewAdapter() Adapter {
+	hashAdapter := hash.NewAdapter()
+	builder := NewBuilder()
+	return createAdapter(
+		hashAdapter,
+		builder,
+	)
+}
+
 // NewBuilder creates a new builder instance
 func NewBuilder() Builder {
 	hashAdapter := hash.NewAdapter()
