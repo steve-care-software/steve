@@ -5,6 +5,20 @@ import (
 	"github.com/steve-care-software/steve/domain/hash"
 )
 
+const dataLengthTooSmallErrPattern = "the data length was expected to be at least %d bytes, %d returned"
+
+// NewAdapter creates a new adapter
+func NewAdapter() Adapter {
+	trxAdapter := transactions.NewAdapter()
+	hashAdapter := hash.NewAdapter()
+	builder := NewBuilder()
+	return createAdapter(
+		trxAdapter,
+		hashAdapter,
+		builder,
+	)
+}
+
 // NewBuilder creates a new builder
 func NewBuilder() Builder {
 	hashAdapter := hash.NewAdapter()
@@ -16,7 +30,7 @@ func NewBuilder() Builder {
 // Adapter represents the content adapter
 type Adapter interface {
 	ToBytes(ins Content) ([]byte, error)
-	ToInstance(data []byte) (Content, error)
+	ToInstance(data []byte) (Content, []byte, error)
 }
 
 // Builder creates a new builder

@@ -46,11 +46,11 @@ func (app *builder) WithParent(parent hash.Hash) Builder {
 
 // Now builds a new Content instance
 func (app *builder) Now() (Content, error) {
-	if app.trx != nil {
+	if app.trx == nil {
 		return nil, errors.New("the transactions is mandatory in order to build a Content instance")
 	}
 
-	if app.parent != nil {
+	if app.parent == nil {
 		return nil, errors.New("the parent hash is mandatory in order to build a Content instance")
 	}
 
