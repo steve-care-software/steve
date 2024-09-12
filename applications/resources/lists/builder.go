@@ -38,7 +38,7 @@ func (app *builder) WithResource(resource resources.Application) Builder {
 
 // Now builds a new Application
 func (app *builder) Now() (Application, error) {
-	if app.resourceApp != nil {
+	if app.resourceApp == nil {
 		return nil, errors.New("the resource application is mandatory in order to build an APplication instance")
 	}
 

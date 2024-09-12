@@ -44,13 +44,13 @@ func (app *application) Retrieve(name string, index uint, amount uint) ([][]byte
 	}
 
 	length := len(values)
-	if length >= int(index) {
+	if length <= int(index) {
 		str := fmt.Sprintf("the index (%d) is invalid because the list contain %d elements", index, length)
 		return nil, errors.New(str)
 	}
 
 	toIndex := index + amount
-	if length >= int(toIndex) {
+	if length <= int(toIndex) {
 		str := fmt.Sprintf("the amount (%d) is invalid because the list contain %d elements, and the index + amount (%d) exceeds that length", amount, length, (index + amount))
 		return nil, errors.New(str)
 	}
@@ -70,17 +70,17 @@ func (app *application) RetrieveAll(name string) ([][]byte, error) {
 
 // Append append values to the list
 func (app *application) Append(name string, values [][]byte) error {
+	list := values
 	data, err := app.resourceApp.Retrieve(name)
-	if err != nil {
-		return err
+	if err == nil {
+		retList, err := app.listAdapter.ToInstance(data)
+		if err != nil {
+			return err
+		}
+
+		list = append(retList, values...)
 	}
 
-	list, err := app.listAdapter.ToInstance(data)
-	if err != nil {
-		return err
-	}
-
-	list = append(list, values...)
 	updatedData, err := app.listAdapter.ToBytes(list)
 	if err != nil {
 		return err

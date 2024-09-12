@@ -1,6 +1,17 @@
 package lists
 
-import "github.com/steve-care-software/steve/applications/resources"
+import (
+	"github.com/steve-care-software/steve/applications/resources"
+	"github.com/steve-care-software/steve/domain/stores/lists"
+)
+
+// NewBuilder creates a new builder
+func NewBuilder() Builder {
+	listAdapter := lists.NewAdapter()
+	return createBuilder(
+		listAdapter,
+	)
+}
 
 // Builder represents the application builder
 type Builder interface {
