@@ -5,6 +5,12 @@ func NewBuilder() Builder {
 	return createBuilder()
 }
 
+// Adapter represents the rules adapter
+type Adapter interface {
+	ToBytes(ins Rules) ([]byte, error)
+	ToInstance(data []byte) (Rules, error)
+}
+
 // Builder represents the builder
 type Builder interface {
 	Create() Builder

@@ -21,6 +21,14 @@ func NewTransactionBuilder() TransactionBuilder {
 	)
 }
 
+// Adapter represents the transactions adapter
+type Adapter interface {
+	InstancesToBytes(ins Transactions) ([]byte, error)
+	BytesToInstances(data []byte) (Transactions, error)
+	InstanceToBytes(ins Transaction) ([]byte, error)
+	BytesToInstance(data []byte) (Transaction, error)
+}
+
 // Builder represents the builder
 type Builder interface {
 	Create() Builder

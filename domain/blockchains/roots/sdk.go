@@ -12,6 +12,12 @@ func NewBuilder() Builder {
 	)
 }
 
+// Adapter represents the roots adapter
+type Adapter interface {
+	ToBytes(ins Root) ([]byte, error)
+	ToInstance(data []byte) (Root, error)
+}
+
 // / Builder represents the root builder
 type Builder interface {
 	Create() Builder

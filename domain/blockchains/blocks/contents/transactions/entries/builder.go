@@ -69,7 +69,7 @@ func (app *builder) Now() (Entry, error) {
 	pHash, err := app.hashAdapter.FromMultiBytes([][]byte{
 		app.flag.Bytes(),
 		app.script.Bytes(),
-		[]byte(fmt.Sprintf("%f", app.pFees)),
+		[]byte(fmt.Sprintf("%d", *app.pFees)),
 	})
 
 	if err != nil {

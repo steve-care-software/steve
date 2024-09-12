@@ -13,6 +13,12 @@ func NewBuilder() Builder {
 	)
 }
 
+// Adapter represents the content adapter
+type Adapter interface {
+	ToBytes(ins Content) ([]byte, error)
+	ToInstance(data []byte) (Content, error)
+}
+
 // Builder creates a new builder
 type Builder interface {
 	Create() Builder
