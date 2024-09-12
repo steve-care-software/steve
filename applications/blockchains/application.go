@@ -443,7 +443,12 @@ func (app *application) Blockchain(identifier uuid.UUID) (blockchains.Blockchain
 		return nil, err
 	}
 
-	return app.blockchainAdapter.ToInstance(retBytes)
+	ins, _, err := app.blockchainAdapter.ToInstance(retBytes)
+	if err != nil {
+		return nil, err
+	}
+
+	return ins, nil
 }
 
 // Script returns the script by its hash
@@ -478,7 +483,12 @@ func (app *application) retrieveBlockchainFromID(id uuid.UUID) (blockchains.Bloc
 		return nil, err
 	}
 
-	return app.blockchainAdapter.ToInstance(retData)
+	ins, _, err := app.blockchainAdapter.ToInstance(retData)
+	if err != nil {
+		return nil, err
+	}
+
+	return ins, nil
 }
 
 func (app *application) difficulty(blockchain blockchains.Blockchain, amountTrx uint) (*uint8, error) {

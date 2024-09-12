@@ -2,7 +2,8 @@ package uuids
 
 import "github.com/google/uuid"
 
-const uuidSize = 16
+// UUIDSize represents the uuid size
+const UUIDSize = 16
 
 // NewAdapter creates a new adapter
 func NewAdapter() Adapter {

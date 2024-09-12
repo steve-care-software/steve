@@ -13,10 +13,10 @@ func createAdapter() Adapter {
 // FromBytes converts bytes to ids
 func (app *adapter) FromBytes(data []byte) ([]uuid.UUID, error) {
 	list := []uuid.UUID{}
-	amount := len(data) / uuidSize
+	amount := len(data) / UUIDSize
 	for i := 0; i < amount; i++ {
-		index := i * uuidSize
-		uuidBytes := data[index : index+uuidSize]
+		index := i * UUIDSize
+		uuidBytes := data[index : index+UUIDSize]
 		uuid, err := uuid.FromBytes(uuidBytes)
 		if err != nil {
 			return nil, err

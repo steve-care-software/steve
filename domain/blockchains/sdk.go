@@ -9,6 +9,22 @@ import (
 	"github.com/steve-care-software/steve/domain/blockchains/rules"
 )
 
+const dataLengthTooSmallErrPattern = "the data length was expected to be at least %d bytes, %d returned"
+
+// NewAdapter creates a new adapter
+func NewAdapter() Adapter {
+	blockAdapter := blocks.NewAdapter()
+	rulesAdapter := rules.NewAdapter()
+	rootAdapter := roots.NewAdapter()
+	builder := NewBuilder()
+	return createAdapter(
+		blockAdapter,
+		rulesAdapter,
+		rootAdapter,
+		builder,
+	)
+}
+
 // NewBuilder creates a new builder
 func NewBuilder() Builder {
 	return createBuilder()
@@ -17,7 +33,7 @@ func NewBuilder() Builder {
 // Adapter represents the blockchain adapter
 type Adapter interface {
 	ToBytes(ins Blockchain) ([]byte, error)
-	ToInstance(data []byte) (Blockchain, error)
+	ToInstance(data []byte) (Blockchain, []byte, error)
 }
 
 // Builder represents the builder
