@@ -2,13 +2,85 @@ package blockchains
 
 import (
 	"github.com/google/uuid"
+	"github.com/steve-care-software/steve/applications/cryptography"
+	resources "github.com/steve-care-software/steve/applications/resources"
+	"github.com/steve-care-software/steve/applications/resources/lists"
 	"github.com/steve-care-software/steve/domain/blockchains"
 	"github.com/steve-care-software/steve/domain/blockchains/blocks"
+	"github.com/steve-care-software/steve/domain/blockchains/blocks/contents"
 	"github.com/steve-care-software/steve/domain/blockchains/blocks/contents/transactions"
+	"github.com/steve-care-software/steve/domain/blockchains/blocks/contents/transactions/entries"
+	"github.com/steve-care-software/steve/domain/blockchains/identities"
+	"github.com/steve-care-software/steve/domain/blockchains/roots"
+	"github.com/steve-care-software/steve/domain/blockchains/rules"
 	"github.com/steve-care-software/steve/domain/hash"
+	"github.com/steve-care-software/steve/domain/uuids"
 )
 
 const maxDifficulty = 64
+
+// NewBuilder creates a new builder
+func NewBuilder(
+	identityNamesList string,
+	blockchainListKeyname string,
+	identityKeynamePrefix string,
+	identityUnitsKeynamePrefix string,
+	blockchainKeynamePrefix string,
+	scriptKeynamePrefix string,
+	blockKeynamePrefix string,
+	blockQueueKeyname string,
+) Builder {
+	cryptographyApp := cryptography.NewApplication()
+	identityAdapter := identities.NewAdapter()
+	identityBuilder := identities.NewBuilder()
+	blockchainAdapter := blockchains.NewAdapter()
+	blockchainBuilder := blockchains.NewBuilder()
+	rootBuilder := roots.NewBuilder()
+	rulesBuilder := rules.NewBuilder()
+	blocksAdapter := blocks.NewAdapter()
+	blocksBuilder := blocks.NewBuilder()
+	blockBuilder := blocks.NewBlockBuilder()
+	contentBuilder := contents.NewBuilder()
+	transactionsBuilder := transactions.NewBuilder()
+	transactionBuilder := transactions.NewTransactionBuilder()
+	entryBuilder := entries.NewBuilder()
+	hashAdapter := hash.NewAdapter()
+	uuidAdapter := uuids.NewAdapter()
+	return createBuilder(
+		cryptographyApp,
+		identityAdapter,
+		identityBuilder,
+		blockchainAdapter,
+		blockchainBuilder,
+		rootBuilder,
+		rulesBuilder,
+		blocksAdapter,
+		blocksBuilder,
+		blockBuilder,
+		contentBuilder,
+		transactionsBuilder,
+		transactionBuilder,
+		entryBuilder,
+		hashAdapter,
+		uuidAdapter,
+		identityNamesList,
+		blockchainListKeyname,
+		identityKeynamePrefix,
+		identityUnitsKeynamePrefix,
+		blockchainKeynamePrefix,
+		scriptKeynamePrefix,
+		blockKeynamePrefix,
+		blockQueueKeyname,
+	)
+}
+
+// Builder represents the application builder
+type Builder interface {
+	Create() Builder
+	WithResource(resourceApp resources.Application) Builder
+	WithList(listApp lists.Application) Builder
+	Now() (Application, error)
+}
 
 // Application represents the blockchain application
 type Application interface {

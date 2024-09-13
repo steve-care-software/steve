@@ -25,9 +25,9 @@ import (
 )
 
 type application struct {
-	cryptographyApp              cryptography.Application
 	storeListApp                 lists.Application
 	resourceApp                  resources.Application
+	cryptographyApp              cryptography.Application
 	identityAdapter              identities.Adapter
 	identityBuilder              identities.Builder
 	blockchainAdapter            blockchains.Adapter
@@ -56,9 +56,9 @@ type application struct {
 }
 
 func createApplication(
-	cryptographyApp cryptography.Application,
 	storeListApp lists.Application,
 	resourceApp resources.Application,
+	cryptographyApp cryptography.Application,
 	identityAdapter identities.Adapter,
 	identityBuilder identities.Builder,
 	blockchainAdapter blockchains.Adapter,
@@ -84,9 +84,9 @@ func createApplication(
 	blockQueueKeyname string,
 ) Application {
 	out := application{
-		cryptographyApp:              cryptographyApp,
 		storeListApp:                 storeListApp,
 		resourceApp:                  resourceApp,
+		cryptographyApp:              cryptographyApp,
 		identityAdapter:              identityAdapter,
 		identityBuilder:              identityBuilder,
 		blockchainAdapter:            blockchainAdapter,
@@ -458,7 +458,11 @@ func (app *application) Script(hash hash.Hash) ([]byte, error) {
 }
 
 func (app *application) generateIdentityFromSeedWordsThenEncrypt(name string, password []byte, seedWords []string) ([]byte, error) {
-	pk := app.cryptographyApp.GeneratePrivateKey(seedWords)
+	pk, err := app.cryptographyApp.GeneratePrivateKey(seedWords)
+	if err != nil {
+		return nil, err
+	}
+
 	identity, err := app.identityBuilder.Create().
 		WithName(name).
 		WithPK(pk).

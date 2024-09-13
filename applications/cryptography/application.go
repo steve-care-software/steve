@@ -8,7 +8,9 @@ import (
 	"crypto/sha256"
 	"errors"
 	"io"
+	"strings"
 
+	"github.com/tyler-smith/go-bip39"
 	"golang.org/x/crypto/pbkdf2"
 )
 
@@ -91,11 +93,18 @@ func (app *application) Decrypt(encrypted []byte, password []byte) ([]byte, erro
 }
 
 // GeneratePrivateKey generates a private key and returns it
-func (app *application) GeneratePrivateKey(seedWords []string) ed25519.PrivateKey {
-	seed := []byte{}
-	for _, oneWord := range seedWords {
-		seed = append(seed, []byte(oneWord)...)
+func (app *application) GeneratePrivateKey(words []string) (ed25519.PrivateKey, error) {
+	// Validate mnemonic phrase
+	mnemonic := strings.Join(words, " ")
+	if !bip39.IsMnemonicValid(mnemonic) {
+		return nil, errors.New("invalid mnemonic, please use 12 or 24 words")
 	}
 
-	return ed25519.NewKeyFromSeed(seed)
+	// Convert mnemonic to seed (using an optional passphrase, here empty)
+	seed := bip39.NewSeed(mnemonic, "")
+
+	// Derive the private key using PBKDF2 and SHA256 with the seed
+	// Ed25519 requires a 32-byte seed, so we hash the seed with PBKDF2
+	key := pbkdf2.Key(seed, []byte("ed25519 seed"), 4096, ed25519.SeedSize, sha256.New)
+	return ed25519.NewKeyFromSeed(key), nil
 }
