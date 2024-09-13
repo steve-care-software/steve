@@ -4,6 +4,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/steve-care-software/steve/applications/resources"
 	"github.com/steve-care-software/steve/applications/resources/lists"
 )
@@ -13,6 +14,12 @@ func TestApplication_Success(t *testing.T) {
 	defer func() {
 		os.RemoveAll(baseDir)
 	}()
+
+	randomID, err := uuid.NewRandom()
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
 
 	resourceApp, err := resources.NewBuilder().Create().
 		WithBasePath(baseDir).
@@ -44,8 +51,8 @@ func TestApplication_Success(t *testing.T) {
 		"identities",
 		"blockchains",
 		"identities:by_name:",
-		"identities:units:by_name:",
-		"blockchain:byt_uuid:",
+		"units:by_blockchain_and_pubkeyhash:",
+		"blockchain:by_uuid:",
 		"script:by_hash:",
 		"block:by_hash:",
 		"block_queues",
@@ -165,6 +172,59 @@ func TestApplication_Success(t *testing.T) {
 	err = application.Authenticate(firstUsername, firstNewPassword)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	// retrieve invalid blockchain units:
+	_, err = application.Units(randomID)
+	if err == nil {
+		t.Errorf("the error was expected to be valid, nil returned")
+		return
+	}
+
+	// create a new blockchain:
+	blockchainID, err := uuid.NewRandom()
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	unitAmount := uint64(100000000000)
+	err = application.Create(
+		blockchainID,
+		"myBlockchain",
+		"This is a description",
+		unitAmount,
+		0,
+		2,
+		0.01,
+	)
+
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	err = resourceApp.Commit()
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	err = resourceApp.Init("my_database.db")
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	pAmount, err := application.Units(blockchainID)
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	if unitAmount != *pAmount {
+		t.Errorf("the amount was expected to be %d, %d returned", unitAmount, *pAmount)
 		return
 	}
 

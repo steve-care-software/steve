@@ -3,7 +3,6 @@ package blockchains
 import (
 	"crypto"
 	"crypto/ed25519"
-	"encoding/binary"
 	"errors"
 	"fmt"
 	"time"
@@ -21,6 +20,7 @@ import (
 	"github.com/steve-care-software/steve/domain/blockchains/roots"
 	"github.com/steve-care-software/steve/domain/blockchains/rules"
 	"github.com/steve-care-software/steve/domain/hash"
+	"github.com/steve-care-software/steve/domain/stores/headers/activities/commits/modifications/resources/pointers"
 	"github.com/steve-care-software/steve/domain/uuids"
 )
 
@@ -192,32 +192,42 @@ func (app *application) Recover(name string, newPassword []byte, words []string)
 // Authenticated returns the authenticated idgentity, if any
 func (app *application) Authenticated() (string, error) {
 	if app.currentAuthenticatedIdentity == nil {
-		return "", errors.New("there is currently no authenticated identity")
+		return "", errors.New(noAuthIdentityErr)
 	}
 
 	return app.currentAuthenticatedIdentity.Name(), nil
 }
 
-// Units returns the amount of units the authenticated identity hasg
-func (app *application) Units() (*uint64, error) {
-	if app.currentAuthenticatedIdentity != nil {
-		return nil, errors.New("there is no authenticated identity")
+// Units returns the amount of units the authenticated identity has
+func (app *application) Units(blockchain uuid.UUID) (*uint64, error) {
+	if app.currentAuthenticatedIdentity == nil {
+		return nil, errors.New(noAuthIdentityErr)
 	}
 
-	keyname := fmt.Sprintf("%s%s", app.identityUnitsKeynamePrefix, app.currentAuthenticatedIdentity.Name())
+	pubKey := app.currentAuthenticatedIdentity.PK().Public().(ed25519.PublicKey)
+	pubKeyHash, err := app.hashAdapter.FromBytes(pubKey)
+	if err != nil {
+		return nil, err
+	}
+
+	keyname := app.unitsPerOwnerAndBlockchainKeyname(*pubKeyHash, blockchain)
 	data, err := app.resourceApp.Retrieve(keyname)
 	if err != nil {
 		return nil, err
 	}
 
-	amount := binary.LittleEndian.Uint64(data)
-	return &amount, nil
+	pAmount, err := pointers.BytesToUint64(data)
+	if err != nil {
+		return nil, err
+	}
+
+	return pAmount, nil
 }
 
 // Transact creates a new transaction and adds it to our queue list
 func (app *application) Transact(script []byte, fees uint64, flag hash.Hash) error {
-	if app.currentAuthenticatedIdentity != nil {
-		return errors.New("there is no authenticated identity")
+	if app.currentAuthenticatedIdentity == nil {
+		return errors.New(noAuthIdentityErr)
 	}
 
 	entry, err := app.entryBuilder.Create().
@@ -378,6 +388,7 @@ func (app *application) Sync(blockHash hash.Hash) error {
 
 // Create a new blockchain
 func (app *application) Create(
+	identifier uuid.UUID,
 	name string,
 	description string,
 	unitAmount uint64,
@@ -385,8 +396,8 @@ func (app *application) Create(
 	baseDifficulty uint8,
 	increaseDiffPerrx float64,
 ) error {
-	if app.currentAuthenticatedIdentity != nil {
-		return errors.New("there is no authenticated identity")
+	if app.currentAuthenticatedIdentity == nil {
+		return errors.New(noAuthIdentityErr)
 	}
 
 	rules, err := app.rulesBuilder.Create().
@@ -414,14 +425,9 @@ func (app *application) Create(
 		return err
 	}
 
-	uuid, err := uuid.NewRandom()
-	if err != nil {
-		return err
-	}
-
 	createdOn := time.Now().UTC()
 	blockchain, err := app.blockchainBuilder.Create().
-		WithIdentifier(uuid).
+		WithIdentifier(identifier).
 		WithName(name).
 		WithDescription(description).
 		WithRules(rules).
@@ -439,7 +445,14 @@ func (app *application) Create(
 	}
 
 	keyname := fmt.Sprintf("%s%s", app.blockchainKeynamePrefix, blockchain.Identifier().String())
-	return app.resourceApp.Insert(keyname, retBytes)
+	err = app.resourceApp.Insert(keyname, retBytes)
+	if err != nil {
+		return err
+	}
+
+	unitAmountBytes := pointers.Uint64ToBytes(unitAmount)
+	unitsKeyname := app.unitsPerOwnerAndBlockchainKeyname(*pPubKeyHash, identifier)
+	return app.resourceApp.Insert(unitsKeyname, unitAmountBytes)
 }
 
 // Blockchains returns the list of blockchains
@@ -525,4 +538,8 @@ func (app *application) difficulty(blockchain blockchains.Blockchain, amountTrx 
 
 	casted := uint8(difficulty)
 	return &casted, nil
+}
+
+func (app *application) unitsPerOwnerAndBlockchainKeyname(owner hash.Hash, blockchain uuid.UUID) string {
+	return fmt.Sprintf("%s%s%s", app.identityUnitsKeynamePrefix, blockchain.String(), owner.String())
 }

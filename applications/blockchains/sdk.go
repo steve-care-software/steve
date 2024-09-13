@@ -17,6 +17,7 @@ import (
 	"github.com/steve-care-software/steve/domain/uuids"
 )
 
+const noAuthIdentityErr = "there is currently no authenticated identity"
 const maxDifficulty = 64
 
 // NewBuilder creates a new builder
@@ -100,7 +101,7 @@ type Application interface {
 	Authenticated() (string, error)
 
 	// Units returns the amount of units the authenticated identity has
-	Units() (*uint64, error)
+	Units(blockchain uuid.UUID) (*uint64, error)
 
 	// Transact creates a new transaction and adds it to our queue list
 	Transact(script []byte, fees uint64, flag hash.Hash) error
@@ -121,7 +122,7 @@ type Application interface {
 	Sync(blockHash hash.Hash) error
 
 	// Create a new blockchain
-	Create(name string, description string, unitAmount uint64, miningValue uint8, baseDifficulty uint8, increaseDiffPerrx float64) error
+	Create(identifier uuid.UUID, name string, description string, unitAmount uint64, miningValue uint8, baseDifficulty uint8, increaseDiffPerrx float64) error
 
 	// Blockchains returns the list of blockchains
 	Blockchains() ([]uuid.UUID, error)

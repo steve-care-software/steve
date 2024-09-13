@@ -308,7 +308,7 @@ func (app *application) Commit() error {
 		WithParent(app.header.Root().Hash())
 
 	if app.header.HasActivity() {
-		commitBuilder.WithParent(app.header.Activity().Hash())
+		commitBuilder.WithParent(app.header.Activity().Head())
 	}
 
 	commit, err := commitBuilder.Now()
