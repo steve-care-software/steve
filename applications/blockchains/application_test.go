@@ -135,4 +135,37 @@ func TestApplication_Success(t *testing.T) {
 		t.Errorf("the authenticated username was expected to be %s, %s returned", authUsername, firstPassword)
 		return
 	}
+
+	firstNewPassword := []byte("this is the new password")
+	err = application.Recover(firstUsername, firstNewPassword, seedWords)
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	err = resourceApp.Commit()
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	err = resourceApp.Init("my_database.db")
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	// old password
+	err = application.Authenticate(firstUsername, firstPassword)
+	if err == nil {
+		t.Errorf("the error was expected to be valid, nil returned")
+		return
+	}
+
+	err = application.Authenticate(firstUsername, firstNewPassword)
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
 }

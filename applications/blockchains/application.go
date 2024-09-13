@@ -180,7 +180,13 @@ func (app *application) Recover(name string, newPassword []byte, words []string)
 	}
 
 	keyname := fmt.Sprintf("%s%s", app.identityKeynamePrefix, name)
-	return app.resourceApp.Insert(keyname, cipher)
+	err = app.resourceApp.Save(keyname, cipher)
+	if err != nil {
+		return err
+	}
+
+	app.currentAuthenticatedIdentity = nil
+	return nil
 }
 
 // Authenticated returns the authenticated idgentity, if any
