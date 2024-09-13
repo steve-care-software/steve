@@ -185,6 +185,10 @@ func (app *application) Recover(name string, newPassword []byte, words []string)
 
 // Authenticated returns the authenticated idgentity, if any
 func (app *application) Authenticated() (string, error) {
+	if app.currentAuthenticatedIdentity == nil {
+		return "", errors.New("there is currently no authenticated identity")
+	}
+
 	return app.currentAuthenticatedIdentity.Name(), nil
 }
 

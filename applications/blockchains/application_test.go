@@ -70,7 +70,9 @@ func TestApplication_Success(t *testing.T) {
 		"about",
 	}
 
-	err = application.Register("roger", []byte("myPassword"), seedWords)
+	firstUsername := "roger"
+	firstPassword := []byte("this is a password")
+	err = application.Register(firstUsername, firstPassword, seedWords)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
@@ -99,8 +101,38 @@ func TestApplication_Success(t *testing.T) {
 		return
 	}
 
-	if identitiesList[0] != "roger" {
-		t.Errorf("the identity at index 0 was expected to be %s, %s returned", "roger", identitiesList[0])
+	if identitiesList[0] != firstUsername {
+		t.Errorf("the identity at index 0 was expected to be %s, %s returned", firstUsername, identitiesList[0])
+		return
+	}
+
+	_, err = application.Authenticated()
+	if err == nil {
+		t.Errorf("the error was expected to be valid, nil returned")
+		return
+	}
+
+	err = application.Authenticate(firstUsername, firstPassword)
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	// bad password
+	err = application.Authenticate(firstUsername, []byte("bad password"))
+	if err == nil {
+		t.Errorf("the error was expected to be valid, nil returned")
+		return
+	}
+
+	authUsername, err := application.Authenticated()
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	if authUsername != firstUsername {
+		t.Errorf("the authenticated username was expected to be %s, %s returned", authUsername, firstPassword)
 		return
 	}
 }
