@@ -140,7 +140,14 @@ func (app *application) Register(name string, password []byte, seedWords []strin
 	}
 
 	keyname := fmt.Sprintf("%s%s", app.identityKeynamePrefix, name)
-	return app.resourceApp.Insert(keyname, cipher)
+	err = app.resourceApp.Insert(keyname, cipher)
+	if err != nil {
+		return err
+	}
+
+	return app.storeListApp.Append(app.identityNamesList, [][]byte{
+		[]byte(name),
+	})
 }
 
 // Authenticate authenticates in an identity:

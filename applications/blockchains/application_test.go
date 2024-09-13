@@ -75,4 +75,32 @@ func TestApplication_Success(t *testing.T) {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
 	}
+
+	err = resourceApp.Commit()
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	err = resourceApp.Init("my_database.db")
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	identitiesList, err := application.Identities()
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	if len(identitiesList) != 1 {
+		t.Errorf("%d identities were expected, %d returned", 1, len(identitiesList))
+		return
+	}
+
+	if identitiesList[0] != "roger" {
+		t.Errorf("the identity at index 0 was expected to be %s, %s returned", "roger", identitiesList[0])
+		return
+	}
 }
