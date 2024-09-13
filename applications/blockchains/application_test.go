@@ -228,4 +228,26 @@ func TestApplication_Success(t *testing.T) {
 		return
 	}
 
+	retBlockchain, err := application.Blockchain(blockchainID)
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	if retBlockchain.Identifier().String() != blockchainID.String() {
+		t.Errorf("the blockchain identifier was expetced to be %s, %s returned", retBlockchain.Identifier().String(), blockchainID.String())
+		return
+	}
+
+	retBlockchainIds, err := application.Blockchains()
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	if len(retBlockchainIds) != 1 {
+		t.Errorf("%d bockchains were expected, %d returned", len(retBlockchainIds), 1)
+		return
+	}
+
 }

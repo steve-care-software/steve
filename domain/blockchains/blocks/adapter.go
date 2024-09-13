@@ -48,6 +48,11 @@ func (app *adapter) InstancesToBytes(ins Blocks) ([]byte, error) {
 
 // BytesToInstances converts bytes to instances
 func (app *adapter) BytesToInstances(data []byte) (Blocks, []byte, error) {
+	if len(data) < pointers.Uint64Size {
+		str := fmt.Sprintf(dataLengthTooSmallErrPattern, pointers.Uint64Size, len(data))
+		return nil, nil, errors.New(str)
+	}
+
 	pAmount, err := pointers.BytesToUint64(data[0:pointers.Uint64Size])
 	if err != nil {
 		return nil, nil, err

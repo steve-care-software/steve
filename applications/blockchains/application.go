@@ -450,6 +450,19 @@ func (app *application) Create(
 		return err
 	}
 
+	identifierBytes, err := identifier.MarshalBinary()
+	if err != nil {
+		return err
+	}
+
+	err = app.storeListApp.Append(app.blockchainListKeyname, [][]byte{
+		identifierBytes,
+	})
+
+	if err != nil {
+		return err
+	}
+
 	unitAmountBytes := pointers.Uint64ToBytes(unitAmount)
 	unitsKeyname := app.unitsPerOwnerAndBlockchainKeyname(*pPubKeyHash, identifier)
 	return app.resourceApp.Insert(unitsKeyname, unitAmountBytes)
