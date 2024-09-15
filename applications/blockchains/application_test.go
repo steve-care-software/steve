@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/steve-care-software/steve/applications/resources"
 	"github.com/steve-care-software/steve/applications/resources/lists"
+	"github.com/steve-care-software/steve/domain/hash"
 )
 
 func TestApplication_Success(t *testing.T) {
@@ -247,6 +248,32 @@ func TestApplication_Success(t *testing.T) {
 
 	if len(retBlockchainIds) != 1 {
 		t.Errorf("%d bockchains were expected, %d returned", len(retBlockchainIds), 1)
+		return
+	}
+
+	fees := 200
+	script := []byte("this is some script")
+	pFlag, err := hash.NewAdapter().FromBytes([]byte("this is some flag"))
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	err = application.Transact(script, uint64(fees), *pFlag)
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	trxQueue, err := application.TrxQueue()
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	trxQueueList := trxQueue.List()
+	if len(trxQueueList) != 1 {
+		t.Errorf("the queue was expected to contain %d trx, %d returned", 1, len(trxQueueList))
 		return
 	}
 

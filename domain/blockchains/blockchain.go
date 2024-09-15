@@ -1,12 +1,15 @@
 package blockchains
 
 import (
+	"errors"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/steve-care-software/steve/domain/blockchains/blocks"
 	"github.com/steve-care-software/steve/domain/blockchains/roots"
 	"github.com/steve-care-software/steve/domain/blockchains/rules"
+	"github.com/steve-care-software/steve/domain/hash"
 )
 
 type blockchain struct {
@@ -108,6 +111,21 @@ func (obj *blockchain) Root() roots.Root {
 // CreatedOn returns the creation time
 func (obj *blockchain) CreatedOn() time.Time {
 	return obj.createdOn
+}
+
+// Difficulty returns the difficulty needed for the provided amount of trx
+func (obj *blockchain) Difficulty(amountTrx uint) (*uint8, error) {
+	baseDifficulty := uint64(obj.rules.BaseDifficulty())
+	increateDiffPerTrx := obj.rules.IncreaseDifficultyPerTrx()
+	incrAmount := uint64(increateDiffPerTrx * float64(amountTrx))
+	difficulty := baseDifficulty + incrAmount
+	if difficulty > hash.Size {
+		str := fmt.Sprintf("the max difficulty amount was expected to at max %d, %d calculated", hash.Size, difficulty)
+		return nil, errors.New(str)
+	}
+
+	casted := uint8(difficulty)
+	return &casted, nil
 }
 
 // HasHead returns true if there is an head, false otherwise

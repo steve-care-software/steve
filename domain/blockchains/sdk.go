@@ -57,6 +57,7 @@ type Blockchain interface {
 	Rules() rules.Rules
 	Root() roots.Root
 	CreatedOn() time.Time
+	Difficulty(amountTrx uint) (*uint8, error)
 	HasHead() bool
 	Head() blocks.Block
 }

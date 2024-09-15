@@ -266,16 +266,6 @@ func (app *application) TrxQueue() (transactions.Transactions, error) {
 		Now()
 }
 
-// Difficulty speculates the difficulty based on the amount of trx
-func (app *application) Difficulty(blockchainID uuid.UUID, amountTrx uint) (*uint8, error) {
-	blockchain, err := app.retrieveBlockchainFromID(blockchainID)
-	if err != nil {
-		return nil, err
-	}
-
-	return app.difficulty(blockchain, amountTrx)
-}
-
 // Mine mines a block using the queued transaction, with the specified max amount of trx
 func (app *application) Mine(blockchainID uuid.UUID, maxAmountTrx uint) error {
 	blockchain, err := app.retrieveBlockchainFromID(blockchainID)
@@ -291,12 +281,19 @@ func (app *application) Mine(blockchainID uuid.UUID, maxAmountTrx uint) error {
 		remaining = app.trxQueue[maxAmountTrx:]
 	}
 
-	pDifficulty, err := app.difficulty(blockchain, uint(len(trxList)))
+	pDifficulty, err := blockchain.Difficulty(uint(len(trxList)))
 	if err != nil {
 		return err
 	}
 
-	result, err := mine(trxList, *pDifficulty)
+	transactions, err := app.transactionsBuilder.Create().WithList(trxList).Now()
+	if err != nil {
+		return err
+	}
+
+	rules := blockchain.Rules()
+	miningValue := rules.MiningValue()
+	result, err := mine(app.hashAdapter, transactions, *pDifficulty, miningValue)
 	if err != nil {
 		return err
 	}
@@ -304,11 +301,6 @@ func (app *application) Mine(blockchainID uuid.UUID, maxAmountTrx uint) error {
 	parent := blockchain.Root().Hash()
 	if blockchain.HasHead() {
 		parent = blockchain.Head().Hash()
-	}
-
-	transactions, err := app.transactionsBuilder.Create().WithList(trxList).Now()
-	if err != nil {
-		return err
 	}
 
 	content, err := app.contentBuilder.Create().
@@ -536,21 +528,6 @@ func (app *application) retrieveBlockchainFromID(id uuid.UUID) (blockchains.Bloc
 	}
 
 	return ins, nil
-}
-
-func (app *application) difficulty(blockchain blockchains.Blockchain, amountTrx uint) (*uint8, error) {
-	rules := blockchain.Rules()
-	baseDifficulty := uint64(rules.BaseDifficulty())
-	increateDiffPerTrx := rules.IncreaseDifficultyPerTrx()
-	incrAmount := uint64(increateDiffPerTrx * float64(amountTrx))
-	difficulty := baseDifficulty + incrAmount
-	if difficulty > maxDifficulty {
-		str := fmt.Sprintf("the max difficulty amount was expected to at max %d, %d calculated", maxDifficulty, difficulty)
-		return nil, errors.New(str)
-	}
-
-	casted := uint8(difficulty)
-	return &casted, nil
 }
 
 func (app *application) unitsPerOwnerAndBlockchainKeyname(owner hash.Hash, blockchain uuid.UUID) string {

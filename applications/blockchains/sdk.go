@@ -18,7 +18,6 @@ import (
 )
 
 const noAuthIdentityErr = "there is currently no authenticated identity"
-const maxDifficulty = 64
 
 // NewBuilder creates a new builder
 func NewBuilder(
@@ -108,9 +107,6 @@ type Application interface {
 
 	// TrxQueue returns the transactions ready to be put in a block
 	TrxQueue() (transactions.Transactions, error)
-
-	// Difficulty speculates the difficulty based on the amount of trx
-	Difficulty(blockchainID uuid.UUID, amountTrx uint) (*uint8, error)
 
 	// Mine mines a block using the queued transaction, with the specified max amount of trx
 	Mine(blockchain uuid.UUID, maxAmountTrx uint) error
