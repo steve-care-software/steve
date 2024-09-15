@@ -1,6 +1,8 @@
 package blocks
 
-import "github.com/steve-care-software/steve/domain/blockchains/blocks/contents"
+import (
+	"github.com/steve-care-software/steve/domain/blockchains/blocks/contents"
+)
 
 // NewBlocksForTests creates a new blocks for tests
 func NewBlocksForTests(list []Block) Blocks {

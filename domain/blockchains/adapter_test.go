@@ -22,7 +22,14 @@ func TestAdapter_withoutDescription_withoutHead_withRemaining_Success(t *testing
 		return
 	}
 
-	pOwner, err := hash.NewAdapter().FromBytes([]byte("owner"))
+	hashAdapter := hash.NewAdapter()
+	pOwner, err := hashAdapter.FromBytes([]byte("owner"))
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	pCommit, err := hashAdapter.FromBytes([]byte("commit"))
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
@@ -33,7 +40,7 @@ func TestAdapter_withoutDescription_withoutHead_withRemaining_Success(t *testing
 		"myBlockchain",
 		"",
 		rules.NewRulesForTests(0, 2, 0.01),
-		roots.NewRootForTests(456, *pOwner),
+		roots.NewRootForTests(456, *pOwner, *pCommit),
 		time.Now().UTC(),
 	)
 
@@ -76,7 +83,14 @@ func TestAdapter_withDescription_withoutHead_withRemaining_Success(t *testing.T)
 		return
 	}
 
-	pOwner, err := hash.NewAdapter().FromBytes([]byte("owner"))
+	hashAdapter := hash.NewAdapter()
+	pOwner, err := hashAdapter.FromBytes([]byte("owner"))
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	pCommit, err := hashAdapter.FromBytes([]byte("commit"))
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
@@ -87,7 +101,7 @@ func TestAdapter_withDescription_withoutHead_withRemaining_Success(t *testing.T)
 		"myBlockchain",
 		"this is a description",
 		rules.NewRulesForTests(0, 2, 0.01),
-		roots.NewRootForTests(456, *pOwner),
+		roots.NewRootForTests(456, *pOwner, *pCommit),
 		time.Now().UTC(),
 	)
 
@@ -161,12 +175,30 @@ func TestAdapter_withDescription_withHead_withRemaining_Success(t *testing.T) {
 		return
 	}
 
+	pCommit, err := hashAdapter.FromBytes([]byte("commit"))
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	pMiner, err := hashAdapter.FromBytes([]byte("miner hash"))
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	pContentCommmit, err := hashAdapter.FromBytes([]byte("content commit hash"))
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
 	blockchain := NewBlockchainWithHeadForTests(
 		identifier,
 		"myBlockchain",
 		"this is a description",
 		rules.NewRulesForTests(0, 2, 0.01),
-		roots.NewRootForTests(456, *pOwner),
+		roots.NewRootForTests(456, *pOwner, *pCommit),
 		time.Now().UTC(),
 		blocks.NewBlockForTests(
 			contents.NewContentForTests(
@@ -181,6 +213,8 @@ func TestAdapter_withDescription_withHead_withRemaining_Success(t *testing.T) {
 					),
 				}),
 				*pParent,
+				*pMiner,
+				*pContentCommmit,
 			),
 			[]byte("this is some result"),
 		),

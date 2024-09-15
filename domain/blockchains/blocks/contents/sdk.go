@@ -38,6 +38,8 @@ type Builder interface {
 	Create() Builder
 	WithTransactions(trx transactions.Transactions) Builder
 	WithParent(parent hash.Hash) Builder
+	WithMiner(miner hash.Hash) Builder
+	WithCommit(commit hash.Hash) Builder
 	Now() (Content, error)
 }
 
@@ -46,4 +48,6 @@ type Content interface {
 	Hash() hash.Hash
 	Transactions() transactions.Transactions
 	Parent() hash.Hash
+	Miner() hash.Hash
+	Commit() hash.Hash
 }

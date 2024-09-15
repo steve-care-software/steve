@@ -9,17 +9,23 @@ type content struct {
 	hash   hash.Hash
 	trx    transactions.Transactions
 	parent hash.Hash
+	miner  hash.Hash
+	commit hash.Hash
 }
 
 func createContent(
 	hash hash.Hash,
 	trx transactions.Transactions,
 	parent hash.Hash,
+	miner hash.Hash,
+	commit hash.Hash,
 ) Content {
 	out := content{
 		hash:   hash,
 		trx:    trx,
 		parent: parent,
+		miner:  miner,
+		commit: commit,
 	}
 
 	return &out
@@ -38,4 +44,14 @@ func (obj *content) Transactions() transactions.Transactions {
 // Parent returns the parent hash
 func (obj *content) Parent() hash.Hash {
 	return obj.parent
+}
+
+// Miner returns the miner hash
+func (obj *content) Miner() hash.Hash {
+	return obj.miner
+}
+
+// Commit returns the commit hash
+func (obj *content) Commit() hash.Hash {
+	return obj.commit
 }

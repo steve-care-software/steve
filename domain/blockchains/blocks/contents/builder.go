@@ -11,6 +11,8 @@ type builder struct {
 	hashAdapter hash.Adapter
 	trx         transactions.Transactions
 	parent      hash.Hash
+	miner       hash.Hash
+	commit      hash.Hash
 }
 
 func createBuilder(
@@ -20,6 +22,8 @@ func createBuilder(
 		hashAdapter: hashAdapter,
 		trx:         nil,
 		parent:      nil,
+		miner:       nil,
+		commit:      nil,
 	}
 
 	return &out
@@ -44,6 +48,18 @@ func (app *builder) WithParent(parent hash.Hash) Builder {
 	return app
 }
 
+// WithMiner add miner to the builder
+func (app *builder) WithMiner(miner hash.Hash) Builder {
+	app.miner = miner
+	return app
+}
+
+// WithCommit add commit to the builder
+func (app *builder) WithCommit(commit hash.Hash) Builder {
+	app.commit = commit
+	return app
+}
+
 // Now builds a new Content instance
 func (app *builder) Now() (Content, error) {
 	if app.trx == nil {
@@ -54,14 +70,24 @@ func (app *builder) Now() (Content, error) {
 		return nil, errors.New("the parent hash is mandatory in order to build a Content instance")
 	}
 
+	if app.miner == nil {
+		return nil, errors.New("the miner is mandatory in order to build a Content instance")
+	}
+
+	if app.commit == nil {
+		return nil, errors.New("the commit is mandatory in order to build a Content instance")
+	}
+
 	pHash, err := app.hashAdapter.FromMultiBytes([][]byte{
 		app.trx.Hash().Bytes(),
 		app.parent.Bytes(),
+		app.miner.Bytes(),
+		app.commit.Bytes(),
 	})
 
 	if err != nil {
 		return nil, err
 	}
 
-	return createContent(*pHash, app.trx, app.parent), nil
+	return createContent(*pHash, app.trx, app.parent, app.miner, app.commit), nil
 }

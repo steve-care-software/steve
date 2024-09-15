@@ -29,6 +29,7 @@ func createAdapter(
 func (app *adapter) ToBytes(ins Root) ([]byte, error) {
 	output := pointers.Uint64ToBytes(ins.Amount())
 	output = append(output, ins.Owner().Bytes()...)
+	output = append(output, ins.Commit().Bytes()...)
 	return output, nil
 }
 
@@ -55,9 +56,21 @@ func (app *adapter) ToInstance(data []byte) (Root, []byte, error) {
 		return nil, nil, err
 	}
 
+	remaining = remaining[hash.Size:]
+	if len(remaining) < hash.Size {
+		str := fmt.Sprintf(dataLengthTooSmallErrPattern, hash.Size, len(remaining))
+		return nil, nil, errors.New(str)
+	}
+
+	pCommit, err := app.hashAdapter.FromBytes(remaining[:hash.Size])
+	if err != nil {
+		return nil, nil, err
+	}
+
 	ins, err := app.builder.Create().
 		WithAmount(*pAmount).
 		WithOwner(*pOwner).
+		WithCommit(*pCommit).
 		Now()
 
 	if err != nil {

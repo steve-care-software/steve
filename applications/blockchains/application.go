@@ -495,7 +495,17 @@ func (app *application) block(blockchain blockchains.Blockchain, block blocks.Bl
 	}
 
 	blockchainKeyname := fmt.Sprintf("%s%s", app.blockchainKeynamePrefix, blockchain.Identifier().String())
-	return app.resourceApp.Save(blockchainKeyname, blockchainBytes)
+	err = app.resourceApp.Save(blockchainKeyname, blockchainBytes)
+	if err != nil {
+		return err
+	}
+
+	return app.transferFees(identifier, block)
+}
+
+func (app *application) transferFees(blockchainID uuid.UUID, block blocks.Block) error {
+	//keyname := app.unitsPerOwnerAndBlockchainKeyname(*pubKeyHash, blockchain)
+	return nil
 }
 
 func (app *application) generateIdentityFromSeedWordsThenEncrypt(name string, password []byte, seedWords []string) ([]byte, error) {

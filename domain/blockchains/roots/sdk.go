@@ -35,6 +35,7 @@ type Builder interface {
 	Create() Builder
 	WithAmount(amount uint64) Builder
 	WithOwner(owner hash.Hash) Builder
+	WithCommit(commit hash.Hash) Builder
 	Now() (Root, error)
 }
 
@@ -43,4 +44,5 @@ type Root interface {
 	Hash() hash.Hash
 	Amount() uint64
 	Owner() hash.Hash
+	Commit() hash.Hash
 }

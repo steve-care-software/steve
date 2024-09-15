@@ -8,17 +8,20 @@ type root struct {
 	hash   hash.Hash
 	amount uint64
 	owner  hash.Hash
+	commit hash.Hash
 }
 
 func createRoot(
 	hash hash.Hash,
 	amount uint64,
 	owner hash.Hash,
+	commit hash.Hash,
 ) Root {
 	out := root{
 		hash:   hash,
 		amount: amount,
 		owner:  owner,
+		commit: commit,
 	}
 
 	return &out
@@ -37,4 +40,9 @@ func (obj *root) Amount() uint64 {
 // Owner returns the owner
 func (obj *root) Owner() hash.Hash {
 	return obj.owner
+}
+
+// Commit returns the commit
+func (obj *root) Commit() hash.Hash {
+	return obj.commit
 }

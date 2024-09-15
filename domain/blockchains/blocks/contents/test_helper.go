@@ -6,8 +6,8 @@ import (
 )
 
 // NewContentForTests creates a new content for tests
-func NewContentForTests(trx transactions.Transactions, parent hash.Hash) Content {
-	ins, err := NewBuilder().Create().WithTransactions(trx).WithParent(parent).Now()
+func NewContentForTests(trx transactions.Transactions, parent hash.Hash, miner hash.Hash, commit hash.Hash) Content {
+	ins, err := NewBuilder().Create().WithTransactions(trx).WithParent(parent).WithMiner(miner).WithCommit(commit).Now()
 	if err != nil {
 		panic(err)
 	}

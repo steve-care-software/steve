@@ -36,7 +36,10 @@ func (app *adapter) ToBytes(ins Content) ([]byte, error) {
 	}
 
 	output := trxBytes
-	return append(output, ins.Parent().Bytes()...), nil
+	output = append(output, ins.Parent().Bytes()...)
+	output = append(output, ins.Miner().Bytes()...)
+	output = append(output, ins.Commit().Bytes()...)
+	return output, nil
 }
 
 // ToInstance converts bytes to instance
@@ -56,14 +59,38 @@ func (app *adapter) ToInstance(data []byte) (Content, []byte, error) {
 		return nil, nil, err
 	}
 
+	remaining := retRemaining[hash.Size:]
+	if len(remaining) < hash.Size {
+		str := fmt.Sprintf(dataLengthTooSmallErrPattern, hash.Size, len(remaining))
+		return nil, nil, errors.New(str)
+	}
+
+	pMiner, err := app.hashAdapter.FromBytes(remaining[:hash.Size])
+	if err != nil {
+		return nil, nil, err
+	}
+
+	remaining = remaining[hash.Size:]
+	if len(remaining) < hash.Size {
+		str := fmt.Sprintf(dataLengthTooSmallErrPattern, hash.Size, len(remaining))
+		return nil, nil, errors.New(str)
+	}
+
+	pCommit, err := app.hashAdapter.FromBytes(remaining[:hash.Size])
+	if err != nil {
+		return nil, nil, err
+	}
+
 	ins, err := app.builder.Create().
 		WithTransactions(retTrx).
 		WithParent(*pHash).
+		WithMiner(*pMiner).
+		WithCommit(*pCommit).
 		Now()
 
 	if err != nil {
 		return nil, nil, err
 	}
 
-	return ins, retRemaining[hash.Size:], nil
+	return ins, remaining[hash.Size:], nil
 }

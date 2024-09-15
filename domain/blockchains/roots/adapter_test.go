@@ -16,7 +16,13 @@ func TestAdapter_Success(t *testing.T) {
 		return
 	}
 
-	root := NewRootForTests(456, *pOwner)
+	pCommit, err := hashAdapter.FromBytes([]byte("owner"))
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	root := NewRootForTests(456, *pOwner, *pCommit)
 
 	adapter := NewAdapter()
 	retBytes, err := adapter.ToBytes(root)
