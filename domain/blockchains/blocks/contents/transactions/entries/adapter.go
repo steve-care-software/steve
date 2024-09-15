@@ -46,7 +46,7 @@ func (app *adapter) ToInstance(data []byte) (Entry, []byte, error) {
 	}
 
 	remaining := data[hash.Size:]
-	if len(data) < hash.Size {
+	if len(remaining) < hash.Size {
 		str := fmt.Sprintf(dataLengthTooSmallErrPattern, hash.Size, len(remaining))
 		return nil, nil, errors.New(str)
 	}

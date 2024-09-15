@@ -14,7 +14,6 @@ import (
 	"github.com/steve-care-software/steve/domain/blockchains/roots"
 	"github.com/steve-care-software/steve/domain/blockchains/rules"
 	"github.com/steve-care-software/steve/domain/hash"
-	"github.com/steve-care-software/steve/domain/uuids"
 )
 
 const noAuthIdentityErr = "there is currently no authenticated identity"
@@ -45,7 +44,6 @@ func NewBuilder(
 	transactionBuilder := transactions.NewTransactionBuilder()
 	entryBuilder := entries.NewBuilder()
 	hashAdapter := hash.NewAdapter()
-	uuidAdapter := uuids.NewAdapter()
 	return createBuilder(
 		cryptographyApp,
 		identityAdapter,
@@ -62,7 +60,6 @@ func NewBuilder(
 		transactionBuilder,
 		entryBuilder,
 		hashAdapter,
-		uuidAdapter,
 		identityNamesList,
 		blockchainListKeyname,
 		identityKeynamePrefix,
@@ -103,7 +100,7 @@ type Application interface {
 	Units(blockchain uuid.UUID) (*uint64, error)
 
 	// Transact creates a new transaction and adds it to our queue list
-	Transact(script []byte, fees uint64, flag hash.Hash) error
+	Transact(script hash.Hash, fees uint64, flag hash.Hash) error
 
 	// TrxQueue returns the transactions ready to be put in a block
 	TrxQueue() (transactions.Transactions, error)

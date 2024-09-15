@@ -1,6 +1,6 @@
 package lists
 
-const remainijngTooSmallPatternErr = "the remaining was expected to contain at least %d bytes in order to convert it to a list"
+const remainingTooSmallPatternErr = "the remaining was expected to contain at least %d bytes in order to convert it to a list"
 
 // NewAdapter creates a new adapter
 func NewAdapter() Adapter {

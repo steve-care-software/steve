@@ -10,7 +10,6 @@ import (
 	"github.com/steve-care-software/steve/domain/blockchains/roots"
 	"github.com/steve-care-software/steve/domain/blockchains/rules"
 	"github.com/steve-care-software/steve/domain/stores/headers/activities/commits/modifications/resources/pointers"
-	"github.com/steve-care-software/steve/domain/uuids"
 )
 
 type adapter struct {
@@ -83,17 +82,17 @@ func (app *adapter) ToBytes(ins Blockchain) ([]byte, error) {
 
 // ToInstance convert bytes to blockchain
 func (app *adapter) ToInstance(data []byte) (Blockchain, []byte, error) {
-	if len(data) < uuids.UUIDSize {
-		str := fmt.Sprintf(dataLengthTooSmallErrPattern, uuids.UUIDSize, len(data))
+	if len(data) < uuidSize {
+		str := fmt.Sprintf(dataLengthTooSmallErrPattern, uuidSize, len(data))
 		return nil, nil, errors.New(str)
 	}
 
-	identidier, err := uuid.FromBytes(data[:uuids.UUIDSize])
+	identidier, err := uuid.FromBytes(data[:uuidSize])
 	if err != nil {
 		return nil, nil, err
 	}
 
-	remaining := data[uuids.UUIDSize:]
+	remaining := data[uuidSize:]
 	if len(remaining) < pointers.Uint64Size {
 		str := fmt.Sprintf(dataLengthTooSmallErrPattern, pointers.Uint64Size, len(remaining))
 		return nil, nil, errors.New(str)

@@ -247,19 +247,24 @@ func TestApplication_Success(t *testing.T) {
 	}
 
 	if len(retBlockchainIds) != 1 {
-		t.Errorf("%d bockchains were expected, %d returned", len(retBlockchainIds), 1)
+		t.Errorf("%d bockchains were expected, %d returned", 1, len(retBlockchainIds))
 		return
 	}
 
 	fees := 200
-	script := []byte("this is some script")
+	pScript, err := hash.NewAdapter().FromBytes([]byte("this is some script"))
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
 	pFlag, err := hash.NewAdapter().FromBytes([]byte("this is some flag"))
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
 	}
 
-	err = application.Transact(script, uint64(fees), *pFlag)
+	err = application.Transact(*pScript, uint64(fees), *pFlag)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
@@ -277,4 +282,35 @@ func TestApplication_Success(t *testing.T) {
 		return
 	}
 
+	// mine:
+	err = application.Mine(blockchainID, 2)
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	err = resourceApp.Commit()
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	err = resourceApp.Init("my_database.db")
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	// queue:
+	blockQueue, err := application.BlocksQueue()
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	blockQueueList := blockQueue.List()
+	if len(blockQueueList) != 1 {
+		t.Errorf("%d blocks were expected to be in the queue, %d returned", 1, len(blockQueueList))
+		return
+	}
 }

@@ -31,3 +31,28 @@ func TestAdapter_Success(t *testing.T) {
 	}
 
 }
+
+func TestAdapter_withOneElement_Success(t *testing.T) {
+	list := [][]byte{
+		[]byte("this is first"),
+	}
+
+	adapter := NewAdapter()
+	retBytes, err := adapter.ToBytes(list)
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	retList, err := adapter.ToInstance(retBytes)
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	if !reflect.DeepEqual(list, retList) {
+		t.Errorf("the returned list is invalid")
+		return
+	}
+
+}

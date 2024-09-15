@@ -15,7 +15,6 @@ import (
 	"github.com/steve-care-software/steve/domain/blockchains/roots"
 	"github.com/steve-care-software/steve/domain/blockchains/rules"
 	"github.com/steve-care-software/steve/domain/hash"
-	"github.com/steve-care-software/steve/domain/uuids"
 )
 
 type builder struct {
@@ -36,7 +35,6 @@ type builder struct {
 	transactionBuilder         transactions.TransactionBuilder
 	entryBuilder               entries.Builder
 	hashAdapter                hash.Adapter
-	uuidAdapter                uuids.Adapter
 	identityNamesList          string
 	blockchainListKeyname      string
 	identityKeynamePrefix      string
@@ -63,7 +61,6 @@ func createBuilder(
 	transactionBuilder transactions.TransactionBuilder,
 	entryBuilder entries.Builder,
 	hashAdapter hash.Adapter,
-	uuidAdapter uuids.Adapter,
 	identityNamesList string,
 	blockchainListKeyname string,
 	identityKeynamePrefix string,
@@ -91,7 +88,6 @@ func createBuilder(
 		transactionBuilder:         transactionBuilder,
 		entryBuilder:               entryBuilder,
 		hashAdapter:                hashAdapter,
-		uuidAdapter:                uuidAdapter,
 		identityNamesList:          identityNamesList,
 		blockchainListKeyname:      blockchainListKeyname,
 		identityKeynamePrefix:      identityKeynamePrefix,
@@ -123,7 +119,6 @@ func (app *builder) Create() Builder {
 		app.transactionBuilder,
 		app.entryBuilder,
 		app.hashAdapter,
-		app.uuidAdapter,
 		app.identityNamesList,
 		app.blockchainListKeyname,
 		app.identityKeynamePrefix,
@@ -175,7 +170,6 @@ func (app *builder) Now() (Application, error) {
 		app.transactionBuilder,
 		app.entryBuilder,
 		app.hashAdapter,
-		app.uuidAdapter,
 		app.identityNamesList,
 		app.blockchainListKeyname,
 		app.identityKeynamePrefix,

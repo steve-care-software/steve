@@ -21,7 +21,6 @@ import (
 	"github.com/steve-care-software/steve/domain/blockchains/rules"
 	"github.com/steve-care-software/steve/domain/hash"
 	"github.com/steve-care-software/steve/domain/stores/headers/activities/commits/modifications/resources/pointers"
-	"github.com/steve-care-software/steve/domain/uuids"
 )
 
 type application struct {
@@ -42,7 +41,6 @@ type application struct {
 	transactionBuilder           transactions.TransactionBuilder
 	entryBuilder                 entries.Builder
 	hashAdapter                  hash.Adapter
-	uuidAdapter                  uuids.Adapter
 	identityNamesList            string
 	blockchainListKeyname        string
 	identityKeynamePrefix        string
@@ -73,7 +71,6 @@ func createApplication(
 	transactionBuilder transactions.TransactionBuilder,
 	entryBuilder entries.Builder,
 	hashAdapter hash.Adapter,
-	uuidAdapter uuids.Adapter,
 	identityNamesList string,
 	blockchainListKeyname string,
 	identityKeynamePrefix string,
@@ -101,7 +98,6 @@ func createApplication(
 		transactionBuilder:           transactionBuilder,
 		entryBuilder:                 entryBuilder,
 		hashAdapter:                  hashAdapter,
-		uuidAdapter:                  uuidAdapter,
 		identityNamesList:            identityNamesList,
 		blockchainListKeyname:        blockchainListKeyname,
 		identityKeynamePrefix:        identityKeynamePrefix,
@@ -225,7 +221,7 @@ func (app *application) Units(blockchain uuid.UUID) (*uint64, error) {
 }
 
 // Transact creates a new transaction and adds it to our queue list
-func (app *application) Transact(script []byte, fees uint64, flag hash.Hash) error {
+func (app *application) Transact(script hash.Hash, fees uint64, flag hash.Hash) error {
 	if app.currentAuthenticatedIdentity == nil {
 		return errors.New(noAuthIdentityErr)
 	}
@@ -286,14 +282,14 @@ func (app *application) Mine(blockchainID uuid.UUID, maxAmountTrx uint) error {
 		return err
 	}
 
-	transactions, err := app.transactionsBuilder.Create().WithList(trxList).Now()
+	trx, err := app.transactionsBuilder.Create().WithList(trxList).Now()
 	if err != nil {
 		return err
 	}
 
 	rules := blockchain.Rules()
 	miningValue := rules.MiningValue()
-	result, err := mine(app.hashAdapter, transactions, *pDifficulty, miningValue)
+	result, err := mine(app.hashAdapter, trx, *pDifficulty, miningValue)
 	if err != nil {
 		return err
 	}
@@ -305,7 +301,7 @@ func (app *application) Mine(blockchainID uuid.UUID, maxAmountTrx uint) error {
 
 	content, err := app.contentBuilder.Create().
 		WithParent(parent).
-		WithTransactions(transactions).
+		WithTransactions(trx).
 		Now()
 
 	if err != nil {
@@ -338,44 +334,31 @@ func (app *application) Block(blockchain uuid.UUID, block blocks.Block) error {
 		return err
 	}
 
-	retQueueBytes, err := app.resourceApp.Retrieve(app.blockQueueKeyname)
-	if err != nil {
-		return err
-	}
-
-	retQueue, _, err := app.blocksAdapter.BytesToInstances(retQueueBytes)
-	if err != nil {
-		return err
-	}
-
-	queueList := retQueue.List()
-	queueList = append(queueList, block)
-	blocks, err := app.blocksBuilder.Create().WithList(queueList).Now()
-	if err != nil {
-		return err
-	}
-
-	retBlocksBytes, err := app.blocksAdapter.InstancesToBytes(blocks)
-	if err != nil {
-		return err
-	}
-
-	return app.resourceApp.Insert(app.blockQueueKeyname, retBlocksBytes)
+	return app.storeListApp.Append(app.blockQueueKeyname, [][]byte{
+		retBytes,
+	})
 }
 
 // BlocksQueue returns the mined blocks
 func (app *application) BlocksQueue() (blocks.Blocks, error) {
-	retBytes, err := app.resourceApp.Retrieve(app.blockQueueKeyname)
+	retBytes, err := app.storeListApp.RetrieveAll(app.blockQueueKeyname)
 	if err != nil {
 		return nil, err
 	}
 
-	ins, _, err := app.blocksAdapter.BytesToInstances(retBytes)
-	if err != nil {
-		return nil, err
+	blocksList := []blocks.Block{}
+	for _, oneBlockBytes := range retBytes {
+		retBlock, _, err := app.blocksAdapter.BytesToInstance(oneBlockBytes)
+		if err != nil {
+			return nil, err
+		}
+
+		blocksList = append(blocksList, retBlock)
 	}
 
-	return ins, nil
+	return app.blocksBuilder.Create().
+		WithList(blocksList).
+		Now()
 }
 
 // Sync syncs the mined blocks with the network
@@ -467,12 +450,22 @@ func (app *application) Create(
 
 // Blockchains returns the list of blockchains
 func (app *application) Blockchains() ([]uuid.UUID, error) {
-	retBytes, err := app.resourceApp.Retrieve(app.blockchainListKeyname)
+	retBytes, err := app.storeListApp.RetrieveAll(app.blockchainListKeyname)
 	if err != nil {
 		return nil, err
 	}
 
-	return app.uuidAdapter.FromBytes(retBytes)
+	list := []uuid.UUID{}
+	for _, oneUUIDBytes := range retBytes {
+		uuid, err := uuid.FromBytes(oneUUIDBytes)
+		if err != nil {
+			return nil, err
+		}
+
+		list = append(list, uuid)
+	}
+
+	return list, nil
 }
 
 // Blockchain returns the blochain by id

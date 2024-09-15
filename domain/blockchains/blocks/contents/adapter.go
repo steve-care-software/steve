@@ -34,6 +34,7 @@ func (app *adapter) ToBytes(ins Content) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	output := trxBytes
 	return append(output, ins.Parent().Bytes()...), nil
 }
