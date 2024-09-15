@@ -111,6 +111,9 @@ type Application interface {
 	// Mine mines a block using the queued transaction, with the specified max amount of trx
 	Mine(blockchain uuid.UUID, maxAmountTrx uint) error
 
+	// Block adds a block to the queue
+	Block(blockchain uuid.UUID, block blocks.Block) error
+
 	// BlocksQueue returns the mined blocks queue
 	BlocksQueue() (blocks.Blocks, error)
 

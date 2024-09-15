@@ -321,6 +321,12 @@ func (app *application) Mine(blockchainID uuid.UUID, maxAmountTrx uint) error {
 		return err
 	}
 
+	app.trxQueue = remaining
+	return app.Block(blockchainID, block)
+}
+
+// Block adds a block to the queue
+func (app *application) Block(blockchain uuid.UUID, block blocks.Block) error {
 	retBytes, err := app.blocksAdapter.InstanceToBytes(block)
 	if err != nil {
 		return err
@@ -354,7 +360,6 @@ func (app *application) Mine(blockchainID uuid.UUID, maxAmountTrx uint) error {
 		return err
 	}
 
-	app.trxQueue = remaining
 	return app.resourceApp.Insert(app.blockQueueKeyname, retBlocksBytes)
 }
 
