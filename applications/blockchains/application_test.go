@@ -56,7 +56,6 @@ func TestApplication_Success(t *testing.T) {
 		"blockchain:by_uuid:",
 		"script:by_hash:",
 		"block:by_hash:",
-		"block_queues",
 	).Create().WithResource(resourceApp).WithList(listApp).Now()
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
@@ -301,16 +300,15 @@ func TestApplication_Success(t *testing.T) {
 		return
 	}
 
-	// queue:
-	blockQueue, err := application.BlocksQueue()
+	// retrieve blockchain:
+	retBlockchainAfterMine, err := application.Blockchain(blockchainID)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
 	}
 
-	blockQueueList := blockQueue.List()
-	if len(blockQueueList) != 1 {
-		t.Errorf("%d blocks were expected to be in the queue, %d returned", 1, len(blockQueueList))
+	if !retBlockchainAfterMine.HasHead() {
+		t.Errorf("the blockchain was expected to contain an head")
 		return
 	}
 }

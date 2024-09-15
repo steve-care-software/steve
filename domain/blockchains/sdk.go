@@ -9,7 +9,7 @@ import (
 	"github.com/steve-care-software/steve/domain/blockchains/rules"
 )
 
-const dataLengthTooSmallErrPattern = "the data length was expected to be at least %d bytes, %d returned"
+const dataLengthTooSmallErrPattern = "(blockchain) the data length was expected to be at least %d bytes, %d returned"
 const uuidSize = 16
 
 // NewAdapter creates a new adapter

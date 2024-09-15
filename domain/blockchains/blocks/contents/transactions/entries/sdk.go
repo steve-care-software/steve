@@ -2,7 +2,7 @@ package entries
 
 import "github.com/steve-care-software/steve/domain/hash"
 
-const dataLengthTooSmallErrPattern = "the data length was expected to be at least %d bytes, %d returned"
+const dataLengthTooSmallErrPattern = "(entry) the data length was expected to be at least %d bytes, %d returned"
 
 // NewAdapter creates a new adapter
 func NewAdapter() Adapter {

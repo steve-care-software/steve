@@ -48,7 +48,6 @@ type application struct {
 	blockchainKeynamePrefix      string
 	scriptKeynamePrefix          string
 	blockKeynamePrefix           string
-	blockQueueKeyname            string
 	currentAuthenticatedIdentity identities.Identity
 	trxQueue                     []transactions.Transaction
 }
@@ -78,7 +77,6 @@ func createApplication(
 	blockchainKeynamePrefix string,
 	scriptKeynamePrefix string,
 	blockKeynamePrefix string,
-	blockQueueKeyname string,
 ) Application {
 	out := application{
 		storeListApp:                 storeListApp,
@@ -105,7 +103,6 @@ func createApplication(
 		blockchainKeynamePrefix:      blockchainKeynamePrefix,
 		scriptKeynamePrefix:          scriptKeynamePrefix,
 		blockKeynamePrefix:           blockKeynamePrefix,
-		blockQueueKeyname:            blockQueueKeyname,
 		currentAuthenticatedIdentity: nil,
 		trxQueue:                     []transactions.Transaction{},
 	}
@@ -318,47 +315,17 @@ func (app *application) Mine(blockchainID uuid.UUID, maxAmountTrx uint) error {
 	}
 
 	app.trxQueue = remaining
-	return app.Block(blockchainID, block)
+	return app.block(blockchain, block)
 }
 
-// Block adds a block to the queue
-func (app *application) Block(blockchain uuid.UUID, block blocks.Block) error {
-	retBytes, err := app.blocksAdapter.InstanceToBytes(block)
+// Block adds a block as the head of its blockchain
+func (app *application) Block(blockchainID uuid.UUID, block blocks.Block) error {
+	blockchain, err := app.Blockchain(blockchainID)
 	if err != nil {
 		return err
 	}
 
-	keyname := fmt.Sprintf("%s%s", app.blockKeynamePrefix, block.Hash().String())
-	err = app.resourceApp.Insert(keyname, retBytes)
-	if err != nil {
-		return err
-	}
-
-	return app.storeListApp.Append(app.blockQueueKeyname, [][]byte{
-		retBytes,
-	})
-}
-
-// BlocksQueue returns the mined blocks
-func (app *application) BlocksQueue() (blocks.Blocks, error) {
-	retBytes, err := app.storeListApp.RetrieveAll(app.blockQueueKeyname)
-	if err != nil {
-		return nil, err
-	}
-
-	blocksList := []blocks.Block{}
-	for _, oneBlockBytes := range retBytes {
-		retBlock, _, err := app.blocksAdapter.BytesToInstance(oneBlockBytes)
-		if err != nil {
-			return nil, err
-		}
-
-		blocksList = append(blocksList, retBlock)
-	}
-
-	return app.blocksBuilder.Create().
-		WithList(blocksList).
-		Now()
+	return app.block(blockchain, block)
 }
 
 // Sync syncs the mined blocks with the network
@@ -488,6 +455,47 @@ func (app *application) Blockchain(identifier uuid.UUID) (blockchains.Blockchain
 func (app *application) Script(hash hash.Hash) ([]byte, error) {
 	keyname := fmt.Sprintf("%s%s", app.scriptKeynamePrefix, hash.String())
 	return app.resourceApp.Retrieve(keyname)
+}
+
+func (app *application) block(blockchain blockchains.Blockchain, block blocks.Block) error {
+	retBytes, err := app.blocksAdapter.InstanceToBytes(block)
+	if err != nil {
+		return err
+	}
+
+	keyname := fmt.Sprintf("%s%s", app.blockKeynamePrefix, block.Hash().String())
+	err = app.resourceApp.Insert(keyname, retBytes)
+	if err != nil {
+		return err
+	}
+
+	identifier := blockchain.Identifier()
+	name := blockchain.Name()
+	description := blockchain.Description()
+	rules := blockchain.Rules()
+	root := blockchain.Root()
+	createdOn := blockchain.CreatedOn()
+	updated, err := app.blockchainBuilder.Create().
+		WithIdentifier(identifier).
+		WithName(name).
+		WithDescription(description).
+		WithRules(rules).
+		WithRoot(root).
+		WithHead(block).
+		CreatedOn(createdOn).
+		Now()
+
+	if err != nil {
+		return err
+	}
+
+	blockchainBytes, err := app.blockchainAdapter.ToBytes(updated)
+	if err != nil {
+		return err
+	}
+
+	blockchainKeyname := fmt.Sprintf("%s%s", app.blockchainKeynamePrefix, blockchain.Identifier().String())
+	return app.resourceApp.Save(blockchainKeyname, blockchainBytes)
 }
 
 func (app *application) generateIdentityFromSeedWordsThenEncrypt(name string, password []byte, seedWords []string) ([]byte, error) {

@@ -27,7 +27,6 @@ func NewBuilder(
 	blockchainKeynamePrefix string,
 	scriptKeynamePrefix string,
 	blockKeynamePrefix string,
-	blockQueueKeyname string,
 ) Builder {
 	cryptographyApp := cryptography.NewApplication()
 	identityAdapter := identities.NewAdapter()
@@ -67,7 +66,6 @@ func NewBuilder(
 		blockchainKeynamePrefix,
 		scriptKeynamePrefix,
 		blockKeynamePrefix,
-		blockQueueKeyname,
 	)
 }
 
@@ -110,9 +108,6 @@ type Application interface {
 
 	// Block adds a block to the queue
 	Block(blockchain uuid.UUID, block blocks.Block) error
-
-	// BlocksQueue returns the mined blocks queue
-	BlocksQueue() (blocks.Blocks, error)
 
 	// Sync syncs the mined blocks with the network
 	Sync(blockHash hash.Hash) error

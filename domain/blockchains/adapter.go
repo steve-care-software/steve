@@ -98,7 +98,8 @@ func (app *adapter) ToInstance(data []byte) (Blockchain, []byte, error) {
 		return nil, nil, errors.New(str)
 	}
 
-	pNameLength, err := pointers.BytesToUint64(remaining[:pointers.Uint64Size])
+	nameBytesLength := data[uuidSize : uuidSize+pointers.Uint64Size]
+	pNameLength, err := pointers.BytesToUint64(nameBytesLength)
 	if err != nil {
 		return nil, nil, err
 	}

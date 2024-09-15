@@ -18,7 +18,6 @@ func createAdapter() Adapter {
 // ToBytes converts list to bytes
 func (app *adapter) ToBytes(list [][]byte) ([]byte, error) {
 	lengthBytes := pointers.Uint64ToBytes(uint64(len(list)))
-
 	output := lengthBytes
 	for i := 0; i < len(list); i++ {
 		amount := uint64(len(list[i]))
@@ -46,12 +45,6 @@ func (app *adapter) ToInstance(data []byte) ([][]byte, error) {
 	remaining := data[pointers.Uint64Size:]
 	casted := int(*pLength)
 	for i := 0; i < casted; i++ {
-
-		length := len(remaining)
-		if length <= 0 {
-			break
-		}
-
 		if len(remaining) < pointers.Uint64Size {
 			str := fmt.Sprintf(remainingTooSmallPatternErr, pointers.Uint64Size)
 			return nil, errors.New(str)
