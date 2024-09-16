@@ -2,6 +2,8 @@ package blocks
 
 import (
 	"bytes"
+	"crypto/ed25519"
+	"crypto/rand"
 	"reflect"
 	"testing"
 
@@ -49,16 +51,38 @@ func TestAdapter_single_withRemaining_Success(t *testing.T) {
 		return
 	}
 
+	pubKey, pk, err := ed25519.GenerateKey(rand.Reader)
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	firstEntry := entries.NewEntryForTests(*pFlag, *pScript, 22)
+	firstSignature := ed25519.Sign(pk, firstEntry.Hash().Bytes())
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	secondEntry := entries.NewEntryForTests(*pFlag, *pOtherScript, 34)
+	secondSignature := ed25519.Sign(pk, secondEntry.Hash().Bytes())
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
 	block := NewBlockForTests(
 		contents.NewContentForTests(
 			transactions.NewTransactionsForTests([]transactions.Transaction{
 				transactions.NewTransactionForTests(
-					entries.NewEntryForTests(*pFlag, *pScript, 22),
-					[]byte("lets say this is a signature"),
+					firstEntry,
+					firstSignature,
+					pubKey,
 				),
 				transactions.NewTransactionForTests(
-					entries.NewEntryForTests(*pFlag, *pOtherScript, 34),
-					[]byte("lets say this is a signature"),
+					secondEntry,
+					secondSignature,
+					pubKey,
 				),
 			}),
 			*pParent,
@@ -131,17 +155,39 @@ func TestAdapter_multiple_withRemaining_Success(t *testing.T) {
 		return
 	}
 
+	pubKey, pk, err := ed25519.GenerateKey(rand.Reader)
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	firstEntry := entries.NewEntryForTests(*pFlag, *pScript, 22)
+	firstSignature := ed25519.Sign(pk, firstEntry.Hash().Bytes())
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	secondEntry := entries.NewEntryForTests(*pFlag, *pOtherScript, 34)
+	secondSignature := ed25519.Sign(pk, secondEntry.Hash().Bytes())
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
 	blocks := NewBlocksForTests([]Block{
 		NewBlockForTests(
 			contents.NewContentForTests(
 				transactions.NewTransactionsForTests([]transactions.Transaction{
 					transactions.NewTransactionForTests(
-						entries.NewEntryForTests(*pFlag, *pScript, 22),
-						[]byte("lets say this is a signature"),
+						firstEntry,
+						firstSignature,
+						pubKey,
 					),
 					transactions.NewTransactionForTests(
-						entries.NewEntryForTests(*pFlag, *pOtherScript, 34),
-						[]byte("lets say this is a signature"),
+						secondEntry,
+						secondSignature,
+						pubKey,
 					),
 				}),
 				*pParent,

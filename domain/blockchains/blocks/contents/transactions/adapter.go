@@ -1,6 +1,7 @@
 package transactions
 
 import (
+	"crypto/ed25519"
 	"errors"
 	"fmt"
 
@@ -90,11 +91,12 @@ func (app *adapter) InstanceToBytes(ins Transaction) ([]byte, error) {
 	}
 
 	signatureBytes := ins.Signature()
-	lengthBytes := pointers.Uint64ToBytes(uint64(len(signatureBytes)))
+	pubKeyBytes := ins.PublicKey()
 
 	output := entryBytes
-	output = append(output, lengthBytes...)
-	return append(output, signatureBytes...), nil
+	output = append(output, signatureBytes...)
+	output = append(output, pubKeyBytes...)
+	return output, nil
 }
 
 // BytesToInstance converts bytes to instance
@@ -104,31 +106,28 @@ func (app *adapter) BytesToInstance(data []byte) (Transaction, []byte, error) {
 		return nil, nil, err
 	}
 
-	if len(retRemaining) < pointers.Uint64Size {
-		str := fmt.Sprintf(dataLengthTooSmallErrPattern, pointers.Uint64Size, len(retRemaining))
+	if len(retRemaining) < ed25519.SignatureSize {
+		str := fmt.Sprintf(dataLengthTooSmallErrPattern, ed25519.SignatureSize, len(retRemaining))
 		return nil, nil, errors.New(str)
 	}
 
-	pLength, err := pointers.BytesToUint64(retRemaining[:pointers.Uint64Size])
-	if err != nil {
-		return nil, nil, err
-	}
-
-	remaining := retRemaining[pointers.Uint64Size:]
-	if uint64(len(remaining)) < *pLength {
-		str := fmt.Sprintf(dataLengthTooSmallErrPattern, *pLength, len(remaining))
+	signatureBytes := retRemaining[:ed25519.SignatureSize]
+	remaining := retRemaining[ed25519.SignatureSize:]
+	if len(remaining) < ed25519.PublicKeySize {
+		str := fmt.Sprintf(dataLengthTooSmallErrPattern, ed25519.PublicKeySize, len(remaining))
 		return nil, nil, errors.New(str)
 	}
 
-	signatureBytes := remaining[:*pLength]
+	pubKey := remaining[:ed25519.PublicKeySize]
 	ins, err := app.transactionBuilder.Create().
 		WithEntry(retEntry).
 		WithSignature(signatureBytes).
+		WithPublicKey(pubKey).
 		Now()
 
 	if err != nil {
 		return nil, nil, err
 	}
 
-	return ins, remaining[*pLength:], nil
+	return ins, remaining[ed25519.PublicKeySize:], nil
 }

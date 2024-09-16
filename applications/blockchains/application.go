@@ -1,7 +1,6 @@
 package blockchains
 
 import (
-	"crypto"
 	"crypto/ed25519"
 	"errors"
 	"fmt"
@@ -234,12 +233,14 @@ func (app *application) Transact(script hash.Hash, fees uint64, flag hash.Hash) 
 	}
 
 	message := entry.Hash().Bytes()
-	signature, err := app.currentAuthenticatedIdentity.PK().Sign(nil, message, crypto.SHA512)
-	if err != nil {
-		return err
-	}
+	pk := app.currentAuthenticatedIdentity.PK()
+	signature := ed25519.Sign(pk, message)
+	publicKey := pk.Public().(ed25519.PublicKey)
+	trx, err := app.transactionBuilder.Create().WithEntry(entry).
+		WithSignature(signature).
+		WithPublicKey(publicKey).
+		Now()
 
-	trx, err := app.transactionBuilder.Create().WithEntry(entry).WithSignature(signature).Now()
 	if err != nil {
 		return err
 	}
@@ -523,11 +524,18 @@ func (app *application) block(blockchain blockchains.Blockchain, block blocks.Bl
 		return err
 	}
 
-	return app.transferFees(identifier, block)
+	return app.transferFees(updated, block)
 }
 
-func (app *application) transferFees(blockchainID uuid.UUID, block blocks.Block) error {
-	//keyname := app.unitsPerOwnerAndBlockchainKeyname(*pubKeyHash, blockchain)
+func (app *application) transferFees(blockchain blockchains.Blockchain, block blocks.Block) error {
+	/*content := block.Content()
+	miner := content.Miner()
+	transactionsList := content.Transactions().List()
+	for _, oneTrx := range transactionsList {
+
+	}
+
+	keyname := app.unitsPerOwnerAndBlockchainKeyname(miner, blockchain.Identifier())*/
 	return nil
 }
 

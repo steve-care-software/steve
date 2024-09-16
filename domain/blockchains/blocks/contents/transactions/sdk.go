@@ -1,6 +1,8 @@
 package transactions
 
 import (
+	"crypto/ed25519"
+
 	"github.com/steve-care-software/steve/domain/blockchains/blocks/contents/transactions/entries"
 	"github.com/steve-care-software/steve/domain/hash"
 )
@@ -61,6 +63,7 @@ type TransactionBuilder interface {
 	Create() TransactionBuilder
 	WithEntry(entry entries.Entry) TransactionBuilder
 	WithSignature(signature []byte) TransactionBuilder
+	WithPublicKey(pubKey ed25519.PublicKey) TransactionBuilder
 	Now() (Transaction, error)
 }
 
@@ -69,4 +72,5 @@ type Transaction interface {
 	Hash() hash.Hash
 	Entry() entries.Entry
 	Signature() []byte
+	PublicKey() ed25519.PublicKey
 }

@@ -2,6 +2,8 @@ package transactions
 
 import (
 	"bytes"
+	"crypto/ed25519"
+	"crypto/rand"
 	"reflect"
 	"testing"
 
@@ -23,9 +25,18 @@ func TestAdapter_single_Success(t *testing.T) {
 		return
 	}
 
+	pubKey, pk, err := ed25519.GenerateKey(rand.Reader)
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	entry := entries.NewEntryForTests(*pFlag, *pScript, 34)
+	signature := ed25519.Sign(pk, entry.Hash().Bytes())
 	trx := NewTransactionForTests(
-		entries.NewEntryForTests(*pFlag, *pScript, 34),
-		[]byte("lets say this is a signature"),
+		entry,
+		signature,
+		pubKey,
 	)
 
 	adapter := NewAdapter()
@@ -72,14 +83,36 @@ func TestAdapter_multiple_withRemaining_Success(t *testing.T) {
 		return
 	}
 
+	pubKey, pk, err := ed25519.GenerateKey(rand.Reader)
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	firstEntry := entries.NewEntryForTests(*pFlag, *pScript, 22)
+	firstSignature := ed25519.Sign(pk, firstEntry.Hash().Bytes())
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	secondEntry := entries.NewEntryForTests(*pFlag, *pOtherScript, 34)
+	secondSignature := ed25519.Sign(pk, secondEntry.Hash().Bytes())
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
 	trx := NewTransactionsForTests([]Transaction{
 		NewTransactionForTests(
-			entries.NewEntryForTests(*pFlag, *pScript, 22),
-			[]byte("lets say this is a signature"),
+			firstEntry,
+			firstSignature,
+			pubKey,
 		),
 		NewTransactionForTests(
-			entries.NewEntryForTests(*pFlag, *pOtherScript, 34),
-			[]byte("lets say this is a signature"),
+			secondEntry,
+			secondSignature,
+			pubKey,
 		),
 	})
 

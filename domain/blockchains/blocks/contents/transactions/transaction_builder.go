@@ -1,6 +1,7 @@
 package transactions
 
 import (
+	"crypto/ed25519"
 	"errors"
 
 	"github.com/steve-care-software/steve/domain/blockchains/blocks/contents/transactions/entries"
@@ -11,6 +12,7 @@ type transactionBuilder struct {
 	hashAdapter hash.Adapter
 	entry       entries.Entry
 	signature   []byte
+	pubKey      ed25519.PublicKey
 }
 
 func createTransactionBuilder(
@@ -20,6 +22,7 @@ func createTransactionBuilder(
 		hashAdapter: hashAdapter,
 		entry:       nil,
 		signature:   nil,
+		pubKey:      nil,
 	}
 
 	return &out
@@ -44,6 +47,12 @@ func (app *transactionBuilder) WithSignature(signature []byte) TransactionBuilde
 	return app
 }
 
+// WithPublicKey adds a public key to the builder
+func (app *transactionBuilder) WithPublicKey(pubKey ed25519.PublicKey) TransactionBuilder {
+	app.pubKey = pubKey
+	return app
+}
+
 // Now builds a new transaction instance
 func (app *transactionBuilder) Now() (Transaction, error) {
 	if app.entry == nil {
@@ -58,9 +67,18 @@ func (app *transactionBuilder) Now() (Transaction, error) {
 		return nil, errors.New("the signature is mandatory in order to build a Transaction instance")
 	}
 
+	if app.pubKey == nil {
+		return nil, errors.New("the public key is mandatory in order to build a Transaction instance")
+	}
+
+	if !ed25519.Verify(app.pubKey, app.entry.Hash().Bytes(), app.signature) {
+		return nil, errors.New("the signature is invalid")
+	}
+
 	pHash, err := app.hashAdapter.FromMultiBytes([][]byte{
 		app.entry.Hash().Bytes(),
 		app.signature,
+		app.pubKey,
 	})
 
 	if err != nil {
@@ -71,5 +89,6 @@ func (app *transactionBuilder) Now() (Transaction, error) {
 		*pHash,
 		app.entry,
 		app.signature,
+		app.pubKey,
 	), nil
 }

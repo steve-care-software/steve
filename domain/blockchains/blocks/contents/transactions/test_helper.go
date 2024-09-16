@@ -1,6 +1,10 @@
 package transactions
 
-import "github.com/steve-care-software/steve/domain/blockchains/blocks/contents/transactions/entries"
+import (
+	"crypto/ed25519"
+
+	"github.com/steve-care-software/steve/domain/blockchains/blocks/contents/transactions/entries"
+)
 
 // NewTransactionsForTests creates a new transactions for tests
 func NewTransactionsForTests(list []Transaction) Transactions {
@@ -13,10 +17,11 @@ func NewTransactionsForTests(list []Transaction) Transactions {
 }
 
 // NewTransactionForTests creates a new transaction for tests
-func NewTransactionForTests(entry entries.Entry, signature []byte) Transaction {
+func NewTransactionForTests(entry entries.Entry, signature []byte, pubKey ed25519.PublicKey) Transaction {
 	ins, err := NewTransactionBuilder().Create().
 		WithEntry(entry).
 		WithSignature(signature).
+		WithPublicKey(pubKey).
 		Now()
 
 	if err != nil {

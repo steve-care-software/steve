@@ -1,6 +1,8 @@
 package transactions
 
 import (
+	"crypto/ed25519"
+
 	"github.com/steve-care-software/steve/domain/blockchains/blocks/contents/transactions/entries"
 	"github.com/steve-care-software/steve/domain/hash"
 )
@@ -9,17 +11,20 @@ type transaction struct {
 	hash      hash.Hash
 	entry     entries.Entry
 	signature []byte
+	publicKey ed25519.PublicKey
 }
 
 func createTransaction(
 	hash hash.Hash,
 	entry entries.Entry,
 	signature []byte,
+	publicKey ed25519.PublicKey,
 ) Transaction {
 	out := transaction{
 		hash:      hash,
 		entry:     entry,
 		signature: signature,
+		publicKey: publicKey,
 	}
 
 	return &out
@@ -38,4 +43,9 @@ func (obj *transaction) Entry() entries.Entry {
 // Signature returns the signature
 func (obj *transaction) Signature() []byte {
 	return obj.signature
+}
+
+// PublicKey returns the public key
+func (obj *transaction) PublicKey() ed25519.PublicKey {
+	return obj.publicKey
 }
