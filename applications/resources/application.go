@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/steve-care-software/steve/domain/hash"
 	"github.com/steve-care-software/steve/domain/stores/contents"
 	"github.com/steve-care-software/steve/domain/stores/headers"
 	"github.com/steve-care-software/steve/domain/stores/headers/activities"
@@ -389,7 +390,7 @@ func (app *application) Rollback(amount uint) error {
 		return err
 	}
 
-	keepOnlyRoot := false
+	currentHeadCommitHash := currentHeadCommit.Hash()
 	castedAmount := int(amount)
 	for i := 0; i < castedAmount; i++ {
 		isLast := (i + 1) == castedAmount
@@ -400,17 +401,31 @@ func (app *application) Rollback(amount uint) error {
 				return err
 			}
 
-			keepOnlyRoot = true
+			currentHeadCommitHash = app.header.Root().Hash()
 			break
 		}
 
-		currentHeadCommit = retCommit
+		currentHeadCommitHash = retCommit.Hash()
+	}
+
+	return app.RollbackTo(currentHeadCommitHash)
+}
+
+// RollbackTo rollbacks to the provided commit hash
+func (app *application) RollbackTo(head hash.Hash) error {
+	if app.header == nil {
+		return errors.New("there is no header, which means that the database cannot be rollbacked (not enough past commits) or it has never been initialized")
+	}
+
+	if !app.header.HasActivity() {
+		return errors.New("there is no activity, which means that the database cannot be rollbacked (not enough past commits)")
 	}
 
 	root := app.header.Root()
+	activity := app.header.Activity()
+	commits := activity.Commits()
 	builder := app.headerBuilder.Create().WithRoot(root)
-	if !keepOnlyRoot {
-		head := currentHeadCommit.Hash()
+	if !root.Hash().Compare(head) {
 		activity, err := app.activityBuilder.Create().
 			WithHead(head).
 			WithCommits(commits).

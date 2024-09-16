@@ -1,6 +1,7 @@
 package resources
 
 import (
+	"github.com/steve-care-software/steve/domain/hash"
 	"github.com/steve-care-software/steve/domain/stores/contents"
 	"github.com/steve-care-software/steve/domain/stores/headers"
 	"github.com/steve-care-software/steve/domain/stores/headers/activities"
@@ -60,4 +61,5 @@ type Application interface {
 	Commit() error
 	Cancel() error
 	Rollback(amount uint) error
+	RollbackTo(commit hash.Hash) error
 }
