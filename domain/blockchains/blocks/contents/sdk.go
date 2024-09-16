@@ -1,6 +1,8 @@
 package contents
 
 import (
+	"crypto/ed25519"
+
 	"github.com/steve-care-software/steve/domain/blockchains/blocks/contents/transactions"
 	"github.com/steve-care-software/steve/domain/hash"
 )
@@ -38,7 +40,7 @@ type Builder interface {
 	Create() Builder
 	WithTransactions(trx transactions.Transactions) Builder
 	WithParent(parent hash.Hash) Builder
-	WithMiner(miner hash.Hash) Builder
+	WithMiner(miner ed25519.PublicKey) Builder
 	WithCommit(commit hash.Hash) Builder
 	Now() (Content, error)
 }
@@ -48,6 +50,6 @@ type Content interface {
 	Hash() hash.Hash
 	Transactions() transactions.Transactions
 	Parent() hash.Hash
-	Miner() hash.Hash
+	Miner() ed25519.PublicKey
 	Commit() hash.Hash
 }

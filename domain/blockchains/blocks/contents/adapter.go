@@ -1,6 +1,7 @@
 package contents
 
 import (
+	"crypto/ed25519"
 	"errors"
 	"fmt"
 
@@ -37,7 +38,7 @@ func (app *adapter) ToBytes(ins Content) ([]byte, error) {
 
 	output := trxBytes
 	output = append(output, ins.Parent().Bytes()...)
-	output = append(output, ins.Miner().Bytes()...)
+	output = append(output, ins.Miner()...)
 	output = append(output, ins.Commit().Bytes()...)
 	return output, nil
 }
@@ -65,12 +66,8 @@ func (app *adapter) ToInstance(data []byte) (Content, []byte, error) {
 		return nil, nil, errors.New(str)
 	}
 
-	pMiner, err := app.hashAdapter.FromBytes(remaining[:hash.Size])
-	if err != nil {
-		return nil, nil, err
-	}
-
-	remaining = remaining[hash.Size:]
+	miner := remaining[:ed25519.PublicKeySize]
+	remaining = remaining[ed25519.PublicKeySize:]
 	if len(remaining) < hash.Size {
 		str := fmt.Sprintf(dataLengthTooSmallErrPattern, hash.Size, len(remaining))
 		return nil, nil, errors.New(str)
@@ -84,7 +81,7 @@ func (app *adapter) ToInstance(data []byte) (Content, []byte, error) {
 	ins, err := app.builder.Create().
 		WithTransactions(retTrx).
 		WithParent(*pHash).
-		WithMiner(*pMiner).
+		WithMiner(miner).
 		WithCommit(*pCommit).
 		Now()
 

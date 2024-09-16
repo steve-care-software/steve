@@ -183,12 +183,6 @@ func TestAdapter_withDescription_withHead_withRemaining_Success(t *testing.T) {
 		return
 	}
 
-	pMiner, err := hashAdapter.FromBytes([]byte("miner hash"))
-	if err != nil {
-		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
-		return
-	}
-
 	pContentCommmit, err := hashAdapter.FromBytes([]byte("content commit hash"))
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
@@ -237,7 +231,7 @@ func TestAdapter_withDescription_withHead_withRemaining_Success(t *testing.T) {
 					),
 				}),
 				*pParent,
-				*pMiner,
+				pubKey,
 				*pContentCommmit,
 			),
 			[]byte("this is some result"),

@@ -307,15 +307,10 @@ func (app *application) Mine(blockchainID uuid.UUID, maxAmountTrx uint) error {
 	}
 
 	minerPubKey := app.currentAuthenticatedIdentity.PK().Public()
-	pMinerHash, err := app.hashAdapter.FromBytes(minerPubKey.(ed25519.PublicKey))
-	if err != nil {
-		return err
-	}
-
 	content, err := app.contentBuilder.Create().
 		WithParent(parent).
 		WithTransactions(trx).
-		WithMiner(*pMinerHash).
+		WithMiner(minerPubKey.(ed25519.PublicKey)).
 		WithCommit(head.Hash()).
 		Now()
 

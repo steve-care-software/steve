@@ -1,6 +1,7 @@
 package contents
 
 import (
+	"crypto/ed25519"
 	"errors"
 
 	"github.com/steve-care-software/steve/domain/blockchains/blocks/contents/transactions"
@@ -11,7 +12,7 @@ type builder struct {
 	hashAdapter hash.Adapter
 	trx         transactions.Transactions
 	parent      hash.Hash
-	miner       hash.Hash
+	miner       ed25519.PublicKey
 	commit      hash.Hash
 }
 
@@ -49,7 +50,7 @@ func (app *builder) WithParent(parent hash.Hash) Builder {
 }
 
 // WithMiner add miner to the builder
-func (app *builder) WithMiner(miner hash.Hash) Builder {
+func (app *builder) WithMiner(miner ed25519.PublicKey) Builder {
 	app.miner = miner
 	return app
 }
@@ -81,7 +82,7 @@ func (app *builder) Now() (Content, error) {
 	pHash, err := app.hashAdapter.FromMultiBytes([][]byte{
 		app.trx.Hash().Bytes(),
 		app.parent.Bytes(),
-		app.miner.Bytes(),
+		app.miner,
 		app.commit.Bytes(),
 	})
 

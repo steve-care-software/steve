@@ -1,6 +1,8 @@
 package contents
 
 import (
+	"crypto/ed25519"
+
 	"github.com/steve-care-software/steve/domain/blockchains/blocks/contents/transactions"
 	"github.com/steve-care-software/steve/domain/hash"
 )
@@ -9,7 +11,7 @@ type content struct {
 	hash   hash.Hash
 	trx    transactions.Transactions
 	parent hash.Hash
-	miner  hash.Hash
+	miner  ed25519.PublicKey
 	commit hash.Hash
 }
 
@@ -17,7 +19,7 @@ func createContent(
 	hash hash.Hash,
 	trx transactions.Transactions,
 	parent hash.Hash,
-	miner hash.Hash,
+	miner ed25519.PublicKey,
 	commit hash.Hash,
 ) Content {
 	out := content{
@@ -47,7 +49,7 @@ func (obj *content) Parent() hash.Hash {
 }
 
 // Miner returns the miner hash
-func (obj *content) Miner() hash.Hash {
+func (obj *content) Miner() ed25519.PublicKey {
 	return obj.miner
 }
 

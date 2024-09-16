@@ -39,12 +39,6 @@ func TestAdapter_single_withRemaining_Success(t *testing.T) {
 		return
 	}
 
-	pMiner, err := hashAdapter.FromBytes([]byte("miner hash"))
-	if err != nil {
-		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
-		return
-	}
-
 	pCommit, err := hashAdapter.FromBytes([]byte("commit hash"))
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
@@ -86,7 +80,7 @@ func TestAdapter_single_withRemaining_Success(t *testing.T) {
 				),
 			}),
 			*pParent,
-			*pMiner,
+			pubKey,
 			*pCommit,
 		),
 		[]byte("this is some result"),
@@ -143,12 +137,6 @@ func TestAdapter_multiple_withRemaining_Success(t *testing.T) {
 		return
 	}
 
-	pMiner, err := hashAdapter.FromBytes([]byte("miner hash"))
-	if err != nil {
-		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
-		return
-	}
-
 	pCommit, err := hashAdapter.FromBytes([]byte("commit hash"))
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
@@ -191,7 +179,7 @@ func TestAdapter_multiple_withRemaining_Success(t *testing.T) {
 					),
 				}),
 				*pParent,
-				*pMiner,
+				pubKey,
 				*pCommit,
 			),
 			[]byte("this is some result"),
