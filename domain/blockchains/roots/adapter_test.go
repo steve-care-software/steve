@@ -2,6 +2,8 @@ package roots
 
 import (
 	"bytes"
+	"crypto/ed25519"
+	"crypto/rand"
 	"reflect"
 	"testing"
 
@@ -10,19 +12,19 @@ import (
 
 func TestAdapter_Success(t *testing.T) {
 	hashAdapter := hash.NewAdapter()
-	pOwner, err := hashAdapter.FromBytes([]byte("owner"))
-	if err != nil {
-		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
-		return
-	}
-
 	pCommit, err := hashAdapter.FromBytes([]byte("owner"))
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
 	}
 
-	root := NewRootForTests(456, *pOwner, *pCommit)
+	ownerPubKey, _, err := ed25519.GenerateKey(rand.Reader)
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	root := NewRootForTests(456, ownerPubKey, *pCommit)
 
 	adapter := NewAdapter()
 	retBytes, err := adapter.ToBytes(root)

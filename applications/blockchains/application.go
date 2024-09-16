@@ -2,6 +2,7 @@ package blockchains
 
 import (
 	"crypto/ed25519"
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"time"
@@ -197,12 +198,7 @@ func (app *application) Units(blockchain uuid.UUID) (*uint64, error) {
 	}
 
 	pubKey := app.currentAuthenticatedIdentity.PK().Public().(ed25519.PublicKey)
-	pubKeyHash, err := app.hashAdapter.FromBytes(pubKey)
-	if err != nil {
-		return nil, err
-	}
-
-	keyname := app.unitsPerOwnerAndBlockchainKeyname(*pubKeyHash, blockchain)
+	keyname := app.unitsPerOwnerAndBlockchainKeyname(pubKey, blockchain)
 	data, err := app.resourceApp.Retrieve(keyname)
 	if err != nil {
 		return nil, err
@@ -370,20 +366,15 @@ func (app *application) Create(
 		return err
 	}
 
-	pubKey := app.currentAuthenticatedIdentity.PK().Public().(ed25519.PublicKey)
-	pPubKeyHash, err := app.hashAdapter.FromBytes(pubKey)
-	if err != nil {
-		return err
-	}
-
 	head, err := app.resourceApp.Head()
 	if err != nil {
 		return err
 	}
 
+	pubKey := app.currentAuthenticatedIdentity.PK().Public().(ed25519.PublicKey)
 	root, err := app.rootBuilder.Create().
 		WithAmount(unitAmount).
-		WithOwner(*pPubKeyHash).
+		WithOwner(pubKey).
 		WithCommit(head.Hash()).
 		Now()
 
@@ -430,7 +421,7 @@ func (app *application) Create(
 	}
 
 	unitAmountBytes := pointers.Uint64ToBytes(unitAmount)
-	unitsKeyname := app.unitsPerOwnerAndBlockchainKeyname(*pPubKeyHash, identifier)
+	unitsKeyname := app.unitsPerOwnerAndBlockchainKeyname(pubKey, identifier)
 	return app.resourceApp.Insert(unitsKeyname, unitAmountBytes)
 }
 
@@ -572,6 +563,7 @@ func (app *application) retrieveBlockchainFromID(id uuid.UUID) (blockchains.Bloc
 	return ins, nil
 }
 
-func (app *application) unitsPerOwnerAndBlockchainKeyname(owner hash.Hash, blockchain uuid.UUID) string {
-	return fmt.Sprintf("%s%s%s", app.identityUnitsKeynamePrefix, blockchain.String(), owner.String())
+func (app *application) unitsPerOwnerAndBlockchainKeyname(owner ed25519.PublicKey, blockchain uuid.UUID) string {
+	encoded := base64.StdEncoding.EncodeToString(owner)
+	return fmt.Sprintf("%s%s%s", app.identityUnitsKeynamePrefix, blockchain.String(), encoded)
 }

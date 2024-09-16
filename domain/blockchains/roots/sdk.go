@@ -1,6 +1,8 @@
 package roots
 
 import (
+	"crypto/ed25519"
+
 	"github.com/steve-care-software/steve/domain/hash"
 )
 
@@ -34,7 +36,7 @@ type Adapter interface {
 type Builder interface {
 	Create() Builder
 	WithAmount(amount uint64) Builder
-	WithOwner(owner hash.Hash) Builder
+	WithOwner(owner ed25519.PublicKey) Builder
 	WithCommit(commit hash.Hash) Builder
 	Now() (Root, error)
 }
@@ -43,6 +45,6 @@ type Builder interface {
 type Root interface {
 	Hash() hash.Hash
 	Amount() uint64
-	Owner() hash.Hash
+	Owner() ed25519.PublicKey
 	Commit() hash.Hash
 }

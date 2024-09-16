@@ -1,6 +1,7 @@
 package roots
 
 import (
+	"crypto/ed25519"
 	"errors"
 	"fmt"
 
@@ -10,7 +11,7 @@ import (
 type builder struct {
 	hashAdapter hash.Adapter
 	amount      uint64
-	owner       hash.Hash
+	owner       ed25519.PublicKey
 	commit      hash.Hash
 }
 
@@ -41,7 +42,7 @@ func (app *builder) WithAmount(amount uint64) Builder {
 }
 
 // WithOwner adds an owner to the builder
-func (app *builder) WithOwner(owner hash.Hash) Builder {
+func (app *builder) WithOwner(owner ed25519.PublicKey) Builder {
 	app.owner = owner
 	return app
 }
@@ -68,7 +69,7 @@ func (app *builder) Now() (Root, error) {
 
 	pHash, err := app.hashAdapter.FromMultiBytes([][]byte{
 		[]byte(fmt.Sprintf("%d", app.amount)),
-		app.owner.Bytes(),
+		app.owner,
 		app.commit.Bytes(),
 	})
 

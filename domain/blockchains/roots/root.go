@@ -1,20 +1,22 @@
 package roots
 
 import (
+	"crypto/ed25519"
+
 	"github.com/steve-care-software/steve/domain/hash"
 )
 
 type root struct {
 	hash   hash.Hash
 	amount uint64
-	owner  hash.Hash
+	owner  ed25519.PublicKey
 	commit hash.Hash
 }
 
 func createRoot(
 	hash hash.Hash,
 	amount uint64,
-	owner hash.Hash,
+	owner ed25519.PublicKey,
 	commit hash.Hash,
 ) Root {
 	out := root{
@@ -38,7 +40,7 @@ func (obj *root) Amount() uint64 {
 }
 
 // Owner returns the owner
-func (obj *root) Owner() hash.Hash {
+func (obj *root) Owner() ed25519.PublicKey {
 	return obj.owner
 }
 
