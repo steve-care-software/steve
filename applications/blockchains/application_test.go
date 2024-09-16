@@ -85,18 +85,6 @@ func TestApplication_Success(t *testing.T) {
 		return
 	}
 
-	err = resourceApp.Commit()
-	if err != nil {
-		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
-		return
-	}
-
-	err = resourceApp.Init("my_database.db")
-	if err != nil {
-		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
-		return
-	}
-
 	identitiesList, err := application.Identities()
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
@@ -150,18 +138,6 @@ func TestApplication_Success(t *testing.T) {
 		return
 	}
 
-	err = resourceApp.Commit()
-	if err != nil {
-		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
-		return
-	}
-
-	err = resourceApp.Init("my_database.db")
-	if err != nil {
-		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
-		return
-	}
-
 	// old password
 	err = application.Authenticate(firstUsername, firstPassword)
 	if err == nil {
@@ -200,18 +176,6 @@ func TestApplication_Success(t *testing.T) {
 		0.01,
 	)
 
-	if err != nil {
-		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
-		return
-	}
-
-	err = resourceApp.Commit()
-	if err != nil {
-		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
-		return
-	}
-
-	err = resourceApp.Init("my_database.db")
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
@@ -283,18 +247,6 @@ func TestApplication_Success(t *testing.T) {
 
 	// mine:
 	err = application.Mine(blockchainID, 2)
-	if err != nil {
-		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
-		return
-	}
-
-	err = resourceApp.Commit()
-	if err != nil {
-		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
-		return
-	}
-
-	err = resourceApp.Init("my_database.db")
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return

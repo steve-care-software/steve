@@ -138,9 +138,15 @@ func (app *application) Register(name string, password []byte, seedWords []strin
 		return err
 	}
 
-	return app.storeListApp.Append(app.identityNamesList, [][]byte{
+	err = app.storeListApp.Append(app.identityNamesList, [][]byte{
 		[]byte(name),
 	})
+
+	if err != nil {
+		return err
+	}
+
+	return app.resourceApp.Commit()
 }
 
 // Authenticate authenticates in an identity:
@@ -179,7 +185,7 @@ func (app *application) Recover(name string, newPassword []byte, words []string)
 	}
 
 	app.currentAuthenticatedIdentity = nil
-	return nil
+	return app.resourceApp.Commit()
 }
 
 // Authenticated returns the authenticated idgentity, if any
@@ -422,7 +428,12 @@ func (app *application) Create(
 
 	unitAmountBytes := pointers.Uint64ToBytes(unitAmount)
 	unitsKeyname := app.unitsPerOwnerAndBlockchainKeyname(pubKey, identifier)
-	return app.resourceApp.Insert(unitsKeyname, unitAmountBytes)
+	err = app.resourceApp.Insert(unitsKeyname, unitAmountBytes)
+	if err != nil {
+		return err
+	}
+
+	return app.resourceApp.Commit()
 }
 
 // Blockchains returns the list of blockchains
@@ -529,7 +540,12 @@ func (app *application) block(blockchain blockchains.Blockchain, block blocks.Bl
 	}
 
 	blockchainKeyname := fmt.Sprintf("%s%s", app.blockchainKeynamePrefix, blockchain.Identifier().String())
-	return app.resourceApp.Save(blockchainKeyname, blockchainBytes)
+	err = app.resourceApp.Save(blockchainKeyname, blockchainBytes)
+	if err != nil {
+		return err
+	}
+
+	return app.resourceApp.Commit()
 }
 
 func (app *application) validateBlock(blockchain blockchains.Blockchain, block blocks.Block) error {
