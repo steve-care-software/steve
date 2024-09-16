@@ -362,6 +362,22 @@ func (app *application) Commit() error {
 	return app.Cancel()
 }
 
+// Head returns the commit head
+func (app *application) Head() (commits.Commit, error) {
+	if app.header == nil {
+		return nil, errors.New("there is no header, which means that the database cannot be rollbacked (not enough past commits) or it has never been initialized")
+	}
+
+	if !app.header.HasActivity() {
+		return nil, errors.New("there is no activity, which means that the database cannot be rollbacked (not enough past commits)")
+	}
+
+	activity := app.header.Activity()
+	head := activity.Head()
+	commits := activity.Commits()
+	return commits.Fetch(head)
+}
+
 // Cancel cancels the modifications
 func (app *application) Cancel() error {
 	defer app.pFile.Close()
@@ -382,14 +398,12 @@ func (app *application) Rollback(amount uint) error {
 		return errors.New("there is no activity, which means that the database cannot be rollbacked (not enough past commits)")
 	}
 
-	activity := app.header.Activity()
-	head := activity.Head()
-	commits := activity.Commits()
-	currentHeadCommit, err := commits.Fetch(head)
+	currentHeadCommit, err := app.Head()
 	if err != nil {
 		return err
 	}
 
+	commits := app.header.Activity().Commits()
 	currentHeadCommitHash := currentHeadCommit.Hash()
 	castedAmount := int(amount)
 	for i := 0; i < castedAmount; i++ {

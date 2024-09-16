@@ -58,6 +58,7 @@ type Application interface {
 	Insert(identifier string, data []byte) error
 	Save(identifier string, data []byte) error
 	Delete(identifier string) error
+	Head() (commits.Commit, error)
 	Commit() error
 	Cancel() error
 	Rollback(amount uint) error

@@ -261,6 +261,10 @@ func (app *application) TrxQueue() (transactions.Transactions, error) {
 
 // Mine mines a block using the queued transaction, with the specified max amount of trx
 func (app *application) Mine(blockchainID uuid.UUID, maxAmountTrx uint) error {
+	if app.currentAuthenticatedIdentity == nil {
+		return errors.New(noAuthIdentityErr)
+	}
+
 	blockchain, err := app.retrieveBlockchainFromID(blockchainID)
 	if err != nil {
 		return err
@@ -296,9 +300,22 @@ func (app *application) Mine(blockchainID uuid.UUID, maxAmountTrx uint) error {
 		parent = blockchain.Head().Hash()
 	}
 
+	head, err := app.resourceApp.Head()
+	if err != nil {
+		return err
+	}
+
+	minerPubKey := app.currentAuthenticatedIdentity.PK().Public()
+	pMinerHash, err := app.hashAdapter.FromBytes(minerPubKey.(ed25519.PublicKey))
+	if err != nil {
+		return err
+	}
+
 	content, err := app.contentBuilder.Create().
 		WithParent(parent).
 		WithTransactions(trx).
+		WithMiner(*pMinerHash).
+		WithCommit(head.Hash()).
 		Now()
 
 	if err != nil {
@@ -363,9 +380,15 @@ func (app *application) Create(
 		return err
 	}
 
+	head, err := app.resourceApp.Head()
+	if err != nil {
+		return err
+	}
+
 	root, err := app.rootBuilder.Create().
 		WithAmount(unitAmount).
 		WithOwner(*pPubKeyHash).
+		WithCommit(head.Hash()).
 		Now()
 
 	if err != nil {
