@@ -56,7 +56,11 @@ func TestApplication_Success(t *testing.T) {
 		"blockchain:by_uuid:",
 		"script:by_hash:",
 		"block:by_hash:",
-	).Create().WithResource(resourceApp).WithList(listApp).Now()
+	).Create().
+		WithResource(resourceApp).
+		WithList(listApp).
+		Now()
+
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return

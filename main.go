@@ -1,36 +1,106 @@
 package main
 
 import (
-	"crypto/ed25519"
-	"crypto/rand"
 	"fmt"
+	"strings"
+
+	"github.com/alexflint/go-arg"
+	"github.com/steve-care-software/steve/applications/blockchains"
+	"github.com/steve-care-software/steve/applications/resources"
+	"github.com/steve-care-software/steve/applications/resources/lists"
 )
 
 func main() {
-	// Generate an Ed25519 private and public key pair
-	publicKey, privateKey, err := ed25519.GenerateKey(rand.Reader)
-	if err != nil {
-		fmt.Println("Error generating keys:", err)
-		return
+	var args struct {
+		Action    string `arg:"positional"  help:"register, authenticate"`
+		ChunkSize uint64 `arg:"--chunk_size,env:CHUNK_SIZE" default:"1024"`
+		Username  string `arg:"--username,env:USERNAME"`
+		Password  string `arg:"--password,env:PASSWORD"`
+		BaseDir   string `arg:"env:BASE_DIR"`
+		DbFile    string `arg:"env:DB_FILENAME"`
 	}
 
-	// The message we want to sign
-	message := []byte("This is a secret message")
+	// args parsing:
+	arg.MustParse(&args)
 
-	// Sign the message with the private key
-	signature := ed25519.Sign(privateKey, message)
+	// engine:
+	targetIdentitifer := "target_identifier.tmp"
+	resourceApp, err := resources.NewBuilder().Create().
+		WithBasePath(args.BaseDir).
+		WithReadChunkSize(args.ChunkSize).
+		WithTargetIdentifier(targetIdentitifer).
+		Now()
 
-	// Print the keys, signature, and the message
-	fmt.Printf("Public Key: %x\n", publicKey)
-	fmt.Printf("Private Key: %x\n", privateKey)
-	fmt.Printf("Signature: %x\n", signature)
-	fmt.Printf("Message: %s\n", message)
+	if err != nil {
+		panic(err)
+	}
 
-	// Verify the signature with the public key
-	isValid := ed25519.Verify(publicKey, message, signature)
-	if isValid {
-		fmt.Println("Signature is valid!")
-	} else {
-		fmt.Println("Signature is not valid!")
+	err = resourceApp.Init(args.DbFile)
+	if err != nil {
+		panic(err)
+	}
+
+	listApp, err := lists.NewBuilder().Create().
+		WithResource(resourceApp).
+		Now()
+
+	if err != nil {
+		panic(err)
+	}
+
+	application, err := blockchains.NewBuilder(
+		"identities",
+		"blockchains",
+		"identities:by_name:",
+		"units:by_blockchain_and_pubkeyhash:",
+		"blockchain:by_uuid:",
+		"script:by_hash:",
+		"block:by_hash:",
+	).Create().
+		WithResource(resourceApp).
+		WithList(listApp).
+		Now()
+
+	if err != nil {
+		panic(err)
+	}
+
+	switch args.Action {
+	case "register":
+		seedWords := []string{
+			"abandon",
+			"abandon",
+			"abandon",
+			"abandon",
+			"abandon",
+			"abandon",
+			"abandon",
+			"abandon",
+			"abandon",
+			"abandon",
+			"abandon",
+			"about",
+		}
+
+		err := application.Register(args.Username, []byte(args.Password), seedWords)
+		if err != nil {
+			fmt.Printf("register: %s", err.Error())
+			return
+		}
+
+		fmt.Printf("registered username: %s\n", args.Username)
+		fmt.Printf("##########\n SEED WORDS:\n %s \n##########\n", strings.Join(seedWords, ", "))
+		return
+	case "authenticate":
+		err := application.Authenticate(args.Username, []byte(args.Password))
+		if err != nil {
+			fmt.Printf("authenticate: %s", err.Error())
+			return
+		}
+
+		fmt.Printf("authenticated using username: %s", args.Username)
+		return
+	default:
+		fmt.Println("the action is invalid")
 	}
 }
