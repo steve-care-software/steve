@@ -23,11 +23,7 @@ func mine(
 	trxHash := transactions.Hash()
 	cpt := big.NewInt(1)
 	for {
-		pHash, err := hashAdapter.FromMultiBytes([][]byte{
-			trxHash.Bytes(),
-			cpt.Bytes(),
-		})
-
+		pHash, err := executeHash(hashAdapter, trxHash, cpt.Bytes())
 		if err != nil {
 			return nil, err
 		}
@@ -41,4 +37,11 @@ func mine(
 	}
 
 	return cpt.Bytes(), nil
+}
+
+func executeHash(hashAdapter hash.Adapter, trxHash hash.Hash, result []byte) (*hash.Hash, error) {
+	return hashAdapter.FromMultiBytes([][]byte{
+		trxHash.Bytes(),
+		result,
+	})
 }

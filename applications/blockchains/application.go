@@ -468,7 +468,31 @@ func (app *application) Script(hash hash.Hash) ([]byte, error) {
 }
 
 func (app *application) block(blockchain blockchains.Blockchain, block blocks.Block) error {
+	err := app.validateBlock(blockchain, block)
+	if err != nil {
+		return err
+	}
+
+	pCommit, err := app.resourceApp.Head()
+	if err != nil {
+		return err
+	}
+
+	commitHash := pCommit.Hash()
+	blockCommitHash := block.Content().Commit()
+	if !blockCommitHash.Compare(commitHash) {
+		err := app.resourceApp.RollbackTo(blockCommitHash)
+		if err != nil {
+			return err
+		}
+	}
+
 	retBytes, err := app.blocksAdapter.InstanceToBytes(block)
+	if err != nil {
+		return err
+	}
+
+	err = app.transferFees(blockchain, block)
 	if err != nil {
 		return err
 	}
@@ -505,12 +529,93 @@ func (app *application) block(blockchain blockchains.Blockchain, block blocks.Bl
 	}
 
 	blockchainKeyname := fmt.Sprintf("%s%s", app.blockchainKeynamePrefix, blockchain.Identifier().String())
-	err = app.resourceApp.Save(blockchainKeyname, blockchainBytes)
+	return app.resourceApp.Save(blockchainKeyname, blockchainBytes)
+}
+
+func (app *application) validateBlock(blockchain blockchains.Blockchain, block blocks.Block) error {
+	if !blockchain.HasHead() {
+		return nil
+	}
+
+	parent := blockchain.Head().Hash()
+	miningValue := blockchain.Rules().MiningValue()
+	pCurrentWork, err := app.canculateWorkFromHeadToBlock(miningValue, parent, block)
 	if err != nil {
 		return err
 	}
 
-	return app.transferFees(updated, block)
+	pBlockWork, err := app.workFromBlock(miningValue, block)
+	if err != nil {
+		return err
+	}
+
+	// replace the block:
+	if *pCurrentWork < *pBlockWork {
+		return nil
+	}
+
+	str := fmt.Sprintf(
+		"the provided block (hash: %s) contains %d difficulty of work, its blockchain (id: %s) contains %d difficulty of work after that block, therefore the provided block cannot be added to the blockchain",
+		block.Hash().String(),
+		*pBlockWork,
+		blockchain.Identifier().String(),
+		*pCurrentWork,
+	)
+
+	return errors.New(str)
+}
+
+func (app *application) canculateWorkFromHeadToBlock(miningValue uint8, headHash hash.Hash, block blocks.Block) (*uint, error) {
+	keyname := fmt.Sprintf("%s%s", app.blockKeynamePrefix, headHash.String())
+	blockBytes, err := app.resourceApp.Retrieve(keyname)
+	if err != nil {
+		return nil, err
+	}
+
+	head, _, err := app.blocksAdapter.BytesToInstance(blockBytes)
+	if err != nil {
+		return nil, err
+	}
+
+	if head.Hash().Compare(block.Hash()) {
+		output := uint(0)
+		return &output, nil
+	}
+
+	pHeadWork, err := app.workFromBlock(miningValue, head)
+	if err != nil {
+		return nil, err
+	}
+
+	parentBlockHash := head.Content().Parent()
+	pWork, err := app.canculateWorkFromHeadToBlock(miningValue, parentBlockHash, block)
+	if err != nil {
+		return nil, err
+	}
+
+	output := *pHeadWork + *pWork
+	return &output, nil
+}
+
+func (app *application) workFromBlock(miningValue uint8, block blocks.Block) (*uint, error) {
+	result := block.Result()
+	trxHash := block.Content().Transactions().Hash()
+	pHash, err := executeHash(app.hashAdapter, trxHash, result)
+	if err != nil {
+		return nil, err
+	}
+
+	difficulty := uint(0)
+	hashBytes := pHash.Bytes()
+	for _, oneByte := range hashBytes {
+		if oneByte != miningValue {
+			break
+		}
+
+		difficulty++
+	}
+
+	return &difficulty, nil
 }
 
 func (app *application) transferFees(blockchain blockchains.Blockchain, block blocks.Block) error {

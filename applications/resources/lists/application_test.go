@@ -59,12 +59,6 @@ func TestApplication_Success(t *testing.T) {
 		return
 	}
 
-	err = resourceApp.Init("my_database.db")
-	if err != nil {
-		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
-		return
-	}
-
 	pAmount, err := application.Amount(identiier)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
@@ -111,12 +105,6 @@ func TestApplication_Success(t *testing.T) {
 	}
 
 	err = resourceApp.Commit()
-	if err != nil {
-		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
-		return
-	}
-
-	err = resourceApp.Init("my_database.db")
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return

@@ -35,6 +35,7 @@ type application struct {
 	targetIdentifier     string
 	loadedPointers       map[string]pointers.Pointer
 	header               headers.Header
+	currentIdentifier    string
 	pBodyIndex           *uint64
 	pFile                *os.File
 	filePath             string
@@ -75,6 +76,7 @@ func createApplication(
 		basePath:             basePath,
 		loadedPointers:       nil,
 		header:               nil,
+		currentIdentifier:    "",
 		pBodyIndex:           nil,
 		pFile:                nil,
 		filePath:             "",
@@ -119,6 +121,7 @@ func (app *application) Init(dbIdentifier string) error {
 	}
 
 	app.loadedPointers = loadedPointers
+	app.currentIdentifier = dbIdentifier
 	app.pBodyIndex = &bodyIndex
 	app.pFile = pFile
 	app.filePath = file
@@ -288,7 +291,12 @@ func (app *application) Commit() error {
 		}
 
 		// cleanup:
-		return app.Cancel()
+		err = app.Cancel()
+		if err != nil {
+			return err
+		}
+
+		return app.Init(app.currentIdentifier)
 	}
 
 	modificationsList := []modifications.Modification{}
@@ -359,7 +367,12 @@ func (app *application) Commit() error {
 	}
 
 	// cleanup:
-	return app.Cancel()
+	err = app.Cancel()
+	if err != nil {
+		return err
+	}
+
+	return app.Init(app.currentIdentifier)
 }
 
 // Head returns the commit head
@@ -469,7 +482,12 @@ func (app *application) RollbackTo(head hash.Hash) error {
 	}
 
 	// cleanup:
-	return app.Cancel()
+	err = app.Cancel()
+	if err != nil {
+		return err
+	}
+
+	return app.Init(app.currentIdentifier)
 }
 
 func (app *application) readPointer(pointer pointers.Pointer) ([]byte, error) {

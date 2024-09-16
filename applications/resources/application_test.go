@@ -75,12 +75,6 @@ func TestApplication_Success(t *testing.T) {
 		return
 	}
 
-	err = application.Init("my_database.db")
-	if err != nil {
-		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
-		return
-	}
-
 	_, err = application.Retrieve("first")
 	if err == nil {
 		t.Errorf("the error was expected to be valid, nil returned")
@@ -99,12 +93,6 @@ func TestApplication_Success(t *testing.T) {
 	}
 
 	err = application.Rollback(1)
-	if err != nil {
-		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
-		return
-	}
-
-	err = application.Init("my_database.db")
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
@@ -129,12 +117,6 @@ func TestApplication_Success(t *testing.T) {
 	}
 
 	err = application.Commit()
-	if err != nil {
-		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
-		return
-	}
-
-	err = application.Init("my_database.db")
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
