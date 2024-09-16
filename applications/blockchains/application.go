@@ -514,15 +514,58 @@ func (app *application) block(blockchain blockchains.Blockchain, block blocks.Bl
 }
 
 func (app *application) transferFees(blockchain blockchains.Blockchain, block blocks.Block) error {
-	/*content := block.Content()
-	miner := content.Miner()
+	blockchainID := blockchain.Identifier()
+	content := block.Content()
+	minerRevenue := uint64(0)
 	transactionsList := content.Transactions().List()
 	for _, oneTrx := range transactionsList {
+		pubKey := oneTrx.PublicKey()
+		keyname := app.unitsPerOwnerAndBlockchainKeyname(pubKey, blockchainID)
 
+		walletAmount := uint64(0)
+		unitAmountBytes, err := app.resourceApp.Retrieve(keyname)
+		if err != nil {
+			return err
+		}
+
+		pWalletAmount, err := pointers.BytesToUint64(unitAmountBytes)
+		if err == nil {
+			walletAmount = (*pWalletAmount)
+		}
+
+		trxFees := oneTrx.Entry().Fees()
+		if walletAmount < trxFees {
+			str := fmt.Sprintf("the transaction (hash: %s) of block (hash: %s) in blockchain (id: %s) was expected to pay %d units in fees, but the wallet only contains %d units", oneTrx.Hash().String(), block.Hash().String(), blockchainID.String(), trxFees, walletAmount)
+			return errors.New(str)
+		}
+
+		updatedAmount := walletAmount - trxFees
+		updatedAmountBytes := pointers.Uint64ToBytes(updatedAmount)
+		err = app.resourceApp.Save(keyname, updatedAmountBytes)
+		if err != nil {
+			return err
+		}
+
+		minerRevenue += trxFees
 	}
 
-	keyname := app.unitsPerOwnerAndBlockchainKeyname(miner, blockchain.Identifier())*/
-	return nil
+	// retrieve the miner wallet amount:
+	miner := content.Miner()
+	keyname := app.unitsPerOwnerAndBlockchainKeyname(miner, blockchainID)
+	unitAmountBytes, err := app.resourceApp.Retrieve(keyname)
+	if err != nil {
+		return err
+	}
+
+	currentAmount := uint64(0)
+	pWalletAmount, err := pointers.BytesToUint64(unitAmountBytes)
+	if err == nil {
+		currentAmount = *pWalletAmount
+	}
+
+	updatedAmount := currentAmount + minerRevenue
+	updatedAmountBytes := pointers.Uint64ToBytes(updatedAmount)
+	return app.resourceApp.Save(keyname, updatedAmountBytes)
 }
 
 func (app *application) generateIdentityFromSeedWordsThenEncrypt(name string, password []byte, seedWords []string) ([]byte, error) {
