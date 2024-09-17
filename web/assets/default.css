@@ -97,7 +97,7 @@ h1 {
     text-decoration: none;
     margin: 0px 0px 5px 0px;
     padding: 0px;
-    font-size: 12px;
+    font-size: 14px;
     font-weight: bold;
     text-decoration: none;
     border-bottom: 2px solid #ffffff;
@@ -110,6 +110,62 @@ h1 {
 
 #leftcontainer {
     position: fixed;
+}
+
+#identitycontainer.block {
+    background-color: #e2adc3;
+}
+
+
+#identitycontainer.block h2 {
+    color: #000000;
+    border-color: #000000;
+}
+
+#identitycontainer.block a {
+    color: #034873;
+}
+
+#identitycontainer.block a:hover {
+    color: #000000;
+    text-decoration: underline;
+}
+
+#identitycontainer .loginbox {
+    width: 100%;
+    padding: 0px;
+    margin-bottom: 5px;
+    border-bottom: 2px dashed #000000;
+
+}
+
+#identitycontainer .loginbox label {
+    font-size: 14px;
+    color: #000000;
+}
+
+#identitycontainer .loginbox .inputbox {
+    background-color: #e2adc3;
+    border: 0px;
+    border-bottom: 2px solid #000000;
+    font-size: 14px;
+    width: 100%;
+    padding: 5px;
+    color: #ffffff;
+}
+
+#identitycontainer .loginbox .inputbox:focus {
+    outline: none;
+}
+
+#identitycontainer .loginbox .btn {
+    background-color: #035d94;
+    font-size: 14px;
+    color: #ffffff;
+    padding: 10px;
+    margin: 10px 0px 10px 0px;
+    border: 0px;
+    float: right;
 }
 
 #middlecontent {

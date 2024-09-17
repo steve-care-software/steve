@@ -2,29 +2,57 @@
   <head>{{template "head" .}}</head>
   <body>
     <div id="maincontainer">
-      <div id="leftcontainer" class="block">
-        <div id="sectionmenu" class="leftstyle">
-          <h2>Sections</h2>
-          {{template "left_menu" .}}
+      <div id="leftcontainer">
+        <div id="topleftmenu" class="block">
+          <div id="section" class="leftstyle">
+            <h2>Sections</h2>
+            {{template "left_menu" .}}
+          </div>
+  
+          <div id="queries" class="leftstyle">
+            <h2>Past Queries</h2>
+            <ul>
+              <li><a href="/queries/28f5aa28fe1e15ca7d755205296a5a583018bb3d20e4c3a010a0fdec850cb3316563e637a51015c0475d51bea311c2ceeff52ab99ace3dd2b8ffac6c57dd1d02">First title of the query</a></li>
+              <li><a href="/queries/28f5aa28fe1e15ca7d755205296a5a583018bb3d20e4c3a010a0fdec850cb3316563e637a51015c0475d51bea311c2ceeff52ab99ace3dd2b8ffac6c57dd1d02">Second title of a great query</a></li>
+              <li><a href="/queries/28f5aa28fe1e15ca7d755205296a5a583018bb3d20e4c3a010a0fdec850cb3316563e637a51015c0475d51bea311c2ceeff52ab99ace3dd2b8ffac6c57dd1d02">Yes, this is another title again</a></li>
+              <li><a href="/queries/28f5aa28fe1e15ca7d755205296a5a583018bb3d20e4c3a010a0fdec850cb3316563e637a51015c0475d51bea311c2ceeff52ab99ace3dd2b8ffac6c57dd1d02">Oh yes, another title!</a></li>
+            </ul>
+          </div>
+  
+          <div id="languages" class="leftstyle">
+            <h2>Languages</h2>
+            <ul>
+              <li><a href="/">English</a></li>
+              <li><a href="/fr">French</a></li>
+            </ul>
+          </div>
         </div>
 
-        <div id="queries" class="leftstyle">
-          <h2>Past Queries</h2>
-          <ul>
-            <li><a href="/queries/28f5aa28fe1e15ca7d755205296a5a583018bb3d20e4c3a010a0fdec850cb3316563e637a51015c0475d51bea311c2ceeff52ab99ace3dd2b8ffac6c57dd1d02">First title of the query</a></li>
-            <li><a href="/queries/28f5aa28fe1e15ca7d755205296a5a583018bb3d20e4c3a010a0fdec850cb3316563e637a51015c0475d51bea311c2ceeff52ab99ace3dd2b8ffac6c57dd1d02">Second title of a great query</a></li>
-            <li><a href="/queries/28f5aa28fe1e15ca7d755205296a5a583018bb3d20e4c3a010a0fdec850cb3316563e637a51015c0475d51bea311c2ceeff52ab99ace3dd2b8ffac6c57dd1d02">Yes, this is another title again</a></li>
-            <li><a href="/queries/28f5aa28fe1e15ca7d755205296a5a583018bb3d20e4c3a010a0fdec850cb3316563e637a51015c0475d51bea311c2ceeff52ab99ace3dd2b8ffac6c57dd1d02">Oh yes, another title!</a></li>
-          </ul>
+        <div id="identitycontainer" class="block">
+          <div  class="leftstyle">
+            <h2>Authenticate</h2>
+            <table class="loginbox">
+              <tbody>
+                <tr>
+                  <td><label for="username">Username:</label></td>
+                  <td><input type="text" id="username" class="inputbox" /></td>
+                </tr>
+                <tr>
+                  <td><label for="password">Password:</label></td>
+                  <td><input type="password" id="username" class="inputbox" /></td>
+                </tr>
+                <tr>
+                  <td colspan="2"><input type="submit" value="Authenticate" class="btn" /></td>
+                </tr>
+              </tbody>
+            </table>
+            <ul>
+              <li><a href="/register">Register</a></li>
+              <li><a href="/recover">Recover</a></li>
+            </ul>
+          </div>
         </div>
-
-        <div id="languages" class="leftstyle">
-          <h2>Languages</h2>
-          <ul>
-            <li><a href="/">English</a></li>
-            <li><a href="/fr">French</a></li>
-          </ul>
-        </div>
+        
       </div>
 
       <div id="middlecontent">
