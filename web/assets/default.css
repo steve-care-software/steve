@@ -16,13 +16,13 @@ body {
 }
 
 a {
-    color: #2e95d3;
+    color: #6daad0;
     text-decoration: none;
 }
 
 a:hover {
-    color: #df3079;
-    text-decoration: underline;
+    color: #df729f;
+    text-decoration: none;
 }
 
 pre {
@@ -54,7 +54,7 @@ pre {
 h1 {
     text-decoration: none;
     margin: 0;
-    padding: 10px;
+    padding: 0px;
     font-size: 22px;
     font-weight: bold;
     text-decoration: none;
@@ -85,15 +85,28 @@ h1 {
     flex-direction: row;
 }
 
-#leftmenu {
+.leftstyle {
     min-width: 100px;
     text-align: left;
+    min-width: 250px;
+    font-size: 14px;
+    line-height: 220%;
 }
 
-#leftmenu ul {
+.leftstyle ul {
     list-style: none;
     padding: 0px;
     margin: 0px;
+}
+
+.leftstyle h2 {
+    text-decoration: none;
+    margin: 0px 0px 5px 0px;
+    padding: 0px;
+    font-size: 12px;
+    font-weight: bold;
+    text-decoration: none;
+    border-bottom: 2px solid #ffffff;
 }
 
 #breadcrumb ul {
