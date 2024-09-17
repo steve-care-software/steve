@@ -12,7 +12,7 @@
 body {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     background-color: #212121;
-    padding: 10px 0px 10px 0px;
+    padding: 5px 0px 5px 0px;
 }
 
 a {
@@ -41,7 +41,6 @@ pre {
     display: flex;
     overflow: hidden;
     min-height:100%;
-
     line-height: 140%;
     background-color: #212121;
     border: 2px solid #212121;
@@ -66,7 +65,7 @@ h1 {
     background-color: #000000;
     border: 2px solid #000000;
     border-radius: 5px;
-    margin: 10px;
+    margin: 0px 10px 10px 10px;
     padding: 25px;
     color: #ffffff;
 }
@@ -75,22 +74,17 @@ h1 {
     line-height: 200%;
 }
 
-#maincontainer {
-    display: flex;
-    flex-direction: row;
-}
-
 .code {
     display: flex;
     flex-direction: row;
 }
 
 .leftstyle {
-    min-width: 100px;
     text-align: left;
-    min-width: 250px;
     font-size: 14px;
     line-height: 220%;
+    min-width: 250px;
+    margin: 0px 0px 25px 0px;
 }
 
 .leftstyle ul {
@@ -107,6 +101,19 @@ h1 {
     font-weight: bold;
     text-decoration: none;
     border-bottom: 2px solid #ffffff;
+}
+
+#maincontainer {
+    display: flex;
+    flex-direction: row;
+}
+
+#leftcontainer {
+    position: fixed;
+}
+
+#middlecontent {
+    margin-left: 320px;
 }
 
 #breadcrumb ul {
