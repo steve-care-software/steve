@@ -1,106 +1,73 @@
 package main
 
 import (
-	"fmt"
-	"strings"
+	"html/template"
+	"log"
+	"net/http"
+	"os"
+	"path/filepath"
+	"time"
 
-	"github.com/alexflint/go-arg"
-	"github.com/steve-care-software/steve/applications/blockchains"
-	"github.com/steve-care-software/steve/applications/resources"
-	"github.com/steve-care-software/steve/applications/resources/lists"
+	"github.com/gorilla/mux"
 )
 
+// Home represents the home data
+type Home struct {
+}
+
+type spaHandler struct {
+	staticPath string
+	indexPath  string
+}
+
+func (h spaHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	// Join internally call path.Clean to prevent directory traversal
+	path := filepath.Join(h.staticPath, r.URL.Path)
+
+	// check whether a file exists or is a directory at the given path
+	fi, err := os.Stat(path)
+	if os.IsNotExist(err) || fi.IsDir() {
+		// file does not exist or path is a directory, serve index.html
+		http.ServeFile(w, r, filepath.Join(h.staticPath, h.indexPath))
+		return
+	}
+
+	if err != nil {
+		// if we got an error (that wasn't that the file doesn't exist) stating the
+		// file, return a 500 internal server error and stop
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// otherwise, use http.FileServer to serve the static file
+	http.FileServer(http.Dir(h.staticPath)).ServeHTTP(w, r)
+}
+
 func main() {
-	var args struct {
-		Action    string `arg:"positional"  help:"register, authenticate"`
-		ChunkSize uint64 `arg:"--chunk_size,env:CHUNK_SIZE" default:"1024"`
-		Username  string `arg:"--username,env:USERNAME"`
-		Password  string `arg:"--password,env:PASSWORD"`
-		BaseDir   string `arg:"env:BASE_DIR"`
-		DbFile    string `arg:"env:DB_FILENAME"`
-	}
+	// templates:
+	tmpl := make(map[string]*template.Template)
+	tmpl["index.html"] = template.Must(template.ParseFiles("./web/templates/index.html", "./web/templates/base.html"))
 
-	// args parsing:
-	arg.MustParse(&args)
-
-	// engine:
-	targetIdentitifer := "target_identifier.tmp"
-	resourceApp, err := resources.NewBuilder().Create().
-		WithBasePath(args.BaseDir).
-		WithReadChunkSize(args.ChunkSize).
-		WithTargetIdentifier(targetIdentitifer).
-		Now()
-
-	if err != nil {
-		panic(err)
-	}
-
-	err = resourceApp.Init(args.DbFile)
-	if err != nil {
-		panic(err)
-	}
-
-	listApp, err := lists.NewBuilder().Create().
-		WithResource(resourceApp).
-		Now()
-
-	if err != nil {
-		panic(err)
-	}
-
-	application, err := blockchains.NewBuilder(
-		"identities",
-		"blockchains",
-		"identities:by_name:",
-		"units:by_blockchain_and_pubkeyhash:",
-		"blockchain:by_uuid:",
-		"script:by_hash:",
-		"block:by_hash:",
-	).Create().
-		WithResource(resourceApp).
-		WithList(listApp).
-		Now()
-
-	if err != nil {
-		panic(err)
-	}
-
-	switch args.Action {
-	case "register":
-		seedWords := []string{
-			"abandon",
-			"abandon",
-			"abandon",
-			"abandon",
-			"abandon",
-			"abandon",
-			"abandon",
-			"abandon",
-			"abandon",
-			"abandon",
-			"abandon",
-			"about",
-		}
-
-		err := application.Register(args.Username, []byte(args.Password), seedWords)
+	// router:
+	router := mux.NewRouter()
+	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		err := tmpl["index.html"].ExecuteTemplate(w, "base", &Home{})
 		if err != nil {
-			fmt.Printf("register: %s", err.Error())
-			return
+			log.Printf("error: %s", err.Error())
 		}
+	})
 
-		fmt.Printf("registered username: %s\n", args.Username)
-		fmt.Printf("##########\n SEED WORDS:\n %s \n##########\n", strings.Join(seedWords, ", "))
-		return
-	case "authenticate":
-		err := application.Authenticate(args.Username, []byte(args.Password))
-		if err != nil {
-			fmt.Printf("authenticate: %s", err.Error())
-			return
-		}
+	spa := spaHandler{staticPath: "web/assets", indexPath: "index.html"}
+	router.PathPrefix("/").Handler(spa)
 
-		fmt.Printf("authenticated using username: %s", args.Username)
-		return
-	default:
-		fmt.Println("the action is invalid")
+	// server:
+	srv := &http.Server{
+		Handler: router,
+		Addr:    "127.0.0.1:8080",
+		// Good practice: enforce timeouts for servers you create!
+		WriteTimeout: 15 * time.Second,
+		ReadTimeout:  15 * time.Second,
 	}
+
+	log.Fatal(srv.ListenAndServe())
 }
