@@ -1,6 +1,7 @@
 {{define "base"}}<html>
   <head>{{template "head" .}}</head>
   <body>
+    {{template "topmenu" .}}
     <div id="maincontainer">
       <div id="leftcontainer">
         <div id="topleftmenu" class="block">
@@ -28,28 +29,9 @@
           </div>
         </div>
 
-        <div id="identitycontainer" class="block">
+        <div id="adblock" class="block">
           <div  class="leftstyle">
-            <h2>Authenticate</h2>
-            <table class="loginbox">
-              <tbody>
-                <tr>
-                  <td><label for="username">Username:</label></td>
-                  <td><input type="text" id="username" class="inputbox" /></td>
-                </tr>
-                <tr>
-                  <td><label for="password">Password:</label></td>
-                  <td><input type="password" id="username" class="inputbox" /></td>
-                </tr>
-                <tr>
-                  <td colspan="2"><input type="submit" value="Authenticate" class="btn" /></td>
-                </tr>
-              </tbody>
-            </table>
-            <ul>
-              <li><a href="/register">Register</a></li>
-              <li><a href="/recover">Recover</a></li>
-            </ul>
+            <br /><br /><br /><br /><br /><br />
           </div>
         </div>
         

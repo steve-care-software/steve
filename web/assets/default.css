@@ -103,73 +103,115 @@ h1 {
     border-bottom: 2px solid #ffffff;
 }
 
-#maincontainer {
+#topmenu {
+    padding: 10px;
+    margin: 10px;
+}
+
+#topmenu {
     display: flex;
     flex-direction: row;
 }
 
-#leftcontainer {
-    position: fixed;
+#topmenu #topleftmenu {
+    font-size: 16px;
+    padding-top: 30px;
+    width: 40%;
 }
 
-#identitycontainer.block {
-    background-color: #e2adc3;
+#topmenu #topleftmenu ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
-
-#identitycontainer.block h2 {
-    color: #000000;
-    border-color: #000000;
+#topmenu #topleftmenu ul li {
+    display: inline;
+    margin: 0px 20px 0px 20px;
 }
 
-#identitycontainer.block a {
-    color: #034873;
+#topmenu #toplogo {
+    background-image: url("logo_high_quality.png");
+    background-repeat: no-repeat;
+    width: 233px;
+    height: 100px;
+    margin: 0px auto 0px auto;
 }
 
-#identitycontainer.block a:hover {
-    color: #000000;
-    text-decoration: underline;
+#topmenu #toplogo span {
+    display: none;
 }
 
-#identitycontainer .loginbox {
+#topmenu #rightsection {
+    width: 40%;
+}
+
+#topmenu #rightsection .loginbox {
     width: 100%;
     padding: 0px;
-    margin-bottom: 5px;
-    border-bottom: 2px dashed #000000;
-
+    display: flex;
+    justify-content: right;
 }
 
-#identitycontainer .loginbox label {
+#topmenu #rightsection .loginbox label {
     font-size: 14px;
-    color: #000000;
+    color: #ffffff;
 }
 
-#identitycontainer .loginbox .inputbox {
-    background-color: #e2adc3;
+#topmenu #rightsection .loginbox .inputbox {
+    background-color: #212121;
     border: 0px;
-    border-bottom: 2px solid #000000;
+    border-bottom: 2px solid #ffffff;
     font-size: 14px;
-    width: 100%;
+    width: 100px;
     padding: 5px;
-    color: #000000;
+    margin: 0px 10px 0px 10px;
+    color: #ffffff;
 }
 
-#identitycontainer .loginbox .inputbox:focus {
+#topmenu #rightsection .loginbox .inputbox:focus {
     outline: none;
 }
 
-#identitycontainer .loginbox .btn {
+#topmenu #rightsection .loginbox .btn {
     background-color: #035d94;
     font-size: 14px;
     color: #ffffff;
     padding: 10px;
     margin: 10px 0px 10px 0px;
     border: 0px;
-    float: right;
 }
 
-#middlecontent {
-    margin-left: 370px;
+#topmenu #rightsection ul {
+    display: flex;
+    justify-content: right;
+    font-size: 14px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#topmenu #rightsection ul li {
+    display: inline;
+    padding: 0px 0px 0px 20px;
+}
+
+#maincontainer {
+    display: flex;
+    flex-direction: row;
+}
+
+#adblock.block {
+    background-color: #035d94;
+}
+
+#adblock.block a {
+    color: #034873;
+}
+
+#adblock.block a:hover {
+    color: #000000;
+    text-decoration: underline;
 }
 
 #breadcrumb ul {
