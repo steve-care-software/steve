@@ -103,6 +103,37 @@ h1 {
     border-bottom: 2px solid #ffffff;
 }
 
+.inputbox {
+    background-color: #212121;
+    border: 0px;
+    border-bottom: 2px solid #ffffff;
+    font-size: 14px;
+    padding: 5px;
+    margin: 0px 10px 0px 10px;
+    color: #ffffff;
+}
+
+.inputbox:focus {
+    outline: none;
+}
+
+form label {
+    font-size: 14px;
+}
+
+.right {
+    margin: 0px 0px 0px auto;
+}
+
+.btn {
+    background-color: #035d94;
+    font-size: 14px;
+    color: #ffffff;
+    padding: 10px;
+    margin: 10px 0px 10px 0px;
+    border: 0px;
+}
+
 #topmenu {
     padding: 10px;
     margin: 10px;
@@ -159,27 +190,7 @@ h1 {
 }
 
 #topmenu #rightsection .loginbox .inputbox {
-    background-color: #212121;
-    border: 0px;
-    border-bottom: 2px solid #ffffff;
-    font-size: 14px;
     width: 100px;
-    padding: 5px;
-    margin: 0px 10px 0px 10px;
-    color: #ffffff;
-}
-
-#topmenu #rightsection .loginbox .inputbox:focus {
-    outline: none;
-}
-
-#topmenu #rightsection .loginbox .btn {
-    background-color: #035d94;
-    font-size: 14px;
-    color: #ffffff;
-    padding: 10px;
-    margin: 10px 0px 10px 0px;
-    border: 0px;
 }
 
 #topmenu #rightsection ul {
@@ -228,6 +239,46 @@ h1 {
     padding: 0px 10px 0px 10px;
     color: #ffffff;
     content: "/\00a0";
+}
+
+#middlecontent {
+    width: 100%;
+}
+
+#registerbox {
+    background-color: #212121;
+    width: 90%;
+    margin: 0px auto 0px auto;
+    padding: 20px;
+    border: 2px solid #212121;
+    border-radius: 5px;
+}
+
+#registerbox #registercontent {
+    display: flex;
+    flex-direction: row;
+}
+
+#registerbox #registerform {
+    color: #ffffff;
+    height: 200px;
+    padding: 30px;
+    margin: 00px;
+}
+
+#registerbox #seedwords {
+
+}
+
+#registerbox #seedwords ol {
+    column-count: 6;
+    column-gap: 20px;
+    list-style-position: inside;
+}
+
+#registerbox #seedwords ol li {
+    line-height: 1.5em;
+    height: 3em;
 }
 
 footer {

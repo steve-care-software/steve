@@ -55,6 +55,146 @@
     </ul>
 {{end}}
 
+{{define "maincontent"}}
+    <h1>This is a title</h1>
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin a magna mauris. Aliquam erat volutpat. Cras eget efficitur mauris, vitae tincidunt turpis. Morbi quis nisl lacus. Duis eget euismod erat, in facilisis nibh. Proin ultricies nisl ut viverra ultrices. Proin sed ante nec mauris condimentum posuere.</p>
+    <p>Sed sit amet tempor purus. Cras ornare purus ut finibus aliquet. Phasellus nisl leo, tempor eget lorem vestibulum, sollicitudin dictum justo. Aliquam euismod vulputate congue. Nam sed lorem pretium purus pretium sollicitudin ut eget felis. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse dictum orci sed libero eleifend, eu finibus leo semper. Nunc ut neque vulputate, ultrices metus ut, facilisis elit. Proin vestibulum varius massa a finibus.</p>
+    
+    <div class="code">
+        <pre>
+          v1;
+          > .instructions;
+          # .SPACE .TAB .EOL;
+      
+          instructions: .instruction*;
+          instruction: .instructionPossibilities .SEMI_COLON;
+          instructionPossibilities: .assignment;
+      
+          assignment: .boolAssignment
+                    | .uintAssignment
+                    | .intAssignment
+                    | .floatAssignment
+                    ---
+                      bool: "bool myVariable = true";
+                      uint: "uint8 myVariable = 32";
+                      int: "int64 myVariable = -345";
+                      float: "float32 myVariable = -12.45";
+                    ;
+      
+          oneNumber: .N_ZERO
+                   | .N_ONE
+                   | .N_TWO
+                   | .N_THREE
+                   | .N_FOUR
+                   | .N_FIVE
+                   | .N_SIX
+                   | .N_SEVEN
+                   | .N_HEIGHT
+                   | .N_NINE
+                   ---
+                    zero: "0";
+                    one: "1";
+                    two: "2";
+                    three: "3";
+                    four: "4";
+                    five: "5";
+                    six: "6";
+                    seven: "7";
+                    height: "8";
+                    nine: "9";
+                  ;
+      
+          N_ZERO: "0";
+          N_ONE: "1";
+          N_TWO: "2";
+          N_THREE: "3";
+          N_FOUR: "4";
+          N_FIVE: "5";
+          N_SIX: "6";
+          N_SEVEN: "7";
+          N_HEIGHT: "8";
+          N_NINE: "9";
+      
+          LL_A: "a";
+          LL_B: "b";
+          LL_C: "c";
+          LL_D: "d";
+          LL_E: "e";
+          LL_F: "f";
+          LL_G: "g";
+          LL_H: "h";
+          LL_I: "i";
+          LL_J: "j";
+          LL_K: "k";
+          LL_L: "l";
+          LL_M: "m";
+          LL_N: "n";
+          LL_O: "o";
+          LL_P: "p";
+          LL_Q: "q";
+          LL_R: "r";
+          LL_S: "s";
+          LL_T: "t";
+          LL_U: "u";
+          LL_V: "v";
+          LL_W: "w";
+          LL_X: "x";
+          LL_Y: "y";
+          LL_Z: "z";
+          
+          UL_A: "A";
+          UL_B: "B";
+          UL_C: "C";
+          UL_D: "D";
+          UL_E: "E";
+          UL_F: "F";
+          UL_G: "G";
+          UL_H: "H";
+          UL_I: "I";
+          UL_J: "J";
+          UL_K: "K";
+          UL_L: "L";
+          UL_M: "M";
+          UL_N: "N";
+          UL_O: "O";
+          UL_P: "P";
+          UL_Q: "Q";
+          UL_R: "R";
+          UL_S: "S";
+          UL_T: "T";
+          UL_U: "U";
+          UL_V: "V";
+          UL_W: "W";
+          UL_X: "X";
+          UL_Y: "Y";
+          UL_Z: "Z";
+      
+          BACKSLASH: "\\";
+          QUOTE: "\"";
+      
+          OPEN_PARENTHESIS: "(";
+          CLOSE_PARENTHESIS: ")";
+      
+          PLUS: "+";
+          MINUS: "-";
+          DOT: ".";
+          EQUAL: "=";
+          SEMI_COLON: ";";
+      
+          TRUE: "true";
+          FALSE: "false";
+      
+          SPACE: " ";
+          TAB: "	";
+          EOL: "
+              ";
+        </pre>
+
+      <textarea class="ide"></textarea> 
+    </div>
+    
+    <p>Ut scelerisque nisl ac imperdiet vestibulum. Cras vitae vehicula arcu, at rutrum ipsum. Proin tristique, dui eget mattis tristique, dolor nunc gravida lacus, dignissim tempus tellus massa eu neque. Phasellus rutrum pharetra mauris. Donec consectetur dolor ac nibh ullamcorper, eu dapibus dui tempor. Donec in volutpat lorem. Phasellus lacinia eros nec elit congue congue. Pellentesque diam neque, hendrerit quis nibh ut, tristique ornare leo. Donec faucibus neque at tortor tristique sollicitudin. Proin posuere, leo eget consectetur rhoncus, erat arcu semper purus, id facilisis velit augue a urna. Sed eu tortor ac nibh lacinia ornare. Donec tristique bibendum lorem vitae aliquam. Donec sit amet iaculis quam. Vivamus iaculis mattis aliquet.</p> 
+{{end}}
 
 {{define "footer"}}
     <footer class="block">

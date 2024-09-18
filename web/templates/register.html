@@ -1,0 +1,124 @@
+{{define "head"}}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Steve Care</title>
+    <link rel="stylesheet" href="default.css">
+{{end}}
+
+{{define "topmenu"}}
+    <div id="topmenu">
+        <nav id="topleftmenu">
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/documentation">Documentation</a></li>
+                <li><a href="/blog">Blog</a></li>
+                <li><a href="/newsletter">Newsletter</a></li>
+                <li><a href="/mission">Mission</a></li>
+                <li><a href="/contact-us">Contact us</a></li>
+            </ul>
+        </nav>
+        
+        <a href="/" id="toplogo"><span>Steve Care</span></a>
+
+        <div  id="rightsection">
+            <div class="loginbox">
+                <form action="/">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td><input type="text" id="username" class="inputbox" placeholder="Username" /></td>
+                                <td><input type="password" id="password" class="inputbox" placeholder="Password" /></td>
+                                <td><input type="submit" value="Authenticate" class="btn" /></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </form>
+            </div>
+
+            <ul>
+                <li><a href="/register">Register</a></li>
+                <li><a href="/recover">Recover</a></li>
+            </ul>
+        </div>
+    </div>
+    
+{{end}}
+
+{{define "left_menu"}}
+    <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/blockchains">Blockchains</a></li>
+        <li><a href="/identities">Identities</a></li>
+        <li><a href="/wallets">Wallets</a></li>
+        <li><a href="/script">Scripts</a></li>
+        <li><a href="/queries">Queries</a></li>
+    </ul>
+{{end}}
+
+{{define "maincontent"}}
+    <h1>Register</h1>
+    <p>Registering an identity consists of reserving a username and generating a private key assigned to that username.  The private key will be encrypted using your choosen passwword.  The private key is generated using 24 words that will be shown to you after submitting the form.</p>
+    <p>You need to write down the words because if you lose your password, you'll need them to <a href="/recover">recover</a> your account.</p>
+    <form action="/register">
+        <div id="registerbox">
+            <div id="registercontent">
+                <table id="registerform">
+                    <tbody>
+                        <tr>
+                            <td><label for="username">Username</label></td>
+                            <td><input type="text" id="username" class="inputbox" /></td>
+                        </tr>
+                        <tr>
+                            <td><label for="password">Password</label></td>
+                            <td><input type="text" id="password" class="inputbox" /></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="right"><input type="submit" value="Register" class="btn" /></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="warning">
+                    <p>Please note that the order is important, the words must be provided in the same order in order to <a href="/recover">Recover</a> your account, in case your lose your password.</p>
+                </div>
+            </div>
+
+            <div id="seedwords">
+                <h2>The private key's seed words are:</h2>
+                <ol>
+                    <li>abandon</li>
+                    <li>about</li>
+                    <li>army</li>
+                    <li>basket</li>
+                    <li>blanket</li>
+                    <li>board</li>
+                    <li>budget</li>
+                    <li>chat</li>
+                    <li>consider</li>
+                    <li>crystal</li>
+                    <li>detect</li>
+                    <li>drum</li>
+                    <li>energy</li>
+                    <li>february</li>
+                    <li>frame</li>
+                    <li>hair</li>
+                    <li>hub</li>
+                    <li>iron</li>
+                    <li>law</li>
+                    <li>make</li>
+                    <li>myself</li>
+                    <li>oppose</li>
+                    <li>peace</li>
+                    <li>priority</li>
+                </ol>
+            </div>
+        </div>
+    </form>
+{{end}}
+
+{{define "footer"}}
+    <footer class="block">
+        &copy; Copyright Steve Care Software.  All rights reserved.
+    </footer>
+    <script src="ide.js"></script>
+{{end}}
