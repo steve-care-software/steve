@@ -35,6 +35,11 @@ pre {
     color: #ffffff;
 }
 
+p {
+    padding: 10px;
+    margin: 5px;
+}
+
 .ide {
     width: 100%;
     box-sizing: border-box;
@@ -55,6 +60,16 @@ h1 {
     margin: 0;
     padding: 0px;
     font-size: 22px;
+    font-weight: bold;
+    text-decoration: none;
+    border-bottom: 2px solid #ffffff;
+}
+
+h2 {
+    text-decoration: none;
+    margin: 0;
+    padding: 0px;
+    font-size: 18px;
     font-weight: bold;
     text-decoration: none;
     border-bottom: 2px solid #ffffff;
@@ -132,6 +147,22 @@ form label {
     padding: 10px;
     margin: 10px 0px 10px 0px;
     border: 0px;
+}
+
+.warningbox {
+    background-color: #ffffff;
+    border: 2px solid #ffffff;
+    border-radius: 5px;
+    padding: 20px;
+    margin: 10px auto 10px auto;
+    color: #000000;
+}
+
+.errormessage {
+    background-color: #df729f;
+    color: #ffffff;
+    border-radius: 5px;
+    border-color: #df729f;
 }
 
 #topmenu {
@@ -246,28 +277,32 @@ form label {
 }
 
 #registerbox {
-    background-color: #212121;
     width: 90%;
     margin: 0px auto 0px auto;
     padding: 20px;
-    border: 2px solid #212121;
     border-radius: 5px;
 }
 
 #registerbox #registercontent {
     display: flex;
     flex-direction: row;
+    margin: 0px auto 0px auto;
 }
 
 #registerbox #registerform {
     color: #ffffff;
     height: 200px;
-    padding: 30px;
-    margin: 00px;
+    padding: 10px;
+    margin: 10px 50px 10px 0px;
+}
+
+#registerbox #registerform .inputbox {
+    width: 400px;
+    background-color: #000000;
 }
 
 #registerbox #seedwords {
-
+    margin-top: 20px;
 }
 
 #registerbox #seedwords ol {

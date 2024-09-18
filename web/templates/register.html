@@ -61,24 +61,30 @@
     <p>You need to write down the words because if you lose your password, you'll need them to <a href="/recover">recover</a> your account.</p>
     <form action="/register">
         <div id="registerbox">
-            <div id="registercontent">
-                <table id="registerform">
-                    <tbody>
-                        <tr>
-                            <td><label for="username">Username</label></td>
-                            <td><input type="text" id="username" class="inputbox" /></td>
-                        </tr>
-                        <tr>
-                            <td><label for="password">Password</label></td>
-                            <td><input type="text" id="password" class="inputbox" /></td>
-                        </tr>
-                        <tr>
-                            <td colspan="2" class="right"><input type="submit" value="Register" class="btn" /></td>
-                        </tr>
-                    </tbody>
-                </table>
 
-                <div class="warning">
+            <div class="errormessage">
+                <p>The username and password are mandatory in order to register an identity.</p>
+            </div>
+            
+            <div id="registercontent">
+                <div>
+                    <table id="registerform">
+                        <tbody>
+                            <tr>
+                                <td><label for="username">Username</label></td>
+                                <td><input type="text" id="username" class="inputbox" /></td>
+                            </tr>
+                            <tr>
+                                <td><label for="password">Password</label></td>
+                                <td><input type="text" id="password" class="inputbox" /></td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" class="right"><input type="submit" value="Register" class="btn" /></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="warningbox">
                     <p>Please note that the order is important, the words must be provided in the same order in order to <a href="/recover">Recover</a> your account, in case your lose your password.</p>
                 </div>
             </div>
