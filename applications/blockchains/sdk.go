@@ -77,8 +77,11 @@ type Builder interface {
 
 // Application represents the blockchain application
 type Application interface {
+	// AmountIdentities returns the amount of identities
+	AmountIdentities() (*uint, error)
+
 	// Identities lists the identity names:
-	Identities() ([]string, error)
+	Identities(index uint, amount uint) ([]string, error)
 
 	// Register registers a new identity:
 	Register(name string, password []byte, language uint8) ([]string, error)
@@ -110,8 +113,11 @@ type Application interface {
 	// Create a new blockchain
 	Create(identity identities.Identity, identifier uuid.UUID, name string, description string, unitAmount uint64, miningValue uint8, baseDifficulty uint8, increaseDiffPerrx float64) error
 
+	// AmountBlockchains returns the amount of blockchains
+	AmountBlockchains() (*uint, error)
+
 	// Blockchains returns the list of blockchains
-	Blockchains() ([]uuid.UUID, error)
+	Blockchains(index uint, amount uint) ([]uuid.UUID, error)
 
 	// Blockchain returns the blochain by id
 	Blockchain(identifier uuid.UUID) (blockchains.Blockchain, error)

@@ -50,7 +50,7 @@ func (app *application) Retrieve(name string, index uint, amount uint) ([][]byte
 	}
 
 	toIndex := index + amount
-	if length <= int(toIndex) {
+	if length < int(toIndex) {
 		str := fmt.Sprintf("the amount (%d) is invalid because the list contain %d elements, and the index + amount (%d) exceeds that length", amount, length, (index + amount))
 		return nil, errors.New(str)
 	}

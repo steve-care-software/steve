@@ -80,7 +80,18 @@ func TestApplication_Success(t *testing.T) {
 		return
 	}
 
-	identitiesList, err := application.Identities()
+	pIdentitiesAmount, err := application.AmountIdentities()
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	if *pIdentitiesAmount != 1 {
+		t.Errorf("%d identities were expected, %d returned", 1, *pIdentitiesAmount)
+		return
+	}
+
+	identitiesList, err := application.Identities(0, 1)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
@@ -160,14 +171,14 @@ func TestApplication_Success(t *testing.T) {
 		return
 	}
 
-	pAmount, err := application.Units(retIdentity, blockchainID)
+	pUnitsAmount, err := application.Units(retIdentity, blockchainID)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
 	}
 
-	if unitAmount != *pAmount {
-		t.Errorf("the amount was expected to be %d, %d returned", unitAmount, *pAmount)
+	if unitAmount != *pUnitsAmount {
+		t.Errorf("the amount was expected to be %d, %d returned", unitAmount, *pUnitsAmount)
 		return
 	}
 
@@ -182,7 +193,18 @@ func TestApplication_Success(t *testing.T) {
 		return
 	}
 
-	retBlockchainIds, err := application.Blockchains()
+	pBlockchainAmount, err := application.AmountBlockchains()
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	if *pBlockchainAmount != 1 {
+		t.Errorf("%d blockchains were expected, %d returned", 1, *pBlockchainAmount)
+		return
+	}
+
+	retBlockchainIds, err := application.Blockchains(0, 1)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return

@@ -108,9 +108,14 @@ func createApplication(
 	return &out
 }
 
+// AmountIdentities returns the amount of identities
+func (app *application) AmountIdentities() (*uint, error) {
+	return app.storeListApp.Amount(app.identityNamesList)
+}
+
 // Identities lists the identity names:
-func (app *application) Identities() ([]string, error) {
-	list, err := app.storeListApp.RetrieveAll(app.identityNamesList)
+func (app *application) Identities(index uint, amount uint) ([]string, error) {
+	list, err := app.storeListApp.Retrieve(app.identityNamesList, index, amount)
 	if err != nil {
 		return nil, err
 	}
@@ -413,9 +418,14 @@ func (app *application) Create(
 	return app.resourceApp.Commit()
 }
 
+// AmountBlockchains returns the amount of blockchains
+func (app *application) AmountBlockchains() (*uint, error) {
+	return app.storeListApp.Amount(app.blockchainListKeyname)
+}
+
 // Blockchains returns the list of blockchains
-func (app *application) Blockchains() ([]uuid.UUID, error) {
-	retBytes, err := app.storeListApp.RetrieveAll(app.blockchainListKeyname)
+func (app *application) Blockchains(index uint, amount uint) ([]uuid.UUID, error) {
+	retBytes, err := app.storeListApp.Retrieve(app.blockchainListKeyname, index, amount)
 	if err != nil {
 		return nil, err
 	}

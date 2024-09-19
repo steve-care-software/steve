@@ -87,7 +87,7 @@ func TestApplication_Success(t *testing.T) {
 		return
 	}
 
-	_, err = application.Retrieve(identiier, 0, uint(len(values)))
+	_, err = application.Retrieve(identiier, 0, uint(len(values)+1))
 	if err == nil {
 		t.Errorf("the error was expected to be valid, nil returned")
 		return
