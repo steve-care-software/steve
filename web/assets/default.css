@@ -186,29 +186,36 @@ form label {
 }
 
 .tablevalues {
-    width: 100%;
-    background-color: #ffffff;
-    font-size: 14px;
-    line-height: 200%;
+    background-color: #035d94;
+    border: 2px solid #035d94;
+    border-radius: 5px;
     margin: 10px 0px 10px 0px;
 }
 
+.tablevalues table {
+    width: 100%;
+    background-color: #343333;
+    font-size: 14px;
+    line-height: 200%;
+    color: #ffffff;
+    border-collapse: collapse;
+}
 
-.tablevalues td{
+.tablevalues td {
     padding: 10px;
     margin: 10px;
     text-align: center;
+    border: 0px;
 }
 
 .tablevalues thead td {
-    background-color: #000000;
+    background-color: #035d94;
     color: #ffffff;
-    border-bottom: 1px solid #000000;
     text-align: center;
 }
 
 .tablevalues tbody .second td {
-    background-color: #c9e6f8;
+    background-color: #212121;
 }
 
 #topmenu {
