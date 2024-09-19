@@ -218,6 +218,44 @@ form label {
     background-color: #212121;
 }
 
+.pagination {
+    padding: 0px;
+    margin: 30px 0px 30px 0px;
+}
+
+.pagination ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.pagination ul li {
+    display: inline;
+    margin: 0px 10px 0px 10px;
+    padding: 0;
+}
+
+.pagination ul span {
+    padding: 10px;
+    color: #ffffff;
+
+}
+
+.pagination ul a {
+    border-radius: 5px;
+    background-color: #035d94;
+    color: #ffffff;
+    padding: 15px;
+}
+
+.pagination ul a:hover {
+    background-color: #df729f;
+    color: #ffffff;
+}
+
 #topmenu {
     padding: 10px;
     margin: 10px;
