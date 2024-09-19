@@ -1,11 +1,11 @@
-package tokens
+package lines
 
 import (
 	"errors"
 )
 
 type builder struct {
-	list []Token
+	list []Line
 }
 
 func createBuilder() Builder {
@@ -22,22 +22,22 @@ func (app *builder) Create() Builder {
 }
 
 // WithList adds a list to the builder
-func (app *builder) WithList(list []Token) Builder {
+func (app *builder) WithList(list []Line) Builder {
 	app.list = list
 	return app
 }
 
-// Now builds a new Tokens instance
-func (app *builder) Now() (Tokens, error) {
+// Now builds a new Lines instance
+func (app *builder) Now() (Lines, error) {
 	if app.list != nil && len(app.list) <= 0 {
 		app.list = nil
 	}
 
 	if app.list == nil {
-		return nil, errors.New("there must be at least 1 Token in order to build a Tokens instance")
+		return nil, errors.New("there must be at least 1 Line in order to build a Lines instance")
 	}
 
-	return createTokens(
+	return createLines(
 		app.list,
 	), nil
 }

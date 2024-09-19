@@ -1,10 +1,19 @@
 package lines
 
 import (
-	"github.com/steve-care-software/steve/domain/hash"
 	"github.com/steve-care-software/steve/domain/programs/grammars/blocks/suites"
 	"github.com/steve-care-software/steve/domain/transpiles/blocks/lines/tokens"
 )
+
+// NewBuilder creates a new builder
+func NewBuilder() Builder {
+	return createBuilder()
+}
+
+// NewLineBuilder creates a new line builder
+func NewLineBuilder() LineBuilder {
+	return createLineBuilder()
+}
 
 // Builder represents lines builder
 type Builder interface {
@@ -28,7 +37,6 @@ type LineBuilder interface {
 
 // Line represents a line
 type Line interface {
-	Hash() hash.Hash
 	Tokens() tokens.Tokens
 	HasSuites() bool
 	Suites() suites.Suites

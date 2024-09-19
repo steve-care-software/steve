@@ -8,10 +8,7 @@ import (
 
 // NewBuilder creates a new builder
 func NewBuilder() Builder {
-	hashAdapter := hash.NewAdapter()
-	return createBuilder(
-		hashAdapter,
-	)
+	return createBuilder()
 }
 
 // NewTokenBuilder creates a new token builder
