@@ -2,6 +2,7 @@ package transpiles
 
 import (
 	"github.com/steve-care-software/steve/domain/chains/nfts"
+	"github.com/steve-care-software/steve/domain/hash"
 	"github.com/steve-care-software/steve/domain/programs"
 	"github.com/steve-care-software/steve/domain/transpiles/blocks"
 )
@@ -28,6 +29,8 @@ type Builder interface {
 	Create() Builder
 	WithBlocks(blocks blocks.Blocks) Builder
 	WithRoot(root string) Builder
+	WithOrigin(origin hash.Hash) Builder
+	WithTarget(target hash.Hash) Builder
 	Now() (Transpile, error)
 }
 
@@ -35,4 +38,6 @@ type Builder interface {
 type Transpile interface {
 	Blocks() blocks.Blocks
 	Root() string
+	Origin() hash.Hash
+	Target() hash.Hash
 }

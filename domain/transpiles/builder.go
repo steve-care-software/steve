@@ -3,18 +3,23 @@ package transpiles
 import (
 	"errors"
 
+	"github.com/steve-care-software/steve/domain/hash"
 	"github.com/steve-care-software/steve/domain/transpiles/blocks"
 )
 
 type builder struct {
 	blocks blocks.Blocks
 	root   string
+	origin hash.Hash
+	target hash.Hash
 }
 
 func createBuilder() Builder {
 	out := builder{
 		blocks: nil,
 		root:   "",
+		origin: nil,
+		target: nil,
 	}
 
 	return &out
@@ -37,6 +42,18 @@ func (app *builder) WithRoot(root string) Builder {
 	return app
 }
 
+// WithOrigin adds an origin to the builder
+func (app *builder) WithOrigin(origin hash.Hash) Builder {
+	app.origin = origin
+	return app
+}
+
+// WithTarget adds a target to the builder
+func (app *builder) WithTarget(target hash.Hash) Builder {
+	app.target = target
+	return app
+}
+
 // Now builds a new Transpile instance
 func (app *builder) Now() (Transpile, error) {
 	if app.blocks == nil {
@@ -47,5 +64,13 @@ func (app *builder) Now() (Transpile, error) {
 		return nil, errors.New("the root is mandatory in order to build a Transpile instance")
 	}
 
-	return createTranspile(app.blocks, app.root), nil
+	if app.origin == nil {
+		return nil, errors.New("the origin hash is mandatory in order to build a Transpile instance")
+	}
+
+	if app.target == nil {
+		return nil, errors.New("the target hash is mandatory in order to build a Transpile instance")
+	}
+
+	return createTranspile(app.blocks, app.root, app.origin, app.target), nil
 }
