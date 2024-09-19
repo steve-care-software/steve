@@ -9,14 +9,12 @@ import (
 
 type tokenBuilder struct {
 	update updates.Update
-	del    pointers.Pointer
 	insert pointers.Pointer
 }
 
 func createTokenBuilder() TokenBuilder {
 	out := tokenBuilder{
 		update: nil,
-		del:    nil,
 		insert: nil,
 	}
 
@@ -34,12 +32,6 @@ func (app *tokenBuilder) WithUpdate(update updates.Update) TokenBuilder {
 	return app
 }
 
-// WithDelete adds a delete to the builder
-func (app *tokenBuilder) WithDelete(delete pointers.Pointer) TokenBuilder {
-	app.del = delete
-	return app
-}
-
 // WithInsert adds an insert to the builder
 func (app *tokenBuilder) WithInsert(insert pointers.Pointer) TokenBuilder {
 	app.insert = insert
@@ -50,10 +42,6 @@ func (app *tokenBuilder) WithInsert(insert pointers.Pointer) TokenBuilder {
 func (app *tokenBuilder) Now() (Token, error) {
 	if app.update != nil {
 		return createTokenWithUpdate(app.update), nil
-	}
-
-	if app.del != nil {
-		return createTokenWithDelete(app.del), nil
 	}
 
 	if app.insert != nil {

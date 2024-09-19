@@ -31,7 +31,6 @@ type Tokens interface {
 type TokenBuilder interface {
 	Create() TokenBuilder
 	WithUpdate(update updates.Update) TokenBuilder
-	WithDelete(delete pointers.Pointer) TokenBuilder
 	WithInsert(insert pointers.Pointer) TokenBuilder
 	Now() (Token, error)
 }
@@ -40,8 +39,6 @@ type TokenBuilder interface {
 type Token interface {
 	IsUpdate() bool
 	Update() updates.Update
-	IsDelete() bool
-	Delete() pointers.Pointer
 	IsInsert() bool
 	Insert() pointers.Pointer
 }

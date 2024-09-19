@@ -4,11 +4,12 @@ import (
 	"errors"
 
 	"github.com/steve-care-software/steve/domain/transpiles/blocks/lines/tokens/pointers"
+	"github.com/steve-care-software/steve/domain/transpiles/blocks/lines/tokens/updates/targets"
 )
 
 type builder struct {
 	origin pointers.Pointer
-	target pointers.Pointer
+	target targets.Target
 }
 
 func createBuilder() Builder {
@@ -32,7 +33,7 @@ func (app *builder) WithOrigin(origin pointers.Pointer) Builder {
 }
 
 // WithTarget adds a target to the builder
-func (app *builder) WithTarget(target pointers.Pointer) Builder {
+func (app *builder) WithTarget(target targets.Target) Builder {
 	app.target = target
 	return app
 }

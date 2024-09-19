@@ -7,36 +7,27 @@ import (
 
 type token struct {
 	update updates.Update
-	del    pointers.Pointer
 	insert pointers.Pointer
 }
 
 func createTokenWithUpdate(
 	update updates.Update,
 ) Token {
-	return createTokenInternally(update, nil, nil)
-}
-
-func createTokenWithDelete(
-	del pointers.Pointer,
-) Token {
-	return createTokenInternally(nil, del, nil)
+	return createTokenInternally(update, nil)
 }
 
 func createTokenWithInsert(
 	insert pointers.Pointer,
 ) Token {
-	return createTokenInternally(nil, nil, insert)
+	return createTokenInternally(nil, insert)
 }
 
 func createTokenInternally(
 	update updates.Update,
-	del pointers.Pointer,
 	insert pointers.Pointer,
 ) Token {
 	out := token{
 		update: update,
-		del:    del,
 		insert: insert,
 	}
 
@@ -51,16 +42,6 @@ func (obj *token) IsUpdate() bool {
 // Update returns the update, if any
 func (obj *token) Update() updates.Update {
 	return obj.update
-}
-
-// IsDelete returns true if there is a delete, false otherwise
-func (obj *token) IsDelete() bool {
-	return obj.del != nil
-}
-
-// Delete returns the delete, if any
-func (obj *token) Delete() pointers.Pointer {
-	return obj.del
 }
 
 // IsInsert returns true if there is an insert, false otherwise

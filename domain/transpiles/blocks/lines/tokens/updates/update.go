@@ -2,16 +2,17 @@ package updates
 
 import (
 	"github.com/steve-care-software/steve/domain/transpiles/blocks/lines/tokens/pointers"
+	"github.com/steve-care-software/steve/domain/transpiles/blocks/lines/tokens/updates/targets"
 )
 
 type update struct {
 	origin pointers.Pointer
-	target pointers.Pointer
+	target targets.Target
 }
 
 func createUpdate(
 	origin pointers.Pointer,
-	target pointers.Pointer,
+	target targets.Target,
 ) Update {
 	out := update{
 		origin: origin,
@@ -27,6 +28,6 @@ func (obj *update) Origin() pointers.Pointer {
 }
 
 // Target returns the target
-func (obj *update) Target() pointers.Pointer {
+func (obj *update) Target() targets.Target {
 	return obj.target
 }
