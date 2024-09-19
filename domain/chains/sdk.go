@@ -5,6 +5,22 @@ import (
 	"github.com/steve-care-software/steve/domain/hash"
 )
 
+// NewInterpreterBuilder creates a new interpreter builder
+func NewInterpreterBuilder() InterpreterBuilder {
+	hashAdapter := hash.NewAdapter()
+	return createInterpreterBuilder(
+		hashAdapter,
+	)
+}
+
+// NewTranspileBuilder creates a new transpile builder
+func NewTranspileBuilder() TranspileBuilder {
+	hashAdapter := hash.NewAdapter()
+	return createTranspileBuilder(
+		hashAdapter,
+	)
+}
+
 // Adapter represents a chain adapterg
 type Adapter interface {
 	ToNFT(ins Chain) (Chain, error)
@@ -53,6 +69,7 @@ type InterpreterBuilder interface {
 
 // Interpreter represents the interpreter
 type Interpreter interface {
+	Hash() hash.Hash
 	Variable() string
 	HasNext() bool
 	Next() Chain
