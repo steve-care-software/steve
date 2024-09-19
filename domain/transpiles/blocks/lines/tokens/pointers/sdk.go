@@ -5,6 +5,14 @@ import (
 	"github.com/steve-care-software/steve/domain/transpiles/blocks/lines/tokens/pointers/elements"
 )
 
+// NewBuilder creates a new builder
+func NewBuilder() Builder {
+	hashAdapter := hash.NewAdapter()
+	return createBuilder(
+		hashAdapter,
+	)
+}
+
 // Builder represents the pointer builder
 type Builder interface {
 	Create() Builder
