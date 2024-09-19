@@ -1,7 +1,41 @@
 {{define "base"}}<html>
   <head>{{template "head" .}}</head>
   <body>
-    {{template "topmenu" .}}
+    <div id="topmenu">
+      <nav id="topleftmenu">
+          <ul>
+              <li><a href="/">Home</a></li>
+              <li><a href="/documentation">Documentation</a></li>
+              <li><a href="/blog">Blog</a></li>
+              <li><a href="/newsletter">Newsletter</a></li>
+              <li><a href="/mission">Mission</a></li>
+              <li><a href="/contact-us">Contact us</a></li>
+          </ul>
+      </nav>
+      
+      <a href="/" id="toplogo"><span>Steve Care</span></a>
+
+      <div  id="rightsection">
+          <div class="loginbox">
+              <form action="/">
+                  <table>
+                      <tbody>
+                          <tr>
+                              <td><input type="text" id="username" class="inputbox" placeholder="Username" /></td>
+                              <td><input type="password" id="password" class="inputbox" placeholder="Password" /></td>
+                              <td><input type="submit" value="Authenticate" class="btn" /></td>
+                          </tr>
+                      </tbody>
+                  </table>
+              </form>
+          </div>
+
+          <ul>
+              <li><a href="/register">Register</a></li>
+              <li><a href="/recover">Recover</a></li>
+          </ul>
+      </div>
+    </div>
     <div id="maincontainer">
       <div id="leftcontainer">
         <div id="topleftmenu" class="block">
