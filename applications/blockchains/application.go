@@ -126,16 +126,16 @@ func (app *application) Identities() ([]string, error) {
 }
 
 // Register registers a new identity:
-func (app *application) Register(name string, password []byte, seedWords []string) error {
-	cipher, err := app.generateIdentityFromSeedWordsThenEncrypt(name, password, seedWords)
+func (app *application) Register(name string, password []byte, language uint8) ([]string, error) {
+	cipher, seedWords, err := app.generateIdentityThenEncrypt(name, password, language)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	keyname := fmt.Sprintf("%s%s", app.identityKeynamePrefix, name)
 	err = app.resourceApp.Insert(keyname, cipher)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	err = app.storeListApp.Append(app.identityNamesList, [][]byte{
@@ -143,10 +143,15 @@ func (app *application) Register(name string, password []byte, seedWords []strin
 	})
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return app.resourceApp.Commit()
+	err = app.resourceApp.Commit()
+	if err != nil {
+		return nil, err
+	}
+
+	return seedWords, nil
 }
 
 // Authenticate authenticates in an identity:
@@ -689,27 +694,50 @@ func (app *application) transferFees(blockchain blockchains.Blockchain, block bl
 	return app.resourceApp.Save(keyname, updatedAmountBytes)
 }
 
+func (app *application) generateIdentityThenEncrypt(name string, password []byte, language uint8) ([]byte, []string, error) {
+	pk, seedWords, err := app.cryptographyApp.GeneratePrivateKey(language)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return app.generateIdentityFromPKThenEncrypt(name, password, pk, seedWords)
+}
+
 func (app *application) generateIdentityFromSeedWordsThenEncrypt(name string, password []byte, seedWords []string) ([]byte, error) {
-	pk, err := app.cryptographyApp.GeneratePrivateKey(seedWords)
+	pk, err := app.cryptographyApp.GeneratePrivateKeyFromSeedWords(seedWords)
 	if err != nil {
 		return nil, err
 	}
 
+	identity, _, err := app.generateIdentityFromPKThenEncrypt(name, password, pk, seedWords)
+	if err != nil {
+		return nil, err
+	}
+
+	return identity, nil
+}
+
+func (app *application) generateIdentityFromPKThenEncrypt(name string, password []byte, pk ed25519.PrivateKey, seedWords []string) ([]byte, []string, error) {
 	identity, err := app.identityBuilder.Create().
 		WithName(name).
 		WithPK(pk).
 		Now()
 
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	data, err := app.identityAdapter.ToBytes(identity)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return app.cryptographyApp.Encrypt(data, password)
+	retBytes, err := app.cryptographyApp.Encrypt(data, password)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return retBytes, seedWords, nil
 }
 
 func (app *application) retrieveBlockchainFromID(id uuid.UUID) (blockchains.Blockchain, error) {

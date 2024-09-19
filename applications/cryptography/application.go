@@ -4,13 +4,15 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/ed25519"
-	"crypto/rand"
+	crypto_rand "crypto/rand"
 	"crypto/sha256"
 	"errors"
+	"fmt"
 	"io"
 	"strings"
 
 	"github.com/tyler-smith/go-bip39"
+	"github.com/tyler-smith/go-bip39/wordlists"
 	"golang.org/x/crypto/pbkdf2"
 )
 
@@ -26,7 +28,7 @@ func createApplication() Application {
 func (app *application) Encrypt(message []byte, password []byte) ([]byte, error) {
 	// Derive a key from the password using PBKDF2
 	salt := make([]byte, 16)
-	_, err := io.ReadFull(rand.Reader, salt)
+	_, err := io.ReadFull(crypto_rand.Reader, salt)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +50,7 @@ func (app *application) Encrypt(message []byte, password []byte) ([]byte, error)
 
 	// Generate a random nonce for GCM
 	nonce := make([]byte, aesGCM.NonceSize())
-	_, err = io.ReadFull(rand.Reader, nonce)
+	_, err = io.ReadFull(crypto_rand.Reader, nonce)
 	if err != nil {
 		return nil, err
 	}
@@ -93,11 +95,46 @@ func (app *application) Decrypt(encrypted []byte, password []byte) ([]byte, erro
 }
 
 // GeneratePrivateKey generates a private key and returns it
-func (app *application) GeneratePrivateKey(words []string) (ed25519.PrivateKey, error) {
+func (app *application) GeneratePrivateKey(language uint8) (ed25519.PrivateKey, []string, error) {
+	switch language {
+	case LangEnglish:
+		bip39.SetWordList(wordlists.English)
+	case LangFrench:
+		bip39.SetWordList(wordlists.French)
+	default:
+		return nil, nil, errors.New("the language is invalid")
+	}
+
+	// Generate 256 bits (32 bytes) of entropy
+	entropy, err := bip39.NewEntropy(256)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to generate entropy: %w", err)
+	}
+
+	// Generate the mnemonic from the entropy
+	mnemonic, err := bip39.NewMnemonic(entropy)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to generate mnemonic: %w", err)
+	}
+
+	pk, err := app.generatePrivateKey(mnemonic)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return pk, strings.Split(mnemonic, " "), nil
+}
+
+func (app *application) GeneratePrivateKeyFromSeedWords(seedWords []string) (ed25519.PrivateKey, error) {
 	// Validate mnemonic phrase
-	mnemonic := strings.Join(words, " ")
+	mnemonic := strings.Join(seedWords, " ")
+	return app.generatePrivateKey(mnemonic)
+}
+
+func (app *application) generatePrivateKey(mnemonic string) (ed25519.PrivateKey, error) {
+	// Validate mnemonic phrase
 	if !bip39.IsMnemonicValid(mnemonic) {
-		return nil, errors.New("invalid mnemonic, please use 12 or 24 words")
+		return nil, errors.New("the provided seed words are invalid")
 	}
 
 	// Convert mnemonic to seed (using an optional passphrase, here empty)

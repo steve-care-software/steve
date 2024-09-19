@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
+	"github.com/steve-care-software/steve/applications/cryptography"
 	"github.com/steve-care-software/steve/applications/resources"
 	"github.com/steve-care-software/steve/applications/resources/lists"
 	"github.com/steve-care-software/steve/domain/hash"
@@ -66,26 +67,16 @@ func TestApplication_Success(t *testing.T) {
 		return
 	}
 
-	seedWords := []string{
-		"abandon",
-		"abandon",
-		"abandon",
-		"abandon",
-		"abandon",
-		"abandon",
-		"abandon",
-		"abandon",
-		"abandon",
-		"abandon",
-		"abandon",
-		"about",
-	}
-
 	firstUsername := "roger"
 	firstPassword := []byte("this is a password")
-	err = application.Register(firstUsername, firstPassword, seedWords)
+	seedWords, err := application.Register(firstUsername, firstPassword, cryptography.LangEnglish)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	if len(seedWords) != 24 {
+		t.Errorf("%d seed words were expected, %d returned", 24, len(seedWords))
 		return
 	}
 

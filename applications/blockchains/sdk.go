@@ -83,7 +83,7 @@ type Application interface {
 	Identities() ([]string, error)
 
 	// Register registers a new identity:
-	Register(name string, password []byte, seedWords []string) error
+	Register(name string, password []byte, language uint8) ([]string, error)
 
 	// Authenticate authenticates in an identity:
 	Authenticate(name string, password []byte) error
