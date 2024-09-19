@@ -1,6 +1,9 @@
 package updates
 
-import "github.com/steve-care-software/steve/domain/transpiles/blocks/lines/tokens/pointers"
+import (
+	"github.com/steve-care-software/steve/domain/hash"
+	"github.com/steve-care-software/steve/domain/transpiles/blocks/lines/tokens/pointers"
+)
 
 // Builder represents an update builder
 type Builder interface {
@@ -12,6 +15,7 @@ type Builder interface {
 
 // Update represents an update
 type Update interface {
+	Hash() hash.Hash
 	Origin() pointers.Pointer
 	Target() pointers.Pointer
 }

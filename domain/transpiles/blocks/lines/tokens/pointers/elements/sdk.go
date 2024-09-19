@@ -1,5 +1,9 @@
 package elements
 
+import (
+	"github.com/steve-care-software/steve/domain/hash"
+)
+
 // Builder represents the element builder
 type Builder interface {
 	Create() Builder
@@ -10,6 +14,7 @@ type Builder interface {
 
 // Element represents an element
 type Element interface {
+	Hash() hash.Hash
 	IsToken() bool
 	Token() string
 	IsRule() bool

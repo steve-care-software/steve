@@ -1,6 +1,7 @@
 package lines
 
 import (
+	"github.com/steve-care-software/steve/domain/hash"
 	"github.com/steve-care-software/steve/domain/programs/grammars/blocks/suites"
 	"github.com/steve-care-software/steve/domain/transpiles/blocks/lines/tokens"
 )
@@ -27,6 +28,7 @@ type LineBuilder interface {
 
 // Line represents a line
 type Line interface {
+	Hash() hash.Hash
 	Tokens() tokens.Tokens
 	HasSuites() bool
 	Suites() suites.Suites

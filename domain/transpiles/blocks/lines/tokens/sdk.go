@@ -1,6 +1,7 @@
 package tokens
 
 import (
+	"github.com/steve-care-software/steve/domain/hash"
 	"github.com/steve-care-software/steve/domain/transpiles/blocks/lines/tokens/pointers"
 	"github.com/steve-care-software/steve/domain/transpiles/blocks/lines/tokens/updates"
 )
@@ -28,6 +29,7 @@ type TokenBuilder interface {
 
 // Token represents a token
 type Token interface {
+	Hash() hash.Hash
 	IsUpdate() bool
 	Update() updates.Update
 	IsDelete() bool
