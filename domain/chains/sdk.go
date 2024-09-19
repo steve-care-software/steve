@@ -37,7 +37,7 @@ func NewTranspileBuilder() TranspileBuilder {
 	)
 }
 
-// Adapter represents a chain adapterg
+// Adapter represents a chain adapter
 type Adapter interface {
 	ToNFT(ins Chain) (Chain, error)
 	ToInstance(nft nfts.NFT) (Chain, error)
