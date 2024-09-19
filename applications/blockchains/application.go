@@ -24,32 +24,31 @@ import (
 )
 
 type application struct {
-	storeListApp                 lists.Application
-	resourceApp                  resources.Application
-	cryptographyApp              cryptography.Application
-	identityAdapter              identities.Adapter
-	identityBuilder              identities.Builder
-	blockchainAdapter            blockchains.Adapter
-	blockchainBuilder            blockchains.Builder
-	rootBuilder                  roots.Builder
-	rulesBuilder                 rules.Builder
-	blocksAdapter                blocks.Adapter
-	blocksBuilder                blocks.Builder
-	blockBuilder                 blocks.BlockBuilder
-	contentBuilder               contents.Builder
-	transactionsBuilder          transactions.Builder
-	transactionBuilder           transactions.TransactionBuilder
-	entryBuilder                 entries.Builder
-	hashAdapter                  hash.Adapter
-	identityNamesList            string
-	blockchainListKeyname        string
-	identityKeynamePrefix        string
-	identityUnitsKeynamePrefix   string
-	blockchainKeynamePrefix      string
-	scriptKeynamePrefix          string
-	blockKeynamePrefix           string
-	currentAuthenticatedIdentity identities.Identity
-	trxQueue                     []transactions.Transaction
+	storeListApp               lists.Application
+	resourceApp                resources.Application
+	cryptographyApp            cryptography.Application
+	identityAdapter            identities.Adapter
+	identityBuilder            identities.Builder
+	blockchainAdapter          blockchains.Adapter
+	blockchainBuilder          blockchains.Builder
+	rootBuilder                roots.Builder
+	rulesBuilder               rules.Builder
+	blocksAdapter              blocks.Adapter
+	blocksBuilder              blocks.Builder
+	blockBuilder               blocks.BlockBuilder
+	contentBuilder             contents.Builder
+	transactionsBuilder        transactions.Builder
+	transactionBuilder         transactions.TransactionBuilder
+	entryBuilder               entries.Builder
+	hashAdapter                hash.Adapter
+	identityNamesList          string
+	blockchainListKeyname      string
+	identityKeynamePrefix      string
+	identityUnitsKeynamePrefix string
+	blockchainKeynamePrefix    string
+	scriptKeynamePrefix        string
+	blockKeynamePrefix         string
+	trxQueue                   []transactions.Transaction
 }
 
 func createApplication(
@@ -79,32 +78,31 @@ func createApplication(
 	blockKeynamePrefix string,
 ) Application {
 	out := application{
-		storeListApp:                 storeListApp,
-		resourceApp:                  resourceApp,
-		cryptographyApp:              cryptographyApp,
-		identityAdapter:              identityAdapter,
-		identityBuilder:              identityBuilder,
-		blockchainAdapter:            blockchainAdapter,
-		blockchainBuilder:            blockchainBuilder,
-		rootBuilder:                  rootBuilder,
-		rulesBuilder:                 rulesBuilder,
-		blocksAdapter:                blocksAdapter,
-		blocksBuilder:                blocksBuilder,
-		blockBuilder:                 blockBuilder,
-		contentBuilder:               contentBuilder,
-		transactionsBuilder:          transactionsBuilder,
-		transactionBuilder:           transactionBuilder,
-		entryBuilder:                 entryBuilder,
-		hashAdapter:                  hashAdapter,
-		identityNamesList:            identityNamesList,
-		blockchainListKeyname:        blockchainListKeyname,
-		identityKeynamePrefix:        identityKeynamePrefix,
-		identityUnitsKeynamePrefix:   identityUnitsKeynamePrefix,
-		blockchainKeynamePrefix:      blockchainKeynamePrefix,
-		scriptKeynamePrefix:          scriptKeynamePrefix,
-		blockKeynamePrefix:           blockKeynamePrefix,
-		currentAuthenticatedIdentity: nil,
-		trxQueue:                     []transactions.Transaction{},
+		storeListApp:               storeListApp,
+		resourceApp:                resourceApp,
+		cryptographyApp:            cryptographyApp,
+		identityAdapter:            identityAdapter,
+		identityBuilder:            identityBuilder,
+		blockchainAdapter:          blockchainAdapter,
+		blockchainBuilder:          blockchainBuilder,
+		rootBuilder:                rootBuilder,
+		rulesBuilder:               rulesBuilder,
+		blocksAdapter:              blocksAdapter,
+		blocksBuilder:              blocksBuilder,
+		blockBuilder:               blockBuilder,
+		contentBuilder:             contentBuilder,
+		transactionsBuilder:        transactionsBuilder,
+		transactionBuilder:         transactionBuilder,
+		entryBuilder:               entryBuilder,
+		hashAdapter:                hashAdapter,
+		identityNamesList:          identityNamesList,
+		blockchainListKeyname:      blockchainListKeyname,
+		identityKeynamePrefix:      identityKeynamePrefix,
+		identityUnitsKeynamePrefix: identityUnitsKeynamePrefix,
+		blockchainKeynamePrefix:    blockchainKeynamePrefix,
+		scriptKeynamePrefix:        scriptKeynamePrefix,
+		blockKeynamePrefix:         blockKeynamePrefix,
+		trxQueue:                   []transactions.Transaction{},
 	}
 
 	return &out
@@ -155,25 +153,24 @@ func (app *application) Register(name string, password []byte, language uint8) (
 }
 
 // Authenticate authenticates in an identity:
-func (app *application) Authenticate(name string, password []byte) error {
+func (app *application) Authenticate(name string, password []byte) (identities.Identity, error) {
 	keyname := fmt.Sprintf("%s%s", app.identityKeynamePrefix, name)
 	cipher, err := app.resourceApp.Retrieve(keyname)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	data, err := app.cryptographyApp.Decrypt(cipher, password)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	identity, _, err := app.identityAdapter.ToInstance(data)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	app.currentAuthenticatedIdentity = identity
-	return nil
+	return identity, nil
 }
 
 // Recover recovers an identity using the seed phrases
@@ -189,26 +186,12 @@ func (app *application) Recover(name string, newPassword []byte, words []string)
 		return err
 	}
 
-	app.currentAuthenticatedIdentity = nil
 	return app.resourceApp.Commit()
 }
 
-// Authenticated returns the authenticated idgentity, if any
-func (app *application) Authenticated() (string, error) {
-	if app.currentAuthenticatedIdentity == nil {
-		return "", errors.New(noAuthIdentityErr)
-	}
-
-	return app.currentAuthenticatedIdentity.Name(), nil
-}
-
 // Units returns the amount of units the authenticated identity has
-func (app *application) Units(blockchain uuid.UUID) (*uint64, error) {
-	if app.currentAuthenticatedIdentity == nil {
-		return nil, errors.New(noAuthIdentityErr)
-	}
-
-	pubKey := app.currentAuthenticatedIdentity.PK().Public().(ed25519.PublicKey)
+func (app *application) Units(identity identities.Identity, blockchain uuid.UUID) (*uint64, error) {
+	pubKey := identity.PK().Public().(ed25519.PublicKey)
 	keyname := app.unitsPerOwnerAndBlockchainKeyname(pubKey, blockchain)
 	data, err := app.resourceApp.Retrieve(keyname)
 	if err != nil {
@@ -224,11 +207,7 @@ func (app *application) Units(blockchain uuid.UUID) (*uint64, error) {
 }
 
 // Transact creates a new transaction and adds it to our queue list
-func (app *application) Transact(script hash.Hash, fees uint64, flag hash.Hash) error {
-	if app.currentAuthenticatedIdentity == nil {
-		return errors.New(noAuthIdentityErr)
-	}
-
+func (app *application) Transact(identity identities.Identity, script hash.Hash, fees uint64, flag hash.Hash) error {
 	entry, err := app.entryBuilder.Create().
 		WithFees(fees).
 		WithFlag(flag).
@@ -240,7 +219,7 @@ func (app *application) Transact(script hash.Hash, fees uint64, flag hash.Hash) 
 	}
 
 	message := entry.Hash().Bytes()
-	pk := app.currentAuthenticatedIdentity.PK()
+	pk := identity.PK()
 	signature := ed25519.Sign(pk, message)
 	publicKey := pk.Public().(ed25519.PublicKey)
 	trx, err := app.transactionBuilder.Create().WithEntry(entry).
@@ -268,11 +247,7 @@ func (app *application) TrxQueue() (transactions.Transactions, error) {
 }
 
 // Mine mines a block using the queued transaction, with the specified max amount of trx
-func (app *application) Mine(blockchainID uuid.UUID, maxAmountTrx uint) error {
-	if app.currentAuthenticatedIdentity == nil {
-		return errors.New(noAuthIdentityErr)
-	}
-
+func (app *application) Mine(identity identities.Identity, blockchainID uuid.UUID, maxAmountTrx uint) error {
 	blockchain, err := app.retrieveBlockchainFromID(blockchainID)
 	if err != nil {
 		return err
@@ -313,7 +288,7 @@ func (app *application) Mine(blockchainID uuid.UUID, maxAmountTrx uint) error {
 		return err
 	}
 
-	minerPubKey := app.currentAuthenticatedIdentity.PK().Public()
+	minerPubKey := identity.PK().Public()
 	content, err := app.contentBuilder.Create().
 		WithParent(parent).
 		WithTransactions(trx).
@@ -355,6 +330,7 @@ func (app *application) Sync(blockHash hash.Hash) error {
 
 // Create a new blockchain
 func (app *application) Create(
+	identity identities.Identity,
 	identifier uuid.UUID,
 	name string,
 	description string,
@@ -363,10 +339,6 @@ func (app *application) Create(
 	baseDifficulty uint8,
 	increaseDiffPerrx float64,
 ) error {
-	if app.currentAuthenticatedIdentity == nil {
-		return errors.New(noAuthIdentityErr)
-	}
-
 	rules, err := app.rulesBuilder.Create().
 		WithBaseDifficulty(baseDifficulty).
 		WithIncreaseDifficultyPerTrx(increaseDiffPerrx).
@@ -382,7 +354,7 @@ func (app *application) Create(
 		return err
 	}
 
-	pubKey := app.currentAuthenticatedIdentity.PK().Public().(ed25519.PublicKey)
+	pubKey := identity.PK().Public().(ed25519.PublicKey)
 	root, err := app.rootBuilder.Create().
 		WithAmount(unitAmount).
 		WithOwner(pubKey).

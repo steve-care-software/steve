@@ -16,8 +16,6 @@ import (
 	"github.com/steve-care-software/steve/domain/hash"
 )
 
-const noAuthIdentityErr = "there is currently no authenticated identity"
-
 // NewBuilder creates a new builder
 func NewBuilder(
 	identityNamesList string,
@@ -86,25 +84,22 @@ type Application interface {
 	Register(name string, password []byte, language uint8) ([]string, error)
 
 	// Authenticate authenticates in an identity:
-	Authenticate(name string, password []byte) error
+	Authenticate(name string, password []byte) (identities.Identity, error)
 
 	// Recover recovers an identity using the seed phrases
 	Recover(name string, newPassword []byte, words []string) error
 
-	// Authenticated returns the authenticated idgentity, if any
-	Authenticated() (string, error)
-
 	// Units returns the amount of units the authenticated identity has
-	Units(blockchain uuid.UUID) (*uint64, error)
+	Units(identity identities.Identity, blockchain uuid.UUID) (*uint64, error)
 
 	// Transact creates a new transaction and adds it to our queue list
-	Transact(script hash.Hash, fees uint64, flag hash.Hash) error
+	Transact(identity identities.Identity, script hash.Hash, fees uint64, flag hash.Hash) error
 
 	// TrxQueue returns the transactions ready to be put in a block
 	TrxQueue() (transactions.Transactions, error)
 
 	// Mine mines a block using the queued transaction, with the specified max amount of trx
-	Mine(blockchain uuid.UUID, maxAmountTrx uint) error
+	Mine(identity identities.Identity, blockchain uuid.UUID, maxAmountTrx uint) error
 
 	// Block adds a block to the queue
 	Block(blockchain uuid.UUID, block blocks.Block) error
@@ -113,7 +108,7 @@ type Application interface {
 	Sync(blockHash hash.Hash) error
 
 	// Create a new blockchain
-	Create(identifier uuid.UUID, name string, description string, unitAmount uint64, miningValue uint8, baseDifficulty uint8, increaseDiffPerrx float64) error
+	Create(identity identities.Identity, identifier uuid.UUID, name string, description string, unitAmount uint64, miningValue uint8, baseDifficulty uint8, increaseDiffPerrx float64) error
 
 	// Blockchains returns the list of blockchains
 	Blockchains() ([]uuid.UUID, error)

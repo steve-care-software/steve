@@ -96,33 +96,16 @@ func TestApplication_Success(t *testing.T) {
 		return
 	}
 
-	_, err = application.Authenticated()
-	if err == nil {
-		t.Errorf("the error was expected to be valid, nil returned")
-		return
-	}
-
-	err = application.Authenticate(firstUsername, firstPassword)
+	_, err = application.Authenticate(firstUsername, firstPassword)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
 	}
 
 	// bad password
-	err = application.Authenticate(firstUsername, []byte("bad password"))
+	_, err = application.Authenticate(firstUsername, []byte("bad password"))
 	if err == nil {
 		t.Errorf("the error was expected to be valid, nil returned")
-		return
-	}
-
-	authUsername, err := application.Authenticated()
-	if err != nil {
-		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
-		return
-	}
-
-	if authUsername != firstUsername {
-		t.Errorf("the authenticated username was expected to be %s, %s returned", authUsername, firstPassword)
 		return
 	}
 
@@ -134,20 +117,20 @@ func TestApplication_Success(t *testing.T) {
 	}
 
 	// old password
-	err = application.Authenticate(firstUsername, firstPassword)
+	_, err = application.Authenticate(firstUsername, firstPassword)
 	if err == nil {
 		t.Errorf("the error was expected to be valid, nil returned")
 		return
 	}
 
-	err = application.Authenticate(firstUsername, firstNewPassword)
+	retIdentity, err := application.Authenticate(firstUsername, firstNewPassword)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
 	}
 
 	// retrieve invalid blockchain units:
-	_, err = application.Units(randomID)
+	_, err = application.Units(retIdentity, randomID)
 	if err == nil {
 		t.Errorf("the error was expected to be valid, nil returned")
 		return
@@ -162,6 +145,7 @@ func TestApplication_Success(t *testing.T) {
 
 	unitAmount := uint64(100000000000)
 	err = application.Create(
+		retIdentity,
 		blockchainID,
 		"myBlockchain",
 		"This is a description",
@@ -176,7 +160,7 @@ func TestApplication_Success(t *testing.T) {
 		return
 	}
 
-	pAmount, err := application.Units(blockchainID)
+	pAmount, err := application.Units(retIdentity, blockchainID)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
@@ -222,7 +206,7 @@ func TestApplication_Success(t *testing.T) {
 		return
 	}
 
-	err = application.Transact(*pScript, uint64(fees), *pFlag)
+	err = application.Transact(retIdentity, *pScript, uint64(fees), *pFlag)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
@@ -241,7 +225,7 @@ func TestApplication_Success(t *testing.T) {
 	}
 
 	// mine:
-	err = application.Mine(blockchainID, 2)
+	err = application.Mine(retIdentity, blockchainID, 2)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
