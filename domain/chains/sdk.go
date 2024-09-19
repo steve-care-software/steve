@@ -5,6 +5,14 @@ import (
 	"github.com/steve-care-software/steve/domain/hash"
 )
 
+// NewActionBuilder creates a new action builder
+func NewActionBuilder() ActionBuilder {
+	hashAdapter := hash.NewAdapter()
+	return createActionBuilder(
+		hashAdapter,
+	)
+}
+
 // NewInterpreterBuilder creates a new interpreter builder
 func NewInterpreterBuilder() InterpreterBuilder {
 	hashAdapter := hash.NewAdapter()
