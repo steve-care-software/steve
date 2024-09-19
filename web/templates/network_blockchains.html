@@ -111,6 +111,17 @@
             <li><a href="/network/blockchains/1000">1000</a></li>
         </ul>
     </div>
+
+    <h2>Create Blockchain</h2>
+    <p>If you want to create a new blockchain database in order to process transactions related to a specific functionality, simply fill the form below.</p>
+    <form action="/network/blockchains">
+        <input type="text" id="name" class="inputbox" placeholder="Blockchain Name" />
+        <textarea rows="20" cols="20" id="description" placeholder="Blockchain Description"></textarea>
+        <input type="text" id="unitsamount" class="inputbox" placeholder="Amount of Units" />
+        <input type="text" id="basedifficulty" class="inputbox" placeholder="Base Difficulty" />
+        <input type="text" id="diffincrement" class="inputbox" placeholder="Difficulty Increment" />
+        <input type="submit" value="Create" class="btn" />
+    </form>
 {{end}}
 
 {{define "footer"}}
