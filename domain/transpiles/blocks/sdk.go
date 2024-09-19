@@ -4,6 +4,16 @@ import (
 	"github.com/steve-care-software/steve/domain/transpiles/blocks/lines"
 )
 
+// NewBuilder creates a new builder
+func NewBuilder() Builder {
+	return createBuilder()
+}
+
+// NewBlockBuilder creates a new block builder
+func NewBlockBuilder() BlockBuilder {
+	return createBlockBuilder()
+}
+
 // Builder represents a blocks builder
 type Builder interface {
 	Create() Builder
