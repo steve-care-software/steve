@@ -1,0 +1,109 @@
+{{define "head"}}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Steve Care</title>
+    <link rel="stylesheet" href="/default.css">
+{{end}}
+
+{{define "left_menu"}}
+    <ul>
+        <li><a href="/network/identities">Identities</a></li>
+        <li><a href="/network/wallets">Wallets</a></li>
+        <li><a href="/network/blockchains">Blockchains</a></li>
+        <li><a href="/network/queue">Transactions Queue</a></li>
+    </ul>
+{{end}}
+
+{{define "breadcrumb"}}
+<div id="breadcrumb" class="block content">
+    <ul>
+        <li><a href="/">Home</a></li>
+        <li><a href="/network">Network</a></li>
+      <li>Blockchains</li>
+    </ul>
+  </div>
+{{end}}
+
+{{define "maincontent"}}
+    <h1>Blockchains</h1>
+    <p>Blockchains are decentralized databases that hold a specific function.  To interact with them, you need to create a transaction, which are then inserted into a block.  Every time a blockchain updates, it change its head to the new block it receives and executes its transactions.</p>
+    <table class="tablevalues">
+        <thead>
+            <tr>
+                <td>Identifier</td>
+                <td>Name</td>
+                <td>Description</td>
+                <td>Base Difficulty</td>
+                <td>Increase per Transaction</td>
+                <td>Units Amount</td>
+                <td>Owner</td>
+                <td>Creation Time</td>
+                <td>Head Block</td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><a href="/network/blockchains/c394eed5-bb44-4b62-a7dd-bff88e3ac453">c394eed5-bb44-4b62-a7dd-bff88e3ac453</a></td>
+                <td>WEBX</td>
+                <td>This is the root blockchain where the script's NFTS are recorded</td>
+                <td>2</td>
+                <td>0.1</td>
+                <td>100000000</td>
+                <td><a href="/network/wallets/899f67297e9dc5313a12c988bf5bf27a1d1da31d9442b6cf2889dadf2756b064b6e2b9614e6d8a136da48a0ca788837ea00617cd872497bad9e7c6369ed45486">899f67297e...</a></td>
+                <td>2024-01-23 11:23PM</td>
+                <td><a href="/network/blockchains/c394eed5-bb44-4b62-a7dd-bff88e3ac453/blocks/aeae379a6e857728e44164267fdb7a0e27b205d757cc19899586c89dbb221930f1813d02ff93a661859bc17065eac4d6edf3c38a034e6283a84754d52917e5b0">aeae379a6e...</a></td>
+            </tr>
+            <tr class="second">
+                <td><a href="/network/blockchains/c394eed5-bb44-4b62-a7dd-bff88e3ac453">c394eed5-bb44-4b62-a7dd-bff88e3ac453</a></td>
+                <td>WEBX</td>
+                <td>This is the root blockchain where the script's NFTS are recorded</td>
+                <td>2</td>
+                <td>0.1</td>
+                <td>100000000</td>
+                <td><a href="/network/wallets/899f67297e9dc5313a12c988bf5bf27a1d1da31d9442b6cf2889dadf2756b064b6e2b9614e6d8a136da48a0ca788837ea00617cd872497bad9e7c6369ed45486">899f67297e...</a></td>
+                <td>2024-01-23 11:23PM</td>
+                <td><a href="/network/blockchains/c394eed5-bb44-4b62-a7dd-bff88e3ac453/blocks/aeae379a6e857728e44164267fdb7a0e27b205d757cc19899586c89dbb221930f1813d02ff93a661859bc17065eac4d6edf3c38a034e6283a84754d52917e5b0">aeae379a6e...</a></td>
+            </tr>
+            <tr>
+                <td><a href="/network/blockchains/c394eed5-bb44-4b62-a7dd-bff88e3ac453">c394eed5-bb44-4b62-a7dd-bff88e3ac453</a></td>
+                <td>WEBX</td>
+                <td>This is the root blockchain where the script's NFTS are recorded</td>
+                <td>2</td>
+                <td>0.1</td>
+                <td>100000000</td>
+                <td><a href="/network/wallets/899f67297e9dc5313a12c988bf5bf27a1d1da31d9442b6cf2889dadf2756b064b6e2b9614e6d8a136da48a0ca788837ea00617cd872497bad9e7c6369ed45486">899f67297e...</a></td>
+                <td>2024-01-23 11:23PM</td>
+                <td><a href="/network/blockchains/c394eed5-bb44-4b62-a7dd-bff88e3ac453/blocks/aeae379a6e857728e44164267fdb7a0e27b205d757cc19899586c89dbb221930f1813d02ff93a661859bc17065eac4d6edf3c38a034e6283a84754d52917e5b0">aeae379a6e...</a></td>
+            </tr>
+            <tr class="second">
+                <td><a href="/network/blockchains/c394eed5-bb44-4b62-a7dd-bff88e3ac453">c394eed5-bb44-4b62-a7dd-bff88e3ac453</a></td>
+                <td>WEBX</td>
+                <td>This is the root blockchain where the script's NFTS are recorded</td>
+                <td>2</td>
+                <td>0.1</td>
+                <td>100000000</td>
+                <td><a href="/network/wallets/899f67297e9dc5313a12c988bf5bf27a1d1da31d9442b6cf2889dadf2756b064b6e2b9614e6d8a136da48a0ca788837ea00617cd872497bad9e7c6369ed45486">899f67297e...</a></td>
+                <td>2024-01-23 11:23PM</td>
+                <td><a href="/network/blockchains/c394eed5-bb44-4b62-a7dd-bff88e3ac453/blocks/aeae379a6e857728e44164267fdb7a0e27b205d757cc19899586c89dbb221930f1813d02ff93a661859bc17065eac4d6edf3c38a034e6283a84754d52917e5b0">aeae379a6e...</a></td>
+            </tr>
+            <tr>
+                <td><a href="/network/blockchains/c394eed5-bb44-4b62-a7dd-bff88e3ac453">c394eed5-bb44-4b62-a7dd-bff88e3ac453</a></td>
+                <td>WEBX</td>
+                <td>This is the root blockchain where the script's NFTS are recorded</td>
+                <td>2</td>
+                <td>0.1</td>
+                <td>100000000</td>
+                <td><a href="/network/wallets/899f67297e9dc5313a12c988bf5bf27a1d1da31d9442b6cf2889dadf2756b064b6e2b9614e6d8a136da48a0ca788837ea00617cd872497bad9e7c6369ed45486">899f67297e...</a></td>
+                <td>2024-01-23 11:23PM</td>
+                <td><a href="/network/blockchains/c394eed5-bb44-4b62-a7dd-bff88e3ac453/blocks/aeae379a6e857728e44164267fdb7a0e27b205d757cc19899586c89dbb221930f1813d02ff93a661859bc17065eac4d6edf3c38a034e6283a84754d52917e5b0">aeae379a6e...</a></td>
+            </tr>
+        </tbody>
+    </table>
+{{end}}
+
+{{define "footer"}}
+    <footer class="block">
+        &copy; Copyright Steve Care Software.  All rights reserved.
+    </footer>
+    <script src="ide.js"></script>
+{{end}}

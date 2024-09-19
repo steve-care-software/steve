@@ -50,6 +50,7 @@ func main() {
 	tmpl["register.html"] = template.Must(template.ParseFiles("./web/templates/register.html", "./web/templates/base.html"))
 	tmpl["recover.html"] = template.Must(template.ParseFiles("./web/templates/recover.html", "./web/templates/base.html"))
 	tmpl["network.html"] = template.Must(template.ParseFiles("./web/templates/network.html", "./web/templates/base.html"))
+	tmpl["network_blockchains.html"] = template.Must(template.ParseFiles("./web/templates/network_blockchains.html", "./web/templates/base.html"))
 
 	// router:
 	router := mux.NewRouter()
@@ -76,6 +77,13 @@ func main() {
 
 	router.HandleFunc("/network", func(w http.ResponseWriter, r *http.Request) {
 		err := tmpl["network.html"].ExecuteTemplate(w, "base", &Home{})
+		if err != nil {
+			log.Printf("error: %s", err.Error())
+		}
+	})
+
+	router.HandleFunc("/network/blockchains", func(w http.ResponseWriter, r *http.Request) {
+		err := tmpl["network_blockchains.html"].ExecuteTemplate(w, "base", &Home{})
 		if err != nil {
 			log.Printf("error: %s", err.Error())
 		}
