@@ -2,25 +2,19 @@ package pointers
 
 import (
 	"errors"
-	"strconv"
 
-	"github.com/steve-care-software/steve/domain/hash"
 	"github.com/steve-care-software/steve/domain/transpiles/blocks/lines/tokens/pointers/elements"
 )
 
 type builder struct {
-	hashAdapter hash.Adapter
-	element     elements.Element
-	pIndex      *uint
+	element elements.Element
+	pIndex  *uint
 }
 
-func createBuilder(
-	hashAdapter hash.Adapter,
-) Builder {
+func createBuilder() Builder {
 	out := builder{
-		hashAdapter: hashAdapter,
-		element:     nil,
-		pIndex:      nil,
+		element: nil,
+		pIndex:  nil,
 	}
 
 	return &out
@@ -28,9 +22,7 @@ func createBuilder(
 
 // Create initializes the builder
 func (app *builder) Create() Builder {
-	return createBuilder(
-		app.hashAdapter,
-	)
+	return createBuilder()
 }
 
 // WithElement adds an element to the builder
@@ -55,17 +47,7 @@ func (app *builder) Now() (Pointer, error) {
 		return nil, errors.New("the index is mandatory in order to build a Pointer instance")
 	}
 
-	pHash, err := app.hashAdapter.FromMultiBytes([][]byte{
-		app.element.Hash().Bytes(),
-		[]byte(strconv.Itoa(int(*app.pIndex))),
-	})
-
-	if err != nil {
-		return nil, err
-	}
-
 	return createPointer(
-		*pHash,
 		app.element,
 		*app.pIndex,
 	), nil

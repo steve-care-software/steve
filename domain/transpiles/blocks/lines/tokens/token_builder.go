@@ -3,26 +3,21 @@ package tokens
 import (
 	"errors"
 
-	"github.com/steve-care-software/steve/domain/hash"
 	"github.com/steve-care-software/steve/domain/transpiles/blocks/lines/tokens/pointers"
 	"github.com/steve-care-software/steve/domain/transpiles/blocks/lines/tokens/updates"
 )
 
 type tokenBuilder struct {
-	hashAdapter hash.Adapter
-	update      updates.Update
-	del         pointers.Pointer
-	insert      pointers.Pointer
+	update updates.Update
+	del    pointers.Pointer
+	insert pointers.Pointer
 }
 
-func createTokenBuilder(
-	hashAdapter hash.Adapter,
-) TokenBuilder {
+func createTokenBuilder() TokenBuilder {
 	out := tokenBuilder{
-		hashAdapter: hashAdapter,
-		update:      nil,
-		del:         nil,
-		insert:      nil,
+		update: nil,
+		del:    nil,
+		insert: nil,
 	}
 
 	return &out
@@ -30,9 +25,7 @@ func createTokenBuilder(
 
 // Create initializes the builder
 func (app *tokenBuilder) Create() TokenBuilder {
-	return createTokenBuilder(
-		app.hashAdapter,
-	)
+	return createTokenBuilder()
 }
 
 // WithUpdate adds an update to the builder
@@ -55,35 +48,17 @@ func (app *tokenBuilder) WithInsert(insert pointers.Pointer) TokenBuilder {
 
 // Now builds a new Token instance
 func (app *tokenBuilder) Now() (Token, error) {
-	data := [][]byte{}
 	if app.update != nil {
-		data = append(data, app.update.Hash().Bytes())
+		return createTokenWithUpdate(app.update), nil
 	}
 
 	if app.del != nil {
-		data = append(data, app.del.Hash().Bytes())
+		return createTokenWithDelete(app.del), nil
 	}
 
 	if app.insert != nil {
-		data = append(data, app.insert.Hash().Bytes())
+		return createTokenWithInsert(app.insert), nil
 	}
 
-	if len(data) != 1 {
-		return nil, errors.New("the Token is invalid")
-	}
-
-	pHash, err := app.hashAdapter.FromMultiBytes(data)
-	if err != nil {
-		return nil, err
-	}
-
-	if app.update != nil {
-		return createTokenWithUpdate(*pHash, app.update), nil
-	}
-
-	if app.del != nil {
-		return createTokenWithDelete(*pHash, app.del), nil
-	}
-
-	return createTokenWithInsert(*pHash, app.insert), nil
+	return nil, errors.New("the Token is invalid")
 }

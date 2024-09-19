@@ -1,7 +1,6 @@
 package blocks
 
 import (
-	"github.com/steve-care-software/steve/domain/hash"
 	"github.com/steve-care-software/steve/domain/transpiles/blocks/lines"
 )
 
@@ -27,7 +26,6 @@ type BlockBuilder interface {
 
 // Block represents a block
 type Block interface {
-	Hash() hash.Hash
 	Name() string
 	Lines() lines.Lines
 }

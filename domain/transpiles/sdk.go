@@ -2,7 +2,6 @@ package transpiles
 
 import (
 	"github.com/steve-care-software/steve/domain/chains/nfts"
-	"github.com/steve-care-software/steve/domain/hash"
 	"github.com/steve-care-software/steve/domain/transpiles/blocks"
 )
 
@@ -14,7 +13,6 @@ type NFTAdapter interface {
 
 // Transpile represents a transpile
 type Transpile interface {
-	Hash() hash.Hash
 	Blocks() blocks.Blocks
 	Root() string
 }
