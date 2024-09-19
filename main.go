@@ -48,6 +48,7 @@ func main() {
 	tmpl := make(map[string]*template.Template)
 	tmpl["index.html"] = template.Must(template.ParseFiles("./web/templates/index.html", "./web/templates/base.html"))
 	tmpl["register.html"] = template.Must(template.ParseFiles("./web/templates/register.html", "./web/templates/base.html"))
+	tmpl["recover.html"] = template.Must(template.ParseFiles("./web/templates/recover.html", "./web/templates/base.html"))
 
 	// router:
 	router := mux.NewRouter()
@@ -60,6 +61,13 @@ func main() {
 
 	router.HandleFunc("/register", func(w http.ResponseWriter, r *http.Request) {
 		err := tmpl["register.html"].ExecuteTemplate(w, "base", &Home{})
+		if err != nil {
+			log.Printf("error: %s", err.Error())
+		}
+	})
+
+	router.HandleFunc("/recover", func(w http.ResponseWriter, r *http.Request) {
+		err := tmpl["recover.html"].ExecuteTemplate(w, "base", &Home{})
 		if err != nil {
 			log.Printf("error: %s", err.Error())
 		}

@@ -59,22 +59,20 @@
 <div id="breadcrumb" class="block content">
     <ul>
       <li><a href="/">Home</a></li>
-      <li>Register an Identity</li>
+      <li>Recover your Identity</li>
     </ul>
   </div>
 {{end}}
 
 {{define "maincontent"}}
-    <h1>Register an Identity</h1>
-    <p>Registering an identity consists of reserving a username and generating a private key assigned to that username.  The private key will be encrypted using your choosen passwword.  The private key is generated using 24 words that will be shown to you after submitting the form.</p>
-    <p>You need to write down the words because if you lose your password, you'll need them to <a href="/recover">recover</a> your account.</p>
+    <h1>Recover your identity</h1>
+    <p>When <a href="/register">you registered</a> your identity, you were provided with a list of 24 seed words.  Please write them below, along with your username and a new password to recover access to your identity.</p>
+    <p>If you lost your seed words, you can't recover your identity.</p>
     <form action="/register">
         <div id="registerbox">
-
             <div class="errormessage">
                 <p>The username and password are mandatory in order to register an identity.</p>
             </div>
-            
             <div id="registercontent">
                 <div>
                     <table id="registerform">
@@ -84,52 +82,50 @@
                                 <td><input type="text" id="username" class="inputbox" /></td>
                             </tr>
                             <tr>
-                                <td><label for="password">Password:</label></td>
+                                <td><label for="password">New Password:</label></td>
                                 <td><input type="text" id="password" class="inputbox" /></td>
                             </tr>
                             <tr>
-                                <td><label for="passagain">Password Again:</label></td>
+                                <td><label for="passagain">Password again:</label></td>
                                 <td><input type="text" id="passagain" class="inputbox" /></td>
-                            </tr>
-                            <tr>
-                                <td colspan="2" class="right"><input type="submit" value="Register" class="btn" /></td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-                <div class="warningbox">
-                    <p>Please note that the seed word order below is important.  When <a href="/recover">recovering your account</a> you'll need to provide them in the right order to reset your identity's password.</p>
-                </div>
             </div>
 
             <div id="seedwords">
-                <h2>The private key's seed words are:</h2>
+                <h2>Please type your seed words below:</h2>
                 <ol>
-                    <li>abandon</li>
-                    <li>about</li>
-                    <li>army</li>
-                    <li>basket</li>
-                    <li>blanket</li>
-                    <li>board</li>
-                    <li>budget</li>
-                    <li>chat</li>
-                    <li>consider</li>
-                    <li>crystal</li>
-                    <li>detect</li>
-                    <li>drum</li>
-                    <li>energy</li>
-                    <li>february</li>
-                    <li>frame</li>
-                    <li>hair</li>
-                    <li>hub</li>
-                    <li>iron</li>
-                    <li>law</li>
-                    <li>make</li>
-                    <li>myself</li>
-                    <li>oppose</li>
-                    <li>peace</li>
-                    <li>priority</li>
+                    <li><input type="text" name="seedwords[]" class="inputbox" /></li>
+                    <li><input type="text" name="seedwords[]" class="inputbox" /></li>
+                    <li><input type="text" name="seedwords[]" class="inputbox" /></li>
+                    <li><input type="text" name="seedwords[]" class="inputbox" /></li>
+                    <li><input type="text" name="seedwords[]" class="inputbox" /></li>
+                    <li><input type="text" name="seedwords[]" class="inputbox" /></li>
+                    <li><input type="text" name="seedwords[]" class="inputbox" /></li>
+                    <li><input type="text" name="seedwords[]" class="inputbox" /></li>
+                    <li><input type="text" name="seedwords[]" class="inputbox" /></li>
+                    <li><input type="text" name="seedwords[]" class="inputbox" /></li>
+                    <li><input type="text" name="seedwords[]" class="inputbox" /></li>
+                    <li><input type="text" name="seedwords[]" class="inputbox" /></li>
+                    <li><input type="text" name="seedwords[]" class="inputbox" /></li>
+                    <li><input type="text" name="seedwords[]" class="inputbox" /></li>
+                    <li><input type="text" name="seedwords[]" class="inputbox" /></li>
+                    <li><input type="text" name="seedwords[]" class="inputbox" /></li>
+                    <li><input type="text" name="seedwords[]" class="inputbox" /></li>
+                    <li><input type="text" name="seedwords[]" class="inputbox" /></li>
+                    <li><input type="text" name="seedwords[]" class="inputbox" /></li>
+                    <li><input type="text" name="seedwords[]" class="inputbox" /></li>
+                    <li><input type="text" name="seedwords[]" class="inputbox" /></li>
+                    <li><input type="text" name="seedwords[]" class="inputbox" /></li>
+                    <li><input type="text" name="seedwords[]" class="inputbox" /></li>
+                    <li><input type="text" name="seedwords[]" class="inputbox" /></li>
                 </ol>
+            </div>
+
+            <div class="fullwidth">
+                <input type="submit" value="Recover" class="btn right" />
             </div>
         </div>
     </form>

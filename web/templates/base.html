@@ -38,13 +38,7 @@
       </div>
 
       <div id="middlecontent">
-        <div id="breadcrumb" class="block content">
-          <ul>
-            <li><a href="/">Home</a></li>
-            <li><a href="/identities">Identities</a></li>
-            <li><a href="/identities/steve">Steve</a></li>
-          </ul>
-        </div>
+        {{template "breadcrumb" .}}
         <div id="mainsection" class="block content">
           {{template "maincontent" .}}
         </div>
