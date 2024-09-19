@@ -6,6 +6,22 @@ import (
 	"github.com/steve-care-software/steve/domain/transpiles/blocks/lines/tokens/updates"
 )
 
+// NewBuilder creates a new builder
+func NewBuilder() Builder {
+	hashAdapter := hash.NewAdapter()
+	return createBuilder(
+		hashAdapter,
+	)
+}
+
+// NewTokenBuilder creates a new token builder
+func NewTokenBuilder() TokenBuilder {
+	hashAdapter := hash.NewAdapter()
+	return createTokenBuilder(
+		hashAdapter,
+	)
+}
+
 // Builder represents tokens builder
 type Builder interface {
 	Create() Builder
