@@ -1,61 +1,51 @@
 package chains
 
 import (
-	"github.com/steve-care-software/steve/domain/chains/nfts"
 	"github.com/steve-care-software/steve/domain/hash"
+	"github.com/steve-care-software/steve/domain/programs/grammars/blocks/suites"
 )
 
 // NewBuilder creates a new builder
 func NewBuilder() Builder {
-	hashAdapter := hash.NewAdapter()
-	return createBuilder(
-		hashAdapter,
-	)
+	return createBuilder()
 }
 
 // NewActionBuilder creates a new action builder
 func NewActionBuilder() ActionBuilder {
-	hashAdapter := hash.NewAdapter()
-	return createActionBuilder(
-		hashAdapter,
-	)
+	return createActionBuilder()
 }
 
 // NewInterpreterBuilder creates a new interpreter builder
 func NewInterpreterBuilder() InterpreterBuilder {
-	hashAdapter := hash.NewAdapter()
-	return createInterpreterBuilder(
-		hashAdapter,
-	)
+	return createInterpreterBuilder()
 }
 
 // NewTranspileBuilder creates a new transpile builder
 func NewTranspileBuilder() TranspileBuilder {
-	hashAdapter := hash.NewAdapter()
-	return createTranspileBuilder(
-		hashAdapter,
-	)
+	return createTranspileBuilder()
 }
 
 // Adapter represents a chain adapter
 type Adapter interface {
 	ToNFT(ins Chain) (Chain, error)
-	ToInstance(nft nfts.NFT) (Chain, error)
+	ToInstance(nft hash.Hash) (Chain, error)
 }
 
 // Builder represents a chain builder
 type Builder interface {
 	Create() Builder
-	WithGrammar(grammar nfts.NFT) Builder
+	WithGrammar(grammar hash.Hash) Builder
 	WithAction(action Action) Builder
+	WithSuites(suites suites.Suites) Builder
 	Now() (Chain, error)
 }
 
 // Chain represents a chain of action
 type Chain interface {
-	Hash() hash.Hash
-	Grammar() nfts.NFT // contain my grammar code
+	Grammar() hash.Hash
 	Action() Action
+	HasSuites() bool
+	Suites() suites.Suites
 }
 
 // ActionBuilder represents the action builder
@@ -68,7 +58,6 @@ type ActionBuilder interface {
 
 // Action represents a program action
 type Action interface {
-	Hash() hash.Hash
 	IsInterpret() bool
 	Interpret() Interpreter
 	IsTranspile() bool
@@ -85,7 +74,6 @@ type InterpreterBuilder interface {
 
 // Interpreter represents the interpreter
 type Interpreter interface {
-	Hash() hash.Hash
 	Variable() string
 	HasNext() bool
 	Next() Chain
@@ -94,17 +82,16 @@ type Interpreter interface {
 // TranspileBuilder represents a transpile builder
 type TranspileBuilder interface {
 	Create() TranspileBuilder
-	WithBridge(bridge nfts.NFT) TranspileBuilder
-	WithTarget(target nfts.NFT) TranspileBuilder
+	WithBridge(bridge hash.Hash) TranspileBuilder
+	WithTarget(target hash.Hash) TranspileBuilder
 	WithNext(next Chain) TranspileBuilder
 	Now() (Transpile, error)
 }
 
 // Transpile represents a transpile
 type Transpile interface {
-	Hash() hash.Hash
-	Bridge() nfts.NFT // bridge code
-	Target() nfts.NFT // grammar code
+	Bridge() hash.Hash // transpile code
+	Target() hash.Hash // grammar code
 	HasNext() bool
 	Next() Chain
 }

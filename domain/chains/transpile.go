@@ -1,42 +1,36 @@
 package chains
 
 import (
-	"github.com/steve-care-software/steve/domain/chains/nfts"
 	"github.com/steve-care-software/steve/domain/hash"
 )
 
 type transpile struct {
-	hash   hash.Hash
-	bridge nfts.NFT
-	target nfts.NFT
+	bridge hash.Hash
+	target hash.Hash
 	next   Chain
 }
 
 func createTranspile(
-	hash hash.Hash,
-	bridge nfts.NFT,
-	target nfts.NFT,
+	bridge hash.Hash,
+	target hash.Hash,
 ) Transpile {
-	return createTranspileInternally(hash, bridge, target, nil)
+	return createTranspileInternally(bridge, target, nil)
 }
 
 func createTranspileWithNext(
-	hash hash.Hash,
-	bridge nfts.NFT,
-	target nfts.NFT,
+	bridge hash.Hash,
+	target hash.Hash,
 	next Chain,
 ) Transpile {
-	return createTranspileInternally(hash, bridge, target, next)
+	return createTranspileInternally(bridge, target, next)
 }
 
 func createTranspileInternally(
-	hash hash.Hash,
-	bridge nfts.NFT,
-	target nfts.NFT,
+	bridge hash.Hash,
+	target hash.Hash,
 	next Chain,
 ) Transpile {
 	out := transpile{
-		hash:   hash,
 		bridge: bridge,
 		target: target,
 		next:   next,
@@ -45,18 +39,13 @@ func createTranspileInternally(
 	return &out
 }
 
-// Hash returns the hash
-func (obj *transpile) Hash() hash.Hash {
-	return obj.hash
-}
-
 // Bridge returns the bridge
-func (obj *transpile) Bridge() nfts.NFT {
+func (obj *transpile) Bridge() hash.Hash {
 	return obj.bridge
 }
 
 // Target returns the target
-func (obj *transpile) Target() nfts.NFT {
+func (obj *transpile) Target() hash.Hash {
 	return obj.target
 }
 

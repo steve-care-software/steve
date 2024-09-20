@@ -3,23 +3,21 @@ package chains
 import (
 	"errors"
 
-	"github.com/steve-care-software/steve/domain/chains/nfts"
 	"github.com/steve-care-software/steve/domain/hash"
+	"github.com/steve-care-software/steve/domain/programs/grammars/blocks/suites"
 )
 
 type builder struct {
-	hashAdapter hash.Adapter
-	grammar     nfts.NFT
-	action      Action
+	grammar hash.Hash
+	action  Action
+	suites  suites.Suites
 }
 
-func createBuilder(
-	hashAdapter hash.Adapter,
-) Builder {
+func createBuilder() Builder {
 	out := builder{
-		hashAdapter: hashAdapter,
-		grammar:     nil,
-		action:      nil,
+		grammar: nil,
+		action:  nil,
+		suites:  nil,
 	}
 
 	return &out
@@ -27,13 +25,11 @@ func createBuilder(
 
 // Create initializes the builder
 func (app *builder) Create() Builder {
-	return createBuilder(
-		app.hashAdapter,
-	)
+	return createBuilder()
 }
 
 // WithGrammar adds a grammar to the builder
-func (app *builder) WithGrammar(grammar nfts.NFT) Builder {
+func (app *builder) WithGrammar(grammar hash.Hash) Builder {
 	app.grammar = grammar
 	return app
 }
@@ -41,6 +37,12 @@ func (app *builder) WithGrammar(grammar nfts.NFT) Builder {
 // WithAction adds an action to the builder
 func (app *builder) WithAction(action Action) Builder {
 	app.action = action
+	return app
+}
+
+// WithSuites add suites to the builder
+func (app *builder) WithSuites(suites suites.Suites) Builder {
+	app.suites = suites
 	return app
 }
 
@@ -54,14 +56,9 @@ func (app *builder) Now() (Chain, error) {
 		return nil, errors.New("the action is mandatory in order to build a Chain instance")
 	}
 
-	pHash, err := app.hashAdapter.FromMultiBytes([][]byte{
-		app.grammar.Hash().Bytes(),
-		app.action.Hash().Bytes(),
-	})
-
-	if err != nil {
-		return nil, err
+	if app.suites != nil {
+		return createChainWithSuites(app.grammar, app.action, app.suites), nil
 	}
 
-	return createChain(*pHash, app.grammar, app.action), nil
+	return createChain(app.grammar, app.action), nil
 }

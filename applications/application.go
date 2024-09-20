@@ -7,7 +7,7 @@ import (
 	"github.com/steve-care-software/steve/applications/resources"
 	"github.com/steve-care-software/steve/applications/resources/lists"
 	"github.com/steve-care-software/steve/domain/chains"
-	"github.com/steve-care-software/steve/domain/chains/nfts"
+	"github.com/steve-care-software/steve/domain/nfts"
 )
 
 type application struct {

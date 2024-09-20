@@ -1,9 +1,8 @@
 package transpiles
 
 import (
-	"github.com/steve-care-software/steve/domain/chains/nfts"
 	"github.com/steve-care-software/steve/domain/hash"
-	"github.com/steve-care-software/steve/domain/programs"
+	"github.com/steve-care-software/steve/domain/nfts"
 	"github.com/steve-care-software/steve/domain/transpiles/blocks"
 )
 
@@ -14,8 +13,8 @@ func NewBuilder() Builder {
 
 // ParserAdapter represents the transpile parser adapter
 type ParserAdapter interface {
-	// ToTranspile takes the origin grammar and an input and create a transpile instance
-	ToTranspile(origin programs.Program, input []byte) (Transpile, []byte, error)
+	// ToTranspile takes the input and create a transpile instance
+	ToTranspile(input []byte) (Transpile, []byte, error)
 }
 
 // NFTAdapter represents the nft adapter

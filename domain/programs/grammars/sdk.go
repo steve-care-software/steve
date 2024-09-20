@@ -4,7 +4,7 @@ import (
 	"errors"
 	"math/big"
 
-	"github.com/steve-care-software/steve/domain/chains/nfts"
+	"github.com/steve-care-software/steve/domain/nfts"
 	"github.com/steve-care-software/steve/domain/programs/grammars/blocks"
 	"github.com/steve-care-software/steve/domain/programs/grammars/blocks/lines"
 	"github.com/steve-care-software/steve/domain/programs/grammars/blocks/lines/executions"

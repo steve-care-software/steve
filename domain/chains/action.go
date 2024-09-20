@@ -1,44 +1,32 @@
 package chains
 
-import "github.com/steve-care-software/steve/domain/hash"
-
 type action struct {
-	hash        hash.Hash
 	interpreter Interpreter
 	transpile   Transpile
 }
 
 func createActionWithInterpreter(
-	hash hash.Hash,
 	interpreter Interpreter,
 ) Action {
-	return createActionInternally(hash, interpreter, nil)
+	return createActionInternally(interpreter, nil)
 }
 
 func createActionWithTranspile(
-	hash hash.Hash,
 	transpile Transpile,
 ) Action {
-	return createActionInternally(hash, nil, transpile)
+	return createActionInternally(nil, transpile)
 }
 
 func createActionInternally(
-	hash hash.Hash,
 	interpreter Interpreter,
 	transpile Transpile,
 ) Action {
 	out := action{
-		hash:        hash,
 		interpreter: interpreter,
 		transpile:   transpile,
 	}
 
 	return &out
-}
-
-// Hash returns the hash
-func (obj *action) Hash() hash.Hash {
-	return obj.hash
 }
 
 // IsInterpret returns true if there is an interpreter, false otherwise
