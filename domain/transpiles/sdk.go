@@ -11,7 +11,12 @@ func NewBuilder() Builder {
 	return createBuilder()
 }
 
-// ParserAdapter represents the transpile parser adapter
+// FetchGrammarInput returns the grammar input
+func FetchGrammarInput() []byte {
+	return grammarInput()
+}
+
+// ToTranspile converts an input to a transpile instance
 type ParserAdapter interface {
 	// ToTranspile takes the input and create a transpile instance
 	ToTranspile(input []byte) (Transpile, []byte, error)

@@ -231,6 +231,10 @@ func (app *parserAdapter) toTokens(
 			return nil, nil, errors.New(str)
 		}
 
+		if retToken == nil {
+			continue
+		}
+
 		output = append(output, retToken)
 		remaining = retRemaining
 	}
@@ -373,6 +377,10 @@ func (app *parserAdapter) toToken(
 	if length < min {
 		str := fmt.Sprintf("the token was expected a minimum of %d elements, %d returned", min, length)
 		return nil, nil, errors.New(str)
+	}
+
+	if length <= 0 {
+		return nil, input, nil
 	}
 
 	elements, err := app.elementsBuilder.Create().WithList(elementsList).Now()

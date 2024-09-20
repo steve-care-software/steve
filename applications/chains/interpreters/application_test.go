@@ -4,7 +4,30 @@ import (
 	"testing"
 
 	"github.com/steve-care-software/steve/domain/programs/grammars"
+	"github.com/steve-care-software/steve/domain/transpiles"
 )
+
+func TestApplication_transpileGrammar_execTestSuites_Success(t *testing.T) {
+	grammarInput := transpiles.FetchGrammarInput()
+	grammarParserAdapter := grammars.NewParserAdapter()
+	retGrammar, _, err := grammarParserAdapter.ToGrammar(grammarInput)
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	application := NewApplication()
+	err = application.Suites(retGrammar)
+	if err != nil {
+		t.Errorf("there was an error while running the grammar test suites: %s", err.Error())
+		return
+	}
+}
 
 func TestApplication_grammar_withSuites_Success(t *testing.T) {
 
