@@ -3,7 +3,7 @@ package transpiles
 import (
 	"github.com/steve-care-software/steve/domain/hash"
 	"github.com/steve-care-software/steve/domain/nfts"
-	"github.com/steve-care-software/steve/domain/transpiles/blocks"
+	"github.com/steve-care-software/steve/domain/pipelines/transpiles/blocks"
 )
 
 // NewBuilder creates a new builder

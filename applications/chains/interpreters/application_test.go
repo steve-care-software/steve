@@ -3,8 +3,8 @@ package interpreters
 import (
 	"testing"
 
+	"github.com/steve-care-software/steve/domain/pipelines/transpiles"
 	"github.com/steve-care-software/steve/domain/programs/grammars"
-	"github.com/steve-care-software/steve/domain/transpiles"
 )
 
 func TestApplication_transpileGrammar_execTestSuites_Success(t *testing.T) {

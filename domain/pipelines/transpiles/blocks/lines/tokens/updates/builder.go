@@ -3,8 +3,8 @@ package updates
 import (
 	"errors"
 
-	"github.com/steve-care-software/steve/domain/transpiles/blocks/lines/tokens/pointers"
-	"github.com/steve-care-software/steve/domain/transpiles/blocks/lines/tokens/updates/targets"
+	"github.com/steve-care-software/steve/domain/pipelines/transpiles/blocks/lines/tokens/pointers"
+	"github.com/steve-care-software/steve/domain/pipelines/transpiles/blocks/lines/tokens/updates/targets"
 )
 
 type builder struct {

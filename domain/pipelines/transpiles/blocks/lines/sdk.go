@@ -1,8 +1,8 @@
 package lines
 
 import (
+	"github.com/steve-care-software/steve/domain/pipelines/transpiles/blocks/lines/tokens"
 	"github.com/steve-care-software/steve/domain/programs/grammars/blocks/suites"
-	"github.com/steve-care-software/steve/domain/transpiles/blocks/lines/tokens"
 )
 
 // NewBuilder creates a new builder

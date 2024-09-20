@@ -1,7 +1,7 @@
 package pointers
 
 import (
-	"github.com/steve-care-software/steve/domain/transpiles/blocks/lines/tokens/pointers/elements"
+	"github.com/steve-care-software/steve/domain/pipelines/transpiles/blocks/lines/tokens/pointers/elements"
 )
 
 // NewBuilder creates a new builder

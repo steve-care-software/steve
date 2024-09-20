@@ -1,7 +1,7 @@
 package blocks
 
 import (
-	"github.com/steve-care-software/steve/domain/transpiles/blocks/lines"
+	"github.com/steve-care-software/steve/domain/pipelines/transpiles/blocks/lines"
 )
 
 // NewBuilder creates a new builder

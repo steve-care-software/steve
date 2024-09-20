@@ -2,7 +2,7 @@ package transpiles
 
 import (
 	"github.com/steve-care-software/steve/domain/hash"
-	"github.com/steve-care-software/steve/domain/transpiles/blocks"
+	"github.com/steve-care-software/steve/domain/pipelines/transpiles/blocks"
 )
 
 type transpile struct {

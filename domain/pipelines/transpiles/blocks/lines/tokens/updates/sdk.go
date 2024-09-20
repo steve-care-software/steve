@@ -1,8 +1,8 @@
 package updates
 
 import (
-	"github.com/steve-care-software/steve/domain/transpiles/blocks/lines/tokens/pointers"
-	"github.com/steve-care-software/steve/domain/transpiles/blocks/lines/tokens/updates/targets"
+	"github.com/steve-care-software/steve/domain/pipelines/transpiles/blocks/lines/tokens/pointers"
+	"github.com/steve-care-software/steve/domain/pipelines/transpiles/blocks/lines/tokens/updates/targets"
 )
 
 // NewBuilder creates a new builder instance

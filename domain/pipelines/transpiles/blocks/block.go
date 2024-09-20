@@ -1,6 +1,6 @@
 package blocks
 
-import "github.com/steve-care-software/steve/domain/transpiles/blocks/lines"
+import "github.com/steve-care-software/steve/domain/pipelines/transpiles/blocks/lines"
 
 type block struct {
 	name  string

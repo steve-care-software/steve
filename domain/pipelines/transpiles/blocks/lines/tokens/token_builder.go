@@ -3,8 +3,8 @@ package tokens
 import (
 	"errors"
 
-	"github.com/steve-care-software/steve/domain/transpiles/blocks/lines/tokens/pointers"
-	"github.com/steve-care-software/steve/domain/transpiles/blocks/lines/tokens/updates"
+	"github.com/steve-care-software/steve/domain/pipelines/transpiles/blocks/lines/tokens/pointers"
+	"github.com/steve-care-software/steve/domain/pipelines/transpiles/blocks/lines/tokens/updates"
 )
 
 type tokenBuilder struct {

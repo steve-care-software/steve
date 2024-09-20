@@ -1,14 +1,14 @@
 package transpiles
 
 import (
+	"github.com/steve-care-software/steve/domain/pipelines/transpiles/blocks"
+	"github.com/steve-care-software/steve/domain/pipelines/transpiles/blocks/lines"
+	"github.com/steve-care-software/steve/domain/pipelines/transpiles/blocks/lines/tokens"
+	"github.com/steve-care-software/steve/domain/pipelines/transpiles/blocks/lines/tokens/pointers"
+	"github.com/steve-care-software/steve/domain/pipelines/transpiles/blocks/lines/tokens/pointers/elements"
+	"github.com/steve-care-software/steve/domain/pipelines/transpiles/blocks/lines/tokens/updates"
+	"github.com/steve-care-software/steve/domain/pipelines/transpiles/blocks/lines/tokens/updates/targets"
 	"github.com/steve-care-software/steve/domain/programs/grammars"
-	"github.com/steve-care-software/steve/domain/transpiles/blocks"
-	"github.com/steve-care-software/steve/domain/transpiles/blocks/lines"
-	"github.com/steve-care-software/steve/domain/transpiles/blocks/lines/tokens"
-	"github.com/steve-care-software/steve/domain/transpiles/blocks/lines/tokens/pointers"
-	"github.com/steve-care-software/steve/domain/transpiles/blocks/lines/tokens/pointers/elements"
-	"github.com/steve-care-software/steve/domain/transpiles/blocks/lines/tokens/updates"
-	"github.com/steve-care-software/steve/domain/transpiles/blocks/lines/tokens/updates/targets"
 )
 
 type parserAdapter struct {

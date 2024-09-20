@@ -3,7 +3,7 @@ package blocks
 import (
 	"errors"
 
-	"github.com/steve-care-software/steve/domain/transpiles/blocks/lines"
+	"github.com/steve-care-software/steve/domain/pipelines/transpiles/blocks/lines"
 )
 
 type blockBuilder struct {
