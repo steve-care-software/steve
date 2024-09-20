@@ -1,21 +1,28 @@
 package transfers
 
 import (
-	"crypto"
+	"crypto/ed25519"
 	"errors"
+	"strconv"
+
+	"github.com/steve-care-software/steve/domain/hash"
 )
 
 type builder struct {
-	version   uint
-	amount    uint64
-	publicKey crypto.PublicKey
+	hashAdapter hash.Adapter
+	version     uint
+	amount      uint64
+	publicKey   ed25519.PublicKey
 }
 
-func createBuilder() Builder {
+func createBuilder(
+	hashAdapter hash.Adapter,
+) Builder {
 	out := builder{
-		version:   0,
-		amount:    0,
-		publicKey: nil,
+		hashAdapter: hashAdapter,
+		version:     0,
+		amount:      0,
+		publicKey:   nil,
 	}
 
 	return &out
@@ -23,7 +30,9 @@ func createBuilder() Builder {
 
 // Create initializes the builder
 func (app *builder) Create() Builder {
-	return createBuilder()
+	return createBuilder(
+		app.hashAdapter,
+	)
 }
 
 // WithVersion adds a version to the builder
@@ -39,7 +48,7 @@ func (app *builder) WithAmount(amount uint64) Builder {
 }
 
 // WithPublicKey adds a pubKey to the builder
-func (app *builder) WithPublicKey(pubKey crypto.PublicKey) Builder {
+func (app *builder) WithPublicKey(pubKey ed25519.PublicKey) Builder {
 	app.publicKey = pubKey
 	return app
 }
@@ -58,7 +67,18 @@ func (app *builder) Now() (Transfer, error) {
 		return nil, errors.New("the publicKey is mandatory in order to build a Transfer instance")
 	}
 
+	pHash, err := app.hashAdapter.FromMultiBytes([][]byte{
+		[]byte(strconv.Itoa(int(app.version))),
+		[]byte(strconv.Itoa(int(app.amount))),
+		[]byte(app.publicKey),
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
 	return createTransfer(
+		*pHash,
 		app.version,
 		app.amount,
 		app.publicKey,

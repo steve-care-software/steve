@@ -1,25 +1,37 @@
 package transfers
 
-import "crypto"
+import (
+	"crypto/ed25519"
+
+	"github.com/steve-care-software/steve/domain/hash"
+)
 
 type transfer struct {
+	hash      hash.Hash
 	version   uint
 	amount    uint64
-	publicKey crypto.PublicKey
+	publicKey ed25519.PublicKey
 }
 
 func createTransfer(
+	hash hash.Hash,
 	version uint,
 	amount uint64,
-	publicKey crypto.PublicKey,
+	publicKey ed25519.PublicKey,
 ) Transfer {
 	out := transfer{
+		hash:      hash,
 		version:   version,
 		amount:    amount,
 		publicKey: publicKey,
 	}
 
 	return &out
+}
+
+// Hash returns the hash
+func (obj *transfer) Hash() hash.Hash {
+	return obj.hash
 }
 
 // Version returns the version
@@ -33,6 +45,6 @@ func (obj *transfer) Amount() uint64 {
 }
 
 // PublicKey returns the publicKey
-func (obj *transfer) PublicKey() crypto.PublicKey {
+func (obj *transfer) PublicKey() ed25519.PublicKey {
 	return obj.publicKey
 }
