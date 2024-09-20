@@ -56,7 +56,7 @@ func (app *builder) WithPublicKey(pubKey ed25519.PublicKey) Builder {
 // Now builds a new Transfer instance
 func (app *builder) Now() (Transfer, error) {
 	if app.version <= 0 {
-		return nil, errors.New("the version is mandatory in order to build a Transfer instance")
+		return nil, errors.New("the version must be greater than zero (0) in order to build a Transfer instance")
 	}
 
 	if app.amount <= 0 {
