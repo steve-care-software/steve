@@ -1,6 +1,9 @@
 package points
 
-import "github.com/steve-care-software/steve/domain/scripts/schemas/points/kinds"
+import (
+	"github.com/steve-care-software/steve/domain/hash"
+	"github.com/steve-care-software/steve/domain/scripts/schemas/points/kinds"
+)
 
 const (
 	// StructureList represents the list structure
@@ -15,11 +18,13 @@ const (
 
 // Points represents points
 type Points interface {
+	Hash() hash.Hash
 	List() []Point
 }
 
 // Point represents a point
 type Point interface {
+	Hash() hash.Hash
 	Name() string
 	Kind() kinds.Kind
 	HasStructure() bool
