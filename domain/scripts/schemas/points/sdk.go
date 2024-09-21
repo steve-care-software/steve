@@ -32,10 +32,42 @@ const (
 	KindFloat
 )
 
+// NewBuilder creates a new builder
+func NewBuilder() Builder {
+	hashAdapter := hash.NewAdapter()
+	return createBuilder(
+		hashAdapter,
+	)
+}
+
+// NewPointBuilder creates a new point builder
+func NewPointBuilder() PointBuilder {
+	hashAdapter := hash.NewAdapter()
+	return createPointBuilder(
+		hashAdapter,
+	)
+}
+
+// Builder represents the builder
+type Builder interface {
+	Create() Builder
+	WithList(list []Point) Builder
+	Now() (Points, error)
+}
+
 // Points represents points
 type Points interface {
 	Hash() hash.Hash
 	List() []Point
+}
+
+// PointBuilder represents the point builder
+type PointBuilder interface {
+	Create() PointBuilder
+	WithName(name string) PointBuilder
+	WithKind(kind uint8) PointBuilder
+	WithStructure(structure uint8) PointBuilder
+	Now() (Point, error)
 }
 
 // Point represents a point

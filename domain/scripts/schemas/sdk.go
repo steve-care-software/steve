@@ -7,11 +7,6 @@ import (
 	"github.com/steve-care-software/steve/domain/scripts/schemas/roles"
 )
 
-// ParserAdapter represents a schema parser adapter
-type ParserAdapter interface {
-	ToSchema(input []byte) (Schema, error)
-}
-
 // Schema represents the schema
 type Schema interface {
 	Hash() hash.Hash
