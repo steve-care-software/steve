@@ -4,6 +4,7 @@ import (
 	"github.com/steve-care-software/steve/domain/graphs/connections"
 	"github.com/steve-care-software/steve/domain/graphs/points"
 	"github.com/steve-care-software/steve/domain/hash"
+	"github.com/steve-care-software/steve/domain/scripts/schemas/compensations"
 	"github.com/steve-care-software/steve/domain/scripts/schemas/roles"
 )
 
@@ -16,4 +17,6 @@ type Schema interface {
 	Connections() connections.Connections
 	HasRole() bool
 	Role() roles.Role
+	HasCompensation() bool
+	Compensation() compensations.Compensation
 }
