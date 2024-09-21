@@ -30,6 +30,7 @@ type Builder interface {
 
 // Formats represents formats
 type Formats interface {
+	Hash() hash.Hash
 	List() []Format
 }
 

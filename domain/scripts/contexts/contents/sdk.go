@@ -6,6 +6,14 @@ import (
 	"github.com/steve-care-software/steve/domain/scripts/contexts/contents/weights"
 )
 
+// NewBuilder creates a new builder
+func NewBuilder() Builder {
+	hashAdapter := hash.NewAdapter()
+	return createBuilder(
+		hashAdapter,
+	)
+}
+
 // Builder represents a content builder
 type Builder interface {
 	Create() Builder
