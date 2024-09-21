@@ -5,6 +5,22 @@ import (
 	"github.com/steve-care-software/steve/domain/scripts/contexts/contents/suites"
 )
 
+// NewBuilder creates a new builder
+func NewBuilder() Builder {
+	hashAdapter := hash.NewAdapter()
+	return createBuilder(
+		hashAdapter,
+	)
+}
+
+// NewFormatBuilder creates a format builder
+func NewFormatBuilder() FormatBuilder {
+	hashAdapter := hash.NewAdapter()
+	return createFormatBuilder(
+		hashAdapter,
+	)
+}
+
 // Builder represents a formats builder
 type Builder interface {
 	Create() Builder
