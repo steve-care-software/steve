@@ -1,5 +1,9 @@
 package weights
 
+import (
+	"github.com/steve-care-software/steve/domain/scripts/contexts/contents/suites"
+)
+
 // Weights represents weights
 type Weights interface {
 	List() []Weight
@@ -11,4 +15,6 @@ type Weight interface {
 	Value() uint
 	HasReverse() bool
 	Reverse() string
+	HasSuites() bool
+	Suites() suites.Suites
 }

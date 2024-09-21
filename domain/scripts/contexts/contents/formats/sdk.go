@@ -1,7 +1,7 @@
 package formats
 
 import (
-	"github.com/steve-care-software/steve/domain/hash"
+	"github.com/steve-care-software/steve/domain/scripts/contexts/contents/suites"
 )
 
 // Formats represents formats
@@ -12,5 +12,7 @@ type Formats interface {
 // Format represents a format
 type Format interface {
 	Point() string
-	Grammar() hash.Hash
+	Grammar() string
+	HasSuites() bool
+	Suites() suites.Suites
 }
