@@ -4,6 +4,14 @@ import (
 	"github.com/steve-care-software/steve/domain/hash"
 )
 
+// NewBuilder creates a new builder
+func NewBuilder() Builder {
+	hashAdapter := hash.NewAdapter()
+	return createBuilder(
+		hashAdapter,
+	)
+}
+
 // Builder represents the compensation builder
 type Builder interface {
 	Create() Builder
@@ -16,7 +24,7 @@ type Builder interface {
 type Compensation interface {
 	Hash() hash.Hash
 	HasWrite() bool
-	Write() float64
+	Write() *float64
 	HasReview() bool
-	Review() float64
+	Review() *float64
 }
