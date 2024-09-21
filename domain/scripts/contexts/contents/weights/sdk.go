@@ -5,6 +5,22 @@ import (
 	"github.com/steve-care-software/steve/domain/scripts/contexts/contents/suites"
 )
 
+// NewBuilder creates a new builder
+func NewBuilder() Builder {
+	hashAdapter := hash.NewAdapter()
+	return createBuilder(
+		hashAdapter,
+	)
+}
+
+// NewWeightBuilder creates a weight builder
+func NewWeightBuilder() WeightBuilder {
+	hashAdapter := hash.NewAdapter()
+	return createWeightBuilder(
+		hashAdapter,
+	)
+}
+
 // Builder represents the weights builder
 type Builder interface {
 	Create() Builder
