@@ -2,7 +2,6 @@ package points
 
 import (
 	"github.com/steve-care-software/steve/domain/hash"
-	"github.com/steve-care-software/steve/domain/scripts/schemas/points/kinds"
 )
 
 const (
@@ -14,6 +13,23 @@ const (
 
 	// StructureSortedSet represents the sorted set structure
 	StructureSortedSet
+
+	// StructureVector represents the vector structure
+	StructureVector
+)
+
+const (
+	// KindBytes represents the bytes kind
+	KindBytes (uint8) = iota
+
+	// KindInt represents the int kind
+	KindInt
+
+	// KindUint represents the uint kind
+	KindUint
+
+	// KindFloat represents the float kind
+	KindFloat
 )
 
 // Points represents points
@@ -26,7 +42,7 @@ type Points interface {
 type Point interface {
 	Hash() hash.Hash
 	Name() string
-	Kind() kinds.Kind
+	Kind() uint8
 	HasStructure() bool
 	Structure() *uint8
 }
