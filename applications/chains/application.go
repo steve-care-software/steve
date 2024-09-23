@@ -4,9 +4,9 @@ import (
 	"github.com/steve-care-software/steve/applications/chains/interpreters"
 	transpiles_applications "github.com/steve-care-software/steve/applications/chains/transpiles"
 	"github.com/steve-care-software/steve/domain/chains"
-	"github.com/steve-care-software/steve/domain/pipelines/transpiles"
 	"github.com/steve-care-software/steve/domain/programs"
 	"github.com/steve-care-software/steve/domain/programs/grammars"
+	"github.com/steve-care-software/steve/domain/scripts/specifics/transpiles"
 )
 
 type application struct {
