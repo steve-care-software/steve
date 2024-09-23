@@ -1,7 +1,7 @@
 package scripts
 
 import (
-	"github.com/steve-care-software/steve/domain/scripts/transfers"
+	"github.com/steve-care-software/steve/domain/scripts/specifics/transfers"
 )
 
 // FetchGrammarInput fetches the grammar input
