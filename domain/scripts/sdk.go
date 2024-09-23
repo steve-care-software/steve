@@ -1,9 +1,5 @@
 package scripts
 
-import (
-	"github.com/steve-care-software/steve/domain/scripts/specifics/transfers"
-)
-
 // FetchGrammarInput fetches the grammar input
 func FetchGrammarInput() []byte {
 	return grammarInput()
@@ -16,6 +12,4 @@ type ParserAdapter interface {
 
 // Script represents a script
 type Script interface {
-	IsTransfer() bool
-	Transfer() transfers.Transfer
 }
