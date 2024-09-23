@@ -5,6 +5,22 @@ import (
 	"github.com/steve-care-software/steve/domain/scripts/components/suites"
 )
 
+// NewBuilder creates a new builder
+func NewBuilder() Builder {
+	hashAdapter := hash.NewAdapter()
+	return createBuilder(
+		hashAdapter,
+	)
+}
+
+// NewConnectionBuilder creates a new connection builder
+func NewConnectionBuilder() ConnectionBuilder {
+	hashAdapter := hash.NewAdapter()
+	return createConnectionBuilder(
+		hashAdapter,
+	)
+}
+
 // Builder represents the builder
 type Builder interface {
 	Create() Builder
