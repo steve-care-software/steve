@@ -2,6 +2,22 @@ package expectations
 
 import "github.com/steve-care-software/steve/domain/hash"
 
+// NewBuilder creates a new builder
+func NewBuilder() Builder {
+	hashAdapter := hash.NewAdapter()
+	return createBuilder(
+		hashAdapter,
+	)
+}
+
+// NewExpectationBuilder creates a new expectation builder
+func NewExpectationBuilder() ExpectationBuilder {
+	hashAdapter := hash.NewAdapter()
+	return createExpectationBuilder(
+		hashAdapter,
+	)
+}
+
 // Builder represents the expectations builder
 type Builder interface {
 	Create() Builder
