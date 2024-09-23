@@ -4,8 +4,8 @@ import (
 	"errors"
 
 	"github.com/steve-care-software/steve/domain/hash"
+	"github.com/steve-care-software/steve/domain/scripts/components/suites"
 	"github.com/steve-care-software/steve/domain/scripts/specifics/schemas/connections/links"
-	"github.com/steve-care-software/steve/domain/scripts/specifics/schemas/connections/suites"
 )
 
 type connectionBuilder struct {

@@ -5,20 +5,20 @@ import "github.com/steve-care-software/steve/domain/hash"
 type suite struct {
 	hash   hash.Hash
 	name   string
-	path   []string
+	value  []byte
 	isFail bool
 }
 
 func createSuite(
 	hash hash.Hash,
 	name string,
-	path []string,
+	value []byte,
 	isFail bool,
 ) Suite {
 	out := suite{
 		hash:   hash,
 		name:   name,
-		path:   path,
+		value:  value,
 		isFail: isFail,
 	}
 
@@ -35,9 +35,9 @@ func (obj *suite) Name() string {
 	return obj.name
 }
 
-// Path returns the path
-func (obj *suite) Path() []string {
-	return obj.path
+// Value returns the value
+func (obj *suite) Value() []byte {
+	return obj.value
 }
 
 // IsFail returns true if the suite is expected to fail, false otherwise

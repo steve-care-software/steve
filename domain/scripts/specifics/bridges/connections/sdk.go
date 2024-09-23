@@ -2,7 +2,7 @@ package connections
 
 import (
 	"github.com/steve-care-software/steve/domain/hash"
-	"github.com/steve-care-software/steve/domain/scripts/specifics/bridges/connections/suites"
+	"github.com/steve-care-software/steve/domain/scripts/components/suites"
 )
 
 // Builder represents the builder

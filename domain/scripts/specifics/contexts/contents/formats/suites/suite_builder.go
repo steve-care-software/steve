@@ -2,7 +2,6 @@ package suites
 
 import (
 	"errors"
-	"strings"
 
 	"github.com/steve-care-software/steve/domain/hash"
 )
@@ -10,7 +9,7 @@ import (
 type suiteBuilder struct {
 	hashAdapter hash.Adapter
 	name        string
-	path        []string
+	value       []byte
 	isFail      bool
 }
 
@@ -20,7 +19,7 @@ func createSuiteBuilder(
 	out := suiteBuilder{
 		hashAdapter: hashAdapter,
 		name:        "",
-		path:        nil,
+		value:       nil,
 		isFail:      false,
 	}
 
@@ -40,9 +39,9 @@ func (app *suiteBuilder) WithName(name string) SuiteBuilder {
 	return app
 }
 
-// WithPath adds a path to the builder
-func (app *suiteBuilder) WithPath(path []string) SuiteBuilder {
-	app.path = path
+// WithValue adds a value to the builder
+func (app *suiteBuilder) WithValue(value []byte) SuiteBuilder {
+	app.value = value
 	return app
 }
 
@@ -58,12 +57,12 @@ func (app *suiteBuilder) Now() (Suite, error) {
 		return nil, errors.New("the name is mandatory in order to build a Suite instance")
 	}
 
-	if app.path != nil && len(app.path) <= 0 {
-		app.path = nil
+	if app.value != nil && len(app.value) <= 0 {
+		app.value = nil
 	}
 
-	if app.path == nil {
-		return nil, errors.New("the path is mandatory in order to build a Suite instance")
+	if app.value == nil {
+		return nil, errors.New("the value is mandatory in order to build a Suite instance")
 	}
 
 	isFail := "false"
@@ -73,7 +72,7 @@ func (app *suiteBuilder) Now() (Suite, error) {
 
 	pHash, err := app.hashAdapter.FromMultiBytes([][]byte{
 		[]byte(app.name),
-		[]byte(strings.Join(app.path, ",")),
+		app.value,
 		[]byte(isFail),
 	})
 
@@ -81,5 +80,5 @@ func (app *suiteBuilder) Now() (Suite, error) {
 		return nil, err
 	}
 
-	return createSuite(*pHash, app.name, app.path, app.isFail), nil
+	return createSuite(*pHash, app.name, app.value, app.isFail), nil
 }

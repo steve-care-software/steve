@@ -5,7 +5,7 @@ import (
 	"strconv"
 
 	"github.com/steve-care-software/steve/domain/hash"
-	"github.com/steve-care-software/steve/domain/scripts/specifics/contexts/contents/suites"
+	"github.com/steve-care-software/steve/domain/scripts/components/suites"
 )
 
 type weightBuilder struct {

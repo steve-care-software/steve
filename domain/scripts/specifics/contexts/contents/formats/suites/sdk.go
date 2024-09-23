@@ -35,7 +35,7 @@ type Suites interface {
 type SuiteBuilder interface {
 	Create() SuiteBuilder
 	WithName(name string) SuiteBuilder
-	WithPath(path []string) SuiteBuilder
+	WithValue(value []byte) SuiteBuilder
 	IsFail() SuiteBuilder
 	Now() (Suite, error)
 }
@@ -44,6 +44,6 @@ type SuiteBuilder interface {
 type Suite interface {
 	Hash() hash.Hash
 	Name() string
-	Path() []string
+	Value() []byte
 	IsFail() bool
 }

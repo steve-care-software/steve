@@ -2,7 +2,7 @@ package formats
 
 import (
 	"github.com/steve-care-software/steve/domain/hash"
-	"github.com/steve-care-software/steve/domain/scripts/specifics/contexts/contents/suites"
+	"github.com/steve-care-software/steve/domain/scripts/specifics/contexts/contents/formats/suites"
 )
 
 type format struct {

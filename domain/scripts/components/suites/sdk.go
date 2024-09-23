@@ -1,6 +1,9 @@
 package suites
 
-import "github.com/steve-care-software/steve/domain/hash"
+import (
+	"github.com/steve-care-software/steve/domain/hash"
+	"github.com/steve-care-software/steve/domain/scripts/components/suites/expectations"
+)
 
 // NewBuilder creates a new builder
 func NewBuilder() Builder {
@@ -31,19 +34,21 @@ type Suites interface {
 	List() []Suite
 }
 
-// SuiteBuilder represents the suite builder
+// SuiteBuilder represents a suite builder
 type SuiteBuilder interface {
 	Create() SuiteBuilder
 	WithName(name string) SuiteBuilder
-	WithPath(path []string) SuiteBuilder
-	IsFail() SuiteBuilder
+	WithOrigin(origin string) SuiteBuilder
+	WithDestination(destination string) SuiteBuilder
+	WithExpectations(expectations expectations.Expectations) SuiteBuilder
 	Now() (Suite, error)
 }
 
-// Suite represents a test suite
+// Suite represents a suite
 type Suite interface {
 	Hash() hash.Hash
 	Name() string
-	Path() []string
-	IsFail() bool
+	Origin() string
+	Destination() string
+	Expectations() expectations.Expectations
 }
