@@ -2,35 +2,27 @@ package contexts
 
 import (
 	"errors"
-	"strconv"
 
 	"github.com/steve-care-software/steve/domain/hash"
-	"github.com/steve-care-software/steve/domain/scripts/components/compensations"
-	"github.com/steve-care-software/steve/domain/scripts/components/roles"
+	"github.com/steve-care-software/steve/domain/scripts/components/heads"
 	"github.com/steve-care-software/steve/domain/scripts/specifics/contexts/contents"
 )
 
 type builder struct {
-	hashAdapter  hash.Adapter
-	name         string
-	version      uint
-	content      contents.Content
-	parent       string
-	role         roles.Role
-	compensation compensations.Compensation
+	hashAdapter hash.Adapter
+	head        heads.Head
+	content     contents.Content
+	parent      string
 }
 
 func createBuilder(
 	hashAdapter hash.Adapter,
 ) Builder {
 	out := builder{
-		hashAdapter:  hashAdapter,
-		name:         "",
-		version:      0,
-		content:      nil,
-		parent:       "",
-		role:         nil,
-		compensation: nil,
+		hashAdapter: hashAdapter,
+		head:        nil,
+		content:     nil,
+		parent:      "",
 	}
 
 	return &out
@@ -43,15 +35,9 @@ func (app *builder) Create() Builder {
 	)
 }
 
-// WithName adds a name to the builder
-func (app *builder) WithName(name string) Builder {
-	app.name = name
-	return app
-}
-
-// WithVersion adds a version to the builder
-func (app *builder) WithVersion(version uint) Builder {
-	app.version = version
+// WithHead adds an head to the builder
+func (app *builder) WithHead(head heads.Head) Builder {
+	app.head = head
 	return app
 }
 
@@ -67,26 +53,10 @@ func (app *builder) WithParent(parent string) Builder {
 	return app
 }
 
-// WithRole adds a role to the builder
-func (app *builder) WithRole(role roles.Role) Builder {
-	app.role = role
-	return app
-}
-
-// WithCompensation adds a compensation to the builder
-func (app *builder) WithCompensation(compensation compensations.Compensation) Builder {
-	app.compensation = compensation
-	return app
-}
-
 // Now builds a new Context instance
 func (app *builder) Now() (Context, error) {
-	if app.name == "" {
-		return nil, errors.New("the name is mandatory in order to build a Context instance")
-	}
-
-	if app.version <= 0 {
-		return nil, errors.New("the version is mandatory in order to build a Context instance")
+	if app.head == nil {
+		return nil, errors.New("the head is mandatory in order to build a Context instance")
 	}
 
 	if app.content == nil {
@@ -94,21 +64,12 @@ func (app *builder) Now() (Context, error) {
 	}
 
 	data := [][]byte{
-		[]byte(app.name),
-		[]byte(strconv.Itoa(int(app.version))),
-		app.compensation.Hash().Bytes(),
+		app.head.Hash().Bytes(),
+		app.content.Hash().Bytes(),
 	}
 
 	if app.parent != "" {
 		data = append(data, []byte(app.parent))
-	}
-
-	if app.role != nil {
-		data = append(data, app.role.Hash().Bytes())
-	}
-
-	if app.compensation != nil {
-		data = append(data, app.compensation.Hash().Bytes())
 	}
 
 	pHash, err := app.hashAdapter.FromMultiBytes(data)
@@ -116,80 +77,14 @@ func (app *builder) Now() (Context, error) {
 		return nil, err
 	}
 
-	if app.parent != "" && app.role != nil && app.compensation != nil {
-		return createContextWithParentAndRoleAndCompensation(
-			*pHash,
-			app.name,
-			app.version,
-			app.content,
-			app.parent,
-			app.role,
-			app.compensation,
-		), nil
-	}
-
-	if app.parent != "" && app.role != nil {
-		return createContextWithParentAndRole(
-			*pHash,
-			app.name,
-			app.version,
-			app.content,
-			app.parent,
-			app.role,
-		), nil
-	}
-
-	if app.parent != "" && app.compensation != nil {
-		return createContextWithParentAndCompensation(
-			*pHash,
-			app.name,
-			app.version,
-			app.content,
-			app.parent,
-			app.compensation,
-		), nil
-	}
-
-	if app.role != nil && app.compensation != nil {
-		return createContextWithRoleAndCompensation(
-			*pHash,
-			app.name,
-			app.version,
-			app.content,
-			app.role,
-			app.compensation,
-		), nil
-	}
-
 	if app.parent != "" {
 		return createContextWithParent(
 			*pHash,
-			app.name,
-			app.version,
+			app.head,
 			app.content,
 			app.parent,
 		), nil
 	}
 
-	if app.role != nil {
-		return createContextWithRole(
-			*pHash,
-			app.name,
-			app.version,
-			app.content,
-			app.role,
-		), nil
-	}
-
-	if app.compensation != nil {
-		return createContextWithCompensation(
-			*pHash,
-			app.name,
-			app.version,
-			app.content,
-			app.compensation,
-		), nil
-	}
-
-	return createContext(*pHash, app.name, app.version, app.content), nil
+	return createContext(*pHash, app.head, app.content), nil
 }

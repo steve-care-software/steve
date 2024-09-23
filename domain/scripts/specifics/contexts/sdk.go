@@ -2,8 +2,7 @@ package contexts
 
 import (
 	"github.com/steve-care-software/steve/domain/hash"
-	"github.com/steve-care-software/steve/domain/scripts/components/compensations"
-	"github.com/steve-care-software/steve/domain/scripts/components/roles"
+	"github.com/steve-care-software/steve/domain/scripts/components/heads"
 	"github.com/steve-care-software/steve/domain/scripts/specifics/contexts/contents"
 )
 
@@ -18,25 +17,17 @@ func NewBuilder() Builder {
 // Builder represents the builder
 type Builder interface {
 	Create() Builder
-	WithName(name string) Builder
-	WithVersion(version uint) Builder
+	WithHead(head heads.Head) Builder
 	WithContent(content contents.Content) Builder
 	WithParent(parent string) Builder
-	WithRole(role roles.Role) Builder
-	WithCompensation(compensation compensations.Compensation) Builder
 	Now() (Context, error)
 }
 
 // Context represents a context
 type Context interface {
 	Hash() hash.Hash
-	Name() string
-	Version() uint
+	Head() heads.Head
 	Content() contents.Content
 	HasParent() bool
 	Parent() string
-	HasRole() bool
-	Role() roles.Role
-	HasCompensation() bool
-	Compensation() compensations.Compensation
 }
