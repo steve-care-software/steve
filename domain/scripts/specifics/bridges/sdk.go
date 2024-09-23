@@ -6,6 +6,14 @@ import (
 	"github.com/steve-care-software/steve/domain/scripts/specifics/bridges/connections"
 )
 
+// NewBuilder creates a new builder
+func NewBuilder() Builder {
+	hashAdapter := hash.NewAdapter()
+	return createBuilder(
+		hashAdapter,
+	)
+}
+
 // Builder represents the bridge builder
 type Builder interface {
 	Create() Builder
