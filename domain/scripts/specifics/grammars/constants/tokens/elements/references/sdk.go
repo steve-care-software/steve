@@ -2,16 +2,8 @@ package references
 
 import (
 	"github.com/steve-care-software/steve/domain/hash"
-	"github.com/steve-care-software/steve/domain/scripts/specifics/grammars/blocks/lines/tokens/elements/references/values"
+	"github.com/steve-care-software/steve/domain/scripts/specifics/grammars/constants/tokens/elements/references/values"
 )
-
-// NewBuilder creates a new builder
-func NewBuilder() Builder {
-	hashAdapter := hash.NewAdapter()
-	return createBuilder(
-		hashAdapter,
-	)
-}
 
 // Builder represents the reference builder
 type Builder interface {

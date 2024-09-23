@@ -1,22 +1,25 @@
 package references
 
-import "github.com/steve-care-software/steve/domain/hash"
+import (
+	"github.com/steve-care-software/steve/domain/hash"
+	"github.com/steve-care-software/steve/domain/scripts/specifics/grammars/blocks/lines/tokens/elements/references/values"
+)
 
 type reference struct {
 	hash    hash.Hash
 	grammar string
-	block   string
+	value   values.Value
 }
 
 func createReference(
 	hash hash.Hash,
 	grammar string,
-	block string,
+	value values.Value,
 ) Reference {
 	out := reference{
 		hash:    hash,
 		grammar: grammar,
-		block:   block,
+		value:   value,
 	}
 
 	return &out
@@ -32,7 +35,7 @@ func (obj *reference) Grammar() string {
 	return obj.grammar
 }
 
-// Block returns the block
-func (obj *reference) Block() string {
-	return obj.block
+// Value returns the value
+func (obj *reference) Value() values.Value {
+	return obj.value
 }

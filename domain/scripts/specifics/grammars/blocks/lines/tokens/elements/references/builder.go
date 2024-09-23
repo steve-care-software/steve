@@ -4,12 +4,13 @@ import (
 	"errors"
 
 	"github.com/steve-care-software/steve/domain/hash"
+	"github.com/steve-care-software/steve/domain/scripts/specifics/grammars/blocks/lines/tokens/elements/references/values"
 )
 
 type builder struct {
 	hashAdapter hash.Adapter
 	grammar     string
-	block       string
+	value       values.Value
 }
 
 func createBuilder(
@@ -18,7 +19,7 @@ func createBuilder(
 	out := builder{
 		hashAdapter: hashAdapter,
 		grammar:     "",
-		block:       "",
+		value:       nil,
 	}
 
 	return &out
@@ -37,9 +38,9 @@ func (app *builder) WithGrammar(grammar string) Builder {
 	return app
 }
 
-// WithBlock adds a block to the builder
-func (app *builder) WithBlock(block string) Builder {
-	app.block = block
+// WithValue adds a value to the builder
+func (app *builder) WithValue(value values.Value) Builder {
+	app.value = value
 	return app
 }
 
@@ -49,13 +50,13 @@ func (app *builder) Now() (Reference, error) {
 		return nil, errors.New("the grammar is mandatory in order to build a Reference instance")
 	}
 
-	if app.block == "" {
-		return nil, errors.New("the block is mandatory in order to build a Reference instance")
+	if app.value == nil {
+		return nil, errors.New("the value is mandatory in order to build a Reference instance")
 	}
 
 	pHash, err := app.hashAdapter.FromMultiBytes([][]byte{
 		[]byte(app.grammar),
-		[]byte(app.block),
+		app.value.Hash().Bytes(),
 	})
 
 	if err != nil {
@@ -65,6 +66,6 @@ func (app *builder) Now() (Reference, error) {
 	return createReference(
 		*pHash,
 		app.grammar,
-		app.block,
+		app.value,
 	), nil
 }
