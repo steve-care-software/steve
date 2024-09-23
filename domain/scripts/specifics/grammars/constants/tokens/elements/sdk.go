@@ -2,7 +2,6 @@ package elements
 
 import (
 	"github.com/steve-care-software/steve/domain/hash"
-	"github.com/steve-care-software/steve/domain/programs/grammars/rules"
 	"github.com/steve-care-software/steve/domain/scripts/specifics/grammars/blocks/lines/tokens/elements/references"
 )
 
@@ -12,7 +11,7 @@ type Element interface {
 	IsReference() bool
 	Reference() references.Reference
 	IsRule() bool
-	Rule() rules.Rule
+	Rule() string
 	IsConstant() bool
 	Constant() string
 }
