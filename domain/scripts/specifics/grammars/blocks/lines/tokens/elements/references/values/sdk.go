@@ -2,6 +2,14 @@ package values
 
 import "github.com/steve-care-software/steve/domain/hash"
 
+// NewBuilder creates a new builder
+func NewBuilder() Builder {
+	hashAdapter := hash.NewAdapter()
+	return createBuilder(
+		hashAdapter,
+	)
+}
+
 // Builder represents a value builder
 type Builder interface {
 	Create() Builder
