@@ -5,6 +5,14 @@ import (
 	"github.com/steve-care-software/steve/domain/scripts/specifics/grammars/constants/tokens/elements/references/values"
 )
 
+// NewBuilder creates a new builder
+func NewBuilder() Builder {
+	hashAdapter := hash.NewAdapter()
+	return createBuilder(
+		hashAdapter,
+	)
+}
+
 // Builder represents the reference builder
 type Builder interface {
 	Create() Builder
