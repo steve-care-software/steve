@@ -3,25 +3,24 @@ package suites
 import (
 	"errors"
 
-	"github.com/steve-care-software/steve/domain/programs/grammars/blocks/suites/lexers"
-	"github.com/steve-care-software/steve/domain/programs/grammars/blocks/suites/validations"
+	"github.com/steve-care-software/steve/domain/hash"
 )
 
 type suiteBuilder struct {
+	hashAdapter hash.Adapter
 	name        string
 	input       []byte
 	isFail      bool
-	lexer       lexers.Lexer
-	validations validations.Validations
 }
 
-func createSuiteBuilder() SuiteBuilder {
+func createSuiteBuilder(
+	hashAdapter hash.Adapter,
+) SuiteBuilder {
 	out := suiteBuilder{
+		hashAdapter: hashAdapter,
 		name:        "",
 		input:       nil,
 		isFail:      false,
-		lexer:       nil,
-		validations: nil,
 	}
 
 	return &out
@@ -29,7 +28,9 @@ func createSuiteBuilder() SuiteBuilder {
 
 // Create initializes the builder
 func (app *suiteBuilder) Create() SuiteBuilder {
-	return createSuiteBuilder()
+	return createSuiteBuilder(
+		app.hashAdapter,
+	)
 }
 
 // WithName adds a name to the builder
@@ -50,18 +51,6 @@ func (app *suiteBuilder) IsFail() SuiteBuilder {
 	return app
 }
 
-// WithLexer adds a lexer to the builder
-func (app *suiteBuilder) WithLexer(lexer lexers.Lexer) SuiteBuilder {
-	app.lexer = lexer
-	return app
-}
-
-// WithValidations add the validations to the builder
-func (app *suiteBuilder) WithValidations(validations validations.Validations) SuiteBuilder {
-	app.validations = validations
-	return app
-}
-
 // Now builds a new Suite instance
 func (app *suiteBuilder) Now() (Suite, error) {
 	if app.input != nil && len(app.input) <= 0 {
@@ -72,13 +61,20 @@ func (app *suiteBuilder) Now() (Suite, error) {
 		return nil, errors.New("the name is mandatory in order to build a Suite instance")
 	}
 
-	if app.input == nil {
-		return nil, errors.New("the input is mandatory in order to build a Suite instance")
+	isFail := "false"
+	if app.isFail {
+		isFail = "true"
 	}
 
-	if app.validations != nil {
-		return createSuiteWithValidations(app.name, app.input, app.isFail, app.validations), nil
+	pHash, err := app.hashAdapter.FromMultiBytes([][]byte{
+		[]byte(app.name),
+		app.input,
+		[]byte(isFail),
+	})
+
+	if err != nil {
+		return nil, err
 	}
 
-	return createSuite(app.name, app.input, app.isFail), nil
+	return createSuite(*pHash, app.name, app.input, app.isFail), nil
 }

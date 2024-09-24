@@ -1,94 +1,35 @@
 package suites
 
 import (
-	"github.com/steve-care-software/steve/domain/programs/grammars/blocks/suites/lexers"
-	"github.com/steve-care-software/steve/domain/programs/grammars/blocks/suites/validations"
+	"github.com/steve-care-software/steve/domain/hash"
 )
 
 type suite struct {
-	name        string
-	input       []byte
-	isFail      bool
-	lexer       lexers.Lexer
-	validations validations.Validations
+	hash   hash.Hash
+	name   string
+	input  []byte
+	isFail bool
 }
 
 func createSuite(
+	hash hash.Hash,
 	name string,
 	input []byte,
 	isFail bool,
-) Suite {
-	return createSuiteInternally(
-		name,
-		input,
-		isFail,
-		nil,
-		nil,
-	)
-}
-
-func createSuiteWithLexer(
-	name string,
-	input []byte,
-	isFail bool,
-	lexer lexers.Lexer,
-) Suite {
-	return createSuiteInternally(
-		name,
-		input,
-		isFail,
-		lexer,
-		nil,
-	)
-}
-
-func createSuiteWithValidations(
-	name string,
-	input []byte,
-	isFail bool,
-	validations validations.Validations,
-) Suite {
-	return createSuiteInternally(
-		name,
-		input,
-		isFail,
-		nil,
-		validations,
-	)
-}
-
-func createSuiteWithLexerAndValidations(
-	name string,
-	input []byte,
-	isFail bool,
-	lexer lexers.Lexer,
-	validations validations.Validations,
-) Suite {
-	return createSuiteInternally(
-		name,
-		input,
-		isFail,
-		lexer,
-		validations,
-	)
-}
-
-func createSuiteInternally(
-	name string,
-	input []byte,
-	isFail bool,
-	lexer lexers.Lexer,
-	validations validations.Validations,
 ) Suite {
 	out := suite{
-		name:        name,
-		input:       input,
-		isFail:      isFail,
-		lexer:       lexer,
-		validations: validations,
+		hash:   hash,
+		name:   name,
+		input:  input,
+		isFail: isFail,
 	}
 
 	return &out
+}
+
+// Hash returns the hash
+func (obj *suite) Hash() hash.Hash {
+	return obj.hash
 }
 
 // Name returns the name
@@ -104,24 +45,4 @@ func (obj *suite) Input() []byte {
 // IsFail returns true if expected to fail, false otherwise
 func (obj *suite) IsFail() bool {
 	return obj.isFail
-}
-
-// HasLexer returns true if there is a lexer, false otherwise
-func (obj *suite) HasLexer() bool {
-	return obj.lexer != nil
-}
-
-// Lexer returns the lexer, if any
-func (obj *suite) Lexer() lexers.Lexer {
-	return obj.lexer
-}
-
-// HasValidations returns true if there is validations, false otherwise
-func (obj *suite) HasValidations() bool {
-	return obj.validations != nil
-}
-
-// Validations returns the validations, if any
-func (obj *suite) Validations() validations.Validations {
-	return obj.validations
 }

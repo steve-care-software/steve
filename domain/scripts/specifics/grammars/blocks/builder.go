@@ -1,4 +1,4 @@
-package suites
+package blocks
 
 import (
 	"errors"
@@ -8,7 +8,7 @@ import (
 
 type builder struct {
 	hashAdapter hash.Adapter
-	list        []Suite
+	list        []Block
 }
 
 func createBuilder(
@@ -30,24 +30,24 @@ func (app *builder) Create() Builder {
 }
 
 // WithList adds a list to the builder
-func (app *builder) WithList(list []Suite) Builder {
+func (app *builder) WithList(list []Block) Builder {
 	app.list = list
 	return app
 }
 
-// Now builds a new Suites instance
-func (app *builder) Now() (Suites, error) {
+// Now builds a new Blocks instance
+func (app *builder) Now() (Blocks, error) {
 	if app.list != nil && len(app.list) <= 0 {
 		app.list = nil
 	}
 
 	if app.list == nil {
-		return nil, errors.New("there must be at least 1 Suite in order to build a Suites instance")
+		return nil, errors.New("there must be at least 1 Block in order to build a Blocks instance")
 	}
 
 	data := [][]byte{}
-	for _, oneSuite := range app.list {
-		data = append(data, oneSuite.Hash().Bytes())
+	for _, oneBlock := range app.list {
+		data = append(data, oneBlock.Hash().Bytes())
 	}
 
 	pHash, err := app.hashAdapter.FromMultiBytes(data)
@@ -55,5 +55,8 @@ func (app *builder) Now() (Suites, error) {
 		return nil, err
 	}
 
-	return createSuites(*pHash, app.list), nil
+	return createBlocks(
+		*pHash,
+		app.list,
+	), nil
 }

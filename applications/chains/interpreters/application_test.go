@@ -30,18 +30,6 @@ func TestApplication_transpileGrammar_execTestSuites_Success(t *testing.T) {
 }
 
 func TestApplication_grammar_withSuites_Success(t *testing.T) {
-
-	// in the header:
-	// %myDefaultAfterTokenSpace [%myDefaultPrefix, %myDefaultSuffix];
-
-	// spacers block:
-	// %myEndOfLine: .MY_LINE[2] .%mySubSpacer;
-
-	// resources block:
-	//_myGlobalValue: ./this/is/a/path.json;
-
-	// inside a test:
-	// boolAssignment: "bool myVariable = true" > _myGlobalValue > !(myVariable "some value":uint8 true) (mySecond "second value":uint8 true);
 	grammarInput := []byte(`
 		v1;
 		> .instructions;
