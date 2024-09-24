@@ -3,23 +3,33 @@ package rules
 import (
 	"errors"
 	"fmt"
+
+	"github.com/steve-care-software/steve/domain/hash"
 )
 
 type rules struct {
+	hash hash.Hash
 	list []Rule
 	mp   map[string]Rule
 }
 
 func createRules(
+	hash hash.Hash,
 	list []Rule,
 	mp map[string]Rule,
 ) Rules {
 	out := rules{
+		hash: hash,
 		list: list,
 		mp:   mp,
 	}
 
 	return &out
+}
+
+// Hash returns the hash
+func (obj *rules) Hash() hash.Hash {
+	return obj.hash
 }
 
 // List returns the list of rule

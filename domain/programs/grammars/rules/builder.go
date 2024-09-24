@@ -3,15 +3,21 @@ package rules
 import (
 	"errors"
 	"fmt"
+
+	"github.com/steve-care-software/steve/domain/hash"
 )
 
 type builder struct {
-	list []Rule
+	hashAdapter hash.Adapter
+	list        []Rule
 }
 
-func createBuilder() Builder {
+func createBuilder(
+	hashAdapter hash.Adapter,
+) Builder {
 	out := builder{
-		list: nil,
+		hashAdapter: hashAdapter,
+		list:        nil,
 	}
 
 	return &out
@@ -19,7 +25,9 @@ func createBuilder() Builder {
 
 // Create initializes the builder
 func (app *builder) Create() Builder {
-	return createBuilder()
+	return createBuilder(
+		app.hashAdapter,
+	)
 }
 
 // WithList adds a list to the builder
@@ -38,6 +46,7 @@ func (app *builder) Now() (Rules, error) {
 		return nil, errors.New("there must be at least 1 Rule in order to build a Rules instance")
 	}
 
+	data := [][]byte{}
 	mp := map[string]Rule{}
 	for _, oneRule := range app.list {
 		keyname := oneRule.Name()
@@ -45,8 +54,15 @@ func (app *builder) Now() (Rules, error) {
 			str := fmt.Sprintf("the Rule (name: %s) is a duplicate", keyname)
 			return nil, errors.New(str)
 		}
+
 		mp[keyname] = oneRule
+		data = append(data, oneRule.Hash().Bytes())
 	}
 
-	return createRules(app.list, mp), nil
+	pHash, err := app.hashAdapter.FromMultiBytes(data)
+	if err != nil {
+		return nil, err
+	}
+
+	return createRules(*pHash, app.list, mp), nil
 }

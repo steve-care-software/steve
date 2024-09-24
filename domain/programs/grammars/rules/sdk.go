@@ -1,13 +1,21 @@
 package rules
 
+import "github.com/steve-care-software/steve/domain/hash"
+
 // NewBuilder creates a new builder
 func NewBuilder() Builder {
-	return createBuilder()
+	hashAdapter := hash.NewAdapter()
+	return createBuilder(
+		hashAdapter,
+	)
 }
 
 // NewRuleBuilder creates a new rule builder
 func NewRuleBuilder() RuleBuilder {
-	return createRuleBuilder()
+	hashAdapter := hash.NewAdapter()
+	return createRuleBuilder(
+		hashAdapter,
+	)
 }
 
 // Builder represents a rule list
@@ -19,6 +27,7 @@ type Builder interface {
 
 // Rules represents rules
 type Rules interface {
+	Hash() hash.Hash
 	List() []Rule
 	Fetch(name string) (Rule, error)
 }
@@ -33,6 +42,7 @@ type RuleBuilder interface {
 
 // Rule represents a rule
 type Rule interface {
+	Hash() hash.Hash
 	Name() string
 	Bytes() []byte
 }
