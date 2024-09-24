@@ -4,6 +4,22 @@ import (
 	"github.com/steve-care-software/steve/domain/hash"
 )
 
+// NewBuilder creates a new builder
+func NewBuilder() Builder {
+	hashAdapter := hash.NewAdapter()
+	return createBuilder(
+		hashAdapter,
+	)
+}
+
+// NewSuiteBuilder creates a new suite builder
+func NewSuiteBuilder() SuiteBuilder {
+	hashAdapter := hash.NewAdapter()
+	return createSuiteBuilder(
+		hashAdapter,
+	)
+}
+
 // Builder represents the suites builder
 type Builder interface {
 	Create() Builder
@@ -31,5 +47,5 @@ type Suite interface {
 	Hash() hash.Hash
 	Name() string
 	Input() []byte
-	OUtput() []byte
+	Output() []byte
 }
