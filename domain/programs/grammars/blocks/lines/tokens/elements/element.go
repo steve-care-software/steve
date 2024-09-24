@@ -1,35 +1,40 @@
 package elements
 
+import "github.com/steve-care-software/steve/domain/hash"
+
 type element struct {
+	hash     hash.Hash
 	rule     string
 	block    string
 	spacer   string
 	constant string
 }
 
-func createElementWithRule(rule string) Element {
-	return createElementInternally(rule, "", "", "")
+func createElementWithRule(hash hash.Hash, rule string) Element {
+	return createElementInternally(hash, rule, "", "", "")
 }
 
-func createElementWithBlock(block string) Element {
-	return createElementInternally("", block, "", "")
+func createElementWithBlock(hash hash.Hash, block string) Element {
+	return createElementInternally(hash, "", block, "", "")
 }
 
-func createElementWithSpacer(spacer string) Element {
-	return createElementInternally("", "", spacer, "")
+func createElementWithSpacer(hash hash.Hash, spacer string) Element {
+	return createElementInternally(hash, "", "", spacer, "")
 }
 
-func createElementWithConstant(constant string) Element {
-	return createElementInternally("", "", "", constant)
+func createElementWithConstant(hash hash.Hash, constant string) Element {
+	return createElementInternally(hash, "", "", "", constant)
 }
 
 func createElementInternally(
+	hash hash.Hash,
 	rule string,
 	block string,
 	spacer string,
 	constant string,
 ) Element {
 	out := element{
+		hash:     hash,
 		rule:     rule,
 		block:    block,
 		spacer:   spacer,
@@ -37,6 +42,11 @@ func createElementInternally(
 	}
 
 	return &out
+}
+
+// Hash returns the hash
+func (obj *element) Hash() hash.Hash {
+	return obj.hash
 }
 
 // Name returns the rule or block name

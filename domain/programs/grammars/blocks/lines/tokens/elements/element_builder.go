@@ -1,20 +1,28 @@
 package elements
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/steve-care-software/steve/domain/hash"
+)
 
 type elementBuilder struct {
-	rule     string
-	block    string
-	spacer   string
-	constant string
+	hashAdapter hash.Adapter
+	rule        string
+	block       string
+	spacer      string
+	constant    string
 }
 
-func createElementBuilder() ElementBuilder {
+func createElementBuilder(
+	hashAdapter hash.Adapter,
+) ElementBuilder {
 	out := elementBuilder{
-		rule:     "",
-		block:    "",
-		spacer:   "",
-		constant: "",
+		hashAdapter: hashAdapter,
+		rule:        "",
+		block:       "",
+		spacer:      "",
+		constant:    "",
 	}
 
 	return &out
@@ -22,7 +30,9 @@ func createElementBuilder() ElementBuilder {
 
 // Create initializes the builder
 func (app *elementBuilder) Create() ElementBuilder {
-	return createElementBuilder()
+	return createElementBuilder(
+		app.hashAdapter,
+	)
 }
 
 // WithRule adds a rule to the builder
@@ -51,21 +61,43 @@ func (app *elementBuilder) WithConstant(constant string) ElementBuilder {
 
 // Now builds a new Element
 func (app *elementBuilder) Now() (Element, error) {
+	data := [][]byte{}
 	if app.rule != "" {
-		return createElementWithRule(app.rule), nil
+		data = append(data, []byte(app.rule))
 	}
 
 	if app.block != "" {
-		return createElementWithBlock(app.block), nil
+		data = append(data, []byte(app.block))
 	}
 
 	if app.spacer != "" {
-		return createElementWithSpacer(app.spacer), nil
+		data = append(data, []byte(app.spacer))
 	}
 
 	if app.constant != "" {
-		return createElementWithConstant(app.constant), nil
+		data = append(data, []byte(app.constant))
 	}
 
-	return nil, errors.New("the Element is invalid")
+	if len(data) != 1 {
+		return nil, errors.New("the Element is invalid")
+	}
+
+	pHash, err := app.hashAdapter.FromMultiBytes(data)
+	if err != nil {
+		return nil, err
+	}
+
+	if app.rule != "" {
+		return createElementWithRule(*pHash, app.rule), nil
+	}
+
+	if app.block != "" {
+		return createElementWithBlock(*pHash, app.block), nil
+	}
+
+	if app.spacer != "" {
+		return createElementWithSpacer(*pHash, app.spacer), nil
+	}
+
+	return createElementWithConstant(*pHash, app.constant), nil
 }

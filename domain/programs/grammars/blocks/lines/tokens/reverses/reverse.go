@@ -1,29 +1,43 @@
 package reverses
 
-import "github.com/steve-care-software/steve/domain/programs/grammars/blocks/lines/tokens/elements"
+import (
+	"github.com/steve-care-software/steve/domain/hash"
+	"github.com/steve-care-software/steve/domain/programs/grammars/blocks/lines/tokens/elements"
+)
 
 type reverse struct {
+	hash   hash.Hash
 	escape elements.Element
 }
 
-func createReverse() Reverse {
-	return createReverseInternally(nil)
+func createReverse(
+	hash hash.Hash,
+) Reverse {
+	return createReverseInternally(hash, nil)
 }
 
 func createReverseWithEscape(
+	hash hash.Hash,
 	escape elements.Element,
 ) Reverse {
-	return createReverseInternally(escape)
+	return createReverseInternally(hash, escape)
 }
 
 func createReverseInternally(
+	hash hash.Hash,
 	escape elements.Element,
 ) Reverse {
 	out := reverse{
+		hash:   hash,
 		escape: escape,
 	}
 
 	return &out
+}
+
+// Hash returns the hash
+func (obj *reverse) Hash() hash.Hash {
+	return obj.hash
 }
 
 // HasEscape returns true if there is an escape, false otherwise

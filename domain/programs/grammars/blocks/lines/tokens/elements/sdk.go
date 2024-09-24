@@ -1,5 +1,7 @@
 package elements
 
+import "github.com/steve-care-software/steve/domain/hash"
+
 // NewBuilder creates a new builder
 func NewBuilder() Builder {
 	return createBuilder()
@@ -7,7 +9,10 @@ func NewBuilder() Builder {
 
 // NewElementBuilder creates a new element builder
 func NewElementBuilder() ElementBuilder {
-	return createElementBuilder()
+	hashAdapter := hash.NewAdapter()
+	return createElementBuilder(
+		hashAdapter,
+	)
 }
 
 // Builder represents an elments list
@@ -35,6 +40,7 @@ type ElementBuilder interface {
 
 // Element represents an element
 type Element interface {
+	Hash() hash.Hash
 	Name() string
 	IsRule() bool
 	Rule() string

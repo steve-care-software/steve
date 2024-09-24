@@ -1,14 +1,24 @@
 package cardinalities
 
+import (
+	"strconv"
+
+	"github.com/steve-care-software/steve/domain/hash"
+)
+
 type builder struct {
-	min  uint
-	pMax *uint
+	hashAdapter hash.Adapter
+	min         uint
+	pMax        *uint
 }
 
-func createBuilder() Builder {
+func createBuilder(
+	hashAdapter hash.Adapter,
+) Builder {
 	out := builder{
-		min:  0,
-		pMax: nil,
+		hashAdapter: hashAdapter,
+		min:         0,
+		pMax:        nil,
 	}
 
 	return &out
@@ -16,7 +26,9 @@ func createBuilder() Builder {
 
 // Create initializes the builder
 func (app *builder) Create() Builder {
-	return createBuilder()
+	return createBuilder(
+		app.hashAdapter,
+	)
 }
 
 // WithMin adds a min to the builder
@@ -33,9 +45,22 @@ func (app *builder) WithMax(max uint) Builder {
 
 // Now builds a new Cardinality instance
 func (app *builder) Now() (Cardinality, error) {
-	if app.pMax != nil {
-		return createCardinalityWithMax(app.min, app.pMax), nil
+	data := [][]byte{
+		[]byte(strconv.Itoa(int(app.min))),
 	}
 
-	return createCardinality(app.min), nil
+	if app.pMax != nil {
+		data = append(data, []byte(strconv.Itoa(int(*app.pMax))))
+	}
+
+	pHash, err := app.hashAdapter.FromMultiBytes(data)
+	if err != nil {
+		return nil, err
+	}
+
+	if app.pMax != nil {
+		return createCardinalityWithMax(*pHash, app.min, app.pMax), nil
+	}
+
+	return createCardinality(*pHash, app.min), nil
 }

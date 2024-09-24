@@ -1,10 +1,16 @@
 package reverses
 
-import "github.com/steve-care-software/steve/domain/programs/grammars/blocks/lines/tokens/elements"
+import (
+	"github.com/steve-care-software/steve/domain/hash"
+	"github.com/steve-care-software/steve/domain/programs/grammars/blocks/lines/tokens/elements"
+)
 
 // NewBuilder creates a new builder
 func NewBuilder() Builder {
-	return createBuilder()
+	hashAdapter := hash.NewAdapter()
+	return createBuilder(
+		hashAdapter,
+	)
 }
 
 // Builder represents the reverse builder
@@ -16,6 +22,7 @@ type Builder interface {
 
 // Reverse represents the reverse builder
 type Reverse interface {
+	Hash() hash.Hash
 	HasEscape() bool
 	Escape() elements.Element
 }

@@ -1,14 +1,21 @@
 package reverses
 
-import "github.com/steve-care-software/steve/domain/programs/grammars/blocks/lines/tokens/elements"
+import (
+	"github.com/steve-care-software/steve/domain/hash"
+	"github.com/steve-care-software/steve/domain/programs/grammars/blocks/lines/tokens/elements"
+)
 
 type builder struct {
-	escape elements.Element
+	hashAdapter hash.Adapter
+	escape      elements.Element
 }
 
-func createBuilder() Builder {
+func createBuilder(
+	hashAdapter hash.Adapter,
+) Builder {
 	out := builder{
-		escape: nil,
+		hashAdapter: hashAdapter,
+		escape:      nil,
 	}
 
 	return &out
@@ -16,7 +23,9 @@ func createBuilder() Builder {
 
 // Create initializes the builder
 func (app *builder) Create() Builder {
-	return createBuilder()
+	return createBuilder(
+		app.hashAdapter,
+	)
 }
 
 // WithEscape adds an escape to the builder
@@ -27,9 +36,22 @@ func (app *builder) WithEscape(escape elements.Element) Builder {
 
 // Now builds a new Reverse instance
 func (app *builder) Now() (Reverse, error) {
-	if app.escape != nil {
-		return createReverseWithEscape(app.escape), nil
+	data := [][]byte{
+		[]byte("reverse"),
 	}
 
-	return createReverse(), nil
+	if app.escape != nil {
+		data = append(data, app.escape.Hash().Bytes())
+	}
+
+	pHash, err := app.hashAdapter.FromMultiBytes(data)
+	if err != nil {
+		return nil, err
+	}
+
+	if app.escape != nil {
+		return createReverseWithEscape(*pHash, app.escape), nil
+	}
+
+	return createReverse(*pHash), nil
 }
