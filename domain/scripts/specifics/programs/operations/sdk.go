@@ -1,6 +1,7 @@
 package operations
 
 import (
+	"github.com/steve-care-software/steve/domain/hash"
 	"github.com/steve-care-software/steve/domain/scripts/specifics/programs/values"
 )
 
@@ -14,6 +15,7 @@ type Operations interface {
 // relational: <, >, <=, >=, ==, !=
 // logical: and, or, not, xor
 type Operation interface {
+	Hash() hash.Hash
 	IsArithmetic() bool
 	Arithmetic() StandardOperation
 	IsRelational() bool
