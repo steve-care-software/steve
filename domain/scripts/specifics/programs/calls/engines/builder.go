@@ -55,7 +55,7 @@ func (app *builder) Now() (Engine, error) {
 	}
 
 	pHash, err := app.hashAdapter.FromMultiBytes([][]byte{
-		[]byte{*app.pScope},
+		{*app.pScope},
 		app.function.Hash().Bytes(),
 	})
 
