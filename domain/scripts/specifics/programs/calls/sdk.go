@@ -4,6 +4,8 @@ package calls
 type Call interface {
 	IsProgram() bool
 	Program() ProgramCall
+	IsEngine() bool
+	Engine() EngineCall
 	IsFunc() bool
 	Func() FuncCall
 }
@@ -12,6 +14,12 @@ type Call interface {
 type ProgramCall interface {
 	Name() string
 	Input() string
+}
+
+// EngineCall represents an engine call
+type EngineCall interface {
+	Scope() uint8 // role, identity, etc
+	FuncCall() FuncCall
 }
 
 // FuncCall represents a func call
