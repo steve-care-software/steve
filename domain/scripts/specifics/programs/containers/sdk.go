@@ -22,6 +22,22 @@ const (
 	FlagSortedSet
 )
 
+// NewBuilder creates a new builder
+func NewBuilder() Builder {
+	hashAdapter := hash.NewAdapter()
+	return createBuilder(
+		hashAdapter,
+	)
+}
+
+// NewContainerBuilder creates a new container builder
+func NewContainerBuilder() ContainerBuilder {
+	hashAdapter := hash.NewAdapter()
+	return createContainerBuilder(
+		hashAdapter,
+	)
+}
+
 // Builder represents the containers builder
 type Builder interface {
 	Create() Builder

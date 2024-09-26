@@ -2,7 +2,7 @@ package kinds
 
 import (
 	"errors"
-	"strconv"
+	"fmt"
 
 	"github.com/steve-care-software/steve/domain/hash"
 	"github.com/steve-care-software/steve/domain/scripts/specifics/programs/containers/kinds/numerics"
@@ -63,19 +63,21 @@ func (app *builder) Now() (Kind, error) {
 	if app.pEngine != nil {
 		engine := *app.pEngine
 		if engine > EngineRoute {
-			return nil, errors.New("the engine is invalid in order to build a Kind instance")
+			str := fmt.Sprintf("the engine (%d) is invalid when building the Kind instance", engine)
+			return nil, errors.New(str)
 		}
 
-		data = append(data, []byte(strconv.Itoa(int(engine))))
+		data = append(data, []byte{engine})
 	}
 
 	if app.pRemaining != nil {
 		remaining := *app.pRemaining
 		if remaining > RemainingBool {
-			return nil, errors.New("the remaining is invalid in order to build a Kind instance")
+			str := fmt.Sprintf("the remaining (%d) is invalid when building the Kind instance", remaining)
+			return nil, errors.New(str)
 		}
 
-		data = append(data, []byte(strconv.Itoa(int(remaining))))
+		data = append(data, []byte{remaining})
 	}
 
 	if len(data) != 1 {

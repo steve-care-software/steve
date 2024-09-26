@@ -3,7 +3,6 @@ package numerics
 import (
 	"errors"
 	"fmt"
-	"strconv"
 
 	"github.com/steve-care-software/steve/domain/hash"
 )
@@ -68,8 +67,8 @@ func (app *builder) Now() (Numeric, error) {
 	}
 
 	pHash, err := app.hashAdapter.FromMultiBytes([][]byte{
-		[]byte(strconv.Itoa(int(flag))),
-		[]byte(strconv.Itoa(int(size))),
+		{flag},
+		{size},
 	})
 
 	if err != nil {
