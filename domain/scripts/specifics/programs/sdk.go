@@ -10,6 +10,14 @@ import (
 	"github.com/steve-care-software/steve/domain/scripts/specifics/programs/operations"
 )
 
+// NewLoopKeyValueBuilder creates a new loop key value builder
+func NewLoopKeyValueBuilder() LoopKeyValueBuilder {
+	hashAdapter := hash.NewAdapter()
+	return createLoopKeyValueBuilder(
+		hashAdapter,
+	)
+}
+
 // NewConditionBuilder creates a new condition builder
 func NewConditionBuilder() ConditionBuilder {
 	hashAdapter := hash.NewAdapter()
@@ -130,12 +138,20 @@ type LoopCounter interface {
 	Increment() operations.Operation
 }
 
+type LoopKeyValueBuilder interface {
+	Create() LoopKeyValueBuilder
+	WithKeyname(keyname string) LoopKeyValueBuilder
+	WithValueName(valueName string) LoopKeyValueBuilder
+	WithOperation(operation operations.Operation) LoopKeyValueBuilder
+	Now() (LoopKeyValue, error)
+}
+
 // LoopKeyValue represents a key -> value loop
 type LoopKeyValue interface {
 	Hash() hash.Hash
 	KeyName() string
 	ValueName() string
-	Values() any
+	Operation() operations.Operation
 }
 
 // ConditionBuilder represents a condition builder
