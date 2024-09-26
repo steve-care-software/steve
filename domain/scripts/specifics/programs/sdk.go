@@ -5,6 +5,7 @@ import (
 	"github.com/steve-care-software/steve/domain/scripts/components/heads"
 	"github.com/steve-care-software/steve/domain/scripts/specifics/programs/containers"
 	"github.com/steve-care-software/steve/domain/scripts/specifics/programs/instructions"
+	"github.com/steve-care-software/steve/domain/scripts/specifics/programs/suites"
 )
 
 // Program represents a program
@@ -14,7 +15,7 @@ type Program interface {
 	Input() string
 	Instructions() instructions.Instructions
 	HasSuites() bool
-	Suites() Suites
+	Suites() suites.Suites
 }
 
 // Function represents a function
@@ -25,7 +26,7 @@ type Function interface {
 	HasOutput() bool
 	Output() containers.Containers
 	HasSuites() bool
-	Suites() Suites
+	Suites() suites.Suites
 }
 
 // FuncParameters represents func parameters
@@ -40,18 +41,4 @@ type FuncParameter interface {
 	Name() string
 	Container() containers.Container
 	IsMandatory() bool
-}
-
-// Suites represents suites
-type Suites interface {
-	Hash() hash.Hash
-	List() []Suite
-}
-
-// Suite represents a test suite
-type Suite interface {
-	Hash() hash.Hash
-	Init() instructions.Instructions
-	Input() []byte
-	Expectation() []byte
 }
