@@ -1,7 +1,10 @@
 package values
 
+import "github.com/steve-care-software/steve/domain/hash"
+
 // Value represents a value
 type Value interface {
+	Hash() hash.Hash
 	IsMultiple() bool
 	Multiple() ValueMultiple
 	IsSingle() bool

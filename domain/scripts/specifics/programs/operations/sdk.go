@@ -68,6 +68,22 @@ const (
 	StandardXor
 )
 
+// NewBuilder creates a new builder
+func NewBuilder() Builder {
+	hashAdapter := hash.NewAdapter()
+	return createBuilder(
+		hashAdapter,
+	)
+}
+
+// NewOperationBuilder creates a new operation builder
+func NewOperationBuilder() OperationBuilder {
+	hashAdapter := hash.NewAdapter()
+	return createOperationBuilder(
+		hashAdapter,
+	)
+}
+
 // NewStandardBuilder creates a new standard builder
 func NewStandardBuilder() StandardBuilder {
 	hashAdapter := hash.NewAdapter()
@@ -96,13 +112,13 @@ func NewSingleSwordBuilder() SingleSwordBuilder {
 type Builder interface {
 	Create() Builder
 	WithList(list []Operation) Builder
-	Now() (Operation, error)
+	Now() (Operations, error)
 }
 
 // Operations represents operations
 type Operations interface {
 	Hash() hash.Hash
-	List() Operation
+	List() []Operation
 }
 
 // OperationBuilder represents the operation builder
