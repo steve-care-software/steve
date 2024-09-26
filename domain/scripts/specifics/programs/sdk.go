@@ -7,7 +7,6 @@ import (
 	"github.com/steve-care-software/steve/domain/scripts/specifics/programs/containers"
 	"github.com/steve-care-software/steve/domain/scripts/specifics/programs/initializations"
 	"github.com/steve-care-software/steve/domain/scripts/specifics/programs/operations"
-	"github.com/steve-care-software/steve/domain/scripts/specifics/programs/values"
 )
 
 // Program represents a program
@@ -113,7 +112,7 @@ type LoopCounter interface {
 type LoopKeyValue interface {
 	KeyName() string
 	ValueName() string
-	Values() values.ValueMultiple
+	Values() any
 }
 
 // Condition represents a condition

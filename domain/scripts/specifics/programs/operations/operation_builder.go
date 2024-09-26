@@ -1,10 +1,11 @@
 package operations
 
 import (
+	"bytes"
+	"encoding/gob"
 	"errors"
 
 	"github.com/steve-care-software/steve/domain/hash"
-	"github.com/steve-care-software/steve/domain/scripts/specifics/programs/values"
 )
 
 type operationBuilder struct {
@@ -12,7 +13,8 @@ type operationBuilder struct {
 	standard    Standard
 	singleSword SingleSword
 	bitshift    BitShift
-	value       values.Value
+	variable    string
+	value       any
 }
 
 func createOperationBuilder(
@@ -23,6 +25,7 @@ func createOperationBuilder(
 		standard:    nil,
 		singleSword: nil,
 		bitshift:    nil,
+		variable:    "",
 		value:       nil,
 	}
 
@@ -54,8 +57,14 @@ func (app *operationBuilder) WithBitShift(bitshift BitShift) OperationBuilder {
 	return app
 }
 
+// WithVariable adds variable to the builder
+func (app *operationBuilder) WithVariable(variable string) OperationBuilder {
+	app.variable = variable
+	return app
+}
+
 // WithValue adds value to the builder
-func (app *operationBuilder) WithValue(value values.Value) OperationBuilder {
+func (app *operationBuilder) WithValue(value any) OperationBuilder {
 	app.value = value
 	return app
 }
@@ -75,8 +84,19 @@ func (app *operationBuilder) Now() (Operation, error) {
 		data = append(data, app.bitshift.Hash().Bytes())
 	}
 
+	if app.variable != "" {
+		data = append(data, []byte(app.variable))
+	}
+
 	if app.value != nil {
-		data = append(data, app.value.Hash().Bytes())
+		var buf bytes.Buffer
+		enc := gob.NewEncoder(&buf)
+		err := enc.Encode(data)
+		if err != nil {
+			return nil, err
+		}
+
+		data = append(data, buf.Bytes())
 	}
 
 	if len(data) != 1 {
@@ -106,6 +126,13 @@ func (app *operationBuilder) Now() (Operation, error) {
 		return createOperationWithBitShift(
 			*pHash,
 			app.bitshift,
+		), nil
+	}
+
+	if app.variable != "" {
+		return createOperationWithVariable(
+			*pHash,
+			app.variable,
 		), nil
 	}
 

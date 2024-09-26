@@ -2,7 +2,6 @@ package operations
 
 import (
 	"github.com/steve-care-software/steve/domain/hash"
-	"github.com/steve-care-software/steve/domain/scripts/specifics/programs/values"
 )
 
 type operation struct {
@@ -10,35 +9,43 @@ type operation struct {
 	standard    Standard
 	singleSword SingleSword
 	bitshift    BitShift
-	value       values.Value
+	variable    string
+	value       any
 }
 
 func createOperationWithStandard(
 	hash hash.Hash,
 	standard Standard,
 ) Operation {
-	return createOperationInternally(hash, standard, nil, nil, nil)
+	return createOperationInternally(hash, standard, nil, nil, "", nil)
 }
 
 func createOperationWithSingleSword(
 	hash hash.Hash,
 	singleSword SingleSword,
 ) Operation {
-	return createOperationInternally(hash, nil, singleSword, nil, nil)
+	return createOperationInternally(hash, nil, singleSword, nil, "", nil)
 }
 
 func createOperationWithBitShift(
 	hash hash.Hash,
 	bitshift BitShift,
 ) Operation {
-	return createOperationInternally(hash, nil, nil, bitshift, nil)
+	return createOperationInternally(hash, nil, nil, bitshift, "", nil)
+}
+
+func createOperationWithVariable(
+	hash hash.Hash,
+	variable string,
+) Operation {
+	return createOperationInternally(hash, nil, nil, nil, variable, nil)
 }
 
 func createOperationWithValue(
 	hash hash.Hash,
-	value values.Value,
+	value any,
 ) Operation {
-	return createOperationInternally(hash, nil, nil, nil, value)
+	return createOperationInternally(hash, nil, nil, nil, "", value)
 }
 
 func createOperationInternally(
@@ -46,13 +53,15 @@ func createOperationInternally(
 	standard Standard,
 	singleSword SingleSword,
 	bitshift BitShift,
-	value values.Value,
+	variable string,
+	value any,
 ) Operation {
 	out := operation{
 		hash:        hash,
 		standard:    standard,
 		singleSword: singleSword,
 		bitshift:    bitshift,
+		variable:    variable,
 		value:       value,
 	}
 
@@ -94,12 +103,22 @@ func (obj *operation) BitShift() BitShift {
 	return obj.bitshift
 }
 
+// IsVariable returns true if there is a variable, false otherwise
+func (obj *operation) IsVariable() bool {
+	return obj.variable != ""
+}
+
+// Variable returns the variable, if any
+func (obj *operation) Variable() string {
+	return obj.variable
+}
+
 // IsValue returns true if there is a value, false otherwise
 func (obj *operation) IsValue() bool {
 	return obj.value != nil
 }
 
 // Value returns the value, if any
-func (obj *operation) Value() values.Value {
+func (obj *operation) Value() any {
 	return obj.value
 }

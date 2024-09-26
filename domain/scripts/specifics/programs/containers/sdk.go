@@ -9,8 +9,8 @@ const (
 	// FlagSingle represents the flag single
 	FlagSingle (uint8) = iota
 
-	// FlagVector represents the flag vector
-	FlagVector
+	// FlagMap represents the flag map
+	FlagMap
 
 	// FlagList represents the flag list
 	FlagList

@@ -2,7 +2,6 @@ package operations
 
 import (
 	"github.com/steve-care-software/steve/domain/hash"
-	"github.com/steve-care-software/steve/domain/scripts/specifics/programs/values"
 )
 
 const (
@@ -127,7 +126,8 @@ type OperationBuilder interface {
 	WithStandard(standard Standard) OperationBuilder
 	WithSingleSword(singleSword SingleSword) OperationBuilder
 	WithBitShift(bitshift BitShift) OperationBuilder
-	WithValue(value values.Value) OperationBuilder
+	WithVariable(variable string) OperationBuilder
+	WithValue(value any) OperationBuilder
 	Now() (Operation, error)
 }
 
@@ -140,8 +140,10 @@ type Operation interface {
 	SingleSword() SingleSword
 	IsBitShift() bool
 	BitShift() BitShift
+	IsVariable() bool
+	Variable() string
 	IsValue() bool
-	Value() values.Value
+	Value() any
 }
 
 // StandardBuilder represents the standard operation builder
