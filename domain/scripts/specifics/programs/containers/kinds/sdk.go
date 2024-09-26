@@ -21,6 +21,14 @@ const (
 	RemainingBool
 )
 
+// NewBuilder creates a new builder
+func NewBuilder() Builder {
+	hashAdapter := hash.NewAdapter()
+	return createBuilder(
+		hashAdapter,
+	)
+}
+
 // Builder represents the kind builder
 type Builder interface {
 	Create() Builder
