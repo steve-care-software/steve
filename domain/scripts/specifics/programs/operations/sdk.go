@@ -100,9 +100,6 @@ type OperationBuilder interface {
 }
 
 // Operation represents an operation
-// arithmetic: +, -, *, /, %
-// relational: <, >, <=, >=, ==, !=
-// logical: and, or, not, xor
 type Operation interface {
 	Hash() hash.Hash
 	IsStandard() bool
@@ -141,6 +138,9 @@ type StandardBuilder interface {
 }
 
 // Standard represents a standard operation
+// arithmetic: +, -, *, /, %
+// relational: <, >, <=, >=, ==, !=
+// logical: and, or, not, xor
 type Standard interface {
 	Hash() hash.Hash
 	Operations() Operations
