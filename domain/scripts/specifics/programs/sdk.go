@@ -10,6 +10,14 @@ import (
 	"github.com/steve-care-software/steve/domain/scripts/specifics/programs/operations"
 )
 
+// NewLoopInstructionBuilder creates a new loop instruction builder
+func NewLoopInstructionBuilder() LoopInstructionBuilder {
+	hashAdapter := hash.NewAdapter()
+	return createLoopInstructionBuilder(
+		hashAdapter,
+	)
+}
+
 // NewLoopHeaderBuilder creates a new loop header builder
 func NewLoopHeaderBuilder() LoopHeaderBuilder {
 	hashAdapter := hash.NewAdapter()
@@ -126,6 +134,14 @@ type Loop interface {
 type LoopInstructions interface {
 	Hash() hash.Hash
 	List() []LoopInstruction
+}
+
+// LoopInstructionBuilder represents the loop instruction builder
+type LoopInstructionBuilder interface {
+	Create() LoopInstructionBuilder
+	WithInstruction(instruction Instruction) LoopInstructionBuilder
+	IsBreak() LoopInstructionBuilder
+	Now() (LoopInstruction, error)
 }
 
 // LoopInstruction represents a loop instruction
