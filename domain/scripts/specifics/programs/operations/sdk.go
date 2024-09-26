@@ -22,51 +22,59 @@ const (
 )
 
 const (
-	// StandardOperationPlus represents the +
-	StandardOperationPlus (uint8) = iota
+	// StandardPlus represents the +
+	StandardPlus (uint8) = iota
 
-	// StandardOperationMinus represents the -
-	StandardOperationMinus
+	// StandardMinus represents the -
+	StandardMinus
 
-	// StandardOperationMul represents the *
-	StandardOperationMul
+	// StandardMul represents the *
+	StandardMul
 
-	// StandardOperationDiv represents the /
-	StandardOperationDiv
+	// StandardDiv represents the /
+	StandardDiv
 
-	// StandardOperationMod represents the %
-	StandardOperationMod
+	// StandardMod represents the %
+	StandardMod
 
-	// StandardOperationSmallerThan represents the <
-	StandardOperationSmallerThan
+	// StandardSmallerThan represents the <
+	StandardSmallerThan
 
-	// StandardOperationSmallerThan represents the <=
-	StandardOperationSmallerThanOrEqual
+	// StandardSmallerThan represents the <=
+	StandardSmallerThanOrEqual
 
-	// StandardOperationBiggerThan represents the >
-	StandardOperationBiggerThan
+	// StandardBiggerThan represents the >
+	StandardBiggerThan
 
-	// StandardOperationBiggerThanOrEqual represents the >=
-	StandardOperationBiggerThanOrEqual
+	// StandardBiggerThanOrEqual represents the >=
+	StandardBiggerThanOrEqual
 
-	// StandardOperationEqual represents the ==
-	StandardOperationEqual
+	// StandardEqual represents the ==
+	StandardEqual
 
-	// StandardOperationNotEqual represents the !=
-	StandardOperationNotEqual
+	// StandardNotEqual represents the !=
+	StandardNotEqual
 
-	// StandardOperationAnd represents the &&
-	StandardOperationAnd
+	// StandardAnd represents the &&
+	StandardAnd
 
-	// StandardOperationOr represents the ||
-	StandardOperationOr
+	// StandardOr represents the ||
+	StandardOr
 
-	// StandardOperationNot represents the !
-	StandardOperationNot
+	// StandardNot represents the !
+	StandardNot
 
-	// StandardOperationXor represents the xor
-	StandardOperationXor
+	// StandardXor represents the xor
+	StandardXor
 )
+
+// NewSingleSwordBuilder creates a new single sword builder
+func NewSingleSwordBuilder() SingleSwordBuilder {
+	hashAdapter := hash.NewAdapter()
+	return createSingleSwordBuilder(
+		hashAdapter,
+	)
+}
 
 // Builder represents the operations builder
 type Builder interface {
@@ -84,8 +92,8 @@ type Operations interface {
 // OperationBuilder represents the operation builder
 type OperationBuilder interface {
 	Create() OperationBuilder
-	WithStandardOperation(standardOperation StandardOperation) OperationBuilder
-	WithSingleSword(singleSword SingleSwordOperation) OperationBuilder
+	WithStandard(standard Standard) OperationBuilder
+	WithSingleSword(singleSword SingleSword) OperationBuilder
 	WithBitShift(bitshift BitShift) OperationBuilder
 	WithValue(value values.Value) OperationBuilder
 	Now() (Operation, error)
@@ -98,9 +106,9 @@ type OperationBuilder interface {
 type Operation interface {
 	Hash() hash.Hash
 	IsStandard() bool
-	Standard() StandardOperation
+	Standard() Standard
 	IsSingleSword() bool
-	SingleSword() SingleSwordOperation
+	SingleSword() SingleSword
 	IsBitShift() bool
 	BitShift() BitShift
 	IsValue() bool
@@ -124,31 +132,31 @@ type BitShift interface {
 	Amount() uint8
 }
 
-// StandardOperationBuilder represents the standard operation builder
-type StandardOperationBuilder interface {
-	Create() StandardOperationBuilder
-	WithOperations(operations Operations) StandardOperationBuilder
-	WithFlag(flag uint8) StandardOperationBuilder
-	Now() (StandardOperation, error)
+// StandardBuilder represents the standard operation builder
+type StandardBuilder interface {
+	Create() StandardBuilder
+	WithOperations(operations Operations) StandardBuilder
+	WithFlag(flag uint8) StandardBuilder
+	Now() (Standard, error)
 }
 
-// StandardOperation represents a standard operation
-type StandardOperation interface {
+// Standard represents a standard operation
+type Standard interface {
 	Hash() hash.Hash
 	Operations() Operations
 	Flag() uint8
 }
 
-// SingleSwordOperationBuilder represents the single sword operation builder
-type SingleSwordOperationBuilder interface {
-	Create() SingleSwordOperationBuilder
-	WithVariable(variable string) SingleSwordOperationBuilder
-	WithFlag(flag uint8) SingleSwordOperationBuilder
-	Now() (SingleSwordOperation, error)
+// SingleSwordBuilder represents the single sword operation builder
+type SingleSwordBuilder interface {
+	Create() SingleSwordBuilder
+	WithVariable(variable string) SingleSwordBuilder
+	WithFlag(flag uint8) SingleSwordBuilder
+	Now() (SingleSword, error)
 }
 
-// SingleSwordOperation represents a single sword operation
-type SingleSwordOperation interface {
+// SingleSword represents a single sword operation
+type SingleSword interface {
 	Hash() hash.Hash
 	Variable() string
 	Flag() uint8 // ++, --
