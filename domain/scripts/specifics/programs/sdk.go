@@ -1,6 +1,7 @@
 package programs
 
 import (
+	"github.com/steve-care-software/steve/domain/hash"
 	"github.com/steve-care-software/steve/domain/scripts/components/heads"
 	"github.com/steve-care-software/steve/domain/scripts/specifics/programs/assignments"
 	"github.com/steve-care-software/steve/domain/scripts/specifics/programs/calls"
@@ -11,6 +12,7 @@ import (
 
 // Program represents a program
 type Program interface {
+	Hash() hash.Hash
 	Head() heads.Head
 	Input() string
 	Instructions() Instructions
@@ -20,6 +22,7 @@ type Program interface {
 
 // Function represents a function
 type Function interface {
+	Hash() hash.Hash
 	Parameters() FuncParameters
 	Instructions() Instructions
 	HasOutput() bool
@@ -30,11 +33,13 @@ type Function interface {
 
 // FuncParameters represents func parameters
 type FuncParameters interface {
+	Hash() hash.Hash
 	List() []FuncParameter
 }
 
 // FuncParameter represents a func parameter
 type FuncParameter interface {
+	Hash() hash.Hash
 	Name() string
 	Container() containers.Container
 	IsMandatory() bool
@@ -42,23 +47,27 @@ type FuncParameter interface {
 
 // Suites represents suites
 type Suites interface {
+	Hash() hash.Hash
 	List() []Suite
 }
 
 // Suite represents a test suite
 type Suite interface {
+	Hash() hash.Hash
+	Init() Instructions
 	Input() []byte
 	Expectation() []byte
-	Instructions() Instructions
 }
 
 // Instructions represents instructions
 type Instructions interface {
+	Hash() hash.Hash
 	List() []Instruction
 }
 
 // Instruction represents an instruction
 type Instruction interface {
+	Hash() hash.Hash
 	IsInitialization() bool
 	Initialization() initializations.Initialization
 	IsAssignment() bool
@@ -76,17 +85,20 @@ type Instruction interface {
 
 // Loop represents a loop
 type Loop interface {
+	Hash() hash.Hash
 	LoopHeader() LoopHeader
 	Instructions() LoopInstructions
 }
 
 // LoopInstructions represents a loop instruction
 type LoopInstructions interface {
+	Hash() hash.Hash
 	List() []LoopInstruction
 }
 
 // LoopInstruction represents a loop instruction
 type LoopInstruction interface {
+	Hash() hash.Hash
 	IsInstruction() bool
 	Instruction() Instruction
 	IsBreak() bool
@@ -94,6 +106,7 @@ type LoopInstruction interface {
 
 // LoopHeader represents a loop header
 type LoopHeader interface {
+	Hash() hash.Hash
 	IsCounter() bool
 	Counter() LoopCounter
 	IsKeyValue() bool
@@ -103,6 +116,7 @@ type LoopHeader interface {
 
 // LoopCounter represents a loop counter
 type LoopCounter interface {
+	Hash() hash.Hash
 	Initialization() initializations.Initialization
 	Operation() operations.Operation
 	Increment() operations.Operation
@@ -110,6 +124,7 @@ type LoopCounter interface {
 
 // LoopKeyValue represents a key -> value loop
 type LoopKeyValue interface {
+	Hash() hash.Hash
 	KeyName() string
 	ValueName() string
 	Values() any
@@ -117,6 +132,7 @@ type LoopKeyValue interface {
 
 // Condition represents a condition
 type Condition interface {
+	Hash() hash.Hash
 	Operation() operations.Operation
 	Instructions() Instructions
 }
