@@ -29,6 +29,14 @@ const (
 	Size64
 )
 
+// NewBuilder creates a new builder
+func NewBuilder() Builder {
+	hashAdapter := hash.NewAdapter()
+	return createBuilder(
+		hashAdapter,
+	)
+}
+
 // Builder represents the numeric builder
 type Builder interface {
 	Create() Builder
