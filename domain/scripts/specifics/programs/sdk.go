@@ -10,6 +10,14 @@ import (
 	"github.com/steve-care-software/steve/domain/scripts/specifics/programs/operations"
 )
 
+// NewConditionBuilder creates a new condition builder
+func NewConditionBuilder() ConditionBuilder {
+	hashAdapter := hash.NewAdapter()
+	return createConditionBuilder(
+		hashAdapter,
+	)
+}
+
 // Program represents a program
 type Program interface {
 	Hash() hash.Hash
@@ -128,6 +136,14 @@ type LoopKeyValue interface {
 	KeyName() string
 	ValueName() string
 	Values() any
+}
+
+// ConditionBuilder represents a condition builder
+type ConditionBuilder interface {
+	Create() ConditionBuilder
+	WithOperation(operation operations.Operation) ConditionBuilder
+	WithInstructions(instructions Instructions) ConditionBuilder
+	Now() (Condition, error)
 }
 
 // Condition represents a condition
