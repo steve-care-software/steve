@@ -5,14 +5,14 @@ import (
 	"strings"
 
 	"github.com/steve-care-software/steve/domain/hash"
-	"github.com/steve-care-software/steve/domain/scripts/specifics/programs/instructions/operations"
+	"github.com/steve-care-software/steve/domain/scripts/specifics/programs/containers"
 )
 
 type builder struct {
 	hashAapter hash.Adapter
 	variables  []string
-	operation  operations.Operation
-	isInitial  bool
+	assignable Assignable
+	initial    containers.Container
 }
 
 func createBuilder(
@@ -21,8 +21,8 @@ func createBuilder(
 	out := builder{
 		hashAapter: hashAapter,
 		variables:  nil,
-		operation:  nil,
-		isInitial:  false,
+		assignable: nil,
+		initial:    nil,
 	}
 
 	return &out
@@ -41,15 +41,15 @@ func (app *builder) WithVariables(variables []string) Builder {
 	return app
 }
 
-// WithOperation add opration to the builder
-func (app *builder) WithOperation(operation operations.Operation) Builder {
-	app.operation = operation
+// WithAssignable add opration to the builder
+func (app *builder) WithAssignable(assignable Assignable) Builder {
+	app.assignable = assignable
 	return app
 }
 
-// IsInitial flags the builder as initial
-func (app *builder) IsInitial() Builder {
-	app.isInitial = true
+// WithInitial adds an initial to the builder
+func (app *builder) WithInitial(initial containers.Container) Builder {
+	app.initial = initial
 	return app
 }
 
@@ -63,29 +63,37 @@ func (app *builder) Now() (Assignment, error) {
 		return nil, errors.New("the variables is mandatory in order to build an Assignment instance")
 	}
 
-	if app.operation == nil {
-		return nil, errors.New("the operation is mandatory in order to build an Assignment instance")
+	if app.assignable == nil {
+		return nil, errors.New("the assignable is mandatory in order to build an Assignment instance")
 	}
 
-	isInitial := "false"
-	if app.isInitial {
-		isInitial = "true"
-	}
-
-	pHash, err := app.hashAapter.FromMultiBytes([][]byte{
+	data := [][]byte{
 		[]byte(strings.Join(app.variables, ",")),
-		app.operation.Hash().Bytes(),
-		[]byte(isInitial),
-	})
+		app.assignable.Hash().Bytes(),
+	}
+
+	if app.initial != nil {
+		data = append(data, app.initial.Hash().Bytes())
+	}
+
+	pHash, err := app.hashAapter.FromMultiBytes(data)
 
 	if err != nil {
 		return nil, err
 	}
 
+	if app.initial != nil {
+		return createAssignmentWithInitial(
+			*pHash,
+			app.variables,
+			app.assignable,
+			app.initial,
+		), nil
+	}
+
 	return createAssignment(
 		*pHash,
 		app.variables,
-		app.operation,
-		app.isInitial,
+		app.assignable,
 	), nil
 }

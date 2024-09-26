@@ -2,27 +2,54 @@ package assignments
 
 import (
 	"github.com/steve-care-software/steve/domain/hash"
-	"github.com/steve-care-software/steve/domain/scripts/specifics/programs/instructions/operations"
+	"github.com/steve-care-software/steve/domain/scripts/specifics/programs/containers"
 )
 
 type assignment struct {
-	hash      hash.Hash
-	variables []string
-	operation operations.Operation
-	isInitial bool
+	hash       hash.Hash
+	variables  []string
+	assignable Assignable
+	initial    containers.Container
 }
 
 func createAssignment(
 	hash hash.Hash,
 	variables []string,
-	operation operations.Operation,
-	isInitial bool,
+	assignable Assignable,
+) Assignment {
+	return createAssignmentInternally(
+		hash,
+		variables,
+		assignable,
+		nil,
+	)
+}
+
+func createAssignmentWithInitial(
+	hash hash.Hash,
+	variables []string,
+	assignable Assignable,
+	initial containers.Container,
+) Assignment {
+	return createAssignmentInternally(
+		hash,
+		variables,
+		assignable,
+		initial,
+	)
+}
+
+func createAssignmentInternally(
+	hash hash.Hash,
+	variables []string,
+	assignable Assignable,
+	initial containers.Container,
 ) Assignment {
 	out := assignment{
-		hash:      hash,
-		variables: variables,
-		operation: operation,
-		isInitial: isInitial,
+		hash:       hash,
+		variables:  variables,
+		assignable: assignable,
+		initial:    initial,
 	}
 
 	return &out
@@ -38,12 +65,17 @@ func (obj *assignment) Variables() []string {
 	return obj.variables
 }
 
-// Operation returns the operation
-func (obj *assignment) Operation() operations.Operation {
-	return obj.operation
+// Assignable returns the assignable
+func (obj *assignment) Assignable() Assignable {
+	return obj.assignable
 }
 
-// IsInitial returns true if initial, false otherwise
-func (obj *assignment) IsInitial() bool {
-	return obj.isInitial
+// HasInitial returns true if there is an initial, false otherwise
+func (obj *assignment) HasInitial() bool {
+	return obj.initial != nil
+}
+
+// Initial returns the initial, if any
+func (obj *assignment) Initial() containers.Container {
+	return obj.initial
 }

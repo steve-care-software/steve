@@ -4,7 +4,6 @@ import (
 	"github.com/steve-care-software/steve/domain/hash"
 	"github.com/steve-care-software/steve/domain/scripts/specifics/programs/instructions/assignments"
 	"github.com/steve-care-software/steve/domain/scripts/specifics/programs/instructions/calls"
-	"github.com/steve-care-software/steve/domain/scripts/specifics/programs/instructions/initializations"
 	"github.com/steve-care-software/steve/domain/scripts/specifics/programs/instructions/operations"
 )
 
@@ -70,15 +69,22 @@ type Instructions interface {
 	List() []Instruction
 }
 
+// InstructionBuilder represents an instruction builder
+type InstructionBuilder interface {
+	Create() InstructionBuilder
+	WithAssignment(assignment assignments.Assignment) InstructionBuilder
+	WithLoop(loop Loop) InstructionBuilder
+	WithCondition(condition Condition) InstructionBuilder
+	WithCall(call calls.Call) InstructionBuilder
+	IsReturn() InstructionBuilder
+	Now() (Instruction, error)
+}
+
 // Instruction represents an instruction
 type Instruction interface {
 	Hash() hash.Hash
-	IsInitialization() bool
-	Initialization() initializations.Initialization
 	IsAssignment() bool
 	Assignment() assignments.Assignment
-	IsOperation() bool
-	Operation() operations.Operation
 	IsLoop() bool
 	Loop() Loop
 	IsCondition() bool
@@ -154,7 +160,7 @@ type LoopHeader interface {
 // LoopCounterBuilder represents the loop counter builder
 type LoopCounterBuilder interface {
 	Create() LoopCounterBuilder
-	WithInitialization(initialization initializations.Initialization) LoopCounterBuilder
+	WithAssignment(assignment assignments.Assignment) LoopCounterBuilder
 	WithOperation(operation operations.Operation) LoopCounterBuilder
 	WithIncrement(increment operations.Operation) LoopCounterBuilder
 	Now() (LoopCounter, error)
@@ -163,7 +169,7 @@ type LoopCounterBuilder interface {
 // LoopCounter represents a loop counter
 type LoopCounter interface {
 	Hash() hash.Hash
-	Initialization() initializations.Initialization
+	Assignment() assignments.Assignment
 	Operation() operations.Operation
 	Increment() operations.Operation
 }

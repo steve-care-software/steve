@@ -4,25 +4,25 @@ import (
 	"errors"
 
 	"github.com/steve-care-software/steve/domain/hash"
-	"github.com/steve-care-software/steve/domain/scripts/specifics/programs/instructions/initializations"
+	"github.com/steve-care-software/steve/domain/scripts/specifics/programs/instructions/assignments"
 	"github.com/steve-care-software/steve/domain/scripts/specifics/programs/instructions/operations"
 )
 
 type loopCounterBuilder struct {
-	hashAdapter    hash.Adapter
-	initialization initializations.Initialization
-	operation      operations.Operation
-	increment      operations.Operation
+	hashAdapter hash.Adapter
+	assignment  assignments.Assignment
+	operation   operations.Operation
+	increment   operations.Operation
 }
 
 func createLoopCounterBuilder(
 	hashAdapter hash.Adapter,
 ) LoopCounterBuilder {
 	out := loopCounterBuilder{
-		hashAdapter:    hashAdapter,
-		initialization: nil,
-		operation:      nil,
-		increment:      nil,
+		hashAdapter: hashAdapter,
+		assignment:  nil,
+		operation:   nil,
+		increment:   nil,
 	}
 
 	return &out
@@ -35,9 +35,9 @@ func (app *loopCounterBuilder) Create() LoopCounterBuilder {
 	)
 }
 
-// WithInitialization adds an initialization to the builder
-func (app *loopCounterBuilder) WithInitialization(initialization initializations.Initialization) LoopCounterBuilder {
-	app.initialization = initialization
+// WithAssignment adds an assignment to the builder
+func (app *loopCounterBuilder) WithAssignment(assignment assignments.Assignment) LoopCounterBuilder {
+	app.assignment = assignment
 	return app
 }
 
@@ -55,8 +55,8 @@ func (app *loopCounterBuilder) WithIncrement(increment operations.Operation) Loo
 
 // Now builds a new LoopCounter instance
 func (app *loopCounterBuilder) Now() (LoopCounter, error) {
-	if app.initialization == nil {
-		return nil, errors.New("the initialization is mandatory in order to build a LoopCounter instance")
+	if app.assignment == nil {
+		return nil, errors.New("the assignment is mandatory in order to build a LoopCounter instance")
 	}
 
 	if app.operation == nil {
@@ -68,7 +68,7 @@ func (app *loopCounterBuilder) Now() (LoopCounter, error) {
 	}
 
 	pHash, err := app.hashAdapter.FromMultiBytes([][]byte{
-		app.initialization.Hash().Bytes(),
+		app.assignment.Hash().Bytes(),
 		app.operation.Hash().Bytes(),
 		app.increment.Hash().Bytes(),
 	})
@@ -79,7 +79,7 @@ func (app *loopCounterBuilder) Now() (LoopCounter, error) {
 
 	return createLoopCounter(
 		*pHash,
-		app.initialization,
+		app.assignment,
 		app.operation,
 		app.increment,
 	), nil
