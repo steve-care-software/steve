@@ -80,7 +80,7 @@ func NewSingleSwordBuilder() SingleSwordBuilder {
 type Builder interface {
 	Create() Builder
 	WithList(list []Operation) Builder
-	Now() (Operations, error)
+	Now() (Operation, error)
 }
 
 // Operations represents operations
@@ -112,6 +112,26 @@ type Operation interface {
 	Value() values.Value
 }
 
+// StandardBuilder represents the standard operation builder
+type StandardBuilder interface {
+	Create() StandardBuilder
+	WithFirst(first Operation) StandardBuilder
+	WithSecond(second Operation) StandardBuilder
+	WithFlag(flag uint8) StandardBuilder
+	Now() (Standard, error)
+}
+
+// Standard represents a standard operation
+// arithmetic: +, -, *, /, %
+// relational: <, >, <=, >=, ==, !=
+// logical: and, or, not, xor
+type Standard interface {
+	Hash() hash.Hash
+	First() Operation
+	Second() Operation
+	Flag() uint8
+}
+
 // BitShiftBuilder represents the bitshift builder
 type BitShiftBuilder interface {
 	Create() BitShiftBuilder
@@ -127,24 +147,6 @@ type BitShift interface {
 	Operation() Operation
 	Flag() uint8 // <<, >>
 	Amount() uint8
-}
-
-// StandardBuilder represents the standard operation builder
-type StandardBuilder interface {
-	Create() StandardBuilder
-	WithOperations(operations Operations) StandardBuilder
-	WithFlag(flag uint8) StandardBuilder
-	Now() (Standard, error)
-}
-
-// Standard represents a standard operation
-// arithmetic: +, -, *, /, %
-// relational: <, >, <=, >=, ==, !=
-// logical: and, or, not, xor
-type Standard interface {
-	Hash() hash.Hash
-	Operations() Operations
-	Flag() uint8
 }
 
 // SingleSwordBuilder represents the single sword operation builder
