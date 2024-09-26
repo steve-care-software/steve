@@ -68,6 +68,14 @@ const (
 	StandardXor
 )
 
+// NewBitShiftBuilder creates a new bitshift builder
+func NewBitShiftBuilder() BitShiftBuilder {
+	hashAdapter := hash.NewAdapter()
+	return createBitshiftBuilder(
+		hashAdapter,
+	)
+}
+
 // NewSingleSwordBuilder creates a new single sword builder
 func NewSingleSwordBuilder() SingleSwordBuilder {
 	hashAdapter := hash.NewAdapter()
