@@ -10,6 +10,14 @@ import (
 	"github.com/steve-care-software/steve/domain/scripts/specifics/programs/operations"
 )
 
+// NewLoopHeaderBuilder creates a new loop header builder
+func NewLoopHeaderBuilder() LoopHeaderBuilder {
+	hashAdapter := hash.NewAdapter()
+	return createLoopHeaderBuilder(
+		hashAdapter,
+	)
+}
+
 // NewLoopCounterBuilder creates a new loop counter builder
 func NewLoopCounterBuilder() LoopCounterBuilder {
 	hashAdapter := hash.NewAdapter()
@@ -126,6 +134,15 @@ type LoopInstruction interface {
 	IsInstruction() bool
 	Instruction() Instruction
 	IsBreak() bool
+}
+
+// LoopHeaderBuilder represents a loop header builder
+type LoopHeaderBuilder interface {
+	Create() LoopHeaderBuilder
+	WithCounter(counter LoopCounter) LoopHeaderBuilder
+	WithKeyValue(keyValue LoopKeyValue) LoopHeaderBuilder
+	IsInfinite() LoopHeaderBuilder
+	Now() (LoopHeader, error)
 }
 
 // LoopHeader represents a loop header
