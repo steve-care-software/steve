@@ -7,6 +7,22 @@ import (
 	"github.com/steve-care-software/steve/domain/scripts/specifics/programs/instructions/operations"
 )
 
+// NewBuilder creates a new builder
+func NewBuilder() Builder {
+	hashAdapter := hash.NewAdapter()
+	return createBuilder(
+		hashAdapter,
+	)
+}
+
+// NewInstructionBuilder creates a new instruction builder
+func NewInstructionBuilder() InstructionBuilder {
+	hashAdapter := hash.NewAdapter()
+	return createInstructionBuilder(
+		hashAdapter,
+	)
+}
+
 // NewLoopBuilder creates a new loop builder
 func NewLoopBuilder() LoopBuilder {
 	hashAdapter := hash.NewAdapter()
@@ -61,6 +77,13 @@ func NewConditionBuilder() ConditionBuilder {
 	return createConditionBuilder(
 		hashAdapter,
 	)
+}
+
+// Builder represents the instructions builder
+type Builder interface {
+	Create() Builder
+	WithList(list []Instruction) Builder
+	Now() (Instructions, error)
 }
 
 // Instructions represents instructions
