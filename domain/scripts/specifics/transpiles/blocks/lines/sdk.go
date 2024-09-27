@@ -1,18 +1,25 @@
 package lines
 
 import (
+	"github.com/steve-care-software/steve/domain/hash"
 	"github.com/steve-care-software/steve/domain/programs/grammars/blocks/suites"
 	"github.com/steve-care-software/steve/domain/scripts/specifics/transpiles/blocks/lines/tokens"
 )
 
 // NewBuilder creates a new builder
 func NewBuilder() Builder {
-	return createBuilder()
+	hashAdapter := hash.NewAdapter()
+	return createBuilder(
+		hashAdapter,
+	)
 }
 
 // NewLineBuilder creates a new line builder
 func NewLineBuilder() LineBuilder {
-	return createLineBuilder()
+	hashAdapter := hash.NewAdapter()
+	return createLineBuilder(
+		hashAdapter,
+	)
 }
 
 // Builder represents lines builder
@@ -24,6 +31,7 @@ type Builder interface {
 
 // Lines represents lines
 type Lines interface {
+	Hash() hash.Hash
 	List() []Line
 }
 
@@ -37,6 +45,7 @@ type LineBuilder interface {
 
 // Line represents a line
 type Line interface {
+	Hash() hash.Hash
 	Tokens() tokens.Tokens
 	HasSuites() bool
 	Suites() suites.Suites

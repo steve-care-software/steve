@@ -2,17 +2,23 @@ package elements
 
 import (
 	"errors"
+
+	"github.com/steve-care-software/steve/domain/hash"
 )
 
 type builder struct {
-	token string
-	rule  string
+	hashAdapter hash.Adapter
+	token       string
+	rule        string
 }
 
-func createBuilder() Builder {
+func createBuilder(
+	hashAdapter hash.Adapter,
+) Builder {
 	out := builder{
-		token: "",
-		rule:  "",
+		hashAdapter: hashAdapter,
+		token:       "",
+		rule:        "",
 	}
 
 	return &out
@@ -20,7 +26,9 @@ func createBuilder() Builder {
 
 // Create initializes the builder
 func (app *builder) Create() Builder {
-	return createBuilder()
+	return createBuilder(
+		app.hashAdapter,
+	)
 }
 
 // WithToken adds a token to the builder
@@ -37,13 +45,29 @@ func (app *builder) WithRule(rule string) Builder {
 
 // Now builds a new Element instance
 func (app *builder) Now() (Element, error) {
+	data := [][]byte{}
 	if app.token != "" {
-		return createElementWithToken(app.token), nil
+		data = append(data, []byte("token"))
+		data = append(data, []byte(app.token))
 	}
 
 	if app.rule != "" {
-		return createElementWithRule(app.rule), nil
+		data = append(data, []byte("rule"))
+		data = append(data, []byte(app.rule))
 	}
 
-	return nil, errors.New("the Element is invalid")
+	if len(data) != 2 {
+		return nil, errors.New("the Element is invalid")
+	}
+
+	pHash, err := app.hashAdapter.FromMultiBytes(data)
+	if err != nil {
+		return nil, err
+	}
+
+	if app.token != "" {
+		return createElementWithToken(*pHash, app.token), nil
+	}
+
+	return createElementWithRule(*pHash, app.rule), nil
 }

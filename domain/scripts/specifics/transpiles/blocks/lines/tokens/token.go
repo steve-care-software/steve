@@ -1,37 +1,48 @@
 package tokens
 
 import (
+	"github.com/steve-care-software/steve/domain/hash"
 	"github.com/steve-care-software/steve/domain/scripts/specifics/transpiles/blocks/lines/tokens/pointers"
 	"github.com/steve-care-software/steve/domain/scripts/specifics/transpiles/blocks/lines/tokens/updates"
 )
 
 type token struct {
+	hash   hash.Hash
 	update updates.Update
 	insert pointers.Pointer
 }
 
 func createTokenWithUpdate(
+	hash hash.Hash,
 	update updates.Update,
 ) Token {
-	return createTokenInternally(update, nil)
+	return createTokenInternally(hash, update, nil)
 }
 
 func createTokenWithInsert(
+	hash hash.Hash,
 	insert pointers.Pointer,
 ) Token {
-	return createTokenInternally(nil, insert)
+	return createTokenInternally(hash, nil, insert)
 }
 
 func createTokenInternally(
+	hash hash.Hash,
 	update updates.Update,
 	insert pointers.Pointer,
 ) Token {
 	out := token{
+		hash:   hash,
 		update: update,
 		insert: insert,
 	}
 
 	return &out
+}
+
+// Hash returns the hash
+func (obj *token) Hash() hash.Hash {
+	return obj.hash
 }
 
 // IsUpdate returns true if there is an update, false otherwise

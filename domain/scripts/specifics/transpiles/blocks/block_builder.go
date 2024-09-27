@@ -3,18 +3,23 @@ package blocks
 import (
 	"errors"
 
+	"github.com/steve-care-software/steve/domain/hash"
 	"github.com/steve-care-software/steve/domain/scripts/specifics/transpiles/blocks/lines"
 )
 
 type blockBuilder struct {
-	name  string
-	lines lines.Lines
+	hashAdapter hash.Adapter
+	name        string
+	lines       lines.Lines
 }
 
-func createBlockBuilder() BlockBuilder {
+func createBlockBuilder(
+	hashAdapter hash.Adapter,
+) BlockBuilder {
 	out := blockBuilder{
-		name:  "",
-		lines: nil,
+		hashAdapter: hashAdapter,
+		name:        "",
+		lines:       nil,
 	}
 
 	return &out
@@ -22,7 +27,9 @@ func createBlockBuilder() BlockBuilder {
 
 // Create initializes the builder
 func (app *blockBuilder) Create() BlockBuilder {
-	return createBlockBuilder()
+	return createBlockBuilder(
+		app.hashAdapter,
+	)
 }
 
 // WithName adds a name to the builder
@@ -47,5 +54,14 @@ func (app *blockBuilder) Now() (Block, error) {
 		return nil, errors.New("the lines are mandatory in order to build a Block instance")
 	}
 
-	return createBlock(app.name, app.lines), nil
+	pHash, err := app.hashAdapter.FromMultiBytes([][]byte{
+		[]byte(app.name),
+		app.lines.Hash().Bytes(),
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return createBlock(*pHash, app.name, app.lines), nil
 }

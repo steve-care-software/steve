@@ -1,18 +1,25 @@
 package tokens
 
 import (
+	"github.com/steve-care-software/steve/domain/hash"
 	"github.com/steve-care-software/steve/domain/scripts/specifics/transpiles/blocks/lines/tokens/pointers"
 	"github.com/steve-care-software/steve/domain/scripts/specifics/transpiles/blocks/lines/tokens/updates"
 )
 
 // NewBuilder creates a new builder
 func NewBuilder() Builder {
-	return createBuilder()
+	hashAdapter := hash.NewAdapter()
+	return createBuilder(
+		hashAdapter,
+	)
 }
 
 // NewTokenBuilder creates a new token builder
 func NewTokenBuilder() TokenBuilder {
-	return createTokenBuilder()
+	hashAdapter := hash.NewAdapter()
+	return createTokenBuilder(
+		hashAdapter,
+	)
 }
 
 // Builder represents tokens builder
@@ -24,6 +31,7 @@ type Builder interface {
 
 // Tokens represents tokens
 type Tokens interface {
+	Hash() hash.Hash
 	List() []Token
 }
 
@@ -37,6 +45,7 @@ type TokenBuilder interface {
 
 // Token represents a token
 type Token interface {
+	Hash() hash.Hash
 	IsUpdate() bool
 	Update() updates.Update
 	IsInsert() bool

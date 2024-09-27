@@ -1,17 +1,24 @@
 package blocks
 
 import (
+	"github.com/steve-care-software/steve/domain/hash"
 	"github.com/steve-care-software/steve/domain/scripts/specifics/transpiles/blocks/lines"
 )
 
 // NewBuilder creates a new builder
 func NewBuilder() Builder {
-	return createBuilder()
+	hashAdapter := hash.NewAdapter()
+	return createBuilder(
+		hashAdapter,
+	)
 }
 
 // NewBlockBuilder creates a new block builder
 func NewBlockBuilder() BlockBuilder {
-	return createBlockBuilder()
+	hashAdapter := hash.NewAdapter()
+	return createBlockBuilder(
+		hashAdapter,
+	)
 }
 
 // Builder represents a blocks builder
@@ -23,6 +30,7 @@ type Builder interface {
 
 // Blocks represents blocks
 type Blocks interface {
+	Hash() hash.Hash
 	List() []Block
 }
 
@@ -36,6 +44,7 @@ type BlockBuilder interface {
 
 // Block represents a block
 type Block interface {
+	Hash() hash.Hash
 	Name() string
 	Lines() lines.Lines
 }

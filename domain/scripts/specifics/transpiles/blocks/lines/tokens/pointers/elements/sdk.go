@@ -1,8 +1,13 @@
 package elements
 
+import "github.com/steve-care-software/steve/domain/hash"
+
 // NewBuilder creates a new builder
 func NewBuilder() Builder {
-	return createBuilder()
+	hashAdapter := hash.NewAdapter()
+	return createBuilder(
+		hashAdapter,
+	)
 }
 
 // Builder represents the element builder
@@ -15,6 +20,7 @@ type Builder interface {
 
 // Element represents an element
 type Element interface {
+	Hash() hash.Hash
 	IsToken() bool
 	Token() string
 	IsRule() bool

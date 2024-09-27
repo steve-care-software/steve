@@ -2,13 +2,15 @@ package transpiles
 
 import (
 	"github.com/steve-care-software/steve/domain/hash"
-	"github.com/steve-care-software/steve/domain/nfts"
 	"github.com/steve-care-software/steve/domain/scripts/specifics/transpiles/blocks"
 )
 
 // NewBuilder creates a new builder
 func NewBuilder() Builder {
-	return createBuilder()
+	hashAdapter := hash.NewAdapter()
+	return createBuilder(
+		hashAdapter,
+	)
 }
 
 // FetchGrammarInput returns the grammar input
@@ -22,26 +24,21 @@ type ParserAdapter interface {
 	ToTranspile(input []byte) (Transpile, []byte, error)
 }
 
-// NFTAdapter represents the nft adapter
-type NFTAdapter interface {
-	ToNFT(ins Transpile) (nfts.NFT, error)
-	ToInstance(nft nfts.NFT) (Transpile, error)
-}
-
 // Builder represents the transpile builder
 type Builder interface {
 	Create() Builder
 	WithBlocks(blocks blocks.Blocks) Builder
 	WithRoot(root string) Builder
-	WithOrigin(origin hash.Hash) Builder
-	WithTarget(target hash.Hash) Builder
+	WithOrigin(origin string) Builder
+	WithTarget(target string) Builder
 	Now() (Transpile, error)
 }
 
 // Transpile represents a transpile
 type Transpile interface {
+	Hash() hash.Hash
 	Blocks() blocks.Blocks
 	Root() string
-	Origin() hash.Hash
-	Target() hash.Hash
+	Origin() string
+	Target() string
 }

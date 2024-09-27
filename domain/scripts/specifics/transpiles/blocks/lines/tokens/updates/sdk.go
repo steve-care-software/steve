@@ -1,13 +1,17 @@
 package updates
 
 import (
+	"github.com/steve-care-software/steve/domain/hash"
 	"github.com/steve-care-software/steve/domain/scripts/specifics/transpiles/blocks/lines/tokens/pointers"
 	"github.com/steve-care-software/steve/domain/scripts/specifics/transpiles/blocks/lines/tokens/updates/targets"
 )
 
-// NewBuilder creates a new builder instance
+// NewBuilder creates a new builder
 func NewBuilder() Builder {
-	return createBuilder()
+	hashAdapter := hash.NewAdapter()
+	return createBuilder(
+		hashAdapter,
+	)
 }
 
 // Builder represents an update builder
@@ -20,6 +24,7 @@ type Builder interface {
 
 // Update represents an update
 type Update interface {
+	Hash() hash.Hash
 	Origin() pointers.Pointer
 	Target() targets.Target
 }

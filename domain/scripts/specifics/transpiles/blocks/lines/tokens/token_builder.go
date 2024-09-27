@@ -3,19 +3,24 @@ package tokens
 import (
 	"errors"
 
+	"github.com/steve-care-software/steve/domain/hash"
 	"github.com/steve-care-software/steve/domain/scripts/specifics/transpiles/blocks/lines/tokens/pointers"
 	"github.com/steve-care-software/steve/domain/scripts/specifics/transpiles/blocks/lines/tokens/updates"
 )
 
 type tokenBuilder struct {
-	update updates.Update
-	insert pointers.Pointer
+	hashAdapter hash.Adapter
+	update      updates.Update
+	insert      pointers.Pointer
 }
 
-func createTokenBuilder() TokenBuilder {
+func createTokenBuilder(
+	hashAdapter hash.Adapter,
+) TokenBuilder {
 	out := tokenBuilder{
-		update: nil,
-		insert: nil,
+		hashAdapter: hashAdapter,
+		update:      nil,
+		insert:      nil,
 	}
 
 	return &out
@@ -23,7 +28,9 @@ func createTokenBuilder() TokenBuilder {
 
 // Create initializes the builder
 func (app *tokenBuilder) Create() TokenBuilder {
-	return createTokenBuilder()
+	return createTokenBuilder(
+		app.hashAdapter,
+	)
 }
 
 // WithUpdate adds an update to the builder
@@ -40,13 +47,27 @@ func (app *tokenBuilder) WithInsert(insert pointers.Pointer) TokenBuilder {
 
 // Now builds a new Token instance
 func (app *tokenBuilder) Now() (Token, error) {
+	data := [][]byte{}
 	if app.update != nil {
-		return createTokenWithUpdate(app.update), nil
+		data = append(data, app.update.Hash().Bytes())
 	}
 
 	if app.insert != nil {
-		return createTokenWithInsert(app.insert), nil
+		data = append(data, app.insert.Hash().Bytes())
 	}
 
-	return nil, errors.New("the Token is invalid")
+	if len(data) != 1 {
+		return nil, errors.New("the Token is invalid")
+	}
+
+	pHash, err := app.hashAdapter.FromMultiBytes(data)
+	if err != nil {
+		return nil, err
+	}
+
+	if app.update != nil {
+		return createTokenWithUpdate(*pHash, app.update), nil
+	}
+
+	return createTokenWithInsert(*pHash, app.insert), nil
 }

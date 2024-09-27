@@ -1,38 +1,49 @@
 package lines
 
 import (
+	"github.com/steve-care-software/steve/domain/hash"
 	"github.com/steve-care-software/steve/domain/programs/grammars/blocks/suites"
 	"github.com/steve-care-software/steve/domain/scripts/specifics/transpiles/blocks/lines/tokens"
 )
 
 type line struct {
+	hash   hash.Hash
 	tokens tokens.Tokens
 	suites suites.Suites
 }
 
 func createLine(
+	hash hash.Hash,
 	tokens tokens.Tokens,
 ) Line {
-	return createLineInternally(tokens, nil)
+	return createLineInternally(hash, tokens, nil)
 }
 
 func createLineWithSuites(
+	hash hash.Hash,
 	tokens tokens.Tokens,
 	suites suites.Suites,
 ) Line {
-	return createLineInternally(tokens, suites)
+	return createLineInternally(hash, tokens, suites)
 }
 
 func createLineInternally(
+	hash hash.Hash,
 	tokens tokens.Tokens,
 	suites suites.Suites,
 ) Line {
 	out := line{
+		hash:   hash,
 		tokens: tokens,
 		suites: suites,
 	}
 
 	return &out
+}
+
+// Hash returns the hash
+func (obj *line) Hash() hash.Hash {
+	return obj.hash
 }
 
 // Tokens returns the tokens

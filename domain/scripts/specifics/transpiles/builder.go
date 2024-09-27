@@ -8,18 +8,22 @@ import (
 )
 
 type builder struct {
-	blocks blocks.Blocks
-	root   string
-	origin hash.Hash
-	target hash.Hash
+	hashAdapter hash.Adapter
+	blocks      blocks.Blocks
+	root        string
+	origin      string
+	target      string
 }
 
-func createBuilder() Builder {
+func createBuilder(
+	hashAdapter hash.Adapter,
+) Builder {
 	out := builder{
-		blocks: nil,
-		root:   "",
-		origin: nil,
-		target: nil,
+		hashAdapter: hashAdapter,
+		blocks:      nil,
+		root:        "",
+		origin:      "",
+		target:      "",
 	}
 
 	return &out
@@ -27,7 +31,9 @@ func createBuilder() Builder {
 
 // Create initializes the builder
 func (app *builder) Create() Builder {
-	return createBuilder()
+	return createBuilder(
+		app.hashAdapter,
+	)
 }
 
 // WithBlocks add blocks to the builder
@@ -43,13 +49,13 @@ func (app *builder) WithRoot(root string) Builder {
 }
 
 // WithOrigin adds an origin to the builder
-func (app *builder) WithOrigin(origin hash.Hash) Builder {
+func (app *builder) WithOrigin(origin string) Builder {
 	app.origin = origin
 	return app
 }
 
 // WithTarget adds a target to the builder
-func (app *builder) WithTarget(target hash.Hash) Builder {
+func (app *builder) WithTarget(target string) Builder {
 	app.target = target
 	return app
 }
@@ -64,13 +70,24 @@ func (app *builder) Now() (Transpile, error) {
 		return nil, errors.New("the root is mandatory in order to build a Transpile instance")
 	}
 
-	if app.origin == nil {
+	if app.origin == "" {
 		return nil, errors.New("the origin hash is mandatory in order to build a Transpile instance")
 	}
 
-	if app.target == nil {
+	if app.target == "" {
 		return nil, errors.New("the target hash is mandatory in order to build a Transpile instance")
 	}
 
-	return createTranspile(app.blocks, app.root, app.origin, app.target), nil
+	pHash, err := app.hashAdapter.FromMultiBytes([][]byte{
+		app.blocks.Hash().Bytes(),
+		[]byte(app.root),
+		[]byte(app.origin),
+		[]byte(app.target),
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return createTranspile(*pHash, app.blocks, app.root, app.origin, app.target), nil
 }

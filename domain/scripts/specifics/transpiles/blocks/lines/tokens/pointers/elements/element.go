@@ -1,32 +1,44 @@
 package elements
 
+import "github.com/steve-care-software/steve/domain/hash"
+
 type element struct {
+	hash  hash.Hash
 	token string
 	rule  string
 }
 
 func createElementWithToken(
+	hash hash.Hash,
 	token string,
 ) Element {
-	return createElementInternally(token, "")
+	return createElementInternally(hash, token, "")
 }
 
 func createElementWithRule(
+	hash hash.Hash,
 	rule string,
 ) Element {
-	return createElementInternally("", rule)
+	return createElementInternally(hash, "", rule)
 }
 
 func createElementInternally(
+	hash hash.Hash,
 	token string,
 	rule string,
 ) Element {
 	out := element{
+		hash:  hash,
 		token: token,
 		rule:  rule,
 	}
 
 	return &out
+}
+
+// Hash returns the hash
+func (obj *element) Hash() hash.Hash {
+	return obj.hash
 }
 
 // IsToken returns true if there is a token, false otherwise

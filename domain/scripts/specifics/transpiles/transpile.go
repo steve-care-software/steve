@@ -6,19 +6,22 @@ import (
 )
 
 type transpile struct {
+	hash   hash.Hash
 	blocks blocks.Blocks
 	root   string
-	origin hash.Hash
-	target hash.Hash
+	origin string
+	target string
 }
 
 func createTranspile(
+	hash hash.Hash,
 	blocks blocks.Blocks,
 	root string,
-	origin hash.Hash,
-	target hash.Hash,
+	origin string,
+	target string,
 ) Transpile {
 	out := transpile{
+		hash:   hash,
 		blocks: blocks,
 		root:   root,
 		origin: origin,
@@ -26,6 +29,11 @@ func createTranspile(
 	}
 
 	return &out
+}
+
+// Hash returns the hash
+func (obj *transpile) Hash() hash.Hash {
+	return obj.hash
 }
 
 // Blocks returns the blocks
@@ -39,11 +47,11 @@ func (obj *transpile) Root() string {
 }
 
 // Origin returns the origin
-func (obj *transpile) Origin() hash.Hash {
+func (obj *transpile) Origin() string {
 	return obj.origin
 }
 
 // Target returns the target
-func (obj *transpile) Target() hash.Hash {
+func (obj *transpile) Target() string {
 	return obj.target
 }

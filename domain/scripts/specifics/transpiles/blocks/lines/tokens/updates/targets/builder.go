@@ -1,16 +1,24 @@
 package targets
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/steve-care-software/steve/domain/hash"
+)
 
 type builder struct {
-	constant string
-	rule     string
+	hashAdapter hash.Adapter
+	constant    string
+	rule        string
 }
 
-func createBuilder() Builder {
+func createBuilder(
+	hashAdapter hash.Adapter,
+) Builder {
 	out := builder{
-		constant: "",
-		rule:     "",
+		hashAdapter: hashAdapter,
+		constant:    "",
+		rule:        "",
 	}
 
 	return &out
@@ -18,7 +26,9 @@ func createBuilder() Builder {
 
 // Create initializes the builder
 func (app *builder) Create() Builder {
-	return createBuilder()
+	return createBuilder(
+		app.hashAdapter,
+	)
 }
 
 // WithConstant adds a constant to the builder
@@ -35,13 +45,29 @@ func (app *builder) WithRule(rule string) Builder {
 
 // Now builds a new Target instance
 func (app *builder) Now() (Target, error) {
+	data := [][]byte{}
 	if app.constant != "" {
-		return createTargetWithConstant(app.constant), nil
+		data = append(data, []byte("constant"))
+		data = append(data, []byte(app.constant))
 	}
 
 	if app.rule != "" {
-		return createTargetWithRule(app.rule), nil
+		data = append(data, []byte("rule"))
+		data = append(data, []byte(app.rule))
 	}
 
-	return nil, errors.New("the Target is invalid")
+	if len(data) != 2 {
+		return nil, errors.New("the Target is invalid")
+	}
+
+	pHash, err := app.hashAdapter.FromMultiBytes(data)
+	if err != nil {
+		return nil, err
+	}
+
+	if app.constant != "" {
+		return createTargetWithConstant(*pHash, app.constant), nil
+	}
+
+	return createTargetWithRule(*pHash, app.rule), nil
 }

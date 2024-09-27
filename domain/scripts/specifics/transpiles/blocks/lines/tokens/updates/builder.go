@@ -3,19 +3,24 @@ package updates
 import (
 	"errors"
 
+	"github.com/steve-care-software/steve/domain/hash"
 	"github.com/steve-care-software/steve/domain/scripts/specifics/transpiles/blocks/lines/tokens/pointers"
 	"github.com/steve-care-software/steve/domain/scripts/specifics/transpiles/blocks/lines/tokens/updates/targets"
 )
 
 type builder struct {
-	origin pointers.Pointer
-	target targets.Target
+	hashAdapter hash.Adapter
+	origin      pointers.Pointer
+	target      targets.Target
 }
 
-func createBuilder() Builder {
+func createBuilder(
+	hashAdapter hash.Adapter,
+) Builder {
 	out := builder{
-		origin: nil,
-		target: nil,
+		hashAdapter: hashAdapter,
+		origin:      nil,
+		target:      nil,
 	}
 
 	return &out
@@ -23,7 +28,9 @@ func createBuilder() Builder {
 
 // Create initializes the builder
 func (app *builder) Create() Builder {
-	return createBuilder()
+	return createBuilder(
+		app.hashAdapter,
+	)
 }
 
 // WithOrigin adds an origin to the builder
@@ -48,5 +55,14 @@ func (app *builder) Now() (Update, error) {
 		return nil, errors.New("the target is mandatory in order to build an Update instance")
 	}
 
-	return createUpdate(app.origin, app.target), nil
+	pHash, err := app.hashAdapter.FromMultiBytes([][]byte{
+		app.origin.Hash().Bytes(),
+		app.target.Hash().Bytes(),
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return createUpdate(*pHash, app.origin, app.target), nil
 }

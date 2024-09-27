@@ -3,19 +3,24 @@ package lines
 import (
 	"errors"
 
+	"github.com/steve-care-software/steve/domain/hash"
 	"github.com/steve-care-software/steve/domain/programs/grammars/blocks/suites"
 	"github.com/steve-care-software/steve/domain/scripts/specifics/transpiles/blocks/lines/tokens"
 )
 
 type lineBuilder struct {
-	tokens tokens.Tokens
-	suites suites.Suites
+	hashAdapter hash.Adapter
+	tokens      tokens.Tokens
+	suites      suites.Suites
 }
 
-func createLineBuilder() LineBuilder {
+func createLineBuilder(
+	hashAdapter hash.Adapter,
+) LineBuilder {
 	out := lineBuilder{
-		tokens: nil,
-		suites: nil,
+		hashAdapter: hashAdapter,
+		tokens:      nil,
+		suites:      nil,
 	}
 
 	return &out
@@ -23,7 +28,9 @@ func createLineBuilder() LineBuilder {
 
 // Create initializes the builder
 func (app *lineBuilder) Create() LineBuilder {
-	return createLineBuilder()
+	return createLineBuilder(
+		app.hashAdapter,
+	)
 }
 
 // WithTokens add tokens to the builder
@@ -44,9 +51,22 @@ func (app *lineBuilder) Now() (Line, error) {
 		return nil, errors.New("the tokens are mandatory in order to build a Line instance")
 	}
 
-	if app.suites != nil {
-		return createLineWithSuites(app.tokens, app.suites), nil
+	data := [][]byte{
+		app.tokens.Hash().Bytes(),
 	}
 
-	return createLine(app.tokens), nil
+	if app.suites != nil {
+		data = append(data, app.suites.Hash().Bytes())
+	}
+
+	pHash, err := app.hashAdapter.FromMultiBytes(data)
+	if err != nil {
+		return nil, err
+	}
+
+	if app.suites != nil {
+		return createLineWithSuites(*pHash, app.tokens, app.suites), nil
+	}
+
+	return createLine(*pHash, app.tokens), nil
 }
