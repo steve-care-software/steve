@@ -1,14 +1,298 @@
 package scripts
 
-// PROPERTY_HEAD
-
 func grammarInput() []byte {
 	return []byte(`
 		v1;
 		> .head;
 		# .SPACE .TAB .EOL;
 
-		head: .PROPERTY_HEAD .COLON .headOptions .SEMI_COLON
+		script: .schema
+			---
+				schema: "
+							head:
+									engine: v1;
+									name: myName;
+									access: 
+										read: .first;
+										write: .first .second;
+										review: .first;
+									;
+									compensation: 0.1, 0.23, 0.45;
+							;
+
+							son;
+							father;
+							grandFather;
+							grandGrandFather;
+							myList: list;
+							mySet: set;
+							mySortedSet: sorted_set;
+							myVector: vector[float];
+
+							father[son]: .son .father
+										| .father .grandFather
+										| .grandFather .grandGrandFather
+										---
+											mySuite: .son .grandGrandFather [
+												(.son .father .grandFather .grandGrandFather);
+												!(.son .father .grandFather .grandGrandFather);
+											];
+										;
+
+							grandFather[grandSon]: .son .grandFather
+												| .father .grandGrandFather
+												;
+				";
+			;
+
+		schema: .head .pointWithTypes .connectionBlocks
+			---
+				valid: "
+					head:
+							engine: v1;
+							name: myName;
+							access: 
+								read: .first;
+								write: .first .second;
+								review: .first;
+							;
+							compensation: 0.1, 0.23, 0.45;
+					;
+
+					son;
+					father;
+					grandFather;
+					grandGrandFather;
+					myList: list;
+					mySet: set;
+					mySortedSet: sorted_set;
+					myVector: vector[float];
+
+					father[son]: .son .father
+								| .father .grandFather
+								| .grandFather .grandGrandFather
+								---
+									mySuite: .son .grandGrandFather [
+										(.son .father .grandFather .grandGrandFather);
+										!(.son .father .grandFather .grandGrandFather);
+									];
+								;
+
+					grandFather[grandSon]: .son .grandFather
+										| .father .grandGrandFather
+										;
+				";
+			;
+
+		connectionBlocks: .connectionBlock+
+						---
+							valid: "
+								father[son]: .son .father
+											| .father .grandFather
+											| .grandFather .grandGrandFather
+											---
+												mySuite: .son .grandGrandFather [
+													(.son .father .grandFather .grandGrandFather);
+													!(.son .father .grandFather .grandGrandFather);
+												];
+											;
+
+								grandFather[grandSon]: .son .grandFather
+													| .father .grandGrandFather
+													;
+							";
+						;
+
+		connectionBlock: .connectionName .COLON .links .pointSuitesBlock? .SEMI_COLON
+						---
+							withoutSuite: "
+								father[son]: .son .father
+										   | .father .grandFather
+										   | .grandFather .grandGrandFather
+										   ;
+							";
+
+							withSuites: "
+									father[son]: .son .father
+												| .father .grandFather
+												| .grandFather .grandGrandFather
+												---
+														first: .son .grandGrandFather [
+															(.son .father .grandFather .grandGrandFather);
+															!(.son .father .grandFather .grandGrandFather);
+														];
+
+														second: .son .grandGrandFather [
+															(.son .father .grandFather .grandGrandFather);
+															!(.son .father .grandFather .grandGrandFather);
+														];
+												;
+							";
+						;
+
+		pointSuitesBlock: .suitePrefix .pointSuites
+						---
+							valid: "
+									---
+										first: .son .grandGrandFather [
+											(.son .father .grandFather .grandGrandFather);
+											!(.son .father .grandFather .grandGrandFather);
+										];
+
+										second: .son .grandGrandFather [
+											(.son .father .grandFather .grandGrandFather);
+											!(.son .father .grandFather .grandGrandFather);
+										];
+							";
+						;
+
+		pointSuites: .pointSuite+
+				---
+					none: !"";
+					single: "
+							mySuite: .son .grandGrandFather [
+								(.son .father .grandFather .grandGrandFather);
+								!(.son .father .grandFather .grandGrandFather);
+							];
+						";
+
+					multiple: "
+							first: .son .grandGrandFather [
+								(.son .father .grandFather .grandGrandFather);
+								!(.son .father .grandFather .grandGrandFather);
+							];
+
+							second: .son .grandGrandFather [
+								(.son .father .grandFather .grandGrandFather);
+								!(.son .father .grandFather .grandGrandFather);
+							];
+						";
+				;
+
+		pointSuite: .variableName .COLON .references .BRACKET_OPEN .pointSuiteOptionLine+ .BRACKET_CLOSE .SEMI_COLON
+				---
+					valid: "
+						mySuite: .son .grandGrandFather [
+							(.son .father .grandFather .grandGrandFather);
+							!(.son .father .grandFather .grandGrandFather);
+						];
+					";
+				;
+
+		pointSuiteOptionLine: .pointSuiteOption .SEMI_COLON
+							---
+								expectedInvalid: "!(.son .father .grandFather .grandGrandFather);";
+								expectedValid: "(.son .father .grandFather .grandGrandFather);";
+							;
+
+		pointSuiteOption: .pointInvalidLink
+						| .referencesInParenthesis
+						---
+							expectedInvalid: "!(.son .father .grandFather .grandGrandFather)";
+							expectedValid: "(.son .father .grandFather .grandGrandFather)";
+						;
+
+		pointInvalidLink: .EXCLAMATION_POINT .referencesInParenthesis
+						---
+							valid: "!(.son .father .grandFather .grandGrandFather)";
+						;
+
+		referencesInParenthesis: .PARENTHESIS_OPEN .references .PARENTHESIS_CLOSE
+							---
+								valid: "(.son .father .grandFather .grandGrandFather)";
+							;
+
+		suitePrefix: .HYPHEN[3]
+				---
+					valid: "---";
+				;
+
+		links: .references .pipeReferences*
+			---
+				oneLine: ".son .father";
+				multipleLine: "
+					.son .father
+					| .father .grandFather
+					| .grandFather .grandGrandFather
+				";
+			;
+
+		connectionName: .variableName .variableNameInBracket?
+					---
+						name: "father";
+						nameWithReverse: "father[son]";
+					;
+
+		variableNameInBracket: .BRACKET_OPEN .variableName .BRACKET_CLOSE
+							---
+								valid: "[myVariable]";
+							;
+
+		pipeReferences: .PIPE .references
+					---
+						valid: "| .son .father";
+					;
+
+		pointWithTypes: .pointWithType+
+					---
+						valid: "
+							son;
+							father;
+							grandFather;
+							grandGrandFather;
+							myList: list;
+							mySet: set;
+							mySortedSet: sorted_set;
+							myVector: vector[float];
+						";
+					;
+
+		pointWithType: .variableName .colonPointType? .SEMI_COLON
+					---
+						point: "myPoint;";
+						pointWithType: "mySecondPoint: vector[uint];";
+					;
+
+		colonPointType: .COLON .pointType
+					---
+						list: ": list";
+						set: ": set";
+						sortedSet: ": sorted_set";
+				  		vectorFloat: ": vector[float]";
+						vectorInt: ": vector[int]";
+						vectorUint: ": vector[uint]";
+					;
+					
+		pointType: .pointVector
+				  | .LIST
+				  | .SET
+				  | .SORTED_SET 
+				  ---
+				  		list: "list";
+						set: "set";
+						sortedSet: "sorted_set";
+				  		vectorFloat: "vector[float]";
+						vectorInt: "vector[int]";
+						vectorUint: "vector[uint]";
+				  ;
+
+		pointVector: .VECTOR .BRACKET_OPEN .vectorTypes .BRACKET_CLOSE
+					---
+						float: "vector[float]";
+						int: "vector[int]";
+						uint: "vector[uint]";
+					;
+
+		vectorTypes: .FLOAT
+				   | .INT
+				   | .UINT
+				   ---
+				   		float: "float";
+						int: "int";
+						uint: "uint";
+				   ;
+
+		head: .HEAD .COLON .headOptions .SEMI_COLON
 			---
 				all: "
 						head:
@@ -81,18 +365,18 @@ func grammarInput() []byte {
 									";
 							;
 
-		engine: .PROPERTY_ENGINE .COLON .version .SEMI_COLON
+		engine: .ENGINE .COLON .version .SEMI_COLON
 				---
 					versionOneNumber: "engine: v1;";
 					versionWithMultipleNumbers: "engine: v123;";
 				;
 
-		compensation: .PROPERTY_COMPENSATION .COLON .threeFloatNumbersBetweenZeroAndOne .SEMI_COLON
+		compensation: .COMPENSATION .COLON .threeFloatNumbersBetweenZeroAndOne .SEMI_COLON
 					---
 						valid: "compensation: 0.1, 0.23, 0.45;";
 					;
 
-		access: .PROPERTY_ACCESS .COLON .permissionOptions .SEMI_COLON
+		access: .ACCESS .COLON .permissionOptions .SEMI_COLON
 			---
 				allOptionsWithDuplicates: "
 					access: 
@@ -169,25 +453,25 @@ func grammarInput() []byte {
 							read: "review: .first .second .third;";
 						;
 
-		propertyReview: .PROPERTY_REVIEW .COLON .references .SEMI_COLON
+		propertyReview: .REVIEW .COLON .references .SEMI_COLON
 					---
 						oneRole: "review: .myRole;";
 						multipleRoles: "review: .first .second .third;";
 					;
 
-		propertyWrite: .PROPERTY_WRITE .COLON .references  .SEMI_COLON
+		propertyWrite: .WRITE .COLON .references  .SEMI_COLON
 					---
 						oneRole: "write: .myRole;";
 						multipleRoles: "write: .first .second .third;";
 					;
 
-		propertyRead: .PROPERTY_READ .COLON .references .SEMI_COLON
+		propertyRead: .READ .COLON .references .SEMI_COLON
 					---
 						oneRole: "read: .myRole;";
 						multipleRoles: "read: .first .second .third;";
 					;
 
-		propertyName: .PROPERTY_NAME .COLON .variableName .SEMI_COLON
+		propertyName: .NAME .COLON .variableName .SEMI_COLON
 					---
 						valid: "name: myName;";
 					;
@@ -501,14 +785,29 @@ func grammarInput() []byte {
 		SEMI_COLON: ";";
 		COMMA: ",";
 
-		PROPERTY_HEAD: "head";
-		PROPERTY_NAME: "name";
-		PROPERTY_READ: "read";
-		PROPERTY_WRITE: "write";
-		PROPERTY_REVIEW: "review";
-		PROPERTY_ACCESS: "access";
-		PROPERTY_COMPENSATION: "compensation";
-		PROPERTY_ENGINE: "engine";
+		HEAD: "head";
+		NAME: "name";
+		READ: "read";
+		WRITE: "write";
+		REVIEW: "review";
+		ACCESS: "access";
+		COMPENSATION: "compensation";
+		ENGINE: "engine";
+		LIST: "list";
+		SET: "set";
+		SORTED_SET: "sorted_set";
+		VECTOR: "vector";
+		FLOAT: "float";
+		INT: "int";
+		UINT: "uint";
+
+		BRACKET_OPEN: "[";
+		BRACKET_CLOSE: "]";
+		PARENTHESIS_OPEN: "(";
+		PARENTHESIS_CLOSE: ")";
+		PIPE: "|";
+		HYPHEN: "-";
+		EXCLAMATION_POINT: "!";
 
 		
 	`)
