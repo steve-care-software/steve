@@ -270,7 +270,7 @@ func (app *parserAdapter) ToGrammar(input []byte) (Grammar, []byte, error) {
 		return nil, nil, err
 	}
 
-	return ins, retRemaining, nil
+	return ins, filterPrefix(retRemaining, app.filterBytes), nil
 }
 
 // ToBytes takes a grammar and returns the bytes
@@ -359,7 +359,7 @@ func (app *parserAdapter) bytesToParameterOrToken(input []byte) (parameters.Para
 		return nil, nil, nil, err
 	}
 
-	return nil, retToken, retRemaining, nil
+	return nil, retToken, filterPrefix(retRemaining, app.filterBytes), nil
 }
 
 func (app *parserAdapter) bytesToSuites(input []byte) (suites.Suites, []byte, error) {
@@ -419,7 +419,7 @@ func (app *parserAdapter) bytesToSuite(input []byte) (suites.Suite, []byte, erro
 		return nil, nil, errors.New("the suite was expected to contain the suiteLineSuffix byte at its suffix")
 	}
 
-	return retIns, retRemainingAfterBetween[1:], nil
+	return retIns, filterPrefix(retRemainingAfterBetween[1:], app.filterBytes), nil
 }
 
 func (app *parserAdapter) bytesToBlockDefinition(input []byte) (string, []byte, error) {
@@ -469,7 +469,7 @@ func (app *parserAdapter) bytesToLines(input []byte) (lines.Lines, []byte, error
 		return nil, nil, err
 	}
 
-	return ins, remaining, nil
+	return ins, filterPrefix(remaining, app.filterBytes), nil
 }
 
 func (app *parserAdapter) bytesToLine(input []byte) (lines.Line, []byte, error) {
@@ -499,7 +499,7 @@ func (app *parserAdapter) bytesToLine(input []byte) (lines.Line, []byte, error) 
 		return nil, nil, err
 	}
 
-	return line, remaining, nil
+	return line, filterPrefix(remaining, app.filterBytes), nil
 }
 
 func (app *parserAdapter) bytesToSyscall(input []byte) (executions.Execution, []byte, error) {
@@ -526,7 +526,7 @@ func (app *parserAdapter) bytesToSyscall(input []byte) (executions.Execution, []
 		return nil, nil, errors.New("the syscall was expected to contain the sysCallSuffix as its last byte")
 	}
 
-	return retExecution, retRemaining[1:], nil
+	return retExecution, filterPrefix(retRemaining[1:], app.filterBytes), nil
 }
 
 func (app *parserAdapter) bytesToProcessor(input []byte) (processors.Processor, []byte, error) {
@@ -550,7 +550,7 @@ func (app *parserAdapter) bytesToProcessor(input []byte) (processors.Processor, 
 		return nil, nil, err
 	}
 
-	return processor, remaining, nil
+	return processor, filterPrefix(remaining, app.filterBytes), nil
 }
 
 func (app *parserAdapter) bytesToExecutionOrReplacement(input []byte) (executions.Execution, elements.Element, []byte, error) {
@@ -573,7 +573,7 @@ func (app *parserAdapter) bytesToExecutionOrReplacement(input []byte) (execution
 		return nil, retElement, retElementRemaining, nil
 	}
 
-	return retExecution, nil, retRemaining, nil
+	return retExecution, nil, filterPrefix(retRemaining, app.filterBytes), nil
 }
 
 func (app *parserAdapter) bytesToExecution(input []byte) (executions.Execution, []byte, error) {
@@ -594,7 +594,7 @@ func (app *parserAdapter) bytesToExecution(input []byte) (executions.Execution, 
 		return nil, nil, err
 	}
 
-	return ins, retRemaining, nil
+	return ins, filterPrefix(retRemaining, app.filterBytes), nil
 }
 
 func (app *parserAdapter) bytesToFuncName(input []byte) (string, []byte, error) {
@@ -603,7 +603,7 @@ func (app *parserAdapter) bytesToFuncName(input []byte) (string, []byte, error) 
 		return "", nil, err
 	}
 
-	return string(funcName), retRemaining, nil
+	return string(funcName), filterPrefix(retRemaining, app.filterBytes), nil
 }
 
 func (app *parserAdapter) bytesToParameters(input []byte) (parameters.Parameters, []byte, error) {
@@ -627,7 +627,7 @@ func (app *parserAdapter) bytesToParameters(input []byte) (parameters.Parameters
 		return nil, nil, err
 	}
 
-	return ins, remaining, nil
+	return ins, filterPrefix(remaining, app.filterBytes), nil
 }
 
 func (app *parserAdapter) bytesToValue(input []byte) (values.Value, []byte, error) {
@@ -652,7 +652,7 @@ func (app *parserAdapter) bytesToValue(input []byte) (values.Value, []byte, erro
 		return nil, nil, err
 	}
 
-	return ins, retRemaining, nil
+	return ins, filterPrefix(retRemaining, app.filterBytes), nil
 }
 
 func (app *parserAdapter) bytesToReference(input []byte) (references.Reference, []byte, error) {
@@ -680,7 +680,7 @@ func (app *parserAdapter) bytesToReference(input []byte) (references.Reference, 
 		return nil, nil, err
 	}
 
-	return ins, retValueRemaining, nil
+	return ins, filterPrefix(retValueRemaining, app.filterBytes), nil
 }
 
 func (app *parserAdapter) bytesToParameter(input []byte) (parameters.Parameter, []byte, error) {
@@ -711,7 +711,7 @@ func (app *parserAdapter) bytesToParameter(input []byte) (parameters.Parameter, 
 		return nil, nil, err
 	}
 
-	return ins, retNameRemaining, nil
+	return ins, filterPrefix(retNameRemaining, app.filterBytes), nil
 }
 
 func (app *parserAdapter) bytesToTokens(input []byte) (tokens.Tokens, []byte, error) {
@@ -728,7 +728,7 @@ func (app *parserAdapter) bytesToTokens(input []byte) (tokens.Tokens, []byte, er
 		return nil, nil, err
 	}
 
-	return ins, retRemaining, nil
+	return ins, filterPrefix(retRemaining, app.filterBytes), nil
 }
 
 func (app *parserAdapter) bytesToTokenList(input []byte) ([]tokens.Token, []byte, error) {
@@ -744,7 +744,7 @@ func (app *parserAdapter) bytesToTokenList(input []byte) ([]tokens.Token, []byte
 		remaining = retRemaining
 	}
 
-	return list, remaining, nil
+	return list, filterPrefix(remaining, app.filterBytes), nil
 }
 
 func (app *parserAdapter) bytesToToken(input []byte) (tokens.Token, []byte, error) {
@@ -784,7 +784,7 @@ func (app *parserAdapter) bytesToToken(input []byte) (tokens.Token, []byte, erro
 		return nil, nil, err
 	}
 
-	return ins, retRemaining, nil
+	return ins, filterPrefix(retRemaining, app.filterBytes), nil
 }
 
 func (app *parserAdapter) bytesToTokenReverse(input []byte) (reverses.Reverse, []byte, error) {
@@ -810,7 +810,7 @@ func (app *parserAdapter) bytesToTokenReverse(input []byte) (reverses.Reverse, [
 		return nil, nil, err
 	}
 
-	return ins, remaining, nil
+	return ins, filterPrefix(remaining, app.filterBytes), nil
 }
 
 func (app *parserAdapter) bytesToTokenReverseEscape(input []byte) (elements.Element, []byte, error) {
@@ -837,7 +837,7 @@ func (app *parserAdapter) bytesToTokenReverseEscape(input []byte) (elements.Elem
 		return nil, nil, errors.New("the tokenReverseEscape was expected to contain the tokenReverseEscapeSuffix byte at its suffix")
 	}
 
-	return retElement, retRemaining[1:], nil
+	return retElement, filterPrefix(retRemaining[1:], app.filterBytes), nil
 }
 
 func (app *parserAdapter) bytesToElementReferences(input []byte) (elements.Elements, []byte, error) {
@@ -858,7 +858,7 @@ func (app *parserAdapter) bytesToElementReferences(input []byte) (elements.Eleme
 		return nil, nil, err
 	}
 
-	return ins, remaining, nil
+	return ins, filterPrefix(remaining, app.filterBytes), nil
 }
 
 func (app *parserAdapter) bytesToElementReference(input []byte) (elements.Element, []byte, error) {
@@ -901,7 +901,7 @@ func (app *parserAdapter) bytesToElement(input []byte) (elements.Element, []byte
 		return nil, nil, err
 	}
 
-	return element, retRemaining, nil
+	return element, filterPrefix(retRemaining, app.filterBytes), nil
 }
 
 func (app *parserAdapter) bytesToCardinality(input []byte) (cardinalities.Cardinality, []byte, error) {
@@ -931,7 +931,7 @@ func (app *parserAdapter) bytesToCardinality(input []byte) (cardinalities.Cardin
 		return nil, nil, err
 	}
 
-	return retIns, retRemaining, nil
+	return retIns, filterPrefix(retRemaining, app.filterBytes), nil
 }
 
 func (app *parserAdapter) bytesToRules(input []byte) (rules.Rules, []byte, error) {
@@ -997,7 +997,7 @@ func (app *parserAdapter) bytesToBlockName(input []byte) (string, []byte, error)
 		return "", nil, err
 	}
 
-	return string(blockName), retBlockRemaining, nil
+	return string(blockName), filterPrefix(retBlockRemaining, app.filterBytes), nil
 }
 
 func (app *parserAdapter) bytesToRuleName(input []byte) (string, []byte, error) {
@@ -1012,5 +1012,5 @@ func (app *parserAdapter) bytesToRuleName(input []byte) (string, []byte, error) 
 		return "", nil, err
 	}
 
-	return string(retRuleName), retRemaining, nil
+	return string(retRuleName), filterPrefix(retRemaining, app.filterBytes), nil
 }

@@ -10,14 +10,14 @@ import (
 func TestParserAdapter_execTestSuites_Success(t *testing.T) {
 	grammarInput := FetchGrammarInput()
 	grammarParserAdapter := grammars.NewParserAdapter()
-	retGrammar, _, err := grammarParserAdapter.ToGrammar(grammarInput)
+	retGrammar, retRemaining, err := grammarParserAdapter.ToGrammar(grammarInput)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
 	}
 
-	if err != nil {
-		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+	if len(retRemaining) > 0 {
+		t.Errorf("the remaining script was expected to be empty, this was returned: %s", retRemaining)
 		return
 	}
 

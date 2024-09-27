@@ -122,7 +122,8 @@ const rootPrefix = ">"
 const rootSuffix = ";"
 const omissionPrefix = "#"
 const omissionSuffix = ";"
-const filterBytes = " \n\r\t"
+const filterBytes = ` 	
+` // space, tab and eol
 const sysCallPrefix = "("
 const sysCallSuffix = ")"
 

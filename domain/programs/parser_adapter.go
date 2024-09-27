@@ -73,7 +73,7 @@ func createParserAdapter(
 // ToProgram takes the grammar and input and converts them to a program instance and the remaining data
 func (app *parserAdapter) ToProgram(grammar grammars.Grammar, input []byte) (Program, []byte, error) {
 	root := grammar.Root()
-	retElement, retRemaining, err := app.toElement(grammar, root, input)
+	retElement, retRemaining, err := app.toElement(grammar, root, input, true)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -100,6 +100,7 @@ func (app *parserAdapter) ToProgramWithRoot(grammar grammars.Grammar, rootBlockN
 		grammar,
 		rootBlock,
 		input,
+		true,
 	)
 
 	if err != nil {
@@ -129,6 +130,7 @@ func (app *parserAdapter) toInstruction(
 	grammar grammars.Grammar,
 	block blocks.Block,
 	input []byte,
+	filterForOmission bool,
 ) (instructions.Instruction, []byte, error) {
 	name := block.Name()
 	if block.HasLine() {
@@ -137,6 +139,7 @@ func (app *parserAdapter) toInstruction(
 			grammar,
 			line,
 			input,
+			filterForOmission,
 		)
 
 		if err != nil {
@@ -172,6 +175,7 @@ func (app *parserAdapter) toInstruction(
 			grammar,
 			oneLine,
 			input,
+			filterForOmission,
 		)
 
 		if err != nil {
@@ -210,19 +214,17 @@ func (app *parserAdapter) toTokens(
 	grammar grammars.Grammar,
 	line lines.Line,
 	input []byte,
+	filterForOmission bool,
 ) (instructions.Tokens, []byte, error) {
 	output := []instructions.Token{}
-	remaining := app.filterOmissions(
-		grammar,
-		input,
-	)
-
 	list := line.Tokens().List()
+	remaining := input
 	for idx, oneToken := range list {
 		retToken, retRemaining, err := app.toToken(
 			grammar,
 			oneToken,
 			remaining,
+			filterForOmission,
 		)
 
 		if err != nil {
@@ -251,12 +253,9 @@ func (app *parserAdapter) toToken(
 	grammar grammars.Grammar,
 	token tokens.Token,
 	input []byte,
+	filterForOmission bool,
 ) (instructions.Token, []byte, error) {
-	remaining := app.filterOmissions(
-		grammar,
-		input,
-	)
-
+	remaining := input
 	cardinality := token.Cardinality()
 	hasMax := cardinality.HasMax()
 	pMax := cardinality.Max()
@@ -275,24 +274,20 @@ func (app *parserAdapter) toToken(
 			break
 		}
 
-		retBytes := app.filterOmissions(
-			grammar,
-			remaining,
-		)
-
 		element := token.Element()
 		if token.HasReverse() {
 			isEscaped := false
 			reverse := token.Reverse()
-			retRemaining := retBytes
+			retRemaining := remaining
 			accumulated := []byte{}
-			for _, oneByte := range retBytes {
+			for _, oneByte := range remaining {
 				if reverse.HasEscape() {
 					escapeElement := reverse.Escape()
 					_, retRemainingAfterEscape, err := app.toElement(
 						grammar,
 						escapeElement,
 						retRemaining,
+						filterForOmission,
 					)
 
 					if err == nil {
@@ -306,6 +301,7 @@ func (app *parserAdapter) toToken(
 					grammar,
 					element,
 					retRemaining,
+					filterForOmission,
 				)
 
 				if isEscaped || err != nil {
@@ -360,7 +356,8 @@ func (app *parserAdapter) toToken(
 		retElement, retRemaining, err := app.toElement(
 			grammar,
 			element,
-			retBytes,
+			remaining,
+			filterForOmission,
 		)
 
 		if err != nil {
@@ -394,15 +391,23 @@ func (app *parserAdapter) toToken(
 		return nil, nil, err
 	}
 
-	return retToken, app.filterOmissions(grammar, remaining), nil
+	return retToken, remaining, nil
 }
 
 func (app *parserAdapter) toElement(
 	grammar grammars.Grammar,
 	element elements.Element,
 	input []byte,
+	filterForOmission bool,
 ) (instructions.Element, []byte, error) {
 	remaining := input
+	if filterForOmission {
+		remaining = app.filterOmissions(
+			grammar,
+			input,
+		)
+	}
+
 	builder := app.elementBuilder.Create()
 	if element.IsRule() {
 		ruleName := element.Rule()
@@ -412,13 +417,13 @@ func (app *parserAdapter) toElement(
 		}
 
 		ruleBytes := rule.Bytes()
-		if !bytes.HasPrefix(input, ruleBytes) {
+		if !bytes.HasPrefix(remaining, ruleBytes) {
 			str := fmt.Sprintf("the rule (name: %s) could not be found in the input bytes", ruleName)
 			return nil, nil, errors.New(str)
 		}
 
 		builder.WithRule(rule)
-		remaining = input[len(ruleBytes):]
+		remaining = remaining[len(ruleBytes):]
 	}
 
 	if element.IsBlock() {
@@ -431,7 +436,8 @@ func (app *parserAdapter) toElement(
 		retInstruction, retInstructionRemaining, err := app.toInstruction(
 			grammar,
 			block,
-			input,
+			remaining,
+			filterForOmission,
 		)
 
 		if err != nil {
@@ -445,6 +451,13 @@ func (app *parserAdapter) toElement(
 	ins, err := builder.Now()
 	if err != nil {
 		return nil, nil, err
+	}
+
+	if filterForOmission {
+		remaining = app.filterOmissions(
+			grammar,
+			remaining,
+		)
 	}
 
 	return ins, remaining, nil
@@ -553,23 +566,26 @@ func (app *parserAdapter) filterOmissions(
 		return input
 	}
 
+	remaining := input
 	omissionsList := grammar.Omissions().List()
 	for _, oneOmission := range omissionsList {
 		_, retRemaining, err := app.toElement(
 			grammar,
 			oneOmission,
-			input,
+			remaining,
+			false,
 		)
 
 		if err != nil {
 			continue
 		}
 
+		remaining = retRemaining
 		return app.filterOmissions(
 			grammar,
-			retRemaining,
+			remaining,
 		)
 	}
 
-	return input
+	return remaining
 }
