@@ -12,6 +12,7 @@ func grammarInput() []byte {
 			---
 				all: "
 						head:
+							engine: v1;
 							name: myName;
 							access: 
 								read: .first;
@@ -23,13 +24,15 @@ func grammarInput() []byte {
 				";
 			;
 
-		headOptions: .propertyName .headOptionalOption*
+		headOptions: .engine .propertyName .headOptionalOption*
 				  ---
-				  		propertyName: "
+				  		mandatory: "
+							engine: v1;
 							name: myName;
 						";
 
 						access: "
+							engine: v1;
 							name: myName;
 							access: 
 								read: .first;
@@ -39,11 +42,13 @@ func grammarInput() []byte {
 						";
 
 						compensation: "
+							engine: v1;
 							name: myName;
 							compensation: 0.1, 0.23, 0.45;
 						";
 
 						all: "
+							engine: v1;
 							name: myName;
 							compensation: 0.1, 0.23, 0.45;
 							access: 
@@ -54,6 +59,7 @@ func grammarInput() []byte {
 						";
 
 						nameAtTheEnd: !"
+							engine: v1;
 							compensation: 0.1, 0.23, 0.45;
 							name: myName;
 						";
@@ -74,6 +80,12 @@ func grammarInput() []byte {
 										compensation: 0.1, 0.23, 0.45;
 									";
 							;
+
+		engine: .PROPERTY_ENGINE .COLON .version .SEMI_COLON
+				---
+					versionOneNumber: "engine: v1;";
+					versionWithMultipleNumbers: "engine: v123;";
+				;
 
 		compensation: .PROPERTY_COMPENSATION .COLON .threeFloatNumbersBetweenZeroAndOne .SEMI_COLON
 					---
@@ -496,6 +508,7 @@ func grammarInput() []byte {
 		PROPERTY_REVIEW: "review";
 		PROPERTY_ACCESS: "access";
 		PROPERTY_COMPENSATION: "compensation";
+		PROPERTY_ENGINE: "engine";
 
 		
 	`)
