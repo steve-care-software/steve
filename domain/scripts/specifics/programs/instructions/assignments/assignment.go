@@ -3,19 +3,20 @@ package assignments
 import (
 	"github.com/steve-care-software/steve/domain/hash"
 	"github.com/steve-care-software/steve/domain/scripts/specifics/programs/containers"
+	"github.com/steve-care-software/steve/domain/scripts/specifics/programs/instructions/assignments/assignables"
 )
 
 type assignment struct {
 	hash       hash.Hash
 	variables  []string
-	assignable Assignable
+	assignable assignables.Assignable
 	initial    containers.Container
 }
 
 func createAssignment(
 	hash hash.Hash,
 	variables []string,
-	assignable Assignable,
+	assignable assignables.Assignable,
 ) Assignment {
 	return createAssignmentInternally(
 		hash,
@@ -28,7 +29,7 @@ func createAssignment(
 func createAssignmentWithInitial(
 	hash hash.Hash,
 	variables []string,
-	assignable Assignable,
+	assignable assignables.Assignable,
 	initial containers.Container,
 ) Assignment {
 	return createAssignmentInternally(
@@ -42,7 +43,7 @@ func createAssignmentWithInitial(
 func createAssignmentInternally(
 	hash hash.Hash,
 	variables []string,
-	assignable Assignable,
+	assignable assignables.Assignable,
 	initial containers.Container,
 ) Assignment {
 	out := assignment{
@@ -66,7 +67,7 @@ func (obj *assignment) Variables() []string {
 }
 
 // Assignable returns the assignable
-func (obj *assignment) Assignable() Assignable {
+func (obj *assignment) Assignable() assignables.Assignable {
 	return obj.assignable
 }
 

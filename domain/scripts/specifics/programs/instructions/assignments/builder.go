@@ -6,12 +6,13 @@ import (
 
 	"github.com/steve-care-software/steve/domain/hash"
 	"github.com/steve-care-software/steve/domain/scripts/specifics/programs/containers"
+	"github.com/steve-care-software/steve/domain/scripts/specifics/programs/instructions/assignments/assignables"
 )
 
 type builder struct {
 	hashAapter hash.Adapter
 	variables  []string
-	assignable Assignable
+	assignable assignables.Assignable
 	initial    containers.Container
 }
 
@@ -42,7 +43,7 @@ func (app *builder) WithVariables(variables []string) Builder {
 }
 
 // WithAssignable add opration to the builder
-func (app *builder) WithAssignable(assignable Assignable) Builder {
+func (app *builder) WithAssignable(assignable assignables.Assignable) Builder {
 	app.assignable = assignable
 	return app
 }

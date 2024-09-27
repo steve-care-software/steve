@@ -3,8 +3,7 @@ package assignments
 import (
 	"github.com/steve-care-software/steve/domain/hash"
 	"github.com/steve-care-software/steve/domain/scripts/specifics/programs/containers"
-	"github.com/steve-care-software/steve/domain/scripts/specifics/programs/instructions/calls"
-	"github.com/steve-care-software/steve/domain/scripts/specifics/programs/instructions/operations"
+	"github.com/steve-care-software/steve/domain/scripts/specifics/programs/instructions/assignments/assignables"
 )
 
 // NewBuilder creates a new builder
@@ -19,7 +18,7 @@ func NewBuilder() Builder {
 type Builder interface {
 	Create() Builder
 	WithVariables(variables []string) Builder
-	WithAssignable(assignable Assignable) Builder
+	WithAssignable(assignable assignables.Assignable) Builder
 	WithInitial(initial containers.Container) Builder
 	Now() (Assignment, error)
 }
@@ -28,16 +27,7 @@ type Builder interface {
 type Assignment interface {
 	Hash() hash.Hash
 	Variables() []string
-	Assignable() Assignable
+	Assignable() assignables.Assignable
 	HasInitial() bool
 	Initial() containers.Container
-}
-
-// Assignable represents an assignable
-type Assignable interface {
-	Hash() hash.Hash
-	IsOperation() bool
-	Operation() operations.Operation
-	IsCall() bool
-	Call() calls.Call
 }
