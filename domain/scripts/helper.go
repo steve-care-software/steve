@@ -24,8 +24,10 @@ func grammarInput() []byte {
 							father;
 							grandFather;
 							grandGrandFather;
+							myPoint: point;
 							myList: list;
 							mySet: set;
+							myMap: map;
 							mySortedSet: sorted_set;
 							myVector: vector[float];
 
@@ -255,22 +257,28 @@ func grammarInput() []byte {
 
 		colonPointType: .COLON .pointType
 					---
+						point: ": point";
 						list: ": list";
 						set: ": set";
 						sortedSet: ": sorted_set";
+						map: ": map";
 				  		vectorFloat: ": vector[float]";
 						vectorInt: ": vector[int]";
 						vectorUint: ": vector[uint]";
 					;
 					
-		pointType: .pointVector
+		pointType: .POINT
 				  | .LIST
 				  | .SET
 				  | .SORTED_SET 
+				  | .MAP
+				  | .pointVector
 				  ---
+				  		point: "point";
 				  		list: "list";
 						set: "set";
 						sortedSet: "sorted_set";
+						map: "map";
 				  		vectorFloat: "vector[float]";
 						vectorInt: "vector[int]";
 						vectorUint: "vector[uint]";
@@ -793,8 +801,10 @@ func grammarInput() []byte {
 		ACCESS: "access";
 		COMPENSATION: "compensation";
 		ENGINE: "engine";
+		POINT: "point";
 		LIST: "list";
 		SET: "set";
+		MAP: "map";
 		SORTED_SET: "sorted_set";
 		VECTOR: "vector";
 		FLOAT: "float";
