@@ -33,10 +33,10 @@ func grammarInput() []byte {
 										| .father .grandFather
 										| .grandFather .grandGrandFather
 										---
-											mySuite: .son .grandGrandFather [
+											mySuite[.son .grandGrandFather]:
 												(.son .father .grandFather .grandGrandFather);
 												!(.son .father .grandFather .grandGrandFather);
-											];
+											;
 										;
 
 							grandFather[grandSon]: .son .grandFather
@@ -72,10 +72,10 @@ func grammarInput() []byte {
 								| .father .grandFather
 								| .grandFather .grandGrandFather
 								---
-									mySuite: .son .grandGrandFather [
+									mySuite[.son .grandGrandFather]:
 										(.son .father .grandFather .grandGrandFather);
 										!(.son .father .grandFather .grandGrandFather);
-									];
+									;
 								;
 
 					grandFather[grandSon]: .son .grandFather
@@ -91,10 +91,10 @@ func grammarInput() []byte {
 											| .father .grandFather
 											| .grandFather .grandGrandFather
 											---
-												mySuite: .son .grandGrandFather [
+												mySuite[.son .grandGrandFather]:
 													(.son .father .grandFather .grandGrandFather);
 													!(.son .father .grandFather .grandGrandFather);
-												];
+												;
 											;
 
 								grandFather[grandSon]: .son .grandFather
@@ -117,15 +117,15 @@ func grammarInput() []byte {
 												| .father .grandFather
 												| .grandFather .grandGrandFather
 												---
-														first: .son .grandGrandFather [
+														first[.son .grandGrandFather]:
 															(.son .father .grandFather .grandGrandFather);
 															!(.son .father .grandFather .grandGrandFather);
-														];
+														;
 
-														second: .son .grandGrandFather [
+														second[.son .grandGrandFather]:
 															(.son .father .grandFather .grandGrandFather);
 															!(.son .father .grandFather .grandGrandFather);
-														];
+														;
 												;
 							";
 						;
@@ -134,15 +134,15 @@ func grammarInput() []byte {
 						---
 							valid: "
 									---
-										first: .son .grandGrandFather [
+										first[.son .grandGrandFather]:
 											(.son .father .grandFather .grandGrandFather);
 											!(.son .father .grandFather .grandGrandFather);
-										];
+										;
 
-										second: .son .grandGrandFather [
+										second[.son .grandGrandFather]:
 											(.son .father .grandFather .grandGrandFather);
 											!(.son .father .grandFather .grandGrandFather);
-										];
+										;
 							";
 						;
 
@@ -150,32 +150,32 @@ func grammarInput() []byte {
 				---
 					none: !"";
 					single: "
-							mySuite: .son .grandGrandFather [
+							mySuite[.son .grandGrandFather]:
 								(.son .father .grandFather .grandGrandFather);
 								!(.son .father .grandFather .grandGrandFather);
-							];
+							;
 						";
 
 					multiple: "
-							first: .son .grandGrandFather [
+							first[.son .grandGrandFather]:
 								(.son .father .grandFather .grandGrandFather);
 								!(.son .father .grandFather .grandGrandFather);
-							];
+							;
 
-							second: .son .grandGrandFather [
+							second[.son .grandGrandFather]:
 								(.son .father .grandFather .grandGrandFather);
 								!(.son .father .grandFather .grandGrandFather);
-							];
+							;
 						";
 				;
 
-		pointSuite: .variableName .COLON .references .BRACKET_OPEN .pointSuiteOptionLine+ .BRACKET_CLOSE .SEMI_COLON
+		pointSuite: .variableName .BRACKET_OPEN .references .BRACKET_CLOSE .COLON .pointSuiteOptionLine+ .SEMI_COLON
 				---
 					valid: "
-						mySuite: .son .grandGrandFather [
+						mySuite[.son .grandGrandFather]:
 							(.son .father .grandFather .grandGrandFather);
 							!(.son .father .grandFather .grandGrandFather);
-						];
+						;
 					";
 				;
 
