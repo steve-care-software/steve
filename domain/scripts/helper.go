@@ -28,7 +28,7 @@ func grammarInput() []byte {
 							myList: list;
 							mySet: set;
 							myMap: map;
-							mySortedSet: sorted_set;
+							mySortedSet: sortedSet;
 							myVector: vector[float];
 
 							father[son]: .son .father
@@ -67,7 +67,7 @@ func grammarInput() []byte {
 					grandGrandFather;
 					myList: list;
 					mySet: set;
-					mySortedSet: sorted_set;
+					mySortedSet: sortedSet;
 					myVector: vector[float];
 
 					father[son]: .son .father
@@ -244,7 +244,7 @@ func grammarInput() []byte {
 							grandGrandFather;
 							myList: list;
 							mySet: set;
-							mySortedSet: sorted_set;
+							mySortedSet: sortedSet;
 							myVector: vector[float];
 						";
 					;
@@ -260,7 +260,7 @@ func grammarInput() []byte {
 						point: ": point";
 						list: ": list";
 						set: ": set";
-						sortedSet: ": sorted_set";
+						sortedSet: ": sortedSet";
 						map: ": map";
 				  		vectorFloat: ": vector[float]";
 						vectorInt: ": vector[int]";
@@ -277,7 +277,7 @@ func grammarInput() []byte {
 				  		point: "point";
 				  		list: "list";
 						set: "set";
-						sortedSet: "sorted_set";
+						sortedSet: "sortedSet";
 						map: "map";
 				  		vectorFloat: "vector[float]";
 						vectorInt: "vector[int]";
@@ -805,7 +805,7 @@ func grammarInput() []byte {
 		LIST: "list";
 		SET: "set";
 		MAP: "map";
-		SORTED_SET: "sorted_set";
+		SORTED_SET: "sortedSet";
 		VECTOR: "vector";
 		FLOAT: "float";
 		INT: "int";
