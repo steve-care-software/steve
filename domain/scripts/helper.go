@@ -1,7 +1,6 @@
 package scripts
 
-//suitePrefix
-
+// blockSuiteValue
 func grammarInput() []byte {
 	return []byte(`
 		v1;
@@ -9,6 +8,7 @@ func grammarInput() []byte {
 		# .SPACE .TAB .EOL;
 
 		script: .grammarDefinition
+			  | .transpileDefinition
 			  | .schema
 			---
 				grammar: "
@@ -33,6 +33,35 @@ func grammarInput() []byte {
 								OTHER_RULE: [0, 1, 2, 3];
 								MY_RULE: \"A\";
 					";
+
+				transpile: "
+								head:
+									engine: v1;
+									name: myTranspile;
+									access: 
+										read: .first;
+										write: .first .second;
+										review: .first;
+									;
+									compensation: 0.1, 0.23, 0.45;
+								;
+
+								origin: .myOriginGrammar;
+
+								myBlock: .myElement .MY_RULE[1] ._myConstant[3] .myTargetGrammar[_targetConst] .myTargetGrammar[TARGET_RULE[3]];
+								mySecond: .myTargetGrammar[_targetConst] .myTargetGrammar[TARGET_RULE[3]]
+									---
+										myTest:
+											input: \"this is some data\";
+											expected: [2, 3, 4, 5];
+										;
+
+										myOtherTest:
+											input: [2, 3, 4, 5];
+											expected: \"this is the expected output\";
+										;
+									;
+						";
 
 				schema: "
 							head:
@@ -70,6 +99,206 @@ func grammarInput() []byte {
 												;
 				";
 			;
+
+		transpileDefinition: .head .originDefinition .transpileBlocks
+							---
+								valid: "
+										head:
+											engine: v1;
+											name: myTranspile;
+											access: 
+												read: .first;
+												write: .first .second;
+												review: .first;
+											;
+											compensation: 0.1, 0.23, 0.45;
+										;
+
+										origin: .myOriginGrammar;
+
+										myBlock: .myElement .MY_RULE[1] ._myConstant[3] .myTargetGrammar[_targetConst] .myTargetGrammar[TARGET_RULE[3]];
+										mySecond: .myTargetGrammar[_targetConst] .myTargetGrammar[TARGET_RULE[3]]
+											---
+												myTest:
+													input: \"this is some data\";
+													expected: [2, 3, 4, 5];
+												;
+
+												myOtherTest:
+													input: [2, 3, 4, 5];
+													expected: \"this is the expected output\";
+												;
+											;
+								";
+							;
+
+		originDefinition: .ORIGIN .COLON .reference .SEMI_COLON
+						---
+							valid: "origin: .myOriginGrammar;";
+						;
+
+		transpileBlocks: .transpileBlock+
+						---
+							single: "
+								myBlock: .myElement .MY_RULE[1] ._myConstant[3] .myTargetGrammar[_targetConst] .myTargetGrammar[TARGET_RULE[3]];
+							";
+
+							multiple: "
+								myBlock: .myElement .MY_RULE[1] ._myConstant[3] .myTargetGrammar[_targetConst] .myTargetGrammar[TARGET_RULE[3]];
+								mySecond: .myTargetGrammar[_targetConst] .myTargetGrammar[TARGET_RULE[3]]
+									---
+										myTest:
+											input: \"this is some data\";
+											expected: [2, 3, 4, 5];
+										;
+
+										myOtherTest:
+											input: [2, 3, 4, 5];
+											expected: \"this is the expected output\";
+										;
+									;
+							";
+						;
+
+		transpileBlock: .variableName .COLON .astElements .pipeASTElements? .transpileSuites? .SEMI_COLON
+						---
+							oneInstruction: "
+									myBlock: .myElement .MY_RULE[1] ._myConstant[3] .myTargetGrammar[_targetConst] .myTargetGrammar[TARGET_RULE[3]];
+							";
+
+							oneInstructionWithTests: "
+									myBlock: .myElement .MY_RULE[1] ._myConstant[3] .myTargetGrammar[_targetConst] .myTargetGrammar[TARGET_RULE[3]]
+									---
+										myTest:
+											input: \"this is some data\";
+											expected: [2, 3, 4, 5];
+										;
+
+										myOtherTest:
+											input: [2, 3, 4, 5];
+											expected: \"this is the expected output\";
+										;
+									;
+							";
+
+							multipleInstruction: "
+									myBlock: .myElement .MY_RULE[1] ._myConstant[3] .myTargetGrammar[_targetConst] .myTargetGrammar[TARGET_RULE[3]]
+											| .myTargetGrammar[TARGET_RULE[3]]
+											;
+							";
+
+							multipleInstructionWithTests: "
+									myBlock: .myElement .MY_RULE[1] ._myConstant[3] .myTargetGrammar[_targetConst] .myTargetGrammar[TARGET_RULE[3]]
+											| .myTargetGrammar[TARGET_RULE[3]]
+											---
+												myTest:
+													input: \"this is some data\";
+													expected: [2, 3, 4, 5];
+												;
+
+												myOtherTest:
+													input: [2, 3, 4, 5];
+													expected: \"this is the expected output\";
+												;
+											;
+							";
+						;
+
+		transpileSuites: .suitePrefix .transpileSuite+
+						---
+							valid: "
+									---
+									myTest:
+										input: \"this is some data\";
+										expected: [2, 3, 4, 5];
+									;
+
+									myOtherTest:
+										input: [2, 3, 4, 5];
+										expected: \"this is the expected output\";
+									;
+							";
+						;
+
+		transpileSuite: .variableName .COLON .suiteInput .suiteExpected .SEMI_COLON
+					---
+						valid: "
+								myTest:
+									input: \"this is some data\";
+									expected: [2, 3, 4, 5];
+								;
+						";
+					;
+
+		suiteExpected: .EXPECTED .COLON .blockSuiteValue .SEMI_COLON
+					---
+						string: "
+							expected: \"this is some data\";
+						";
+
+						bytes: "
+							expected: [2, 3, 4, 5];
+						";
+					;
+
+		suiteInput: .INPUT .COLON .blockSuiteValue .SEMI_COLON
+				---
+					string: "
+						input: \"this is some data\";
+					";
+
+					bytes: "
+						input: [2, 3, 4, 5];
+					";
+				;
+
+		pipeASTElements: .PIPE .astElements
+					---
+						origin: "| .MY_RULE ._myConstant[5] .myToken";
+						target: "| .myTargetGrammar[MY_RULE[3]]";
+					;
+
+		astElements: .astElement+
+				---
+					valid: ".MY_RULE ._myConstant[5] .myToken";
+				;
+
+		astElement: .astTargetElement
+				  | .astOriginElementName
+				  ---
+				  		origin: ".MY_RULE";
+						target: ".myTargetGrammar[MY_RULE[3]]";
+				  ;
+
+		astOriginElementName: .blockElementReference .specificAmount?
+							---
+								rule: ".MY_RULE";
+								ruleWithCardinality: ".MY_RULE[3]";
+								ruleWithAmbiguousCardinality: !".MY_RULE[2,3]";
+								block: ".myBlock";
+								blockWithCardinality: ".myBlock[3]";
+								blockWithAmbiguousCardinality: !".myBlock[2,3]";
+								constant: "._myConstant";
+								constantWithCardinality: "._myConstant[3]";
+								constantWithAmbiguousCardinality: !"._myConstant[2,3]";
+							;
+
+		astTargetElement: .reference .BRACKET_OPEN .astTargetElementKeyname .BRACKET_CLOSE
+						---
+							ruleWithAmount: ".myTargetGrammar[MY_RULE[3]]";
+							rule: ".myTargetGrammar[MY_RULE]";
+							constantWithAmount: ".myTargetGrammar[_myConstant[3]]";
+							constant: ".myTargetGrammar[_myConstant]";
+						;
+
+		astTargetElementKeyname: .constantElementName .specificAmount?
+								---
+									constant: "_myConstant";
+									rule: "MY_RULE";
+									constantWithAmount: "_myConstant[3]";
+									ruleWithAmount: "MY_RULE[2]";
+									block: !"myBlock";
+								;
 
 		grammarDefinition: .head .entryDefinition .omitDefinition? .blockDefinition+ .constantDefinition* .ruleDefinition+
 						---
@@ -372,11 +601,11 @@ func grammarInput() []byte {
 							";
 						;
 
-		ruleName: .oneUpperCaseLetter .ruleNameCharacter*
+		ruleName: .oneUpperCaseLetter .ruleNameCharacter+
 				---
-					oneCharacter: "A";
+					oneCharacter: !"A";
 					valid: "MY_RULE";
-					underscore: !"_";
+					beginWithUnderscore: !"_A";
 				;
 		
 		ruleNameCharacter: .oneUpperCaseLetter
@@ -1290,6 +1519,9 @@ func grammarInput() []byte {
 		BOOL: "bool";
 		ENTRY: "entry";
 		OMIT: "omit";
+		ORIGIN: "origin";
+		INPUT: "input";
+		EXPECTED: "expected";
 
 		BRACKET_OPEN: "[";
 		BRACKET_CLOSE: "]";
@@ -1305,6 +1537,7 @@ func grammarInput() []byte {
 		STAR: "*";
 		PLUS: "+";
 		INTERROGATION_POINT: "?";
+		COMMERCIAL_A: "@";
 
 		
 	`)
