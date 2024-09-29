@@ -3,7 +3,7 @@ package scripts
 func grammarInput() []byte {
 	return []byte(`
 		v1;
-		> .head;
+		> .script;
 		# .SPACE .TAB .EOL;
 
 		script: .schema
