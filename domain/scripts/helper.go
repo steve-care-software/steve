@@ -45,6 +45,86 @@ func grammarInput() []byte {
 				";
 			;
 
+		blockElementName: .constantElementName
+						| .variableName
+						---
+							constant: "_myConstant";s
+							rule: "MY_RULE";
+							block: "myBlock";
+						;
+
+		constantDefinition: .constantName .COLON .constantElements .SEMI_COLON
+							---
+								valid: "
+									_myConstant: .MY_RULE .OTHER_RULE[4] ._myConstant ._myConstant[2];
+								";
+						  	;
+
+		constantElements: .constantElement+
+						---
+							valid: "
+								.MY_RULE .OTHER_RULE[4] ._myConstant ._myConstant[2]
+							";
+						;
+
+		constantElement: .constantElementReference .specificAmount?
+					  ---
+					  		rule: ".MY_RULE";
+							ruleWithAmount: ".MY_RULE[4]";
+							constant: "._myConstant";
+							constantWithAmount: "._myConstant[4]";
+					  ;
+
+		constantElementReference: .DOT .constantElementName
+								---
+									constant: "._myConstant";
+									rule: ".MY_RULE";
+								;
+
+		constantElementName: .constantName
+						   | .ruleName
+						   ---
+								constant: "_myConstant";
+								rule: "MY_RULE";
+								block: !"myBlock";
+						   ;
+
+		constantName: .UNDERSCORE .variableName
+					---
+						valid: "_myConstant";
+					;
+
+		specificAmount: .BRACKET_OPEN .numbers .BRACKET_CLOSE
+					---
+						valid: "[2]";
+					;
+
+		cardinality: .BRACKET_OPEN .cardinalityValue .BRACKET_CLOSE
+				   | .PLUS
+				   | .STAR
+				   | .INTERROGATION_POINT
+					---
+						value: "[0, 23]";
+						plus: "+";
+						star: "*";
+						interrogationPoint: "?";
+					;
+
+		cardinalityValue: .numbers .commaNumbers
+						| .numbersComma
+						| .numbers
+						---
+							minWithMax: "0, 23";
+							minWithoutMax: "0,";
+							specific: "4";
+						;
+
+
+		numbersComma: .numbers .COMMA
+					---
+						valid: "0,";
+					;
+
 		ruleDefinitions: .ruleDefinition+
 						---
 							valid: "
@@ -85,13 +165,13 @@ func grammarInput() []byte {
 						bytes: "[1, 2, 3]";
 				 ;
 
-		bytesList: .BRACKET_OPEN .numbers .commaNumber* .BRACKET_CLOSE
+		bytesList: .BRACKET_OPEN .numbers .commaNumbers* .BRACKET_CLOSE
 				---
 					oneNumber: "[0]";
 					list: "[0, 45, 33, 22]";
 				;
 
-		commaNumber: .COMMA .numbers
+		commaNumbers: .COMMA .numbers
 					---
 						valid: ", 45";
 					;
@@ -992,6 +1072,9 @@ func grammarInput() []byte {
 		UNDERSCORE: "_";
 		QUOTE: "\"";
 		BACKSLASH: "\\";
+		STAR: "*";
+		PLUS: "+";
+		INTERROGATION_POINT: "?";
 
 		
 	`)
