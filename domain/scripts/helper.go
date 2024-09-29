@@ -10,6 +10,7 @@ func grammarInput() []byte {
 		script: .grammarDefinition
 			  | .transpileDefinition
 			  | .pipelineDefinition
+			  | .rootDefinition
 			  | .schema
 			---
 				grammar: "
@@ -99,6 +100,42 @@ func grammarInput() []byte {
 								;
 						";
 
+				root: "
+						head:
+							engine: v1;
+							name: myRoot;
+							access: 
+								read: .first;
+								write: .first .second;
+								review: .first;
+							;
+							compensation: 0.1, 0.23, 0.45;
+						;
+
+						.first;
+						.second:
+							.sub:
+								.subSub
+								---
+									myTest:
+										input: \"this is some data\";
+										expected: [2, 3, 4, 5];
+									;
+
+									myOtherTest:
+										input: ![2, 3, 4, 5];
+									;
+								;
+							;
+						;
+						.third
+						---
+							myOtherTest:
+								input: ![2, 3, 4, 5];
+							;
+						;
+				";
+
 				schema: "
 							head:
 									engine: v1;
@@ -135,6 +172,114 @@ func grammarInput() []byte {
 												;
 				";
 			;
+
+		rootDefinition: .head .rootElements
+					---
+						valid: "
+								head:
+									engine: v1;
+									name: myRoot;
+									access: 
+										read: .first;
+										write: .first .second;
+										review: .first;
+									;
+									compensation: 0.1, 0.23, 0.45;
+								;
+
+								.first;
+								.second:
+									.sub:
+										.subSub
+										---
+											myTest:
+												input: \"this is some data\";
+												expected: [2, 3, 4, 5];
+											;
+
+											myOtherTest:
+												input: ![2, 3, 4, 5];
+											;
+										;
+									;
+								;
+								.third
+								---
+									myOtherTest:
+										input: ![2, 3, 4, 5];
+									;
+								;
+						";
+					;
+
+		rootSubElement: .COLON .rootElements;
+
+		rootElements: .rootElement+
+				---
+					valid: "
+							.first;
+							.second:
+								.sub:
+									.subSub
+									---
+										myTest:
+											input: \"this is some data\";
+											expected: [2, 3, 4, 5];
+										;
+
+										myOtherTest:
+											input: ![2, 3, 4, 5];
+										;
+									;
+								;
+							;
+							.third
+							---
+								myOtherTest:
+									input: ![2, 3, 4, 5];
+								;
+							;
+					";
+				;
+
+		rootElement: .reference .rootSubElement? .transpileSuites? .SEMI_COLON
+					---
+						simple: "
+							.first;
+						";
+
+						withSubElement: "
+							.first:
+								.sub:
+									.subSub
+									---
+										myTest:
+											input: \"this is some data\";
+											expected: [2, 3, 4, 5];
+										;
+
+										myOtherTest:
+											input: ![2, 3, 4, 5];
+										;
+									;
+								;
+							;
+						";
+
+						withSuite: "
+							.first
+							---
+								myTest:
+									input: \"this is some data\";
+									expected: [2, 3, 4, 5];
+								;
+
+								myOtherTest:
+									input: ![2, 3, 4, 5];
+								;
+							;
+						";
+					;
 
 		pipelineDefinition: .head .pipelineInstruction
 							---
