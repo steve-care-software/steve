@@ -1,13 +1,39 @@
 package scripts
 
+//suitePrefix
+
 func grammarInput() []byte {
 	return []byte(`
 		v1;
 		> .script;
 		# .SPACE .TAB .EOL;
 
-		script: .schema
+		script: .grammarDefinition
+			  | .schema
 			---
+				grammar: "
+								head:
+									engine: v1;
+									name: myGrammar;
+									access: 
+										read: .first;
+										write: .first .second;
+										review: .first;
+									;
+									compensation: 0.1, 0.23, 0.45;
+								;
+
+								entry: .myBlock;
+
+								myBlock: .first ._second*
+									---
+										validString: \"this is some input\";
+									;
+
+								OTHER_RULE: [0, 1, 2, 3];
+								MY_RULE: \"A\";
+					";
+
 				schema: "
 							head:
 									engine: v1;
@@ -45,10 +71,220 @@ func grammarInput() []byte {
 				";
 			;
 
+		grammarDefinition: .head .entryDefinition .omitDefinition? .blockDefinition+ .constantDefinition* .ruleDefinition+
+						---
+							simple: "
+								head:
+										engine: v1;
+										name: myGrammar;
+										access: 
+											read: .first;
+											write: .first .second;
+											review: .first;
+										;
+										compensation: 0.1, 0.23, 0.45;
+								;
+
+								entry: .myBlock;
+
+								myBlock: .first ._second*
+									---
+										validString: \"this is some input\";
+									;
+
+								OTHER_RULE: [0, 1, 2, 3];
+								MY_RULE: \"A\";
+							";
+
+							withOmit: "
+								head:
+										engine: v1;
+										name: myGrammar;
+										access: 
+											read: .first;
+											write: .first .second;
+											review: .first;
+										;
+										compensation: 0.1, 0.23, 0.45;
+								;
+
+								entry: .myBlock;
+								omit: .SPACE .TAB. EOL;
+
+								myBlock: .first ._second*
+									---
+										validString: \"this is some input\";
+									;
+
+								OTHER_RULE: [0, 1, 2, 3];
+								MY_RULE: \"A\";
+							";
+
+							withConstant: "
+								head:
+										engine: v1;
+										name: myGrammar;
+										access: 
+											read: .first;
+											write: .first .second;
+											review: .first;
+										;
+										compensation: 0.1, 0.23, 0.45;
+								;
+
+								entry: .myBlock;
+
+								myBlock: .first ._second*
+									---
+										validString: \"this is some input\";
+									;
+
+								_myConstant: ._myConstant .MY_RULE[2];
+
+								OTHER_RULE: [0, 1, 2, 3];
+								MY_RULE: \"A\";
+							";
+
+							
+						;
+
+		omitDefinition: .OMIT .COLON .blockElementReference+ .SEMI_COLON
+					---
+						multiple: "
+							omit: .SPACE .TAB. EOL;
+						";
+
+						single: "
+							omit: ._myConstant;
+						";
+					;
+
+		entryDefinition: .ENTRY .COLON .blockElementReference .SEMI_COLON
+						---
+							valid: "
+								entry: .myElement;
+							";
+						;
+
+		blockDefinition: .variableName .COLON .tokens .pipeTokens? .blockSuiteDefinition? .SEMI_COLON
+						---
+							oneLine: "
+								myBlock: .first ._second*;
+							";
+
+							oneLineWithTests: "
+								myBlock: .first ._second*
+									---
+										validString: \"this is some input\";
+									;
+							";
+
+
+							multipleLine: "
+								myBlock: .first ._second*
+									   | .OTHER+ .yes
+									   ;
+							";
+
+							multipleLineWithTests: "
+								myBlock: .first ._second*
+									   | .OTHER+ .yes
+									   ---
+											validString: \"this is some input\";
+										;
+							";
+						;
+
+		blockSuiteDefinition: .suitePrefix .blockSuites
+							---
+								valid: "
+									---
+									validString: \"this is some input\";
+									invalidString: !\"this is some input\";
+									validBytes: [0, 22, 33];
+									invalidBytes: ![0, 22, 33];
+								";
+					;
+
+		blockSuites: .blockSuite+
+					---
+						valid: "
+							validString: \"this is some input\";
+							invalidString: !\"this is some input\";
+							validBytes: [0, 22, 33];
+							invalidBytes: ![0, 22, 33];
+						";
+					;
+
+		blockSuite: .variableName .COLON .EXCLAMATION_POINT? .blockSuiteValue .SEMI_COLON
+				---
+					stringValue: "
+						myName: \"this is some input\";
+					";
+
+					stringValueInvalid: "
+						myName: !\"this is some input\";
+					";
+
+					bytesValue: "
+						myName: [0, 22, 33];
+					";
+
+					bytesValueInvalid: "
+						myName: ![0, 22, 33];
+					";
+				;
+
+		blockSuiteValue: .stringValue
+					   | .bytesList
+					   ---
+					   		stringValue: "
+								\"this is some value\"
+							";
+
+							bytesList: "[0, 22, 33]";
+					   ;
+
+		pipeTokens: .PIPE .tokens
+				---
+					valid: "
+						| !.MY_RULE [._conatnt].MY_RULE[4,] ![._conatnt].myBlock !._constant ._myReference+
+					";
+				;
+
+		tokens: .token+
+			---
+				valid: "
+					!.MY_RULE [._conatnt].MY_RULE[4,] ![._conatnt].myBlock !._constant ._myReference+
+				";
+			;
+
+		token: .EXCLAMATION_POINT? .escapeElement? .blockElementReference .cardinality?
+			---
+				reverse: "!.MY_RULE";
+				escapeCardinality: "[._conatnt].MY_RULE[4,]";
+				cardinality: ".myBlock*";
+				reference: "._myReference";
+			;
+
+		escapeElement: .BRACKET_OPEN .blockElementReference .BRACKET_CLOSE
+					---
+						rule: "[.MY_RULE]";
+						block: "[.myBlock]";
+						constant: "[._myConstant]";
+					;
+
+		blockElementReference: .DOT .blockElementName
+							---
+								rule: ".MY_RULE";
+								block: ".myBlock";
+								constant: "._myConstant";
+							;
+
 		blockElementName: .constantElementName
 						| .variableName
 						---
-							constant: "_myConstant";s
+							constant: "_myConstant";
 							rule: "MY_RULE";
 							block: "myBlock";
 						;
@@ -124,14 +360,6 @@ func grammarInput() []byte {
 					---
 						valid: "0,";
 					;
-
-		ruleDefinitions: .ruleDefinition+
-						---
-							valid: "
-								MY_RULE: \"A\";
-								OTHER_RULE: [0, 1, 2, 3];
-							";
-						;
 
 		ruleDefinition: .ruleName .COLON .ruleValue .SEMI_COLON
 						---
@@ -1060,6 +1288,8 @@ func grammarInput() []byte {
 		UINT: "uint";
 		STRING: "string";
 		BOOL: "bool";
+		ENTRY: "entry";
+		OMIT: "omit";
 
 		BRACKET_OPEN: "[";
 		BRACKET_CLOSE: "]";
