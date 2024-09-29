@@ -9,6 +9,7 @@ func grammarInput() []byte {
 
 		script: .grammarDefinition
 			  | .transpileDefinition
+			  | .pipelineDefinition
 			  | .schema
 			---
 				grammar: "
@@ -67,6 +68,37 @@ func grammarInput() []byte {
 									;
 						";
 
+				pipeline: "
+								head:
+									engine: v1;
+									name: myPipeline;
+									access: 
+										read: .first;
+										write: .first .second;
+										review: .first;
+									;
+									compensation: 0.1, 0.23, 0.45;
+								;
+								recipe: .myTranspile;
+								program: myProgramOutputVar [
+									recipe: .myTranspile;
+									program: myProgramOutputVar [
+										recipe: .myTranspile;
+									];
+								]
+								---
+									myTest:
+										input: \"this is some data\";
+										expected: [2, 3, 4, 5];
+									;
+
+									myOtherTest:
+										input: [2, 3, 4, 5];
+										expected: \"this is the expected output\";
+									;
+								;
+						";
+
 				schema: "
 							head:
 									engine: v1;
@@ -104,6 +136,129 @@ func grammarInput() []byte {
 				";
 			;
 
+		pipelineDefinition: .head .pipelineInstruction
+							---
+								valid: "
+										head:
+											engine: v1;
+											name: myPipeline;
+											access: 
+												read: .first;
+												write: .first .second;
+												review: .first;
+											;
+											compensation: 0.1, 0.23, 0.45;
+										;
+										recipe: .myTranspile;
+										program: myProgramOutputVar [
+											recipe: .myTranspile;
+											program: myProgramOutputVar [
+												recipe: .myTranspile;
+											];
+										]
+										---
+											myTest:
+												input: \"this is some data\";
+												expected: [2, 3, 4, 5];
+											;
+
+											myOtherTest:
+												input: [2, 3, 4, 5];
+												expected: \"this is the expected output\";
+											;
+										;
+								";
+							;
+
+		pipelineInstruction: .pipeLineRecipeDefinition .pipelineProgramDefinition?
+							---
+								recipe: "
+									recipe: .myTranspile;
+								";
+
+								recipeWithProgram: "
+										recipe: .myTranspile;
+										program: myProgramOutputVar [
+											recipe: .myTranspile;
+											program: myProgramOutputVar [
+												recipe: .myTranspile;
+											];
+										]
+										---
+											myTest:
+												input: \"this is some data\";
+												expected: [2, 3, 4, 5];
+											;
+
+											myOtherTest:
+												input: [2, 3, 4, 5];
+												expected: \"this is the expected output\";
+											;
+										;
+								";
+
+								
+							;
+
+		pipelineProgramDefinition: .PROGRAM .COLON .variableName .BRACKET_OPEN .pipelineInstruction .BRACKET_CLOSE .transpileSuites? .SEMI_COLON
+								---
+									recipe: "
+										program: myProgramOutputVar [
+											recipe: .myTranspile;
+										];
+									";
+
+									recipeWithSuites: "
+										program: myProgramOutputVar [
+											recipe: .myTranspile;
+										]
+										---
+											myTest:
+												input: \"this is some data\";
+												expected: [2, 3, 4, 5];
+											;
+
+											myOtherTest:
+												input: [2, 3, 4, 5];
+												expected: \"this is the expected output\";
+											;
+										;
+									";
+
+									recipeWithSubProgramWithSuites: "
+										program: myProgramOutputVar [
+											recipe: .myTranspile;
+											program: myProgramOutputVar [
+												recipe: .myTranspile;
+											];
+										]
+										---
+											myTest:
+												input: \"this is some data\";
+												expected: [2, 3, 4, 5];
+											;
+
+											myOtherTest:
+												input: [2, 3, 4, 5];
+												expected: \"this is the expected output\";
+											;
+										;
+									";
+									
+								;
+
+		pipeLineRecipeDefinition: .RECIPE .COLON .reference .SEMI_COLON
+								---
+									valid: "
+										recipe: .myTranspile;
+									";
+								;
+
+		originDefinition: .ORIGIN .COLON .reference .SEMI_COLON
+						---
+							valid: "origin: .myOriginGrammar;";
+						;
+
 		transpileDefinition: .head .originDefinition .transpileBlocks
 							---
 								valid: "
@@ -135,11 +290,6 @@ func grammarInput() []byte {
 											;
 								";
 							;
-
-		originDefinition: .ORIGIN .COLON .reference .SEMI_COLON
-						---
-							valid: "origin: .myOriginGrammar;";
-						;
 
 		transpileBlocks: .transpileBlock+
 						---
@@ -1573,6 +1723,8 @@ func grammarInput() []byte {
 		ORIGIN: "origin";
 		INPUT: "input";
 		EXPECTED: "expected";
+		RECIPE: "recipe";
+		PROGRAM: "program";
 
 		BRACKET_OPEN: "[";
 		BRACKET_CLOSE: "]";
