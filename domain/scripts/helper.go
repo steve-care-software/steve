@@ -60,6 +60,10 @@ func grammarInput() []byte {
 											input: [2, 3, 4, 5];
 											expected: \"this is the expected output\";
 										;
+
+										expectedImvalid:
+											input: !\"this is some data\";
+										;
 									;
 						";
 
@@ -208,6 +212,10 @@ func grammarInput() []byte {
 						---
 							valid: "
 									---
+									expectedImvalid:
+										input: !\"this is some data\";
+									;
+
 									myTest:
 										input: \"this is some data\";
 										expected: [2, 3, 4, 5];
@@ -220,15 +228,47 @@ func grammarInput() []byte {
 							";
 						;
 
-		transpileSuite: .variableName .COLON .suiteInput .suiteExpected .SEMI_COLON
+		transpileSuite: .transpileSuiteInvalid
+					  | .transpileSuiteValid
 					---
-						valid: "
+						expectedInvalid: "
+								myTest:
+									input: !\"this is some data\";
+								;
+						";
+
+						expectedValid: "
 								myTest:
 									input: \"this is some data\";
 									expected: [2, 3, 4, 5];
 								;
 						";
 					;
+
+		transpileSuiteInvalid: .variableName .COLON .suiteInputInvalid .SEMI_COLON
+							---
+								string: "
+										myTest:
+											input: !\"this is some data\";
+										;
+								";
+
+								bytes: "
+										myTest:
+											input: ![0, 1, 2];
+										;
+								";
+							;
+
+		transpileSuiteValid: .variableName .COLON .suiteInput .suiteExpected .SEMI_COLON
+							---
+								valid: "
+										myTest:
+											input: \"this is some data\";
+											expected: [2, 3, 4, 5];
+										;
+								";
+							;
 
 		suiteExpected: .EXPECTED .COLON .blockSuiteValue .SEMI_COLON
 					---
@@ -240,6 +280,17 @@ func grammarInput() []byte {
 							expected: [2, 3, 4, 5];
 						";
 					;
+
+		suiteInputInvalid: .INPUT .COLON .EXCLAMATION_POINT .blockSuiteValue .SEMI_COLON
+				---
+					string: "
+						input: !\"this is some data\";
+					";
+
+					bytes: "
+						input: ![2, 3, 4, 5];
+					";
+				;
 
 		suiteInput: .INPUT .COLON .blockSuiteValue .SEMI_COLON
 				---
