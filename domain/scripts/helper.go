@@ -45,6 +45,62 @@ func grammarInput() []byte {
 				";
 			;
 
+		ruleDefinitions: .ruleDefinition+
+						---
+							valid: "
+								MY_RULE: \"A\";
+								OTHER_RULE: [0, 1, 2, 3];
+							";
+						;
+
+		ruleDefinition: .ruleName .COLON .ruleValue .SEMI_COLON
+						---
+							bytesList: "
+								OTHER_RULE: [0, 1, 2, 3];
+							";
+
+							string: "
+								MY_RULE: \"A\";
+							";
+						;
+
+		ruleName: .oneUpperCaseLetter .ruleNameCharacter*
+				---
+					oneCharacter: "A";
+					valid: "MY_RULE";
+					underscore: !"_";
+				;
+		
+		ruleNameCharacter: .oneUpperCaseLetter
+						 | .UNDERSCORE
+						 ---
+						 	letter: "A";
+							underscore: "_";
+						 ;
+
+		ruleValue: .bytesList
+				 | .stringValue
+				 ---
+				 		string: "\"this is 13 \\\" string values!\"";
+						bytes: "[1, 2, 3]";
+				 ;
+
+		bytesList: .BRACKET_OPEN .numbers .commaNumber* .BRACKET_CLOSE
+				---
+					oneNumber: "[0]";
+					list: "[0, 45, 33, 22]";
+				;
+
+		commaNumber: .COMMA .numbers
+					---
+						valid: ", 45";
+					;
+
+		stringValue: .QUOTE ![.BACKSLASH].QUOTE .QUOTE
+					---
+						stringInQuotes: "\"this is 13 \\\" string values!\"";
+					;
+
 		schema: .head .pointWithTypes .connectionBlocks
 			---
 				valid: "
@@ -933,6 +989,9 @@ func grammarInput() []byte {
 		HYPHEN: "-";
 		EXCLAMATION_POINT: "!";
 		GREATHER_THAN: ">";
+		UNDERSCORE: "_";
+		QUOTE: "\"";
+		BACKSLASH: "\\";
 
 		
 	`)
