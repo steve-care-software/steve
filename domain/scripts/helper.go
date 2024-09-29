@@ -24,12 +24,10 @@ func grammarInput() []byte {
 							father;
 							grandFather;
 							grandGrandFather;
-							myPoint: point;
-							myList: list;
-							mySet: set;
-							myMap: map;
-							mySortedSet: sortedSet;
-							myVector: vector[float];
+							myList: list[uint8];
+							mySet: set[uint8];
+							myMap: map[uint8];
+							mySortedSet: sortedSet[uint8];
 
 							father[son]: .son .father
 										| .father .grandFather
@@ -65,10 +63,9 @@ func grammarInput() []byte {
 					father;
 					grandFather;
 					grandGrandFather;
-					myList: list;
-					mySet: set;
-					mySortedSet: sortedSet;
-					myVector: vector[float];
+					myList: list[float32];
+					mySet: set[uint8];
+					mySortedSet: sortedSet[uint8];
 
 					father[son]: .son .father
 								| .father .grandFather
@@ -171,10 +168,10 @@ func grammarInput() []byte {
 						";
 				;
 
-		pointSuite: .variableName .BRACKET_OPEN .references .BRACKET_CLOSE .COLON .pointSuiteOptionLine+ .SEMI_COLON
+		pointSuite: .variableName .BRACKET_OPEN .pointReference[2] .BRACKET_CLOSE .COLON .pointSuiteOptionLine+ .SEMI_COLON
 				---
 					valid: "
-						mySuite[.son .grandGrandFather]:
+						mySuite[.son .external[grandGrandFather]]:
 							(.son .father .grandFather .grandGrandFather);
 							!(.son .father .grandFather .grandGrandFather);
 						;
@@ -188,34 +185,43 @@ func grammarInput() []byte {
 							;
 
 		pointSuiteOption: .pointInvalidLink
-						| .referencesInParenthesis
+						| .pointOptimalLink
+						| .pointReferencesInParenthesis
 						---
-							expectedInvalid: "!(.son .father .grandFather .grandGrandFather)";
+							optimal: "> (.son .father .external[grandFather] .grandGrandFather)";
+							expectedInvalid: "!(.son .father .external[grandFather] .grandGrandFather)";
 							expectedValid: "(.son .father .grandFather .grandGrandFather)";
 						;
 
-		pointInvalidLink: .EXCLAMATION_POINT .referencesInParenthesis
+		pointOptimalLink: .GREATHER_THAN .pointReferencesInParenthesis
 						---
-							valid: "!(.son .father .grandFather .grandGrandFather)";
+							valid: "> (.son .father .external[grandFather] .grandGrandFather)";
 						;
 
-		referencesInParenthesis: .PARENTHESIS_OPEN .references .PARENTHESIS_CLOSE
-							---
-								valid: "(.son .father .grandFather .grandGrandFather)";
-							;
+		pointInvalidLink: .EXCLAMATION_POINT .pointReferencesInParenthesis
+						---
+							valid: "!(.son .father .external[grandFather] .grandGrandFather)";
+						;
+
+		pointReferencesInParenthesis: .PARENTHESIS_OPEN .pointReferences .PARENTHESIS_CLOSE
+									---
+										valid: "(.son .external[father] .grandFather .grandGrandFather)";
+									;
 
 		suitePrefix: .HYPHEN[3]
 				---
 					valid: "---";
 				;
 
-		links: .references .pipeReferences*
+		links: .journey .pipeJourney*
 			---
 				oneLine: ".son .father";
 				multipleLine: "
 					.son .father
-					| .father .grandFather
-					| .grandFather .grandGrandFather
+					| .myExternal[father] .grandFather (67)
+					| .grandFather .myExternal[grandGrandFather]
+					| .myExternal[grandFather] .myExternal[grandGrandFather]
+					| .myExternal[grandFather] .grandGrandFather
 				";
 			;
 
@@ -230,10 +236,24 @@ func grammarInput() []byte {
 								valid: "[myVariable]";
 							;
 
-		pipeReferences: .PIPE .references
+		pipeJourney: .PIPE .journey
 					---
 						valid: "| .son .father";
 					;
+
+		journey: .pointReference[2] .weight?
+				---
+					withWeight: ".origin .target (45)";
+					withoutWeight: ".origin .target";
+					withWeightWithExternal: ".myExternal[origin] .target (45)";
+				;
+
+		weight: .PARENTHESIS_OPEN .numbers .PARENTHESIS_CLOSE
+			---
+				zero: "(0)";
+				multiple: "(45)";
+				float: !"(34.98)";
+			;
 
 		pointWithTypes: .pointWithType+
 					---
@@ -242,63 +262,25 @@ func grammarInput() []byte {
 							father;
 							grandFather;
 							grandGrandFather;
-							myList: list;
-							mySet: set;
-							mySortedSet: sortedSet;
-							myVector: vector[float];
+							myList: list[uint8];
+							mySet: set[uint8];
+							mySortedSet: sortedSet[uint8];
 						";
 					;
 
 		pointWithType: .variableName .colonPointType? .SEMI_COLON
 					---
 						point: "myPoint;";
-						pointWithType: "mySecondPoint: vector[uint];";
+						pointWithType: "mySecondPoint: list[uint8];";
 					;
 
-		colonPointType: .COLON .pointType
+		colonPointType: .COLON .schemaTypeOption
 					---
-						point: ": point";
-						list: ": list";
-						set: ": set";
-						sortedSet: ": sortedSet";
-						map: ": map";
-				  		vectorFloat: ": vector[float]";
-						vectorInt: ": vector[int]";
-						vectorUint: ": vector[uint]";
+						list: ": list[float32]";
+						set: ": set[uint8]";
+						sortedSet: ": sortedSet[uint8]";
+						map: ": map[uint8]";
 					;
-					
-		pointType: .POINT
-				  | .LIST
-				  | .SET
-				  | .SORTED_SET 
-				  | .MAP
-				  | .pointVector
-				  ---
-				  		point: "point";
-				  		list: "list";
-						set: "set";
-						sortedSet: "sortedSet";
-						map: "map";
-				  		vectorFloat: "vector[float]";
-						vectorInt: "vector[int]";
-						vectorUint: "vector[uint]";
-				  ;
-
-		pointVector: .VECTOR .BRACKET_OPEN .vectorTypes .BRACKET_CLOSE
-					---
-						float: "vector[float]";
-						int: "vector[int]";
-						uint: "vector[uint]";
-					;
-
-		vectorTypes: .FLOAT
-				   | .INT
-				   | .UINT
-				   ---
-				   		float: "float";
-						int: "int";
-						uint: "uint";
-				   ;
 
 		head: .HEAD .COLON .headOptions .SEMI_COLON
 			---
@@ -717,6 +699,137 @@ func grammarInput() []byte {
 								height: "8";
 								nine: "9";
 							;
+
+		pointReferences: .pointReference+
+						---
+							valid: ".mySchema[myPoint] .myPoint";
+						;
+
+		pointReference: .externalPointReference
+					  | .reference
+					  ---
+							external: ".mySchema[myPoint]";
+							internal: ".myPoint";
+						;
+
+		externalPointReference: .reference .BRACKET_OPEN .variableName .BRACKET_CLOSE
+							---
+								valid: ".mySchema[myPoint]";
+							;
+
+		schemaTypeOption: .reference
+						| .typeOption
+						---
+							container: "set[float32]";
+							primitive: "float32";
+							reference: ".myGrammar";
+						;
+
+		typeOption: .containerType
+				  | .primitiveType
+					---
+				   		container: "list[float32]";
+						primitive: "float32";
+				   ;
+
+		containerType: .containerName .BRACKET_OPEN .typeOption .BRACKET_CLOSE
+					---
+						float: "list[float32]";
+						int: "list[int32]";
+						uint: "list[uint8]";
+						string: "list[string]";
+						bool: "list[bool]";
+						listInLists: "list[list[list[float32]]]";
+						setInLists: "list[sortedSet[set[float32]]]";
+					;
+
+		containerName: .LIST
+					 | .SET
+					 | .SORTED_SET
+					 | .MAP
+					 ---
+					 	list: "list";
+						set: "set";
+						sortedSet: "sortedSet";
+						map: "map";
+					 ;
+
+		primitiveType: .floatType
+					| .intType
+					| .STRING
+					| .BOOL
+					---
+						float32: "float32";
+						float64: "float64";
+						int8: "uint8";
+						int16: "uint16";
+						int32: "uint32";
+						int64: "uint64";
+						uint8: "uint8";
+						uint16: "uint16";
+						uint32: "uint32";
+						uint64: "uint64";
+						string: "string";
+						bool: "bool";
+					;
+
+		floatType: .FLOAT .floatSize
+				---
+					float32: "float32";
+					float64: "float64";
+				;
+
+		intType: .intTypeOption .intSize
+				---
+					int8: "uint8";
+					int16: "uint16";
+					int32: "uint32";
+					int64: "uint64";
+					uint8: "uint8";
+					uint16: "uint16";
+					uint32: "uint32";
+					uint64: "uint64";
+				;
+
+		intTypeOption: .INT
+					| .UINT
+					---
+						int: "int";
+						uint: "uint";
+					;
+
+		intSize: .N_HEIGHT
+				| .sixteen
+				| .thirtyTwo
+				| .sixtyFour
+				---
+					height: "8";
+					sixteen: "16";
+					thirtyTwo: "32";
+					sixtyFour: "64";
+				;
+
+		floatSize: .thirtyTwo
+				| .sixtyFour
+				---
+					thirtyTwo: "32";
+					sixtyFour: "64";
+				;
+
+		sixtyFour: .N_SIX .N_FOUR
+				---
+					valid: "64";
+				;
+
+		thirtyTwo: .N_THREE .N_TWO
+				---
+					valid: "32";
+				;
+
+		sixteen: .N_ONE .N_SIX
+				---
+					valid: "16";
+				;
 							
 		SPACE: " ";
 		TAB: "	";
@@ -806,10 +919,11 @@ func grammarInput() []byte {
 		SET: "set";
 		MAP: "map";
 		SORTED_SET: "sortedSet";
-		VECTOR: "vector";
 		FLOAT: "float";
 		INT: "int";
 		UINT: "uint";
+		STRING: "string";
+		BOOL: "bool";
 
 		BRACKET_OPEN: "[";
 		BRACKET_CLOSE: "]";
@@ -818,6 +932,7 @@ func grammarInput() []byte {
 		PIPE: "|";
 		HYPHEN: "-";
 		EXCLAMATION_POINT: "!";
+		GREATHER_THAN: ">";
 
 		
 	`)
