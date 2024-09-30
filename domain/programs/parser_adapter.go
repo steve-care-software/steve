@@ -73,7 +73,7 @@ func createParserAdapter(
 // ToProgram takes the grammar and input and converts them to a program instance and the remaining data
 func (app *parserAdapter) ToProgram(grammar grammars.Grammar, input []byte) (Program, []byte, error) {
 	root := grammar.Root()
-	retElement, retRemaining, err := app.toElement(grammar, root, input, true)
+	retElement, retRemaining, err := app.toElement(grammar, map[string]map[int][]byte{}, root, input, true)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -98,6 +98,7 @@ func (app *parserAdapter) ToProgramWithRoot(grammar grammars.Grammar, rootBlockN
 
 	retInstruction, retInstructionRemaining, err := app.toInstruction(
 		grammar,
+		map[string]map[int][]byte{},
 		rootBlock,
 		input,
 		true,
@@ -128,6 +129,7 @@ func (app *parserAdapter) ToProgramWithRoot(grammar grammars.Grammar, rootBlockN
 
 func (app *parserAdapter) toInstruction(
 	grammar grammars.Grammar,
+	parentValues map[string]map[int][]byte,
 	block blocks.Block,
 	input []byte,
 	filterForOmission bool,
@@ -135,12 +137,18 @@ func (app *parserAdapter) toInstruction(
 	name := block.Name()
 	if block.HasLine() {
 		line := block.Line()
-		retTokens, retRemaining, err := app.toTokens(
+		retTokens, retRemaining, isForceSkipLine, err := app.toTokens(
 			grammar,
+			parentValues,
 			line,
 			input,
 			filterForOmission,
 		)
+
+		if isForceSkipLine {
+			str := fmt.Sprintf("the block (name: %s) contains 1 line and it was forced to be skipped", name)
+			return nil, nil, errors.New(str)
+		}
 
 		if err != nil {
 			return nil, nil, err
@@ -171,12 +179,33 @@ func (app *parserAdapter) toInstruction(
 
 	lines := block.Lines().List()
 	for idx, oneLine := range lines {
-		retTokens, retRemaining, err := app.toTokens(
+		if _, ok := parentValues[name]; !ok {
+			parentValues[name] = map[int][]byte{}
+		}
+
+		if value, ok := parentValues[name][idx]; ok {
+			if bytes.Equal(value, input) {
+				continue
+			}
+		}
+
+		parentValues[name][idx] = input
+		retTokens, retRemaining, isForceSkipLine, err := app.toTokens(
 			grammar,
+			parentValues,
 			oneLine,
 			input,
 			filterForOmission,
 		)
+
+		delete(parentValues[name], idx)
+		if len(parentValues[name]) <= 0 {
+			delete(parentValues, name)
+		}
+
+		if isForceSkipLine {
+			continue
+		}
 
 		if err != nil {
 			continue
@@ -212,25 +241,27 @@ func (app *parserAdapter) toInstruction(
 
 func (app *parserAdapter) toTokens(
 	grammar grammars.Grammar,
+	parentValues map[string]map[int][]byte,
 	line lines.Line,
 	input []byte,
 	filterForOmission bool,
-) (instructions.Tokens, []byte, error) {
+) (instructions.Tokens, []byte, bool, error) {
 	output := []instructions.Token{}
 	list := line.Tokens().List()
 	remaining := input
 	for idx, oneToken := range list {
+		name := oneToken.Name()
 		retToken, retRemaining, err := app.toToken(
 			grammar,
+			parentValues,
 			oneToken,
 			remaining,
 			filterForOmission,
 		)
 
 		if err != nil {
-			name := oneToken.Name()
 			str := fmt.Sprintf("the token (name: %s, index: %d) could not be matched using the provided input", name, idx)
-			return nil, nil, errors.New(str)
+			return nil, nil, false, errors.New(str)
 		}
 
 		if retToken == nil {
@@ -243,14 +274,15 @@ func (app *parserAdapter) toTokens(
 
 	retTokens, err := app.tokensBuilder.Create().WithList(output).Now()
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, false, err
 	}
 
-	return retTokens, remaining, nil
+	return retTokens, remaining, false, nil
 }
 
 func (app *parserAdapter) toToken(
 	grammar grammars.Grammar,
+	parentValues map[string]map[int][]byte,
 	token tokens.Token,
 	input []byte,
 	filterForOmission bool,
@@ -285,6 +317,7 @@ func (app *parserAdapter) toToken(
 					escapeElement := reverse.Escape()
 					_, retRemainingAfterEscape, err := app.toElement(
 						grammar,
+						parentValues,
 						escapeElement,
 						retRemaining,
 						filterForOmission,
@@ -299,6 +332,7 @@ func (app *parserAdapter) toToken(
 
 				_, retRemainingAfterElement, err := app.toElement(
 					grammar,
+					parentValues,
 					element,
 					retRemaining,
 					filterForOmission,
@@ -355,6 +389,7 @@ func (app *parserAdapter) toToken(
 
 		retElement, retRemaining, err := app.toElement(
 			grammar,
+			parentValues,
 			element,
 			remaining,
 			filterForOmission,
@@ -396,6 +431,7 @@ func (app *parserAdapter) toToken(
 
 func (app *parserAdapter) toElement(
 	grammar grammars.Grammar,
+	parentValues map[string]map[int][]byte,
 	element elements.Element,
 	input []byte,
 	filterForOmission bool,
@@ -435,6 +471,7 @@ func (app *parserAdapter) toElement(
 
 		retInstruction, retInstructionRemaining, err := app.toInstruction(
 			grammar,
+			parentValues,
 			block,
 			remaining,
 			filterForOmission,
@@ -571,6 +608,7 @@ func (app *parserAdapter) filterOmissions(
 	for _, oneOmission := range omissionsList {
 		_, retRemaining, err := app.toElement(
 			grammar,
+			map[string]map[int][]byte{},
 			oneOmission,
 			remaining,
 			false,

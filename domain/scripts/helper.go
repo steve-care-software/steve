@@ -1596,7 +1596,7 @@ func grammarInput() []byte {
 										zero: "0.0";
 										pointZero: !"4556.0";
 									;
-		
+
 		assignment: .firstAssignment
 				  | .reAssignment
 				  ---
@@ -1689,6 +1689,8 @@ func grammarInput() []byte {
 						boolTrue: "true";
 						boolFalse: "false";
 						selector: ".myElement[0][1]->mySubElement[0]->MY_RULE[0]";
+						complexInt: "(-6 + (-34 + 0)) * myVariable + 12";
+						complexFloat: "myVariable + 12.2 * (-6.6 + (-34.32 + 0.1))";
 					;
 
 		boolAssignable: .TRUE
@@ -1698,18 +1700,61 @@ func grammarInput() []byte {
 							false: "false";
 					  ;
 
-		intAssignable: .negativeNumber
+		intAssignable: .intAssignable .intArithmeticTail*
+					| .PARENTHESIS_OPEN  .intAssignable .PARENTHESIS_CLOSE
+					| .negativeNumber
 					| .positiveNumbers
+					| .variableName
 					---
 						negative: "-334";
 						positive: "1234567890";
+						simple: "34 + 0";
+						withParenthesis: "(34 + 0)";
+						withMultipleParenthesis: "((34 + 0) + (5 + 2))";
+						withParenthesisThenSingleNumber: "(34 + 0) + 6";
+						complex: "(-6 + (-34 + 0)) * myVariable + 12";
+						complexAgain: "myVariable + (-6 + (-34 + 0))";
 					;
 
-		floatAssignable: .negativeFloatNumber
-						| .positiveFloatNumber
+		intArithmeticTail: .arithmeticOperator .intAssignable
 						---
-							negative: "-34.87";
-							positive: "0.87";
+							simple: "+ 0";
+							complex: "* (-6 + (-34 + 0))";
+						;
+
+		arithmeticOperator: .PLUS
+						  | .HYPHEN
+						  | .STAR
+						  | .DIV
+						  | .PERCENT
+						  ---
+						  		plus: "+";
+								minus: "-";
+								mul: "*";
+								div: "/";
+								mod: "%";
+						  ;
+
+		floatAssignable: .floatAssignable .floatArithmeticTail*
+					| .PARENTHESIS_OPEN  .floatAssignable .PARENTHESIS_CLOSE
+					| .negativeFloatNumber
+					| .positiveFloatNumber
+					| .variableName
+					---
+						negative: "-34.87";
+						positive: "0.87";
+						simple: "34.0 + 0.1";
+						withParenthesis: "(34.456 + 0.01)";
+						withMultipleParenthesis: "((34.0 + 0.1) + (5.2 + 2.56))";
+						withParenthesisThenSingleNumber: "(34.56 + 0.0) + 6.1";
+						complex: "(-6.01 + (-34.1 + 0.0)) * myVariable + 12.01";
+						complexAgain: "myVariable + (-6.8 + (-34.2 + 0.2))";
+					;
+
+		floatArithmeticTail: .arithmeticOperator .floatAssignable
+						---
+							simple: "+ 0.3";
+							complex: "* (-6.2 + (-34.1 + 0.03))";
 						;
 
 		negativeFloatNumber: .HYPHEN .positiveFloatNumber
@@ -2048,6 +2093,8 @@ func grammarInput() []byte {
 		PLUS: "+";
 		INTERROGATION_POINT: "?";
 		EQUAL: "=";
+		DIV: "/";
+		PERCENT: "%";
 
 		
 	`)

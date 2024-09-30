@@ -72,3 +72,106 @@ func TestParserAdapter_Success(t *testing.T) {
 	fmt.Printf("\n%v\n", retProgram)
 
 }
+
+func TestParserAdapter_withFiniteRecursivity_Success(t *testing.T) {
+	grammarInput := []byte(`
+		v1;
+		>.addition;
+		# .SPACE .TAB. EOL;
+
+		addition: .OPEN_PARENTHESIS .addition .CLOSE_PARENTHESIS
+				| .firstNumber .PLUS_SIGN .secondNumber
+				;
+
+		secondNumber: .N_THREE .N_FOUR .N_FIVE;
+		firstNumber: .N_ONE .N_TWO;
+
+		N_ZERO: "0";
+		N_ONE: "1";
+		N_TWO: "2";
+		N_THREE: "3";
+		N_FOUR: "4";
+		N_FIVE: "5";
+		N_SIX: "6";
+		OPEN_PARENTHESIS: "(";
+		CLOSE_PARENTHESIS: ")";
+		PLUS_SIGN: "+";
+		SPACE: " ";
+		TAB: "	";
+		EOL: "
+";
+	`)
+
+	programRemaining := []byte("this is a remaining")
+	programInput := append([]byte(`
+		( 12 + 345 )`), programRemaining...)
+
+	grammarParserAdapter := grammars.NewParserAdapter()
+	retGrammar, _, err := grammarParserAdapter.ToGrammar(grammarInput)
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	parserAdapter := NewParserAdapter()
+	retProgram, retRemaining, err := parserAdapter.ToProgram(retGrammar, programInput)
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	if !bytes.Equal(programRemaining, retRemaining) {
+		t.Errorf("the returned remaining is invalid")
+		return
+	}
+
+	fmt.Printf("\n%v\n", retProgram)
+
+}
+
+func TestParserAdapter_isInfiniteRecursive_returnsError(t *testing.T) {
+	grammarInput := []byte(`
+		v1;
+		>.line;
+		# .SPACE .TAB. EOL;
+		
+		line: .line
+			| .N_ZERO
+			;
+
+		N_ZERO: "0";
+		SPACE: " ";
+		TAB: "	";
+		EOL: "
+";
+	`)
+
+	programRemaining := []byte("this is a remaining")
+	programInput := append([]byte(`
+		salut ( 12 + 345 )`), programRemaining...)
+
+	grammarParserAdapter := grammars.NewParserAdapter()
+	retGrammar, _, err := grammarParserAdapter.ToGrammar(grammarInput)
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	parserAdapter := NewParserAdapter()
+	_, _, err = parserAdapter.ToProgram(retGrammar, programInput)
+	if err == nil {
+		t.Errorf("the error was expected to be valid, nil returned")
+		return
+	}
+
+}
