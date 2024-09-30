@@ -1597,6 +1597,38 @@ func grammarInput() []byte {
 										pointZero: !"4556.0";
 									;
 
+		instructions: .instruction+;
+		instruction: .assignmentLine
+				   | .conditionLine
+				   ;
+
+		conditionLine: .IF .boolAssignable .COLON .instructions .SEMI_COLON
+					---
+						simple: "
+							if (true):
+								bool myValue := true;
+							;
+						";
+
+						variable: "
+							if (myVariable):
+								bool myValue := true;
+							;
+						";
+
+						complex: "
+							if (myVariable < 6.0 && other > 3):
+								if (myVariable < 6.0 && other > 3):
+									bool myValue := true;
+								;
+
+								myValue = .myElement[0][1]->mySubElement[0]->MY_RULE[0];
+							;
+						";
+					;
+
+		assignmentLine: .assignment .SEMI_COLON;
+
 		assignment: .firstAssignment
 				  | .reAssignment
 				  ---
@@ -2121,6 +2153,7 @@ func grammarInput() []byte {
 		EXPECTED: "expected";
 		RECIPE: "recipe";
 		PROGRAM: "program";
+		IF: "if";
 
 		BRACKET_OPEN: "[";
 		BRACKET_CLOSE: "]";
