@@ -1,6 +1,5 @@
 package scripts
 
-// blockSuiteValue
 func grammarInput() []byte {
 	return []byte(`
 		v1;
@@ -50,7 +49,7 @@ func grammarInput() []byte {
 
 								origin: .myOriginGrammar;
 
-								myBlock: .myElement .MY_RULE[1] ._myConstant[3] .myTargetGrammar[_targetConst] .myTargetGrammar[TARGET_RULE[3]];
+								myBlock: .myElement .myElement[0][1]->_myConstant->mySubElement[0]->MY_RULE[0] ._myConstant[3] .myTargetGrammar[_targetConst] .myTargetGrammar[TARGET_RULE[3]];
 								mySecond: .myTargetGrammar[_targetConst] .myTargetGrammar[TARGET_RULE[3]]
 									---
 										myTest:
@@ -610,24 +609,11 @@ func grammarInput() []byte {
 				;
 
 		astElement: .astTargetElement
-				  | .astOriginElementName
+				  | .selectorValue
 				  ---
 				  		origin: ".MY_RULE";
-						target: ".myTargetGrammar[MY_RULE[3]]";
+						target: ".myElement[0][1]->_myConstant->mySubElement[0]->MY_RULE[0]";
 				  ;
-
-		astOriginElementName: .blockElementReference .specificAmount?
-							---
-								rule: ".MY_RULE";
-								ruleWithCardinality: ".MY_RULE[3]";
-								ruleWithAmbiguousCardinality: !".MY_RULE[2,3]";
-								block: ".myBlock";
-								blockWithCardinality: ".myBlock[3]";
-								blockWithAmbiguousCardinality: !".myBlock[2,3]";
-								constant: "._myConstant";
-								constantWithCardinality: "._myConstant[3]";
-								constantWithAmbiguousCardinality: !"._myConstant[2,3]";
-							;
 
 		astTargetElement: .reference .BRACKET_OPEN .astTargetElementKeyname .BRACKET_CLOSE
 						---
@@ -645,6 +631,33 @@ func grammarInput() []byte {
 									ruleWithAmount: "MY_RULE[2]";
 									block: !"myBlock";
 								;
+
+		selectorValue: .DOT .selectorElement .selectorSubElement*
+					---
+						one: ".myElement";
+						oneWithIndexes: ".myElement[0][1]";
+						complex: ".myElement[0][1]->mySubElement[0]->MY_RULE[0]->_myConstant";
+					;
+
+		selectorSubElement: .HYPHEN .GREATHER_THAN .selectorElement
+						---
+							simple: "->MY_RULE";
+							simpleWithOneIndex: "->myToken[0]";
+							simpleWithTwoIndex: "->myToken[1][2]";
+						;
+
+		selectorElement: .blockElementName .doubleSpecificValue?
+						---
+							simple: "MY_RULE";
+							simpleWithOneIndex: "myToken[0]";
+							simpleWithTwoIndex: "myToken[1][2]";
+						;
+
+		doubleSpecificValue: .specificAmount[1,2]
+							---
+								one: "[0]";
+								two: "[0][1]";
+							;
 
 		grammarDefinition: .head .entryDefinition .omitDefinition? .blockDefinition+ .constantDefinition* .ruleDefinition+
 						---
