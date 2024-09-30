@@ -1622,13 +1622,13 @@ func grammarInput() []byte {
 						floatNegative: "myValue = -34.87";
 						boolTrue: "myValue = true";
 						boolFalse: "myValue = false";
+						operation: "myValue = (65 + 12) * 4";
 						selector: "myValue = .myElement[0][1]->mySubElement[0]->MY_RULE[0]";
 					;
 
 		firstAssignment: .selectorAssignment
 					   | .boolAssignment
 					   | .floatAssignment
-					   | .uintAssignment
 					   | .intAssignment
 					   ---
 					   		selector: "
@@ -1639,6 +1639,8 @@ func grammarInput() []byte {
 							float: "float32 myValue := 0.08";
 							uint: "uint8 myValue := 345";
 							int: "int8 myValue := 345";
+							complexInt: "int64 myValue := (-6 + (-34 + 0)) * myVariable + 12";
+							complexFloat: "float32 myValue :=myVariable + 12.2 * (-6.6 + (-34.32 + 0.1))";
 					   ;
 
 		selectorAssignment: .SELECTOR .variableName .firstAssignSymbol .selectorValue
@@ -1660,16 +1662,18 @@ func grammarInput() []byte {
 							negative: "float64 myValue := -345.876";
 					;
 
-		uintAssignment: .uintType .variableName .COLON .EQUAL .positiveNumbers
-							---
-								positive: "uint8 myValue := 345";
-								negative: !"uint8 myValue := -345";
-							;
-
-		intAssignment: .intType .variableName .firstAssignSymbol .intAssignable
+		intAssignment: .intTypeOption .variableName .firstAssignSymbol .intAssignable
 					---
-							positive: "int8 myValue := 345";
-							negative: "int8 myValue := -345";
+							intPositive: "int8 myValue := 345";
+							intNegative: "int8 myValue := -345";
+							uintComplex: "uint32 myValue := (345 * 12 + -45) * 2";
+					;
+
+		intTypeOption: .intType
+					| .uintType
+					---
+						int: "int32";
+						uint: "uint64";
 					;
 
 		firstAssignSymbol: .COLON .EQUAL
