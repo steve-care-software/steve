@@ -158,7 +158,7 @@ type StandardBuilder interface {
 // Standard represents a standard operation
 // arithmetic: +, -, *, /, %
 // relational: <, >, <=, >=, ==, !=
-// logical: and, or, not, xor
+// logical: &&, ||, !, <>
 type Standard interface {
 	Hash() hash.Hash
 	First() Operation

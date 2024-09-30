@@ -1696,9 +1696,13 @@ func grammarInput() []byte {
 						selector: ".myElement[0][1]->mySubElement[0]->MY_RULE[0]";
 						complexInt: "(-6 + (-34 + 0)) * myVariable + 12";
 						complexFloat: "myVariable + 12.2 * (-6.6 + (-34.32 + 0.1))";
+						complexBool: "(5.2 <= (myVariable * (32.0 + 56.7))) && !(myVariable < 8.0) <> (3 > 0)";
 					;
 
-		boolAssignable: .intAssignable .relationalOperator .intAssignable
+		boolAssignable: .EXCLAMATION_POINT .boolAssignable
+					  | .boolAssignable .boolLogicalTail*
+					  | .floatAssignable .relationalOperator .floatAssignable
+					  | .intAssignable .relationalOperator .intAssignable
 					  | .PARENTHESIS_OPEN  .boolAssignable .PARENTHESIS_CLOSE
 					  | .TRUE
 					  | .FALSE
@@ -1707,8 +1711,25 @@ func grammarInput() []byte {
 					  		true: "true";
 							false: "false";
 							variable: "myVariable";
-							complex: "(5 <= 6)";
+							complexInt: "(5 <= 6)";
+							complexFloat: "(5.2 <= (5.4 * (32.0 + 56.7)))";
+							complexBool: "!(5.2 <= (myVariable * (32.0 + 56.7))) && !(myVariable < 8.0) <> !(3 > 0)";
 					  ;
+
+		boolLogicalTail: .logicalOperator .boolAssignable
+						---
+							simple: "|| (5 > 0)";
+							complex: "&& (5.0 < (8.0 * 43.2))";
+						;
+
+		logicalOperator: .AMPERCENT[2]
+					   | .PIPE[2]
+					   | .SMALLER_THAN .GREATHER_THAN
+						---
+						  	and: "&&";
+							or: "||";
+							xor: "<>";
+						;
 
 		relationalOperator: .GREATHER_THAN .EQUAL?
 						  | .SMALLER_THAN .EQUAL?
@@ -2120,6 +2141,7 @@ func grammarInput() []byte {
 		NOT_EQUAL: "!=";
 		DIV: "/";
 		PERCENT: "%";
+		AMPERCENT: "&";
 
 		
 	`)

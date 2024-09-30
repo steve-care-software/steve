@@ -137,18 +137,13 @@ func (app *parserAdapter) toInstruction(
 	name := block.Name()
 	if block.HasLine() {
 		line := block.Line()
-		retTokens, retRemaining, isForceSkipLine, err := app.toTokens(
+		retTokens, retRemaining, err := app.toTokens(
 			grammar,
 			parentValues,
 			line,
 			input,
 			filterForOmission,
 		)
-
-		if isForceSkipLine {
-			str := fmt.Sprintf("the block (name: %s) contains 1 line and it was forced to be skipped", name)
-			return nil, nil, errors.New(str)
-		}
 
 		if err != nil {
 			return nil, nil, err
@@ -190,7 +185,7 @@ func (app *parserAdapter) toInstruction(
 		}
 
 		parentValues[name][idx] = input
-		retTokens, retRemaining, isForceSkipLine, err := app.toTokens(
+		retTokens, retRemaining, err := app.toTokens(
 			grammar,
 			parentValues,
 			oneLine,
@@ -201,10 +196,6 @@ func (app *parserAdapter) toInstruction(
 		delete(parentValues[name], idx)
 		if len(parentValues[name]) <= 0 {
 			delete(parentValues, name)
-		}
-
-		if isForceSkipLine {
-			continue
 		}
 
 		if err != nil {
@@ -245,7 +236,7 @@ func (app *parserAdapter) toTokens(
 	line lines.Line,
 	input []byte,
 	filterForOmission bool,
-) (instructions.Tokens, []byte, bool, error) {
+) (instructions.Tokens, []byte, error) {
 	output := []instructions.Token{}
 	list := line.Tokens().List()
 	remaining := input
@@ -261,7 +252,7 @@ func (app *parserAdapter) toTokens(
 
 		if err != nil {
 			str := fmt.Sprintf("the token (name: %s, index: %d) could not be matched using the provided input", name, idx)
-			return nil, nil, false, errors.New(str)
+			return nil, nil, errors.New(str)
 		}
 
 		if retToken == nil {
@@ -274,10 +265,10 @@ func (app *parserAdapter) toTokens(
 
 	retTokens, err := app.tokensBuilder.Create().WithList(output).Now()
 	if err != nil {
-		return nil, nil, false, err
+		return nil, nil, err
 	}
 
-	return retTokens, remaining, false, nil
+	return retTokens, remaining, nil
 }
 
 func (app *parserAdapter) toToken(
