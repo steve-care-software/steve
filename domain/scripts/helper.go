@@ -1714,8 +1714,7 @@ func grammarInput() []byte {
 							first: ":=";
 						;
 
-		assignable: .floatAssignable
-				  | .intAssignable
+		assignable: .numericAssignable
 				  | .boolAssignable
 				  | .selectorValue
 				  ---
@@ -1729,7 +1728,19 @@ func grammarInput() []byte {
 						complexInt: "(-6 + (-34 + 0)) * myVariable + 12";
 						complexFloat: "myVariable + 12.2 * (-6.6 + (-34.32 + 0.1))";
 						complexBool: "(5.2 <= (myVariable * (32.0 + 56.7))) && !(myVariable < 8.0) <> (3 > 0)";
+						shiftRight: "((-6 + (-34 + 0)) * myVariable + 12) >> 1";
 					;
+
+		numericAssignable: .numericAssignable .bitshift*
+						| .floatAssignable
+						| .intAssignable
+						| .PARENTHESIS_OPEN  .numericAssignable .PARENTHESIS_CLOSE
+						---
+							complexInt: "(-6 + (-34 + 0)) * myVariable + 12";
+							complexFloat: "myVariable + 12.2 * (-6.6 + (-34.32 + 0.1))";
+							shiftLeft: "(-6 + (-34 + 0)) * myVariable + 12 << 2";
+							shiftRight: "((-6 + (-34 + 0)) * myVariable + 12) >> 1";
+						;
 
 		boolAssignable: .EXCLAMATION_POINT .boolAssignable
 					  | .boolAssignable .boolLogicalTail*
@@ -1793,9 +1804,12 @@ func grammarInput() []byte {
 					;
 
 		intArithmeticTail: .arithmeticOperator .intAssignable
+						| .bitshift
 						---
 							simple: "+ 0";
 							complex: "* (-6 + (-34 + 0))";
+							rightShift: ">> 3";
+							leftShift: "<< 1";
 						;
 
 		arithmeticOperator: .PLUS
@@ -1828,9 +1842,25 @@ func grammarInput() []byte {
 					;
 
 		floatArithmeticTail: .arithmeticOperator .floatAssignable
+							| .bitshift
 						---
 							simple: "+ 0.3";
 							complex: "* (-6.2 + (-34.1 + 0.03))";
+							rightShift: ">> 3";
+							leftShift: "<< 1";
+						;
+
+		bitshift: .bitShiftOperator .positiveNumbers
+				---
+					rightShift: ">> 3";
+					leftShift: "<< 1";
+				;
+
+		bitShiftOperator: .SMALLER_THAN[2]
+						| .GREATHER_THAN[2]
+						---
+							left: "<<";
+							right: ">>";
 						;
 
 		negativeFloatNumber: .HYPHEN .positiveFloatNumber
