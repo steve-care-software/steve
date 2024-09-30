@@ -918,7 +918,7 @@ func grammarInput() []byte {
 						valid: "_myConstant";
 					;
 
-		specificAmount: .BRACKET_OPEN .numbers .BRACKET_CLOSE
+		specificAmount: .BRACKET_OPEN .positiveNumbers .BRACKET_CLOSE
 					---
 						valid: "[2]";
 					;
@@ -934,9 +934,9 @@ func grammarInput() []byte {
 						interrogationPoint: "?";
 					;
 
-		cardinalityValue: .numbers .commaNumbers
+		cardinalityValue: .positiveNumbers .commaNumbers
 						| .numbersComma
-						| .numbers
+						| .positiveNumbers
 						---
 							minWithMax: "0, 23";
 							minWithoutMax: "0,";
@@ -944,7 +944,7 @@ func grammarInput() []byte {
 						;
 
 
-		numbersComma: .numbers .COMMA
+		numbersComma: .positiveNumbers .COMMA
 					---
 						valid: "0,";
 					;
@@ -981,13 +981,13 @@ func grammarInput() []byte {
 						bytes: "[1, 2, 3]";
 				 ;
 
-		bytesList: .BRACKET_OPEN .numbers .commaNumbers* .BRACKET_CLOSE
+		bytesList: .BRACKET_OPEN .positiveNumbers .commaNumbers* .BRACKET_CLOSE
 				---
 					oneNumber: "[0]";
 					list: "[0, 45, 33, 22]";
 				;
 
-		commaNumbers: .COMMA .numbers
+		commaNumbers: .COMMA .positiveNumbers
 					---
 						valid: ", 45";
 					;
@@ -1200,7 +1200,7 @@ func grammarInput() []byte {
 					withWeightWithExternal: ".myExternal[origin] .target (45)";
 				;
 
-		weight: .PARENTHESIS_OPEN .numbers .PARENTHESIS_CLOSE
+		weight: .PARENTHESIS_OPEN .positiveNumbers .PARENTHESIS_CLOSE
 			---
 				zero: "(0)";
 				multiple: "(45)";
@@ -1590,20 +1590,152 @@ func grammarInput() []byte {
 											invalid: !", 32.98";
 										; 
 
-		floatNumberBetweenZeroAndOne: .N_ZERO .DOT .numbers
+		floatNumberBetweenZeroAndOne: .N_ZERO .DOT .positiveNumbers
 									---
 										lessThanZero: "0.23";
 										zero: "0.0";
 										pointZero: !"4556.0";
 									;
+		
+		assignment: .firstAssignment
+				  | .reAssignment
+				  ---
+				 		 firstSelector: "
+									selector mySelector := .myElement[0][1]->mySubElement[0]->MY_RULE[0]
+						";
 
-		numbers: .oneNumber+
-				---
-					oneNumber: "1";
-					numberWithAllNumbers: "1234567890";
-					negativeNumberWithAllNumbers: !"-1234567890";
-					oneLettter: !"a";
-				;
+						firstBool: "bool myValue := true";
+						firstFloat: "float32 myValue := 0.08";
+						firstUint: "uint8 myValue := 345";
+						firstInt: "int8 myValue := 345";
+				 		int: "myValue = 345";
+						float: "myValue = -34.87";
+						bool: "myValue = true";
+						selector: "myValue = .myElement[0][1]->mySubElement[0]->MY_RULE[0]";
+				  ;
+
+		reAssignment: .variableName .EQUAL .assignable
+					---
+						int: "myValue = 345";
+						intNegative: "myValue = -345";
+						float: "myValue = 34.87";
+						floatNegative: "myValue = -34.87";
+						boolTrue: "myValue = true";
+						boolFalse: "myValue = false";
+						selector: "myValue = .myElement[0][1]->mySubElement[0]->MY_RULE[0]";
+					;
+
+		firstAssignment: .selectorAssignment
+					   | .boolAssignment
+					   | .floatAssignment
+					   | .uintAssignment
+					   | .intAssignment
+					   ---
+					   		selector: "
+									selector mySelector := .myElement[0][1]->mySubElement[0]->MY_RULE[0]
+							";
+
+							bool: "bool myValue := true";
+							float: "float32 myValue := 0.08";
+							uint: "uint8 myValue := 345";
+							int: "int8 myValue := 345";
+					   ;
+
+		selectorAssignment: .SELECTOR .variableName .firstAssignSymbol .selectorValue
+							---
+								selector: "
+									selector mySelector := .myElement[0][1]->mySubElement[0]->MY_RULE[0]
+								";
+							;
+
+		boolAssignment: .BOOL .variableName .firstAssignSymbol .boolAssignable
+						---
+							true: "bool myValue := true";
+							false: "bool myValue := false";
+						;
+
+		floatAssignment: .floatType .variableName .firstAssignSymbol .floatAssignable
+					---
+							positive: "float32 myValue := 0.08";
+							negative: "float64 myValue := -345.876";
+					;
+
+		uintAssignment: .uintType .variableName .COLON .EQUAL .positiveNumbers
+							---
+								positive: "uint8 myValue := 345";
+								negative: !"uint8 myValue := -345";
+							;
+
+		intAssignment: .intType .variableName .firstAssignSymbol .intAssignable
+					---
+							positive: "int8 myValue := 345";
+							negative: "int8 myValue := -345";
+					;
+
+		firstAssignSymbol: .COLON .EQUAL
+						---
+							first: ":=";
+						;
+
+		assignable: .floatAssignable
+				  | .intAssignable
+				  | .boolAssignable
+				  | .selectorValue
+				  ---
+						int: "345";
+						intNegative: "-345";
+						float: "34.87";
+						floatNegative: "-34.87";
+						boolTrue: "true";
+						boolFalse: "false";
+						selector: ".myElement[0][1]->mySubElement[0]->MY_RULE[0]";
+					;
+
+		boolAssignable: .TRUE
+					  | .FALSE
+					  ---
+					  		true: "true";
+							false: "false";
+					  ;
+
+		intAssignable: .negativeNumber
+					| .positiveNumbers
+					---
+						negative: "-334";
+						positive: "1234567890";
+					;
+
+		floatAssignable: .negativeFloatNumber
+						| .positiveFloatNumber
+						---
+							negative: "-34.87";
+							positive: "0.87";
+						;
+
+		negativeFloatNumber: .HYPHEN .positiveFloatNumber
+							---
+								valid: "-34.87";
+							;
+
+		positiveFloatNumber: .positiveNumbers .DOT .positiveNumbers
+							---
+								zero: "0.0";
+								lessThanZero: "0.87";
+								biggerThanZero: "23.87";
+							;
+
+		negativeNumber: .HYPHEN .positiveNumbers
+					---
+						valid: "-334";
+					;
+
+		positiveNumbers: .oneNumber+
+						---
+							oneNumber: "1";
+							numberWithAllNumbers: "1234567890";
+							negativeNumberWithAllNumbers: !"-1234567890";
+							oneLettter: !"a";
+						;
 
 		numbersExceptZero: .oneNumberExceptZero+
 				---
@@ -1679,10 +1811,22 @@ func grammarInput() []byte {
 
 		typeOption: .containerType
 				  | .primitiveType
+				  | .engineType
 					---
-				   		container: "list[float32]";
 						primitive: "float32";
+						containerWithPrimitive: "list[float32]";
+						engine: "selector";
+						containerWithEngine: "list[list[selector]]";
 				   ;
+
+		engineType: .SELECTOR
+				  | .JOURNEY
+				  | .ROUTE
+				  ---
+				  		selector: "selector";
+						journey: "journey";
+						route: "route";
+				  ;
 
 		containerType: .containerName .BRACKET_OPEN .typeOption .BRACKET_CLOSE
 					---
@@ -1707,16 +1851,17 @@ func grammarInput() []byte {
 					 ;
 
 		primitiveType: .floatType
+					| .uintType
 					| .intType
 					| .STRING
 					| .BOOL
 					---
 						float32: "float32";
 						float64: "float64";
-						int8: "uint8";
-						int16: "uint16";
-						int32: "uint32";
-						int64: "uint64";
+						int8: "int8";
+						int16: "int16";
+						int32: "int32";
+						int64: "int64";
 						uint8: "uint8";
 						uint16: "uint16";
 						uint32: "uint32";
@@ -1731,24 +1876,21 @@ func grammarInput() []byte {
 					float64: "float64";
 				;
 
-		intType: .intTypeOption .intSize
+		intType: .INT .intSize
 				---
-					int8: "uint8";
-					int16: "uint16";
-					int32: "uint32";
-					int64: "uint64";
+					int8: "int8";
+					int16: "int16";
+					int32: "int32";
+					int64: "int64";
+				;
+
+		uintType: .UINT .intSize
+				---
 					uint8: "uint8";
 					uint16: "uint16";
 					uint32: "uint32";
 					uint64: "uint64";
 				;
-
-		intTypeOption: .INT
-					| .UINT
-					---
-						int: "int";
-						uint: "uint";
-					;
 
 		intSize: .N_HEIGHT
 				| .sixteen
@@ -1876,6 +2018,13 @@ func grammarInput() []byte {
 		UINT: "uint";
 		STRING: "string";
 		BOOL: "bool";
+		SELECTOR: "selector";
+		JOURNEY: "journey";
+		ROUTE: "route";
+
+		TRUE: "true";
+		FALSE: "false";
+
 		ENTRY: "entry";
 		OMIT: "omit";
 		ORIGIN: "origin";
@@ -1898,7 +2047,7 @@ func grammarInput() []byte {
 		STAR: "*";
 		PLUS: "+";
 		INTERROGATION_POINT: "?";
-		COMMERCIAL_A: "@";
+		EQUAL: "=";
 
 		
 	`)
