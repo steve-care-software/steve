@@ -1654,6 +1654,7 @@ func grammarInput() []byte {
 						---
 							true: "bool myValue := true";
 							false: "bool myValue := false";
+							relational: "bool myValue := ((45 + (78 * 2 + 47)) <= 78)";
 						;
 
 		floatAssignment: .floatType .variableName .firstAssignSymbol .floatAssignable
@@ -1697,12 +1698,30 @@ func grammarInput() []byte {
 						complexFloat: "myVariable + 12.2 * (-6.6 + (-34.32 + 0.1))";
 					;
 
-		boolAssignable: .TRUE
+		boolAssignable: .intAssignable .relationalOperator .intAssignable
+					  | .PARENTHESIS_OPEN  .boolAssignable .PARENTHESIS_CLOSE
+					  | .TRUE
 					  | .FALSE
+					  | .variableName
 					  ---
 					  		true: "true";
 							false: "false";
+							variable: "myVariable";
+							complex: "(5 <= 6)";
 					  ;
+
+		relationalOperator: .GREATHER_THAN .EQUAL?
+						  | .SMALLER_THAN .EQUAL?
+						  | .EQUAL[2]
+						  | .NOT_EQUAL
+						  ---
+						  		greaterThan: ">";
+								greaterThanOrEqual: ">=";
+								smallerThan: "<";
+								smallerThanOrEqual: "<=";
+								equal: "==";
+								notEqual: "!=";
+						  ;
 
 		intAssignable: .intAssignable .intArithmeticTail*
 					| .PARENTHESIS_OPEN  .intAssignable .PARENTHESIS_CLOSE
@@ -2090,6 +2109,7 @@ func grammarInput() []byte {
 		HYPHEN: "-";
 		EXCLAMATION_POINT: "!";
 		GREATHER_THAN: ">";
+		SMALLER_THAN: "<";
 		UNDERSCORE: "_";
 		QUOTE: "\"";
 		BACKSLASH: "\\";
@@ -2097,6 +2117,7 @@ func grammarInput() []byte {
 		PLUS: "+";
 		INTERROGATION_POINT: "?";
 		EQUAL: "=";
+		NOT_EQUAL: "!=";
 		DIV: "/";
 		PERCENT: "%";
 
