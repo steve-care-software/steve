@@ -1,23 +1,14 @@
 package grammars
 
 import (
-	"errors"
-	"math/big"
-
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines"
-	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/executions"
-	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/executions/parameters"
-	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/executions/parameters/values"
-	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/executions/parameters/values/references"
-	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/processors"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/tokens"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/tokens/cardinalities"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/tokens/elements"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/tokens/reverses"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/suites"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/constants"
-	"github.com/steve-care-software/steve/parsers/domain/grammars/resources"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/rules"
 )
 
@@ -126,37 +117,8 @@ const filterBytes = `
 const sysCallPrefix = "("
 const sysCallSuffix = ")"
 
-// NewComposeAdapter creates a new composer adapter
-func NewComposeAdapter() ComposeAdapter {
-	return createComposeAdapter(
-		map[string]CoreFn{
-			"math_operation_arithmetic_addition": func(input map[string][]byte) ([]byte, error) {
-				if firstBytes, ok := input["first"]; ok {
-					if secondBytes, ok := input["second"]; ok {
-						pFirst, _ := big.NewInt(int64(0)).SetString(string(firstBytes), 10)
-						if pFirst == nil {
-							return nil, errors.New("the first value could not be converted to a number")
-						}
-
-						pSecond, _ := big.NewInt(int64(0)).SetString(string(secondBytes), 10)
-						if pSecond == nil {
-							return nil, errors.New("the second value could not be converted to a number")
-						}
-
-						return []byte(pFirst.Add(pFirst, pSecond).String()), nil
-					}
-
-					return nil, errors.New("the second value was not defined")
-				}
-
-				return nil, errors.New("the first value was not defined")
-			},
-		},
-	)
-}
-
-// NewParserAdapter creates a new parser adapter
-func NewParserAdapter() ParserAdapter {
+// NewAdapter creates a new adapter
+func NewAdapter() Adapter {
 	grammarBuilder := NewBuilder()
 	blocksBuilder := blocks.NewBuilder()
 	blockBuilder := blocks.NewBlockBuilder()
@@ -164,12 +126,6 @@ func NewParserAdapter() ParserAdapter {
 	suiteBuilder := suites.NewSuiteBuilder()
 	linesBuilder := lines.NewBuilder()
 	lineBuilder := lines.NewLineBuilder()
-	processorBuilder := processors.NewBuilder()
-	executionBuilder := executions.NewBuilder()
-	parametersBuilder := parameters.NewBuilder()
-	parameterBuilder := parameters.NewParameterBuilder()
-	valueBuilder := values.NewBuilder()
-	referenceBuilder := references.NewBuilder()
 	tokensBuilder := tokens.NewBuilder()
 	tokenBuilder := tokens.NewTokenBuilder()
 	reverseBuilder := reverses.NewBuilder()
@@ -183,7 +139,7 @@ func NewParserAdapter() ParserAdapter {
 	possibleUpperCaseLetters := createPossibleUpperCaseLetters()
 	possibleNumbers := createPossibleNumbers()
 	possibleFuncNameCharacters := createPossibleFuncNameCharacters()
-	return createParserAdapter(
+	return createAdapter(
 		grammarBuilder,
 		blocksBuilder,
 		blockBuilder,
@@ -191,12 +147,6 @@ func NewParserAdapter() ParserAdapter {
 		suiteBuilder,
 		linesBuilder,
 		lineBuilder,
-		processorBuilder,
-		executionBuilder,
-		parametersBuilder,
-		parameterBuilder,
-		valueBuilder,
-		referenceBuilder,
 		tokensBuilder,
 		tokenBuilder,
 		reverseBuilder,
@@ -252,8 +202,8 @@ func NewBuilder() Builder {
 	return createBuilder()
 }
 
-// ParserAdapter represents the grammar parser adapter
-type ParserAdapter interface {
+// Adapter represents the adapter
+type Adapter interface {
 	// ToGrammar takes the input and converts it to a grammar instance and the remaining data
 	ToGrammar(input []byte) (Grammar, []byte, error)
 
@@ -275,7 +225,6 @@ type Builder interface {
 	WithRules(rules rules.Rules) Builder
 	WithBlocks(blocks blocks.Blocks) Builder
 	WithOmissions(omissions elements.Elements) Builder
-	WithResources(resources resources.Resources) Builder
 	WithConstants(constants constants.Constants) Builder
 	Now() (Grammar, error)
 }
@@ -288,8 +237,6 @@ type Grammar interface {
 	Blocks() blocks.Blocks
 	HasOmissions() bool
 	Omissions() elements.Elements
-	HasResources() bool
-	Resources() resources.Resources
 	HasConstants() bool
 	Constants() constants.Constants
 }

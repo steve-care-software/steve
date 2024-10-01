@@ -6,7 +6,6 @@ import (
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/tokens/elements"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/constants"
-	"github.com/steve-care-software/steve/parsers/domain/grammars/resources"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/rules"
 )
 
@@ -16,7 +15,6 @@ type builder struct {
 	rules     rules.Rules
 	blocks    blocks.Blocks
 	omissions elements.Elements
-	resources resources.Resources
 	constants constants.Constants
 }
 
@@ -27,7 +25,6 @@ func createBuilder() Builder {
 		rules:     nil,
 		blocks:    nil,
 		omissions: nil,
-		resources: nil,
 		constants: nil,
 	}
 
@@ -69,12 +66,6 @@ func (app *builder) WithOmissions(omissions elements.Elements) Builder {
 	return app
 }
 
-// WithResources add resources to the builder
-func (app *builder) WithResources(resources resources.Resources) Builder {
-	app.resources = resources
-	return app
-}
-
 // WithConstants add constants to the builder
 func (app *builder) WithConstants(constants constants.Constants) Builder {
 	app.constants = constants
@@ -99,28 +90,12 @@ func (app *builder) Now() (Grammar, error) {
 		return nil, errors.New("the blocks is mandatory in order to build a Grammar instance")
 	}
 
-	if app.omissions != nil && app.resources != nil && app.constants != nil {
-		return createGrammarWithOmissionsAndResourcesAndConstants(*app.pVersion, app.root, app.rules, app.blocks, app.omissions, app.resources, app.constants), nil
-	}
-
-	if app.omissions != nil && app.resources != nil {
-		return createGrammarWithOmissionsAndResources(*app.pVersion, app.root, app.rules, app.blocks, app.omissions, app.resources), nil
-	}
-
 	if app.omissions != nil && app.constants != nil {
 		return createGrammarWithOmissionsAndConstants(*app.pVersion, app.root, app.rules, app.blocks, app.omissions, app.constants), nil
 	}
 
-	if app.resources != nil && app.constants != nil {
-		return createGrammarWithResourcesAndConstants(*app.pVersion, app.root, app.rules, app.blocks, app.resources, app.constants), nil
-	}
-
 	if app.omissions != nil {
 		return createGrammarWithOmissions(*app.pVersion, app.root, app.rules, app.blocks, app.omissions), nil
-	}
-
-	if app.resources != nil {
-		return createGrammarWithResources(*app.pVersion, app.root, app.rules, app.blocks, app.resources), nil
 	}
 
 	if app.constants != nil {

@@ -37,31 +37,6 @@ func NewElementBuilder() ElementBuilder {
 	return createElementBuilder()
 }
 
-// NewSyscallBuilder creates a new syscall builder
-func NewSyscallBuilder() SyscallBuilder {
-	return createSyscallBuilder()
-}
-
-// NewParametersBuilder creates a new parameters builder
-func NewParametersBuilder() ParametersBuilder {
-	return createParametersBuilder()
-}
-
-// NewParameterBuilder creates a new parameter builder
-func NewParameterBuilder() ParameterBuilder {
-	return createParameterBuilder()
-}
-
-// NewValueBuilder creates a new value builder
-func NewValueBuilder() ValueBuilder {
-	return createValueBuilder()
-}
-
-// NewReferenceBuilder creates a new reference builder
-func NewReferenceBuilder() ReferenceBuilder {
-	return createReferenceBuilder()
-}
-
 // Builder represents the instructions builder
 type Builder interface {
 	Create() Builder
@@ -81,7 +56,6 @@ type InstructionBuilder interface {
 	WithBlock(block string) InstructionBuilder
 	WithLine(line uint) InstructionBuilder
 	WithTokens(tokens Tokens) InstructionBuilder
-	WithSyscall(syscall Syscall) InstructionBuilder
 	Now() (Instruction, error)
 }
 
@@ -90,8 +64,6 @@ type Instruction interface {
 	Block() string
 	Line() uint
 	Tokens() Tokens
-	HasSyscall() bool
-	Syscall() Syscall
 }
 
 // TokensBuilder represents the tokens builder
@@ -154,75 +126,4 @@ type Element interface {
 	Rule() rules.Rule
 	IsInstruction() bool
 	Instruction() Instruction
-}
-
-// SyscallBuilder represents the syscall builder
-type SyscallBuilder interface {
-	Create() SyscallBuilder
-	WithFuncName(fnName string) SyscallBuilder
-	WithParameters(parameters Parameters) SyscallBuilder
-	Now() (Syscall, error)
-}
-
-// Syscall represents a syscall
-type Syscall interface {
-	FuncName() string
-	HasParameters() bool
-	Parameters() Parameters
-}
-
-// ParametersBuilder represents the parameters builder
-type ParametersBuilder interface {
-	Create() ParametersBuilder
-	WithList(list []Parameter) ParametersBuilder
-	Now() (Parameters, error)
-}
-
-// Parameters represents parameters
-type Parameters interface {
-	List() []Parameter
-}
-
-// ParameterBuilder represents the parameter builder
-type ParameterBuilder interface {
-	Create() ParameterBuilder
-	WithName(name string) ParameterBuilder
-	WithValue(value Value) ParameterBuilder
-	Now() (Parameter, error)
-}
-
-// Parameter represents an execution parameter
-type Parameter interface {
-	Name() string
-	Value() Value
-}
-
-// ValueBuilder represents the value builder
-type ValueBuilder interface {
-	Create() ValueBuilder
-	WithReference(reference Reference) ValueBuilder
-	WithBytes(bytes []byte) ValueBuilder
-	Now() (Value, error)
-}
-
-// Value represents a value
-type Value interface {
-	IsReference() bool
-	Reference() Reference
-	IsBytes() bool
-	Bytes() []byte
-}
-
-// ReferenceBuilder represents the reference builder
-type ReferenceBuilder interface {
-	Create() ReferenceBuilder
-	WithElement(element string) ReferenceBuilder
-	WithIndex(index uint) ReferenceBuilder
-	Now() (Reference, error)
-}
-
-// Reference represents a reference
-type Reference interface {
-	Element() string
-	Index() uint
 }

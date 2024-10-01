@@ -6,9 +6,9 @@ import (
 	"github.com/steve-care-software/steve/parsers/domain/grammars/rules"
 )
 
-// NewParserAdapter creates a new parser adapter
-func NewParserAdapter() ParserAdapter {
-	grammarAdapter := grammars.NewParserAdapter()
+// NewAdapter creates a new adapter
+func NewAdapter() Adapter {
+	grammarAdapter := grammars.NewAdapter()
 	builder := NewBuilder()
 	instructionsBuilder := instructions.NewBuilder()
 	instructionBuilder := instructions.NewInstructionBuilder()
@@ -17,12 +17,7 @@ func NewParserAdapter() ParserAdapter {
 	elementsBuilder := instructions.NewElementsBuilder()
 	elementBuilder := instructions.NewElementBuilder()
 	ruleBuilder := rules.NewRuleBuilder()
-	syscallBuilder := instructions.NewSyscallBuilder()
-	parametersBuilder := instructions.NewParametersBuilder()
-	parameterBuilder := instructions.NewParameterBuilder()
-	valueBuilder := instructions.NewValueBuilder()
-	referenceBuilder := instructions.NewReferenceBuilder()
-	return createParserAdapter(
+	return createAdapter(
 		grammarAdapter,
 		builder,
 		instructionsBuilder,
@@ -32,11 +27,6 @@ func NewParserAdapter() ParserAdapter {
 		elementsBuilder,
 		elementBuilder,
 		ruleBuilder,
-		syscallBuilder,
-		parametersBuilder,
-		parameterBuilder,
-		valueBuilder,
-		referenceBuilder,
 	)
 }
 
@@ -45,8 +35,8 @@ func NewBuilder() Builder {
 	return createBuilder()
 }
 
-// ParserAdapter represents the ast parser adapter
-type ParserAdapter interface {
+// Adapter represents the adapter
+type Adapter interface {
 	// ToAST takes the grammar and input and converts them to a ast instance and the remaining data
 	ToAST(grammar grammars.Grammar, input []byte) (AST, []byte, error)
 

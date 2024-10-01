@@ -19,8 +19,8 @@ func TestParserAdapter_Success(t *testing.T) {
 			;
 
 		additionInParenthesis: .OPEN_PARENTHESIS .addition .CLOSE_PARENTHESIS;
-		addition: (my_syscall .firstNumber:first .secondNumber:second) .firstNumber .PLUS_SIGN .secondNumber;
-		secondNumber: (my_syscall) .N_THREE .N_FOUR .N_FIVE;
+		addition: .firstNumber .PLUS_SIGN .secondNumber;
+		secondNumber: .N_THREE .N_FOUR .N_FIVE;
 		firstNumber: .N_ONE .N_TWO;
 		myReplacement: .N_ONE .N_THREE;
 		replacedNumber: .N_TWO .N_FOUR;
@@ -45,7 +45,7 @@ func TestParserAdapter_Success(t *testing.T) {
 	astInput := append([]byte(`
 		salut ( 12 + 345 )`), astRemaining...)
 
-	grammarParserAdapter := grammars.NewParserAdapter()
+	grammarParserAdapter := grammars.NewAdapter()
 	retGrammar, _, err := grammarParserAdapter.ToGrammar(grammarInput)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
@@ -57,7 +57,7 @@ func TestParserAdapter_Success(t *testing.T) {
 		return
 	}
 
-	parserAdapter := NewParserAdapter()
+	parserAdapter := NewAdapter()
 	retAST, retRemaining, err := parserAdapter.ToAST(retGrammar, astInput)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
@@ -106,7 +106,7 @@ func TestParserAdapter_withFiniteRecursivity_Success(t *testing.T) {
 	astInput := append([]byte(`
 		( 12 + 345 )`), astRemaining...)
 
-	grammarParserAdapter := grammars.NewParserAdapter()
+	grammarParserAdapter := grammars.NewAdapter()
 	retGrammar, _, err := grammarParserAdapter.ToGrammar(grammarInput)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
@@ -118,7 +118,7 @@ func TestParserAdapter_withFiniteRecursivity_Success(t *testing.T) {
 		return
 	}
 
-	parserAdapter := NewParserAdapter()
+	parserAdapter := NewAdapter()
 	retAST, retRemaining, err := parserAdapter.ToAST(retGrammar, astInput)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
@@ -155,7 +155,7 @@ func TestParserAdapter_isInfiniteRecursive_returnsError(t *testing.T) {
 	astInput := append([]byte(`
 		salut ( 12 + 345 )`), astRemaining...)
 
-	grammarParserAdapter := grammars.NewParserAdapter()
+	grammarParserAdapter := grammars.NewAdapter()
 	retGrammar, _, err := grammarParserAdapter.ToGrammar(grammarInput)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
@@ -167,7 +167,7 @@ func TestParserAdapter_isInfiniteRecursive_returnsError(t *testing.T) {
 		return
 	}
 
-	parserAdapter := NewParserAdapter()
+	parserAdapter := NewAdapter()
 	_, _, err = parserAdapter.ToAST(retGrammar, astInput)
 	if err == nil {
 		t.Errorf("the error was expected to be valid, nil returned")

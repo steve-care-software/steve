@@ -9,7 +9,7 @@ import (
 
 func TestParserAdapter_execTestSuites_Success(t *testing.T) {
 	grammarInput := FetchGrammarInput()
-	grammarParserAdapter := grammars.NewParserAdapter()
+	grammarParserAdapter := grammars.NewAdapter()
 	retGrammar, retRemaining, err := grammarParserAdapter.ToGrammar(grammarInput)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())

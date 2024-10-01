@@ -5,18 +5,16 @@ import (
 )
 
 type instructionBuilder struct {
-	block   string
-	pLine   *uint
-	tokens  Tokens
-	syscall Syscall
+	block  string
+	pLine  *uint
+	tokens Tokens
 }
 
 func createInstructionBuilder() InstructionBuilder {
 	out := instructionBuilder{
-		block:   "",
-		pLine:   nil,
-		tokens:  nil,
-		syscall: nil,
+		block:  "",
+		pLine:  nil,
+		tokens: nil,
 	}
 
 	return &out
@@ -45,12 +43,6 @@ func (app *instructionBuilder) WithTokens(tokens Tokens) InstructionBuilder {
 	return app
 }
 
-// WithSyscall adds a syscall to the builder
-func (app *instructionBuilder) WithSyscall(syscall Syscall) InstructionBuilder {
-	app.syscall = syscall
-	return app
-}
-
 // Now builds a new Instruction instance
 func (app *instructionBuilder) Now() (Instruction, error) {
 	if app.block == "" {
@@ -63,15 +55,6 @@ func (app *instructionBuilder) Now() (Instruction, error) {
 
 	if app.tokens == nil {
 		return nil, errors.New("the tokens is mandatory in order to build an Instruction")
-	}
-
-	if app.syscall != nil {
-		return createInstructionWithSyscall(
-			app.block,
-			*app.pLine,
-			app.tokens,
-			app.syscall,
-		), nil
 	}
 
 	return createInstruction(app.block, *app.pLine, app.tokens), nil
