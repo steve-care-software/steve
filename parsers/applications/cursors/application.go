@@ -152,50 +152,6 @@ func (app *application) castToKind(valueStrAsBytes []byte, kind uint8) (any, err
 	return nil, errors.New(str)
 }
 
-/*
-
-const (
-	// KindUint8 represents the uint8
-	KindUint8 (uint8) = iota
-
-	// KindUint16 represents the uint16
-	KindUint16
-
-	// KindUint32 represents the uint32
-	KindUint32
-
-	// KindUint64 represents the uint64
-	KindUint64
-
-	// KindInt8 represents the int8
-	KindInt8
-
-	// KindInt16 represents the int16
-	KindInt16
-
-	// KindInt32 represents the int32
-	KindInt32
-
-	// KindInt64 represents the int64
-	KindInt64
-
-	// KindFloat32 represents the float32
-	KindFloat32
-
-	// KindFloat64 represents the float64
-	KindFloat64
-
-	// KindBool represents the bool
-	KindBool
-
-	// KindString represents the string
-	KindString
-
-	// KindStack represents the stack
-	KindStack
-)
-
-*/
 // Save saves a value to a variable
 func (app *application) Save(index uint, kind uint8, variable string, replaceIfExists bool) error {
 	value, err := app.Fetch(index, kind)
