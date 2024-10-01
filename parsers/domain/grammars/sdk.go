@@ -4,7 +4,6 @@ import (
 	"errors"
 	"math/big"
 
-	"github.com/steve-care-software/steve/engine/domain/nfts"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/executions"
@@ -266,12 +265,6 @@ type ParserAdapter interface {
 type ComposeAdapter interface {
 	// ToBytes takes a grammar and a blockname and returns its bytes
 	ToBytes(grammar Grammar, blockName string) ([]byte, error)
-}
-
-// NFTAdapter represents the nft adapter
-type NFTAdapter interface {
-	ToNFT(ins Grammar) (nfts.NFT, error)
-	ToInstance(nft nfts.NFT) (Grammar, error)
 }
 
 // Builder represents the grammar builder
