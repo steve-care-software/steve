@@ -15,6 +15,11 @@ const (
 	OperatorXor
 )
 
+// NewTailBuilder creates a new tail builder
+func NewTailBuilder() TailBuilder {
+	return createTailBuilder()
+}
+
 // Builder represents the operation builder
 type Builder interface {
 	Create() Builder
