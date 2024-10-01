@@ -15,6 +15,16 @@ const (
 	OperatorXor
 )
 
+// NewBuilder creates a new builder instance
+func NewBuilder() Builder {
+	return createBuilder()
+}
+
+// NewOperationBuilder creates a new operation builder
+func NewOperationBuilder() OperationBuilder {
+	return createOperationBuilder()
+}
+
 // NewActorBuilder creates a new actor builder
 func NewActorBuilder() ActorBuilder {
 	return createActorBuilder()
