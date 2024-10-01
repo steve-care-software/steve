@@ -3,7 +3,6 @@ package asts
 import (
 	"github.com/steve-care-software/steve/parsers/domain/asts/instructions"
 	"github.com/steve-care-software/steve/parsers/domain/grammars"
-	"github.com/steve-care-software/steve/parsers/domain/grammars/rules"
 )
 
 // NewAdapter creates a new adapter
@@ -16,7 +15,7 @@ func NewAdapter() Adapter {
 	tokenBuilder := instructions.NewTokenBuilder()
 	elementsBuilder := instructions.NewElementsBuilder()
 	elementBuilder := instructions.NewElementBuilder()
-	ruleBuilder := rules.NewRuleBuilder()
+	constantBuilder := instructions.NewConstantBuilder()
 	return createAdapter(
 		grammarAdapter,
 		builder,
@@ -26,7 +25,7 @@ func NewAdapter() Adapter {
 		tokenBuilder,
 		elementsBuilder,
 		elementBuilder,
-		ruleBuilder,
+		constantBuilder,
 	)
 }
 

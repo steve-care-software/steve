@@ -147,7 +147,7 @@ func (app *application) interpretElement(
 	currentTokens instructions.Tokens,
 	element instructions.Element,
 ) error {
-	if element.IsRule() {
+	if element.IsConstant() {
 		return nil
 	}
 

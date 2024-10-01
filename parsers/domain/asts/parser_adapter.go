@@ -11,7 +11,7 @@ import (
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/tokens"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/tokens/elements"
-	"github.com/steve-care-software/steve/parsers/domain/grammars/rules"
+	comnstants_elements "github.com/steve-care-software/steve/parsers/domain/grammars/constants/tokens/elements"
 )
 
 type adapter struct {
@@ -23,7 +23,7 @@ type adapter struct {
 	tokenBuilder        instructions.TokenBuilder
 	elementsBuilder     instructions.ElementsBuilder
 	elementBuilder      instructions.ElementBuilder
-	ruleBuilder         rules.RuleBuilder
+	constantBuilder     instructions.ConstantBuilder
 }
 
 func createAdapter(
@@ -35,7 +35,7 @@ func createAdapter(
 	tokenBuilder instructions.TokenBuilder,
 	elementsBuilder instructions.ElementsBuilder,
 	elementBuilder instructions.ElementBuilder,
-	ruleBuilder rules.RuleBuilder,
+	constantBuilder instructions.ConstantBuilder,
 ) Adapter {
 	out := adapter{
 		grammarAdapter:      grammarAdapter,
@@ -46,7 +46,7 @@ func createAdapter(
 		tokenBuilder:        tokenBuilder,
 		elementsBuilder:     elementsBuilder,
 		elementBuilder:      elementBuilder,
-		ruleBuilder:         ruleBuilder,
+		constantBuilder:     constantBuilder,
 	}
 
 	return &out
@@ -317,8 +317,8 @@ func (app *adapter) toToken(
 			}
 
 			name := token.Name()
-			rule, err := app.ruleBuilder.Create().
-				WithBytes(accumulated).
+			constant, err := app.constantBuilder.Create().
+				WithValue(accumulated).
 				WithName(name).
 				Now()
 
@@ -327,7 +327,7 @@ func (app *adapter) toToken(
 			}
 
 			retElement, err := app.elementBuilder.Create().
-				WithRule(rule).
+				WithConstant(constant).
 				Now()
 
 			if err != nil {
@@ -400,19 +400,24 @@ func (app *adapter) toElement(
 	builder := app.elementBuilder.Create()
 	if element.IsRule() {
 		ruleName := element.Rule()
-		rule, err := grammar.Rules().Fetch(ruleName)
+		ruleBytes, retRemaining, err := app.ruleNameToBytes(
+			grammar,
+			ruleName,
+			remaining,
+			filterForOmission,
+		)
+
 		if err != nil {
 			return nil, nil, err
 		}
 
-		ruleBytes := rule.Bytes()
-		if !bytes.HasPrefix(remaining, ruleBytes) {
-			str := fmt.Sprintf("the rule (name: %s) could not be found in the input bytes", ruleName)
-			return nil, nil, errors.New(str)
+		constant, err := app.constantBuilder.Create().WithName(ruleName).WithValue(ruleBytes).Now()
+		if err != nil {
+			return nil, nil, err
 		}
 
-		builder.WithRule(rule)
-		remaining = remaining[len(ruleBytes):]
+		builder.WithConstant(constant)
+		remaining = retRemaining
 	}
 
 	if element.IsBlock() {
@@ -438,6 +443,28 @@ func (app *adapter) toElement(
 		remaining = retInstructionRemaining
 	}
 
+	if element.IsConstant() {
+		constantName := element.Constant()
+		retValue, retRemaining, err := app.constantNameToBytes(
+			grammar,
+			constantName,
+			remaining,
+			filterForOmission,
+		)
+
+		if err != nil {
+			return nil, nil, err
+		}
+
+		constant, err := app.constantBuilder.Create().WithName(constantName).WithValue(retValue).Now()
+		if err != nil {
+			return nil, nil, err
+		}
+
+		builder.WithConstant(constant)
+		remaining = retRemaining
+	}
+
 	ins, err := builder.Now()
 	if err != nil {
 		return nil, nil, err
@@ -451,6 +478,108 @@ func (app *adapter) toElement(
 	}
 
 	return ins, remaining, nil
+}
+
+func (app *adapter) constantNameToBytes(
+	grammar grammars.Grammar,
+	name string,
+	input []byte,
+	filterForOmission bool,
+) ([]byte, []byte, error) {
+	constant, err := grammar.Constants().Fetch(name)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	value := []byte{}
+	remaining := input
+	if filterForOmission {
+		remaining = app.filterOmissions(
+			grammar,
+			remaining,
+		)
+	}
+
+	tokensList := constant.Tokens().List()
+	for _, oneToken := range tokensList {
+		amount := oneToken.Amount()
+		element := oneToken.Element()
+
+		casted := int(amount)
+		for i := 0; i < casted; i++ {
+			elementBytes, retRemaining, err := app.constantElementToBytes(
+				grammar,
+				element,
+				remaining,
+				filterForOmission,
+			)
+
+			if err != nil {
+				return nil, nil, err
+			}
+
+			value = append(value, elementBytes...)
+			remaining = retRemaining
+		}
+	}
+
+	return value, remaining, nil
+}
+
+func (app *adapter) constantElementToBytes(
+	grammar grammars.Grammar,
+	element comnstants_elements.Element,
+	input []byte,
+	filterForOmission bool,
+) ([]byte, []byte, error) {
+	remaining := input
+	if filterForOmission {
+		remaining = app.filterOmissions(
+			grammar,
+			remaining,
+		)
+	}
+
+	if element.IsConstant() {
+		name := element.Constant()
+		return app.constantNameToBytes(grammar, name, input, filterForOmission)
+	}
+
+	ruleName := element.Rule()
+	return app.ruleNameToBytes(
+		grammar,
+		ruleName,
+		remaining,
+		filterForOmission,
+	)
+}
+
+func (app *adapter) ruleNameToBytes(
+	grammar grammars.Grammar,
+	ruleName string,
+	input []byte,
+	filterForOmission bool,
+) ([]byte, []byte, error) {
+	remaining := input
+	if filterForOmission {
+		remaining = app.filterOmissions(
+			grammar,
+			remaining,
+		)
+	}
+
+	rule, err := grammar.Rules().Fetch(ruleName)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	ruleBytes := rule.Bytes()
+	if !bytes.HasPrefix(remaining, ruleBytes) {
+		str := fmt.Sprintf("the rule (name: %s) could not be found in the input bytes", ruleName)
+		return nil, nil, errors.New(str)
+	}
+
+	return ruleBytes, remaining[len(ruleBytes):], nil
 }
 
 func (app *adapter) filterOmissions(

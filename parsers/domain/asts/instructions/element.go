@@ -1,14 +1,12 @@
 package instructions
 
-import "github.com/steve-care-software/steve/parsers/domain/grammars/rules"
-
 type element struct {
-	rule        rules.Rule
+	constant    Constant
 	instruction Instruction
 }
 
-func createElementWithRule(rule rules.Rule) Element {
-	return createElementInternally(rule, nil)
+func createElementWithConstant(constant Constant) Element {
+	return createElementInternally(constant, nil)
 }
 
 func createElementWithInstruction(instruction Instruction) Element {
@@ -16,11 +14,11 @@ func createElementWithInstruction(instruction Instruction) Element {
 }
 
 func createElementInternally(
-	rule rules.Rule,
+	constant Constant,
 	instruction Instruction,
 ) Element {
 	out := element{
-		rule:        rule,
+		constant:    constant,
 		instruction: instruction,
 	}
 
@@ -29,21 +27,21 @@ func createElementInternally(
 
 // Name returns the name
 func (obj *element) Name() string {
-	if obj.IsRule() {
-		return obj.rule.Name()
+	if obj.IsConstant() {
+		return obj.constant.Name()
 	}
 
 	return obj.instruction.Block()
 }
 
-// IsRule returns true if there is a rule, false otherwise
-func (obj *element) IsRule() bool {
-	return obj.rule != nil
+// IsConstant returns true if there is a constant, false otherwise
+func (obj *element) IsConstant() bool {
+	return obj.constant != nil
 }
 
-// Rule returns the rule, if any
-func (obj *element) Rule() rules.Rule {
-	return obj.rule
+// Constant returns the constant, if any
+func (obj *element) Constant() Constant {
+	return obj.constant
 }
 
 // IsInstruction returns true if there is an instruction, false otherwise

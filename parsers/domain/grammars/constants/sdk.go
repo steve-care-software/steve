@@ -22,6 +22,7 @@ type Builder interface {
 // Constants represents constants
 type Constants interface {
 	List() []Constant
+	Fetch(name string) (Constant, error)
 }
 
 // ConstantBuilder represents the constant builder

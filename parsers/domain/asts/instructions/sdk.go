@@ -1,7 +1,5 @@
 package instructions
 
-import "github.com/steve-care-software/steve/parsers/domain/grammars/rules"
-
 // NewBuilder creates a new builder
 func NewBuilder() Builder {
 	return createBuilder()
@@ -35,6 +33,11 @@ func NewElementsBuilder() ElementsBuilder {
 // NewElementBuilder creates a new element builder
 func NewElementBuilder() ElementBuilder {
 	return createElementBuilder()
+}
+
+// NewConstantBuilder creates a new constant builder
+func NewConstantBuilder() ConstantBuilder {
+	return createConstantBuilder()
 }
 
 // Builder represents the instructions builder
@@ -114,7 +117,7 @@ type Elements interface {
 // ElementBuilder represents the element builder
 type ElementBuilder interface {
 	Create() ElementBuilder
-	WithRule(rule rules.Rule) ElementBuilder
+	WithConstant(constant Constant) ElementBuilder
 	WithInstruction(instruction Instruction) ElementBuilder
 	Now() (Element, error)
 }
@@ -122,8 +125,22 @@ type ElementBuilder interface {
 // Element represents an element
 type Element interface {
 	Name() string
-	IsRule() bool
-	Rule() rules.Rule
+	IsConstant() bool
+	Constant() Constant
 	IsInstruction() bool
 	Instruction() Instruction
+}
+
+// ConstantBuilder represents the constant builder
+type ConstantBuilder interface {
+	Create() ConstantBuilder
+	WithName(name string) ConstantBuilder
+	WithValue(value []byte) ConstantBuilder
+	Now() (Constant, error)
+}
+
+// Constant represents a constant
+type Constant interface {
+	Name() string
+	Value() []byte
 }

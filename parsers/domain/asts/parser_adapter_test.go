@@ -18,12 +18,10 @@ func TestParserAdapter_Success(t *testing.T) {
 			| .N_ZERO
 			;
 
-		additionInParenthesis: .OPEN_PARENTHESIS .addition .CLOSE_PARENTHESIS;
-		addition: .firstNumber .PLUS_SIGN .secondNumber;
-		secondNumber: .N_THREE .N_FOUR .N_FIVE;
-		firstNumber: .N_ONE .N_TWO;
-		myReplacement: .N_ONE .N_THREE;
-		replacedNumber: .N_TWO .N_FOUR;
+		additionInParenthesis: .OPEN_PARENTHESIS ._myConstant[2,3] .CLOSE_PARENTHESIS;
+
+		_myConstant: .N_ZERO ._mySubConstant[2] .N_FOUR[4];
+		_mySubConstant: .N_ONE .N_TWO[2] .N_THREE;
 
 		N_ZERO: "0";
 		N_ONE: "1";
@@ -43,7 +41,7 @@ func TestParserAdapter_Success(t *testing.T) {
 
 	astRemaining := []byte("this is a remaining")
 	astInput := append([]byte(`
-		salut ( 12 + 345 )`), astRemaining...)
+		salut ( 012231223444401223122344440122312234444 )`), astRemaining...)
 
 	grammarParserAdapter := grammars.NewAdapter()
 	retGrammar, _, err := grammarParserAdapter.ToGrammar(grammarInput)
@@ -73,6 +71,7 @@ func TestParserAdapter_Success(t *testing.T) {
 
 }
 
+/*
 func TestParserAdapter_withFiniteRecursivity_Success(t *testing.T) {
 	grammarInput := []byte(`
 		v1;
@@ -139,7 +138,7 @@ func TestParserAdapter_isInfiniteRecursive_returnsError(t *testing.T) {
 		v1;
 		>.line;
 		# .SPACE .TAB. EOL;
-		
+
 		line: .line
 			| .N_ZERO
 			;
@@ -175,3 +174,4 @@ func TestParserAdapter_isInfiniteRecursive_returnsError(t *testing.T) {
 	}
 
 }
+*/

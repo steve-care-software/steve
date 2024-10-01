@@ -1,6 +1,9 @@
 package constants
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 type builder struct {
 	list []Constant
@@ -32,10 +35,19 @@ func (app *builder) Now() (Constants, error) {
 	}
 
 	if app.list == nil {
-		return nil, errors.New("there must be at least 1 Constant in order to build an Constants instance")
+		return nil, errors.New("there must be at least 1 Constant in order to build a Constants instance")
 	}
 
-	return createOprations(
-		app.list,
-	), nil
+	mp := map[string]Constant{}
+	for _, oneConstant := range app.list {
+		keyname := oneConstant.Name()
+		if _, ok := mp[keyname]; ok {
+			str := fmt.Sprintf("the Constant (name: %s) is a duplicate", keyname)
+			return nil, errors.New(str)
+		}
+
+		mp[keyname] = oneConstant
+	}
+
+	return createConstants(app.list, mp), nil
 }

@@ -3,18 +3,15 @@ package tokens
 import "github.com/steve-care-software/steve/parsers/domain/grammars/constants/tokens/elements"
 
 type token struct {
-	name    string
 	element elements.Element
 	amount  uint
 }
 
 func createToken(
-	name string,
 	element elements.Element,
 	amount uint,
 ) Token {
 	out := token{
-		name:    name,
 		element: element,
 		amount:  amount,
 	}
@@ -24,7 +21,11 @@ func createToken(
 
 // Name returns the name
 func (obj *token) Name() string {
-	return obj.name
+	if obj.element.IsConstant() {
+		return obj.element.Constant()
+	}
+
+	return obj.element.Rule()
 }
 
 // Element returns the element

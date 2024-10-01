@@ -9,6 +9,8 @@ import (
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/tokens/reverses"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/suites"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/constants"
+	constant_tokens "github.com/steve-care-software/steve/parsers/domain/grammars/constants/tokens"
+	constant_elements "github.com/steve-care-software/steve/parsers/domain/grammars/constants/tokens/elements"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/rules"
 )
 
@@ -91,9 +93,6 @@ const cardinalitySeparator = ","
 const cardinalityZeroPlus = "*"
 const cardinalityOnePlus = "+"
 const cardinalityOptional = "?"
-const indexOpen = "["
-const indexClose = "]"
-const parameterSeparator = ":"
 const tokenReversePrefix = "!"
 const tokenReverseEscapePrefix = "["
 const tokenReverseEscapeSuffix = "]"
@@ -114,12 +113,17 @@ const omissionPrefix = "#"
 const omissionSuffix = ";"
 const filterBytes = ` 	
 ` // space, tab and eol
-const sysCallPrefix = "("
-const sysCallSuffix = ")"
+
+const constantNamePrefix = "_"
 
 // NewAdapter creates a new adapter
 func NewAdapter() Adapter {
 	grammarBuilder := NewBuilder()
+	constantsBuilder := constants.NewBuilder()
+	constantBuilder := constants.NewConstantBuilder()
+	constantTokensBuilder := constant_tokens.NewBuilder()
+	constantTokenBuilder := constant_tokens.NewTokenBuilder()
+	constantElementBuilder := constant_elements.NewBuilder()
 	blocksBuilder := blocks.NewBuilder()
 	blockBuilder := blocks.NewBlockBuilder()
 	suitesBuilder := suites.NewBuilder()
@@ -141,6 +145,11 @@ func NewAdapter() Adapter {
 	possibleFuncNameCharacters := createPossibleFuncNameCharacters()
 	return createAdapter(
 		grammarBuilder,
+		constantsBuilder,
+		constantBuilder,
+		constantTokensBuilder,
+		constantTokenBuilder,
+		constantElementBuilder,
 		blocksBuilder,
 		blockBuilder,
 		suitesBuilder,
@@ -189,11 +198,7 @@ func NewAdapter() Adapter {
 		[]byte(cardinalityZeroPlus)[0],
 		[]byte(cardinalityOnePlus)[0],
 		[]byte(cardinalityOptional)[0],
-		[]byte(indexOpen)[0],
-		[]byte(indexClose)[0],
-		[]byte(parameterSeparator)[0],
-		[]byte(sysCallPrefix)[0],
-		[]byte(sysCallSuffix)[0],
+		[]byte(constantNamePrefix)[0],
 	)
 }
 
@@ -206,15 +211,6 @@ func NewBuilder() Builder {
 type Adapter interface {
 	// ToGrammar takes the input and converts it to a grammar instance and the remaining data
 	ToGrammar(input []byte) (Grammar, []byte, error)
-
-	// ToBytes takes a grammar and returns the bytes
-	ToBytes(grammar Grammar) ([]byte, error)
-}
-
-// ComposeAdapter represents the grammar compose adapter
-type ComposeAdapter interface {
-	// ToBytes takes a grammar and a blockname and returns its bytes
-	ToBytes(grammar Grammar, blockName string) ([]byte, error)
 }
 
 // Builder represents the grammar builder

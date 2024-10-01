@@ -14,11 +14,19 @@ import (
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/tokens/elements"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/tokens/reverses"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/suites"
+	"github.com/steve-care-software/steve/parsers/domain/grammars/constants"
+	constant_tokens "github.com/steve-care-software/steve/parsers/domain/grammars/constants/tokens"
+	constant_elements "github.com/steve-care-software/steve/parsers/domain/grammars/constants/tokens/elements"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/rules"
 )
 
 type adapter struct {
 	grammarBuilder                    Builder
+	constantsBuilder                  constants.Builder
+	constantBuilder                   constants.ConstantBuilder
+	constantTokensBuilder             constant_tokens.Builder
+	constantTokenBuilder              constant_tokens.TokenBuilder
+	constantElementBuilder            constant_elements.Builder
 	blocksBuilder                     blocks.Builder
 	blockBuilder                      blocks.BlockBuilder
 	suitesBuilder                     suites.Builder
@@ -67,15 +75,16 @@ type adapter struct {
 	cardinalityZeroPlus               byte
 	cardinalityOnePlus                byte
 	cardinalityOptional               byte
-	indexOpen                         byte
-	indexClose                        byte
-	parameterSeparator                byte
-	sysCallPrefix                     byte
-	sysCallSuffix                     byte
+	constantNamePrefix                byte
 }
 
 func createAdapter(
 	grammarBuilder Builder,
+	constantsBuilder constants.Builder,
+	constantBuilder constants.ConstantBuilder,
+	constantTokensBuilder constant_tokens.Builder,
+	constantTokenBuilder constant_tokens.TokenBuilder,
+	constantElementBuilder constant_elements.Builder,
 	blocksBuilder blocks.Builder,
 	blockBuilder blocks.BlockBuilder,
 	suitesBuilder suites.Builder,
@@ -124,14 +133,15 @@ func createAdapter(
 	cardinalityZeroPlus byte,
 	cardinalityOnePlus byte,
 	cardinalityOptional byte,
-	indexOpen byte,
-	indexClose byte,
-	parameterSeparator byte,
-	sysCallPrefix byte,
-	sysCallSuffix byte,
+	constantNamePrefix byte,
 ) Adapter {
 	out := adapter{
 		grammarBuilder:                    grammarBuilder,
+		constantsBuilder:                  constantsBuilder,
+		constantBuilder:                   constantBuilder,
+		constantTokensBuilder:             constantTokensBuilder,
+		constantTokenBuilder:              constantTokenBuilder,
+		constantElementBuilder:            constantElementBuilder,
 		blocksBuilder:                     blocksBuilder,
 		blockBuilder:                      blockBuilder,
 		suitesBuilder:                     suitesBuilder,
@@ -180,11 +190,7 @@ func createAdapter(
 		cardinalityZeroPlus:               cardinalityZeroPlus,
 		cardinalityOnePlus:                cardinalityOnePlus,
 		cardinalityOptional:               cardinalityOptional,
-		indexOpen:                         indexOpen,
-		indexClose:                        indexClose,
-		parameterSeparator:                parameterSeparator,
-		sysCallPrefix:                     sysCallPrefix,
-		sysCallSuffix:                     sysCallSuffix,
+		constantNamePrefix:                constantNamePrefix,
 	}
 
 	return &out
@@ -233,8 +239,15 @@ func (app *adapter) ToGrammar(input []byte) (Grammar, []byte, error) {
 		return nil, nil, err
 	}
 
+	remaining = retBlocksRemaining
 	builder = builder.WithBlocks(retBlocks)
-	retRules, retRemaining, err := app.bytesToRules(retBlocksRemaining)
+	retConstants, retConstantsRemaining, err := app.bytesToConstants(remaining)
+	if err == nil {
+		builder.WithConstants(retConstants)
+		remaining = retConstantsRemaining
+	}
+
+	retRules, retRemaining, err := app.bytesToRules(remaining)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -250,9 +263,142 @@ func (app *adapter) ToGrammar(input []byte) (Grammar, []byte, error) {
 	return ins, filterPrefix(retRemaining, app.filterBytes), nil
 }
 
-// ToBytes takes a grammar and returns the bytes
-func (app *adapter) ToBytes(grammar Grammar) ([]byte, error) {
-	return nil, nil
+func (app *adapter) bytesToConstants(input []byte) (constants.Constants, []byte, error) {
+	cpt := 0
+	remaining := input
+	list := []constants.Constant{}
+	for {
+		retConstant, retRemaining, err := app.bytesToConstant(remaining)
+		if err != nil {
+			log.Printf("there was an error while creating the constant (idx: %d): %s", cpt, err.Error())
+			break
+		}
+
+		list = append(list, retConstant)
+		remaining = retRemaining
+		cpt++
+	}
+
+	ins, err := app.constantsBuilder.Create().WithList(list).Now()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return ins, filterPrefix(remaining, app.filterBytes), nil
+}
+
+func (app *adapter) bytesToConstant(input []byte) (constants.Constant, []byte, error) {
+	constantName, retConstantNameRemaining, err := app.bytesToConstantDefinition(input)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	retTokens, retTokensRemaining, err := app.bytesToConstantTokens(retConstantNameRemaining)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	ins, err := app.constantBuilder.Create().WithName(constantName).WithTokens(retTokens).Now()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	if retTokensRemaining[0] != app.blockSuffix {
+		str := fmt.Sprintf("the constant was expected to contain the blockSuffix byte at its suffix, data: \n%s\n", string(retTokensRemaining))
+		return nil, nil, errors.New(str)
+	}
+
+	return ins, filterPrefix(retTokensRemaining[1:], app.filterBytes), nil
+}
+
+func (app *adapter) bytesToConstantTokens(input []byte) (constant_tokens.Tokens, []byte, error) {
+	cpt := 0
+	remaining := input
+	list := []constant_tokens.Token{}
+	for {
+		retConstant, retRemaining, err := app.bytesToConstantToken(remaining)
+		if err != nil {
+			log.Printf("there was an error while creating the constant token (idx: %d): %s", cpt, err.Error())
+			break
+		}
+
+		list = append(list, retConstant)
+		remaining = retRemaining
+		cpt++
+	}
+
+	ins, err := app.constantTokensBuilder.Create().WithList(list).Now()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return ins, filterPrefix(remaining, app.filterBytes), nil
+}
+
+func (app *adapter) bytesToConstantToken(input []byte) (constant_tokens.Token, []byte, error) {
+	retElement, retElementRemaining, err := app.bytesToConstantTokenElementReference(input)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	remaining := retElementRemaining
+	builder := app.constantTokenBuilder.Create().WithElement(retElement).WithAmount(1)
+	retAmount, retRemaining, err := bytesToBracketsIndex(
+		remaining,
+		app.possibleNumbers,
+		app.cardinalityOpen,
+		app.cardinalityClose,
+		app.filterBytes,
+	)
+
+	if err == nil {
+		builder.WithAmount(retAmount)
+		remaining = retRemaining
+	}
+
+	ins, err := builder.Now()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return ins, filterPrefix(remaining, app.filterBytes), nil
+}
+
+func (app *adapter) bytesToConstantTokenElementReference(input []byte) (constant_elements.Element, []byte, error) {
+	input = filterPrefix(input, app.filterBytes)
+	if len(input) <= 0 {
+		return nil, nil, errors.New("the constantToken was expected to contain at least 1 byte")
+	}
+
+	if input[0] != app.tokenReferenceSeparator {
+		return nil, nil, errors.New("the constantToken was expected to contain the tokenReference byte at its prefix")
+	}
+
+	input = filterPrefix(input[1:], app.filterBytes)
+	return app.bytesToConstantTokenElement(input)
+}
+
+func (app *adapter) bytesToConstantTokenElement(input []byte) (constant_elements.Element, []byte, error) {
+	// try to match a rule
+	elementBuilder := app.constantElementBuilder.Create()
+	ruleName, retRemaining, err := app.bytesToRuleName(input)
+	if err != nil {
+		// there is no rule, so try to match a constant
+		constantName, retConstantRemaining, err := app.bytesToConstantName(input)
+		if err == nil {
+			elementBuilder.WithConstant(string(constantName))
+			retRemaining = retConstantRemaining
+		}
+	} else {
+		elementBuilder.WithRule(ruleName)
+	}
+
+	element, err := elementBuilder.Now()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return element, filterPrefix(retRemaining, app.filterBytes), nil
 }
 
 func (app *adapter) bytesToBlocks(input []byte) (blocks.Blocks, []byte, error) {
@@ -402,6 +548,23 @@ func (app *adapter) bytesToBlockDefinition(input []byte) (string, []byte, error)
 	return blockName, filterPrefix(retBlockRemaining[1:], app.filterBytes), nil
 }
 
+func (app *adapter) bytesToConstantDefinition(input []byte) (string, []byte, error) {
+	constantName, retBlockRemaining, err := app.bytesToConstantName(input)
+	if err != nil {
+		return "", nil, err
+	}
+
+	if len(retBlockRemaining) <= 0 {
+		return "", nil, errors.New("the constantDefinition was expected to contain at least 1 byte after fetching its name")
+	}
+
+	if retBlockRemaining[0] != app.blockDefinitionSeparator {
+		return "", nil, errors.New("the constantDefinition was expected to contain the blockDefinitionSeparator byte at its suffix")
+	}
+
+	return constantName, filterPrefix(retBlockRemaining[1:], app.filterBytes), nil
+}
+
 func (app *adapter) bytesToLines(input []byte) (lines.Lines, []byte, error) {
 	remaining := input
 	list := []lines.Line{}
@@ -451,15 +614,6 @@ func (app *adapter) bytesToLine(input []byte) (lines.Line, []byte, error) {
 	}
 
 	return line, filterPrefix(remaining, app.filterBytes), nil
-}
-
-func (app *adapter) bytesToFuncName(input []byte) (string, []byte, error) {
-	funcName, retRemaining, err := blockName(input, app.possibleLowerCaseLetters, app.possibleFuncNameCharacters, app.filterBytes)
-	if err != nil {
-		return "", nil, err
-	}
-
-	return string(funcName), filterPrefix(retRemaining, app.filterBytes), nil
 }
 
 func (app *adapter) bytesToTokens(input []byte) (tokens.Tokens, []byte, error) {
@@ -631,16 +785,19 @@ func (app *adapter) bytesToElement(input []byte) (elements.Element, []byte, erro
 		// there is no rule, so try to match a block
 		blockName, retBlockRemaining, err := app.bytesToBlockName(input)
 		if err != nil {
-			return nil, nil, err
-		}
+			// there is no rule or block, so try to match a constant
+			constantName, retConstantRemaining, err := app.bytesToConstantName(input)
+			if err != nil {
+				return nil, nil, err
+			}
 
-		if err == nil {
+			elementBuilder.WithConstant(string(constantName))
+			retRemaining = retConstantRemaining
+		} else {
 			elementBuilder.WithBlock(string(blockName))
 			retRemaining = retBlockRemaining
 		}
-	}
-
-	if err == nil {
+	} else {
 		elementBuilder.WithRule(ruleName)
 	}
 
@@ -741,6 +898,15 @@ func (app *adapter) bytesToRule(input []byte) (rules.Rule, []byte, error) {
 
 func (app *adapter) bytesToBlockName(input []byte) (string, []byte, error) {
 	blockName, retBlockRemaining, err := blockName(input, app.possibleLowerCaseLetters, app.blockNameAfterFirstByteCharacters, app.filterBytes)
+	if err != nil {
+		return "", nil, err
+	}
+
+	return string(blockName), filterPrefix(retBlockRemaining, app.filterBytes), nil
+}
+
+func (app *adapter) bytesToConstantName(input []byte) (string, []byte, error) {
+	blockName, retBlockRemaining, err := blockName(input, []byte{app.constantNamePrefix}, app.blockNameAfterFirstByteCharacters, app.filterBytes)
 	if err != nil {
 		return "", nil, err
 	}

@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestAdapter_withOmissions_Success(t *testing.T) {
+func TestAdapter_Success(t *testing.T) {
 	remaining := []byte("%!this is some remaining")
 	input := append([]byte(`
 		v1;
@@ -19,8 +19,10 @@ func TestAdapter_withOmissions_Success(t *testing.T) {
 					secondTest:!"this is some value";
 				 ;
 
-		mySecond: .myFirst[1] .mySecond* .myThird+ .myFourth .myFifth[1,]
+		mySecond: .myFirst[1] ._myConstant* .myThird+ .myFourth[2] .myFifth[1,]
 				 ;
+
+		_myConstant: .MY_RULE .MY_SECOND_RULE[2] ._mySubConstant ._otherConstant[2];
 
 		FIRST: "this \" with escape";
 		SECOND: "some value";
@@ -65,9 +67,20 @@ func TestAdapter_withOmissions_Success(t *testing.T) {
 		return
 	}
 
-	retOmissions := retGrammar.Rules().List()
-	if len(retOmissions) != 2 {
-		t.Errorf("the grammar was expected to contain %d omission elements, %d returned", 2, len(retOmissions))
+	retOmissions := retGrammar.Omissions().List()
+	if len(retOmissions) != 3 {
+		t.Errorf("the grammar was expected to contain %d omission elements, %d returned", 3, len(retOmissions))
+		return
+	}
+
+	if !retGrammar.HasConstants() {
+		t.Errorf("the grammar was expected to contain constants")
+		return
+	}
+
+	retConstants := retGrammar.Constants().List()
+	if len(retConstants) != 1 {
+		t.Errorf("the grammar was expected to contain %d constant elements, %d returned", 1, len(retConstants))
 		return
 	}
 }
@@ -348,7 +361,7 @@ func TestAdapter_token_withRuleName_withCardinality_Success(t *testing.T) {
 
 func TestAdapter_token_withoutBlockName_withoutRuleName_returnsError(t *testing.T) {
 	remaining := []byte("this is some remaining")
-	input := append([]byte(`.___`), remaining...)
+	input := append([]byte(`.+++`), remaining...)
 
 	retAdapter := NewAdapter().(*adapter)
 	_, _, err := retAdapter.bytesToToken(input)
@@ -356,6 +369,7 @@ func TestAdapter_token_withoutBlockName_withoutRuleName_returnsError(t *testing.
 		t.Errorf("the error was expected to be valid, nil returned")
 		return
 	}
+
 }
 
 func TestAdapter_token_withoutTokenReferenceByte_returnsError(t *testing.T) {
