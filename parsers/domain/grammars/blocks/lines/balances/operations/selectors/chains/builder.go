@@ -7,18 +7,14 @@ import (
 )
 
 type builder struct {
-	element       elements.Element
-	pTokenIndex   *uint
-	pElementIndex *uint
-	next          Chain
+	element elements.Element
+	token   Token
 }
 
 func createBuilder() Builder {
 	out := builder{
-		element:       nil,
-		pTokenIndex:   nil,
-		pElementIndex: nil,
-		next:          nil,
+		element: nil,
+		token:   nil,
 	}
 
 	return &out
@@ -35,21 +31,9 @@ func (app *builder) WithElement(element elements.Element) Builder {
 	return app
 }
 
-// WithTokenIndex adds a tokenIndex to the builder
-func (app *builder) WithTokenIndex(tokenIndex uint) Builder {
-	app.pTokenIndex = &tokenIndex
-	return app
-}
-
-// WithElementIndex adds an elementIndex to the builder
-func (app *builder) WithElementIndex(elementIndex uint) Builder {
-	app.pElementIndex = &elementIndex
-	return app
-}
-
-// WithNext adds a next to the builder
-func (app *builder) WithNext(next Chain) Builder {
-	app.next = next
+// WithToken adds a token to the builder
+func (app *builder) WithToken(token Token) Builder {
+	app.token = token
 	return app
 }
 
@@ -59,26 +43,18 @@ func (app *builder) Now() (Chain, error) {
 		return nil, errors.New("the element is mandatory in order to build a Chain instance")
 	}
 
-	if app.pTokenIndex == nil {
-		return nil, errors.New("the tokenIndex is mandatory in order to build a Chain instance")
+	if app.token == nil {
+		return nil, errors.New("the token is mandatory in order to build a Chain instance")
 	}
 
-	if app.pElementIndex == nil {
-		return nil, errors.New("the elementIndex is mandatory in order to build a Chain instance")
-	}
-
-	if app.next != nil {
-		return createChainWithNext(
+	if app.token != nil {
+		return createChainWithToken(
 			app.element,
-			*app.pTokenIndex,
-			*app.pElementIndex,
-			app.next,
+			app.token,
 		), nil
 	}
 
 	return createChain(
 		app.element,
-		*app.pTokenIndex,
-		*app.pElementIndex,
 	), nil
 }

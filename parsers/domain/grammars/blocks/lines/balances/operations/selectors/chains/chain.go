@@ -3,50 +3,36 @@ package chains
 import "github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/tokens/elements"
 
 type chain struct {
-	element      elements.Element
-	tokenIndex   uint
-	elementIndex uint
-	next         Chain
+	element elements.Element
+	token   Token
 }
 
 func createChain(
 	element elements.Element,
-	tokenIndex uint,
-	elementIndex uint,
 ) Chain {
 	return createChainInternally(
 		element,
-		tokenIndex,
-		elementIndex,
 		nil,
 	)
 }
 
-func createChainWithNext(
+func createChainWithToken(
 	element elements.Element,
-	tokenIndex uint,
-	elementIndex uint,
-	next Chain,
+	token Token,
 ) Chain {
 	return createChainInternally(
 		element,
-		tokenIndex,
-		elementIndex,
-		next,
+		token,
 	)
 }
 
 func createChainInternally(
 	element elements.Element,
-	tokenIndex uint,
-	elementIndex uint,
-	next Chain,
+	token Token,
 ) Chain {
 	out := chain{
-		element:      element,
-		tokenIndex:   tokenIndex,
-		elementIndex: elementIndex,
-		next:         next,
+		element: element,
+		token:   token,
 	}
 
 	return &out
@@ -57,22 +43,12 @@ func (obj *chain) Element() elements.Element {
 	return obj.element
 }
 
-// TokenIndex returns the tokenIndex
-func (obj *chain) TokenIndex() uint {
-	return obj.tokenIndex
+// HasToken returns true if there is a token, false otherwise
+func (obj *chain) HasToken() bool {
+	return obj.token != nil
 }
 
-// ElementIndex returns the elementIndex
-func (obj *chain) ElementIndex() uint {
-	return obj.elementIndex
-}
-
-// HasNext returns true if there is a next, false otherwise
-func (obj *chain) HasNext() bool {
-	return obj.next != nil
-}
-
-// Next returns the next, if any
-func (obj *chain) Next() Chain {
-	return obj.next
+// Token returns the token, if any
+func (obj *chain) Token() Token {
+	return obj.token
 }
