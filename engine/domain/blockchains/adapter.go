@@ -6,10 +6,10 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/steve-care-software/steve/databases/resources/domain/headers/activities/commits/modifications/resources/pointers"
 	"github.com/steve-care-software/steve/engine/domain/blockchains/blocks"
 	"github.com/steve-care-software/steve/engine/domain/blockchains/roots"
 	"github.com/steve-care-software/steve/engine/domain/blockchains/rules"
-	"github.com/steve-care-software/steve/engine/domain/stores/headers/activities/commits/modifications/resources/pointers"
 )
 
 type adapter struct {

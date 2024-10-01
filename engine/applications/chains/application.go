@@ -5,6 +5,7 @@ import (
 	"github.com/steve-care-software/steve/engine/domain/chains"
 	"github.com/steve-care-software/steve/engine/domain/scripts/specifics/transpiles"
 	interpreters "github.com/steve-care-software/steve/parsers/applications"
+	"github.com/steve-care-software/steve/parsers/domain/asts"
 	"github.com/steve-care-software/steve/parsers/domain/grammars"
 	"github.com/steve-care-software/steve/parsers/domain/programs"
 )
@@ -13,7 +14,7 @@ type application struct {
 	interpreterApp       interpreters.Application
 	transpileApp         transpiles_applications.Application
 	grammarNFTAdapter    grammars.NFTAdapter
-	programParserAdapter programs.ParserAdapter
+	programParserAdapter asts.ParserAdapter
 	transpileNFTAdapter  transpiles.NFTAdapter
 }
 
@@ -21,7 +22,7 @@ func createApplication(
 	interpreterApp interpreters.Application,
 	transpileApp transpiles_applications.Application,
 	grammarNFTAdapter grammars.NFTAdapter,
-	programParserAdapter programs.ParserAdapter,
+	programParserAdapter asts.ParserAdapter,
 	transpileNFTAdapter transpiles.NFTAdapter,
 ) Application {
 	out := application{

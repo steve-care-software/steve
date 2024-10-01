@@ -3,9 +3,9 @@ package applications
 import (
 	"errors"
 
+	lists "github.com/steve-care-software/steve/databases/lists/applications"
+	resources "github.com/steve-care-software/steve/databases/resources/applications"
 	chains_applications "github.com/steve-care-software/steve/engine/applications/chains"
-	"github.com/steve-care-software/steve/engine/applications/resources"
-	"github.com/steve-care-software/steve/engine/applications/resources/lists"
 	"github.com/steve-care-software/steve/engine/domain/chains"
 	"github.com/steve-care-software/steve/engine/domain/nfts"
 )

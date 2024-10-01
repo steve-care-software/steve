@@ -1,6 +1,6 @@
 package transactions
 
-import "github.com/steve-care-software/steve/engine/domain/hash"
+import "github.com/steve-care-software/steve/commons/hash"
 
 type transactions struct {
 	hash hash.Hash

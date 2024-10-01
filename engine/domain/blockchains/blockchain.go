@@ -6,10 +6,10 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/steve-care-software/steve/commons/hash"
 	"github.com/steve-care-software/steve/engine/domain/blockchains/blocks"
 	"github.com/steve-care-software/steve/engine/domain/blockchains/roots"
 	"github.com/steve-care-software/steve/engine/domain/blockchains/rules"
-	"github.com/steve-care-software/steve/engine/domain/hash"
 )
 
 type blockchain struct {

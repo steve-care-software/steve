@@ -1,7 +1,7 @@
 package suites
 
 import (
-	"github.com/steve-care-software/steve/engine/domain/hash"
+	"github.com/steve-care-software/steve/commons/hash"
 )
 
 // NewBuilder creates a new builder

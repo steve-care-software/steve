@@ -1,6 +1,6 @@
 package targets
 
-import "github.com/steve-care-software/steve/engine/domain/hash"
+import "github.com/steve-care-software/steve/commons/hash"
 
 type target struct {
 	hash     hash.Hash

@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/steve-care-software/steve/databases/resources/domain/headers/activities/commits/modifications/resources/pointers"
 	"github.com/steve-care-software/steve/engine/domain/blockchains/blocks/contents"
-	"github.com/steve-care-software/steve/engine/domain/stores/headers/activities/commits/modifications/resources/pointers"
 )
 
 type adapter struct {

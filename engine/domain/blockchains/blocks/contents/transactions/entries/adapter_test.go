@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/steve-care-software/steve/engine/domain/hash"
+	"github.com/steve-care-software/steve/commons/hash"
 )
 
 func TestAdapter_Success(t *testing.T) {

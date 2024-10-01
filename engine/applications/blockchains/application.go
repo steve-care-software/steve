@@ -9,8 +9,8 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/steve-care-software/steve/engine/applications/cryptography"
-	resources "github.com/steve-care-software/steve/engine/applications/resources"
-	"github.com/steve-care-software/steve/engine/applications/resources/lists"
+	resources resources "github.com/steve-care-software/steve/databases/resources/applications"
+	lists "github.com/steve-care-software/steve/databases/lists/applications"
 	"github.com/steve-care-software/steve/engine/domain/blockchains"
 	"github.com/steve-care-software/steve/engine/domain/blockchains/blocks"
 	"github.com/steve-care-software/steve/engine/domain/blockchains/blocks/contents"
@@ -19,8 +19,8 @@ import (
 	"github.com/steve-care-software/steve/engine/domain/blockchains/identities"
 	"github.com/steve-care-software/steve/engine/domain/blockchains/roots"
 	"github.com/steve-care-software/steve/engine/domain/blockchains/rules"
-	"github.com/steve-care-software/steve/engine/domain/hash"
-	"github.com/steve-care-software/steve/engine/domain/stores/headers/activities/commits/modifications/resources/pointers"
+	"github.com/steve-care-software/steve/commons/hash"
+	"github.com/steve-care-software/steve/databases/resources/domain/headers/activities/commits/modifications/resources/pointers"
 )
 
 type application struct {

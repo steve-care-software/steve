@@ -1,7 +1,7 @@
 package constants
 
 import (
-	"github.com/steve-care-software/steve/engine/domain/hash"
+	"github.com/steve-care-software/steve/commons/hash"
 	"github.com/steve-care-software/steve/engine/domain/scripts/specifics/grammars/constants/tokens"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/suites"
 )

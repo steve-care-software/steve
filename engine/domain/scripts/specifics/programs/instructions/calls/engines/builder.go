@@ -3,7 +3,7 @@ package engines
 import (
 	"errors"
 
-	"github.com/steve-care-software/steve/engine/domain/hash"
+	"github.com/steve-care-software/steve/commons/hash"
 	"github.com/steve-care-software/steve/engine/domain/scripts/specifics/programs/instructions/calls/functions"
 )
 

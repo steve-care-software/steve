@@ -1,6 +1,6 @@
 package suites
 
-import "github.com/steve-care-software/steve/engine/domain/hash"
+import "github.com/steve-care-software/steve/commons/hash"
 
 type suite struct {
 	hash   hash.Hash

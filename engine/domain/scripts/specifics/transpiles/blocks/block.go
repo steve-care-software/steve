@@ -1,7 +1,7 @@
 package blocks
 
 import (
-	"github.com/steve-care-software/steve/engine/domain/hash"
+	"github.com/steve-care-software/steve/commons/hash"
 	"github.com/steve-care-software/steve/engine/domain/scripts/specifics/transpiles/blocks/lines"
 )
 

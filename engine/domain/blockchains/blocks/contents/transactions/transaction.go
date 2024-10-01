@@ -3,8 +3,8 @@ package transactions
 import (
 	"crypto/ed25519"
 
+	"github.com/steve-care-software/steve/commons/hash"
 	"github.com/steve-care-software/steve/engine/domain/blockchains/blocks/contents/transactions/entries"
-	"github.com/steve-care-software/steve/engine/domain/hash"
 )
 
 type transaction struct {

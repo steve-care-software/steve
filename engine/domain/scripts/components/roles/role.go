@@ -1,6 +1,6 @@
 package roles
 
-import "github.com/steve-care-software/steve/engine/domain/hash"
+import "github.com/steve-care-software/steve/commons/hash"
 
 type role struct {
 	hash    hash.Hash

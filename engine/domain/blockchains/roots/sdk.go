@@ -3,7 +3,7 @@ package roots
 import (
 	"crypto/ed25519"
 
-	"github.com/steve-care-software/steve/engine/domain/hash"
+	"github.com/steve-care-software/steve/commons/hash"
 )
 
 const dataLengthTooSmallErrPattern = "(root) the data length was expected to be at least %d bytes, %d returned"

@@ -8,13 +8,13 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/steve-care-software/steve/commons/hash"
 	"github.com/steve-care-software/steve/engine/domain/blockchains/blocks"
 	"github.com/steve-care-software/steve/engine/domain/blockchains/blocks/contents"
 	"github.com/steve-care-software/steve/engine/domain/blockchains/blocks/contents/transactions"
 	"github.com/steve-care-software/steve/engine/domain/blockchains/blocks/contents/transactions/entries"
 	"github.com/steve-care-software/steve/engine/domain/blockchains/roots"
 	"github.com/steve-care-software/steve/engine/domain/blockchains/rules"
-	"github.com/steve-care-software/steve/engine/domain/hash"
 )
 
 func TestAdapter_withoutDescription_withoutHead_withRemaining_Success(t *testing.T) {

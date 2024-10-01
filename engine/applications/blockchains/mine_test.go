@@ -6,9 +6,9 @@ import (
 	"crypto/rand"
 	"testing"
 
+	"github.com/steve-care-software/steve/commons/hash"
 	"github.com/steve-care-software/steve/engine/domain/blockchains/blocks/contents/transactions"
 	"github.com/steve-care-software/steve/engine/domain/blockchains/blocks/contents/transactions/entries"
-	"github.com/steve-care-software/steve/engine/domain/hash"
 )
 
 func TestMine_Success(t *testing.T) {

@@ -3,8 +3,8 @@ package contents
 import (
 	"crypto/ed25519"
 
+	"github.com/steve-care-software/steve/commons/hash"
 	"github.com/steve-care-software/steve/engine/domain/blockchains/blocks/contents/transactions"
-	"github.com/steve-care-software/steve/engine/domain/hash"
 )
 
 type content struct {
