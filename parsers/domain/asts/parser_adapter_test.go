@@ -71,7 +71,6 @@ func TestParserAdapter_Success(t *testing.T) {
 
 }
 
-/*
 func TestParserAdapter_withFiniteRecursivity_Success(t *testing.T) {
 	grammarInput := []byte(`
 		v1;
@@ -174,4 +173,3 @@ func TestParserAdapter_isInfiniteRecursive_returnsError(t *testing.T) {
 	}
 
 }
-*/
