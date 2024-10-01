@@ -6,38 +6,31 @@ type element struct {
 	hash     hash.Hash
 	rule     string
 	block    string
-	spacer   string
 	constant string
 }
 
 func createElementWithRule(hash hash.Hash, rule string) Element {
-	return createElementInternally(hash, rule, "", "", "")
+	return createElementInternally(hash, rule, "", "")
 }
 
 func createElementWithBlock(hash hash.Hash, block string) Element {
-	return createElementInternally(hash, "", block, "", "")
-}
-
-func createElementWithSpacer(hash hash.Hash, spacer string) Element {
-	return createElementInternally(hash, "", "", spacer, "")
+	return createElementInternally(hash, "", block, "")
 }
 
 func createElementWithConstant(hash hash.Hash, constant string) Element {
-	return createElementInternally(hash, "", "", "", constant)
+	return createElementInternally(hash, "", "", constant)
 }
 
 func createElementInternally(
 	hash hash.Hash,
 	rule string,
 	block string,
-	spacer string,
 	constant string,
 ) Element {
 	out := element{
 		hash:     hash,
 		rule:     rule,
 		block:    block,
-		spacer:   spacer,
 		constant: constant,
 	}
 
@@ -76,16 +69,6 @@ func (obj *element) IsBlock() bool {
 // Block returns the block, if any
 func (obj *element) Block() string {
 	return obj.block
-}
-
-// IsSpacer returns true if there is a spacer, false otherwise
-func (obj *element) IsSpacer() bool {
-	return obj.spacer != ""
-}
-
-// Spacer returns the spacer, if any
-func (obj *element) Spacer() string {
-	return obj.spacer
 }
 
 // IsConstant returns true if there is a constant, false otherwise

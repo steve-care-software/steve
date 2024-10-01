@@ -33,7 +33,6 @@ type ElementBuilder interface {
 	Create() ElementBuilder
 	WithRule(rule string) ElementBuilder
 	WithBlock(block string) ElementBuilder
-	WithSpacer(spacer string) ElementBuilder
 	WithConstant(constant string) ElementBuilder
 	Now() (Element, error)
 }
@@ -46,8 +45,6 @@ type Element interface {
 	Rule() string
 	IsBlock() bool
 	Block() string
-	IsSpacer() bool
-	Spacer() string
 	IsConstant() bool
 	Constant() string
 }

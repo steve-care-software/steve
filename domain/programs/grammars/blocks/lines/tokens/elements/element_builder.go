@@ -10,7 +10,6 @@ type elementBuilder struct {
 	hashAdapter hash.Adapter
 	rule        string
 	block       string
-	spacer      string
 	constant    string
 }
 
@@ -21,7 +20,6 @@ func createElementBuilder(
 		hashAdapter: hashAdapter,
 		rule:        "",
 		block:       "",
-		spacer:      "",
 		constant:    "",
 	}
 
@@ -47,12 +45,6 @@ func (app *elementBuilder) WithBlock(block string) ElementBuilder {
 	return app
 }
 
-// WithSpacer adds a spacer to the builder
-func (app *elementBuilder) WithSpacer(spacer string) ElementBuilder {
-	app.spacer = spacer
-	return app
-}
-
 // WithConstant adds a constant to the builder
 func (app *elementBuilder) WithConstant(constant string) ElementBuilder {
 	app.constant = constant
@@ -68,10 +60,6 @@ func (app *elementBuilder) Now() (Element, error) {
 
 	if app.block != "" {
 		data = append(data, []byte(app.block))
-	}
-
-	if app.spacer != "" {
-		data = append(data, []byte(app.spacer))
 	}
 
 	if app.constant != "" {
@@ -93,10 +81,6 @@ func (app *elementBuilder) Now() (Element, error) {
 
 	if app.block != "" {
 		return createElementWithBlock(*pHash, app.block), nil
-	}
-
-	if app.spacer != "" {
-		return createElementWithSpacer(*pHash, app.spacer), nil
 	}
 
 	return createElementWithConstant(*pHash, app.constant), nil
