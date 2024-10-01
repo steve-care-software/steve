@@ -15,6 +15,11 @@ const (
 	OperatorXor
 )
 
+// NewActorBuilder creates a new actor builder
+func NewActorBuilder() ActorBuilder {
+	return createActorBuilder()
+}
+
 // NewTailBuilder creates a new tail builder
 func NewTailBuilder() TailBuilder {
 	return createTailBuilder()
