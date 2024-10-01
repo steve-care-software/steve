@@ -1,9 +1,13 @@
 package chains
 
 import (
-	"github.com/steve-care-software/steve/commons/hash"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/tokens/elements"
 )
+
+// NewBuilder creates a new builder
+func NewBuilder() Builder {
+	return createBuilder()
+}
 
 // Builder represents a chain builder
 type Builder interface {
@@ -17,7 +21,6 @@ type Builder interface {
 
 // Chain represents a chain
 type Chain interface {
-	Hash() hash.Hash
 	Element() elements.Element
 	TokenIndex() uint
 	ElementIndex() uint

@@ -1,7 +1,6 @@
 package selectors
 
 import (
-	"github.com/steve-care-software/steve/commons/hash"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/balances/operations/selectors/chains"
 )
 
@@ -15,7 +14,6 @@ type Builder interface {
 
 // Selector represents a selector
 type Selector interface {
-	Hash() hash.Hash
 	Chain() chains.Chain
 	IsNot() bool
 }

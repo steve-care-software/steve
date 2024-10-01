@@ -1,7 +1,6 @@
 package balances
 
 import (
-	"github.com/steve-care-software/steve/commons/hash"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/balances/operations"
 )
 
@@ -14,6 +13,5 @@ type Builder interface {
 
 // Balance represents balance
 type Balance interface {
-	Hash() hash.Hash
 	Lines() []operations.Operations
 }

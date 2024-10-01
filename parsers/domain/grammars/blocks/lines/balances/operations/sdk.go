@@ -1,7 +1,6 @@
 package operations
 
 import (
-	"github.com/steve-care-software/steve/commons/hash"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/balances/operations/selectors"
 )
 
@@ -25,7 +24,6 @@ type Builder interface {
 
 // Operations represents operations
 type Operations interface {
-	Hash() hash.Hash
 	List() []Operation
 }
 
@@ -40,7 +38,6 @@ type OperationBuilder interface {
 
 // Operation represents the operation
 type Operation interface {
-	Hash() hash.Hash
 	Actor() Actor
 	Tail() Tail
 	IsNot() bool
@@ -56,7 +53,6 @@ type ActorBuilder interface {
 
 // Actor represents an operation actor
 type Actor interface {
-	Hash() hash.Hash
 	IsSelector() bool
 	Selector() selectors.Selector
 	IsOperation() bool
@@ -73,7 +69,6 @@ type TailBuilder interface {
 
 // Tail represents the operation tail
 type Tail interface {
-	Hash() hash.Hash
 	Operator() uint8
 	Actor() Actor
 }
