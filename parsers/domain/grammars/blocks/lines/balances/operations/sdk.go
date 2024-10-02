@@ -35,7 +35,7 @@ func NewTailBuilder() TailBuilder {
 	return createTailBuilder()
 }
 
-// Builder represents the operation builder
+// Builder represents the operations builder
 type Builder interface {
 	Create() Builder
 	WithList(list []Operation) Builder
@@ -45,22 +45,6 @@ type Builder interface {
 // Operations represents operations
 type Operations interface {
 	List() []Operation
-}
-
-// OperationBuilder represents an operation builder
-type OperationBuilder interface {
-	Create() OperationBuilder
-	WithActor(actor Actor) OperationBuilder
-	WithTail(tail Tail) OperationBuilder
-	IsNot() OperationBuilder
-	Now() (Operation, error)
-}
-
-// Operation represents the operation
-type Operation interface {
-	Actor() Actor
-	Tail() Tail
-	IsNot() bool
 }
 
 // ActorBuilder represents an actor builder
@@ -77,6 +61,23 @@ type Actor interface {
 	Selector() selectors.Selector
 	IsOperation() bool
 	Operation() Operation
+}
+
+// OperationBuilder represents an operation builder
+type OperationBuilder interface {
+	Create() OperationBuilder
+	WithActor(actor Actor) OperationBuilder
+	WithTail(tail Tail) OperationBuilder
+	IsNot() OperationBuilder
+	Now() (Operation, error)
+}
+
+// Operation represents the operation
+type Operation interface {
+	Actor() Actor
+	IsNot() bool
+	HasTail() bool
+	Tail() Tail
 }
 
 // TailBuilder represents a tail builder

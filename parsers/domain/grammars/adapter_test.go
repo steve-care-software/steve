@@ -13,6 +13,13 @@ func TestAdapter_Success(t *testing.T) {
 		#.first.second.third;
 
 		myFirst: !.myFirst[1] .mySecond* .myThird+ .myFourth? .myFifth[1,]
+					[
+						.myFirst[0][1]->MY_RULE[0][1] && (.myFirst[0][1]->MY_RULE[0][0] || .myFirst[0][1]->MY_RULE[0][0]) :
+							.myFirst[0][1]->MY_RULE[0][0];
+
+						.myFirst[0][1]->MY_RULE[0][1] :
+							.myFirst[0][1]->mySecond[0][0]->myThird[0];
+					];
 				 | .myFirst[1] .mySecond* .myThird+ .myFourth .myFifth[1,]
 				 ---
 				 	firstTest:!"this is some value";

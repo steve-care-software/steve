@@ -35,7 +35,7 @@ func (app *builder) Now() (Operations, error) {
 		return nil, errors.New("there must be at least 1 Operation in order to build an Operations instance")
 	}
 
-	return createOprations(
+	return createOperations(
 		app.list,
 	), nil
 }

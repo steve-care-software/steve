@@ -47,13 +47,16 @@ func (app *operationBuilder) Now() (Operation, error) {
 		return nil, errors.New("the actor is mandatory in order to build an Operation instance")
 	}
 
-	if app.tail == nil {
-		return nil, errors.New("the tail is mandatory in order to build an Operation instance")
+	if app.tail != nil {
+		return createOperationWithTail(
+			app.actor,
+			app.isNot,
+			app.tail,
+		), nil
 	}
 
 	return createOperation(
 		app.actor,
-		app.tail,
 		app.isNot,
 	), nil
 }

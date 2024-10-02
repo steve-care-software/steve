@@ -3,6 +3,10 @@ package grammars
 import (
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines"
+	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/balances"
+	balance_actors "github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/balances/operations"
+	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/balances/operations/selectors"
+	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/balances/operations/selectors/chains"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/tokens"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/tokens/cardinalities"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/tokens/elements"
@@ -115,6 +119,12 @@ const filterBytes = `
 ` // space, tab and eol
 
 const constantNamePrefix = "_"
+const selectorChainElementPrefix = "->"
+const selectorOperatorAnd = "&&"
+const selectorOperatorOr = "||"
+const selectorOperatorXor = "<>"
+const openParenthesis = "("
+const closeParenthesis = ")"
 
 // NewAdapter creates a new adapter
 func NewAdapter() Adapter {
@@ -130,6 +140,15 @@ func NewAdapter() Adapter {
 	suiteBuilder := suites.NewSuiteBuilder()
 	linesBuilder := lines.NewBuilder()
 	lineBuilder := lines.NewLineBuilder()
+	balanceBuilder := balances.NewBuilder()
+	actorsBuilder := balance_actors.NewBuilder()
+	actorBuilder := balance_actors.NewActorBuilder()
+	operationBuilder := balance_actors.NewOperationBuilder()
+	tailBuilder := balance_actors.NewTailBuilder()
+	selectorBuilder := selectors.NewBuilder()
+	selectorChainBuilder := chains.NewBuilder()
+	selectorChainTokenBuilder := chains.NewTokenBuilder()
+	selectorChainElementBuilder := chains.NewElementBuilder()
 	tokensBuilder := tokens.NewBuilder()
 	tokenBuilder := tokens.NewTokenBuilder()
 	reverseBuilder := reverses.NewBuilder()
@@ -156,6 +175,15 @@ func NewAdapter() Adapter {
 		suiteBuilder,
 		linesBuilder,
 		lineBuilder,
+		balanceBuilder,
+		actorsBuilder,
+		actorBuilder,
+		operationBuilder,
+		tailBuilder,
+		selectorBuilder,
+		selectorChainBuilder,
+		selectorChainTokenBuilder,
+		selectorChainElementBuilder,
 		tokensBuilder,
 		tokenBuilder,
 		reverseBuilder,
@@ -199,6 +227,12 @@ func NewAdapter() Adapter {
 		[]byte(cardinalityOnePlus)[0],
 		[]byte(cardinalityOptional)[0],
 		[]byte(constantNamePrefix)[0],
+		[]byte(selectorChainElementPrefix),
+		[]byte(selectorOperatorAnd),
+		[]byte(selectorOperatorOr),
+		[]byte(selectorOperatorXor),
+		[]byte(openParenthesis)[0],
+		[]byte(closeParenthesis)[0],
 	)
 }
 

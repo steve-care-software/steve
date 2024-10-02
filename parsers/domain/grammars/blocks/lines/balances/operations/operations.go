@@ -4,7 +4,7 @@ type operations struct {
 	list []Operation
 }
 
-func createOprations(
+func createOperations(
 	list []Operation,
 ) Operations {
 	out := operations{
