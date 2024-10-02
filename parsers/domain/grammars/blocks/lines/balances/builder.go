@@ -3,11 +3,11 @@ package balances
 import (
 	"errors"
 
-	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/balances/operations"
+	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/balances/selectors"
 )
 
 type builder struct {
-	lines []operations.Operations
+	lines []selectors.Selectors
 }
 
 func createBuilder() Builder {
@@ -24,7 +24,7 @@ func (app *builder) Create() Builder {
 }
 
 // WithLines add lines to the builder
-func (app *builder) WithLines(lines []operations.Operations) Builder {
+func (app *builder) WithLines(lines []selectors.Selectors) Builder {
 	app.lines = lines
 	return app
 }

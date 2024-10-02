@@ -1,5 +1,7 @@
 package instructions
 
+import "github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/balances/selectors/chains"
+
 type element struct {
 	constant    Constant
 	instruction Instruction
@@ -52,4 +54,13 @@ func (obj *element) IsInstruction() bool {
 // Instruction returns the instruction, if any
 func (obj *element) Instruction() Instruction {
 	return obj.instruction
+}
+
+// IsChainValid validates the element against the chain
+func (obj *element) IsChainValid(chain chains.Chain) bool {
+	if obj.IsInstruction() {
+		return obj.instruction.Tokens().IsChainValid(chain)
+	}
+
+	return obj.constant.IsChainValid(chain)
 }

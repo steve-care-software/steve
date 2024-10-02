@@ -1,13 +1,13 @@
 package balances
 
-import "github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/balances/operations"
+import "github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/balances/selectors"
 
 type balance struct {
-	lines []operations.Operations
+	lines []selectors.Selectors
 }
 
 func createBalance(
-	lines []operations.Operations,
+	lines []selectors.Selectors,
 ) Balance {
 	out := balance{
 		lines: lines,
@@ -17,6 +17,6 @@ func createBalance(
 }
 
 // Lines returns the lines
-func (obj *balance) Lines() []operations.Operations {
+func (obj *balance) Lines() []selectors.Selectors {
 	return obj.lines
 }

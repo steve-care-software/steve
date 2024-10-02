@@ -147,6 +147,15 @@ func (app *adapter) toInstruction(
 			continue
 		}
 
+		// if there is a balance and it cannot validate against the token's AST, skip the line:
+		if oneLine.HasBalance() {
+			balance := oneLine.Balance()
+			isValid := retTokens.IsBalanceValid(balance)
+			if !isValid {
+				continue
+			}
+		}
+
 		builder := app.instructionBuilder.Create().
 			WithBlock(name).
 			WithLine(uint(idx)).

@@ -4,9 +4,8 @@ import (
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/balances"
-	balance_actors "github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/balances/operations"
-	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/balances/operations/selectors"
-	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/balances/operations/selectors/chains"
+	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/balances/selectors"
+	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/balances/selectors/chains"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/tokens"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/tokens/cardinalities"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/tokens/elements"
@@ -141,11 +140,8 @@ func NewAdapter() Adapter {
 	linesBuilder := lines.NewBuilder()
 	lineBuilder := lines.NewLineBuilder()
 	balanceBuilder := balances.NewBuilder()
-	actorsBuilder := balance_actors.NewBuilder()
-	actorBuilder := balance_actors.NewActorBuilder()
-	operationBuilder := balance_actors.NewOperationBuilder()
-	tailBuilder := balance_actors.NewTailBuilder()
-	selectorBuilder := selectors.NewBuilder()
+	selectorsBuilder := selectors.NewBuilder()
+	selectorBuilder := selectors.NewSelectorBuilder()
 	selectorChainBuilder := chains.NewBuilder()
 	selectorChainTokenBuilder := chains.NewTokenBuilder()
 	selectorChainElementBuilder := chains.NewElementBuilder()
@@ -176,10 +172,7 @@ func NewAdapter() Adapter {
 		linesBuilder,
 		lineBuilder,
 		balanceBuilder,
-		actorsBuilder,
-		actorBuilder,
-		operationBuilder,
-		tailBuilder,
+		selectorsBuilder,
 		selectorBuilder,
 		selectorChainBuilder,
 		selectorChainTokenBuilder,

@@ -1,5 +1,11 @@
 package instructions
 
+import (
+	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/balances"
+	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/balances/selectors"
+	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/balances/selectors/chains"
+)
+
 // NewBuilder creates a new builder
 func NewBuilder() Builder {
 	return createBuilder()
@@ -80,6 +86,9 @@ type TokensBuilder interface {
 type Tokens interface {
 	List() []Token
 	Fetch(name string, index uint) (Token, error)
+	IsBalanceValid(balance balances.Balance) bool
+	IsSelectorValid(selector selectors.Selector) bool
+	IsChainValid(chain chains.Chain) bool
 }
 
 // TokenBuilder represents the token builder
@@ -112,6 +121,7 @@ type ElementsBuilder interface {
 // Elements represents elements
 type Elements interface {
 	List() []Element
+	Fetch(idx uint) (Element, error)
 }
 
 // ElementBuilder represents the element builder
@@ -125,6 +135,7 @@ type ElementBuilder interface {
 // Element represents an element
 type Element interface {
 	Name() string
+	IsChainValid(chain chains.Chain) bool
 	IsConstant() bool
 	Constant() Constant
 	IsInstruction() bool
@@ -143,4 +154,5 @@ type ConstantBuilder interface {
 type Constant interface {
 	Name() string
 	Value() []byte
+	IsChainValid(chain chains.Chain) bool
 }

@@ -14,11 +14,20 @@ func TestAdapter_Success(t *testing.T) {
 
 		myFirst: !.myFirst[1] .mySecond* .myThird+ .myFourth? .myFifth[1,]
 					[
-						.myFirst[0][1]->MY_RULE[0][1] && (.myFirst[0][1]->MY_RULE[0][0] || .myFirst[0][1]->MY_RULE[0][0]) :
-							.myFirst[0][1]->MY_RULE[0][0];
+						.myFirst[0][1]->MY_RULE[0][1] :
+							.myFirst[0][1]->MY_RULE[0][0]
+						;
 
 						.myFirst[0][1]->MY_RULE[0][1] :
-							.myFirst[0][1]->mySecond[0][0]->myThird[0];
+							.myFirst[0][1]->mySecond[0][0]->myThird[0]
+						;
+
+						.myFirst[0][1]->MY_RULE[0][1] :
+							.myFirst[0][1]->MY_RULE[0][0]:
+								.myFirst[0][1]->mySecond[0][0]->myThird[0]
+						;
+
+						.myFirst[0][1]->MY_RULE[0][1];
 					];
 				 | .myFirst[1] .mySecond* .myThird+ .myFourth .myFifth[1,]
 				 ---
@@ -27,6 +36,15 @@ func TestAdapter_Success(t *testing.T) {
 				 ;
 
 		mySecond: .myFirst[1] ._myConstant* .myThird+ .myFourth[2] .myFifth[1,]
+					[
+						.type[0][0]->FLOAT[0]:
+							.value[0][0]->floatValue[0]
+						;
+
+						.type[0][0]->UINT[0]:
+							.value[0][0]->uintValue[0]
+						;
+					];
 				 ;
 
 		_myConstant: .MY_RULE .MY_SECOND_RULE[2] ._mySubConstant ._otherConstant[2];

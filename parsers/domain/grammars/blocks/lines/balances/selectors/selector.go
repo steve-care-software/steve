@@ -1,6 +1,6 @@
 package selectors
 
-import "github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/balances/operations/selectors/chains"
+import "github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/balances/selectors/chains"
 
 type selector struct {
 	chain chains.Chain

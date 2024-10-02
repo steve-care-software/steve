@@ -10,9 +10,8 @@ import (
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/balances"
-	balance_operations "github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/balances/operations"
-	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/balances/operations/selectors"
-	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/balances/operations/selectors/chains"
+	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/balances/selectors"
+	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/balances/selectors/chains"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/tokens"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/tokens/cardinalities"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/tokens/elements"
@@ -38,11 +37,8 @@ type adapter struct {
 	linesBuilder                      lines.Builder
 	lineBuilder                       lines.LineBuilder
 	balanceBuilder                    balances.Builder
-	operationsBuilder                 balance_operations.Builder
-	actorBuilder                      balance_operations.ActorBuilder
-	operationBuilder                  balance_operations.OperationBuilder
-	tailBuilder                       balance_operations.TailBuilder
-	selectorBuilder                   selectors.Builder
+	selectorsBuilder                  selectors.Builder
+	selectorBuilder                   selectors.SelectorBuilder
 	selectorChainBuilder              chains.Builder
 	selectorChainTokenBuilder         chains.TokenBuilder
 	selectorChainElementBuilder       chains.ElementBuilder
@@ -111,11 +107,8 @@ func createAdapter(
 	linesBuilder lines.Builder,
 	lineBuilder lines.LineBuilder,
 	balanceBuilder balances.Builder,
-	operationsBuilder balance_operations.Builder,
-	actorBuilder balance_operations.ActorBuilder,
-	operationBuilder balance_operations.OperationBuilder,
-	tailBuilder balance_operations.TailBuilder,
-	selectorBuilder selectors.Builder,
+	selectorsBuilder selectors.Builder,
+	selectorBuilder selectors.SelectorBuilder,
 	selectorChainBuilder chains.Builder,
 	selectorChainTokenBuilder chains.TokenBuilder,
 	selectorChainElementBuilder chains.ElementBuilder,
@@ -183,10 +176,7 @@ func createAdapter(
 		linesBuilder:                      linesBuilder,
 		lineBuilder:                       lineBuilder,
 		balanceBuilder:                    balanceBuilder,
-		operationsBuilder:                 operationsBuilder,
-		operationBuilder:                  operationBuilder,
-		actorBuilder:                      actorBuilder,
-		tailBuilder:                       tailBuilder,
+		selectorsBuilder:                  selectorsBuilder,
 		selectorBuilder:                   selectorBuilder,
 		selectorChainBuilder:              selectorChainBuilder,
 		selectorChainTokenBuilder:         selectorChainTokenBuilder,
@@ -675,12 +665,12 @@ func (app *adapter) bytesToBalance(input []byte) (balances.Balance, []byte, erro
 		return nil, nil, errors.New("the balance was expected to contain the cardinalityOpen byte at its prefix")
 	}
 
-	operationsList, retRemaining, err := app.bytesToOperationsList(input[1:])
+	selectorsList, retRemaining, err := app.bytesToSelectorsList(input[1:])
 	if err != nil {
 		return nil, nil, err
 	}
 
-	ins, err := app.balanceBuilder.Create().WithLines(operationsList).Now()
+	ins, err := app.balanceBuilder.Create().WithLines(selectorsList).Now()
 	if err != nil {
 		return nil, nil, err
 	}
@@ -701,32 +691,33 @@ func (app *adapter) bytesToBalance(input []byte) (balances.Balance, []byte, erro
 	return ins, filterPrefix(remainng[1:], app.filterBytes), nil
 }
 
-func (app *adapter) bytesToOperationsList(input []byte) ([]balance_operations.Operations, []byte, error) {
-	list := []balance_operations.Operations{}
+func (app *adapter) bytesToSelectorsList(input []byte) ([]selectors.Selectors, []byte, error) {
+	list := []selectors.Selectors{}
 	remaining := input
 	for {
-		retOperations, retRemaining, err := app.bytesToOperations(remaining)
+		retSelectors, retRemaining, err := app.bytesToSelectors(remaining)
 		if err != nil {
 			break
 		}
 
-		list = append(list, retOperations)
+		list = append(list, retSelectors)
 		remaining = retRemaining
 	}
 
 	return list, filterPrefix(remaining, app.filterBytes), nil
 }
 
-func (app *adapter) bytesToOperations(input []byte) (balance_operations.Operations, []byte, error) {
-	list := []balance_operations.Operation{}
+func (app *adapter) bytesToSelectors(input []byte) (selectors.Selectors, []byte, error) {
+	list := []selectors.Selector{}
 	remaining := input
 	for {
 
-		retOperation, retRemaining, err := app.bytesToOperationInPotentialParenthesis(remaining, false)
+		retSelector, retRemaining, err := app.bytesToSelector(remaining)
 		if err != nil {
 			break
 		}
 
+		list = append(list, retSelector)
 		remaining = retRemaining
 		if len(remaining) > 0 && remaining[0] == app.blockSuffix {
 			remaining = remaining[1:]
@@ -738,112 +729,13 @@ func (app *adapter) bytesToOperations(input []byte) (balance_operations.Operatio
 		}
 
 		if remaining[0] != app.blockDefinitionSeparator {
-			return nil, nil, errors.New("the actors were expected to contain the blockDefinitionSeparator byte between them")
+			return nil, nil, errors.New("the selectors were expected to contain the blockDefinitionSeparator byte between them")
 		}
 
-		list = append(list, retOperation)
 		remaining = filterPrefix(remaining[1:], app.filterBytes)
 	}
 
-	ins, err := app.operationsBuilder.Create().WithList(list).Now()
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return ins, filterPrefix(remaining, app.filterBytes), nil
-}
-
-func (app *adapter) bytesToOperationInPotentialParenthesis(input []byte, isSelectorFirst bool) (balance_operations.Operation, []byte, error) {
-	remaining := filterPrefix(input, app.filterBytes)
-	if len(remaining) <= 0 {
-		return nil, nil, errors.New("the operation was expected to contain at least 1 byte")
-	}
-
-	if remaining[0] != app.openParenthesis {
-		return app.bytesToOperation(remaining, isSelectorFirst)
-	}
-
-	retOperation, retRemaining, err := app.bytesToOperationInPotentialParenthesis(remaining[1:], isSelectorFirst)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	if retRemaining[0] != app.closeParenthesis {
-		return nil, nil, errors.New("the closeParenthesis was expected after parsing the operation")
-	}
-
-	return retOperation, filterPrefix(retRemaining[1:], app.filterBytes), nil
-}
-
-func (app *adapter) bytesToOperation(input []byte, isSelectorFirst bool) (balance_operations.Operation, []byte, error) {
-	if len(input) <= 0 {
-		return nil, nil, errors.New("the balance was expected to contain at least 1 byte")
-	}
-
-	remaining := filterPrefix(input, app.filterBytes)
-	builder := app.operationBuilder.Create()
-	if input[0] == app.tokenReversePrefix {
-		builder.IsNot()
-		remaining = input[1:]
-	}
-
-	retActor, retAfterActor, err := app.bytesToActor(remaining, isSelectorFirst)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	remaining = retAfterActor
-	builder.WithActor(retActor)
-	retTail, retAfterTail, err := app.bytesToTail(retAfterActor, isSelectorFirst)
-	if err == nil {
-		builder.WithTail(retTail)
-		remaining = retAfterTail
-	}
-
-	ins, err := builder.Now()
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return ins, filterPrefix(remaining, app.filterBytes), nil
-}
-
-func (app *adapter) bytesToActor(input []byte, isSelectorFirst bool) (balance_operations.Actor, []byte, error) {
-	remaining := input
-	builder := app.actorBuilder.Create()
-	if isSelectorFirst {
-		retSelector, retRemaining, err := app.bytesToSelector(remaining)
-		if err != nil {
-			return nil, nil, err
-		}
-
-		remaining = retRemaining
-		builder = builder.WithSelector(retSelector)
-		ins, err := builder.Now()
-		if err != nil {
-			return nil, nil, err
-		}
-
-		return ins, remaining, nil
-	}
-
-	retOperation, retRemaining, err := app.bytesToOperationInPotentialParenthesis(remaining, true)
-	if err != nil {
-		retSelector, retRemaining, err := app.bytesToSelector(remaining)
-		if err != nil {
-			return nil, nil, err
-		}
-
-		remaining = retRemaining
-		builder = builder.WithSelector(retSelector)
-	}
-
-	if retOperation != nil {
-		remaining = retRemaining
-		builder = builder.WithOperation(retOperation)
-	}
-
-	ins, err := builder.Now()
+	ins, err := app.selectorsBuilder.Create().WithList(list).Now()
 	if err != nil {
 		return nil, nil, err
 	}
@@ -967,37 +859,6 @@ func (app *adapter) bytesToSelectorChainElement(input []byte) (chains.Element, [
 	}
 
 	return ins, filterPrefix(remaining, app.filterBytes), nil
-}
-
-func (app *adapter) bytesToTail(input []byte, isSelectorFirst bool) (balance_operations.Tail, []byte, error) {
-	remaining := filterPrefix(input, app.filterBytes)
-	builder := app.tailBuilder.Create()
-	if bytes.HasPrefix(remaining, app.selectorOperatorAnd) {
-		builder.WithOperator(balance_operations.OperatorAnd)
-		remaining = remaining[len(app.selectorOperatorAnd):]
-	}
-
-	if bytes.HasPrefix(remaining, app.selectorOperatorOr) {
-		builder.WithOperator(balance_operations.OperatorOr)
-		remaining = remaining[len(app.selectorOperatorOr):]
-	}
-
-	if bytes.HasPrefix(remaining, app.selectorOperatorXor) {
-		builder.WithOperator(balance_operations.OperatorXor)
-		remaining = remaining[len(app.selectorOperatorXor):]
-	}
-
-	retActor, retRemainingAfterActor, err := app.bytesToActor(remaining, isSelectorFirst)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	ins, err := builder.WithActor(retActor).Now()
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return ins, filterPrefix(retRemainingAfterActor, app.filterBytes), nil
 }
 
 func (app *adapter) bytesToTokens(input []byte) (tokens.Tokens, []byte, error) {
