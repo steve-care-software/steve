@@ -2,7 +2,7 @@ package suites
 
 import (
 	"github.com/steve-care-software/steve/databases/graphs/domain/languages/connections/links/references"
-	"github.com/steve-care-software/steve/databases/graphs/domain/languages/connections/suites/contents"
+	"github.com/steve-care-software/steve/databases/graphs/domain/languages/connections/suites/expectations"
 )
 
 // Suites represents suites
@@ -14,5 +14,5 @@ type Suites interface {
 type Suite interface {
 	Name() string
 	Journey() references.Reference
-	Content() contents.Content
+	Expectation() expectations.Expectation
 }

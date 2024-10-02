@@ -22,7 +22,6 @@ func fetchGrammarInput() []byte {
 								| .grandFather .grandGrandFather
 								---
 									mySuite[.son .grandGrandFather]:
-										> (.son .father .external[grandFather] .grandGrandFather);
 										(.son .father .grandFather .grandGrandFather);
 										!(.son .father .grandFather .grandGrandFather);
 									;
@@ -190,13 +189,11 @@ func fetchGrammarInput() []byte {
 
 					multiple: "
 							first[.son .grandGrandFather]:
-								> (.son .father .external[grandFather] .grandGrandFather);
 								(.son .father .grandFather .grandGrandFather);
 								!(.son .father .grandFather .grandGrandFather);
 							;
 
 							second[.son .grandGrandFather]:
-								> (.son .father .external[grandFather] .grandGrandFather);
 								(.son .father .grandFather .grandGrandFather);
 								!(.son .father .grandFather .grandGrandFather);
 							;
@@ -207,44 +204,30 @@ func fetchGrammarInput() []byte {
 				---
 					valid: "
 						mySuite[.son .external[grandGrandFather]]:
-							> (.son .father .external[grandFather] .grandGrandFather);
 							!(.son .father .external[grandFather] .grandGrandFather);
 							(.son .father .external[grandFather] .grandGrandFather);
 						;
 					";
 				;
 
-		suiteInstructions: .suiteOptimalInstruction? .suiteUnlimitedOptionInstruction+
+		suiteInstructions: .suiteOptionInstruction+
 						---
-							withOptimalLink: "
-								> (.son .father .external[grandFather] .grandGrandFather);
+							valid: "
 								!(.son .father .external[grandFather] .grandGrandFather);
 								(.son .father .external[grandFather] .grandGrandFather);
-							";
-
-							withoutOptimalLink: "
 								!(.son .father .external[grandFather] .grandGrandFather);
-								(.son .father .external[grandFather] .grandGrandFather);
-								(.son .father .external[grandFather] .grandGrandFather);
 								(.son .father .external[grandFather] .grandGrandFather);
 							";
 						;
 
-		suiteOptimalInstruction: .suiteOptimalLink .SEMI_COLON;
+		suiteOptionInstruction: .suiteOption .SEMI_COLON;
 
-		suiteUnlimitedOptionInstruction: .suiteUnlimitedOption .SEMI_COLON;
-
-		suiteUnlimitedOption: .suiteInvalidLink
-							| .suiteReferencesInParenthesis
-							---
-								invalidLink: "!(.son .father .external[grandFather] .grandGrandFather)";
-								validLink: "(.son .father .external[grandFather] .grandGrandFather)";
-							;
-
-		suiteOptimalLink: .GREATHER_THAN .suiteReferencesInParenthesis
-						---
-							valid: "> (.son .father .external[grandFather] .grandGrandFather)";
-						;
+		suiteOption: .suiteInvalidLink
+				   | .suiteReferencesInParenthesis
+				   ---
+					invalidLink: "!(.son .father .external[grandFather] .grandGrandFather)";
+					validLink: "(.son .father .external[grandFather] .grandGrandFather)";
+					;
 
 		suiteInvalidLink: .EXCLAMATION_POINT .suiteReferencesInParenthesis
 						---
