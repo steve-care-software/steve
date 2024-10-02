@@ -47,6 +47,33 @@ func (obj *tokens) Fetch(name string, idx uint) (Token, error) {
 	return nil, errors.New(str)
 }
 
+// Search search for instruction/token by name
+func (obj *tokens) Search(name string, idx uint) (Token, error) {
+	retToken, err := obj.Fetch(name, idx)
+	if err == nil {
+		return retToken, nil
+	}
+
+	for _, oneToken := range obj.list {
+		elementList := oneToken.Elements().List()
+		for _, oneElement := range elementList {
+			if oneElement.IsConstant() {
+				continue
+			}
+
+			retToken, err := oneElement.Instruction().Tokens().Fetch(name, idx)
+			if err != nil {
+				continue
+			}
+
+			return retToken, nil
+		}
+	}
+
+	str := fmt.Sprintf("the token (name: %s, index: %d) could not be found", name, idx)
+	return nil, errors.New(str)
+}
+
 // IsBalanceValid validates the tokens against the balance
 func (obj *tokens) IsBalanceValid(balance balances.Balance) bool {
 	list := balance.Lines()
@@ -85,7 +112,7 @@ func (obj *tokens) IsChainValid(chain chains.Chain) bool {
 	if chain.HasToken() {
 		token := chain.Token()
 		tokenIndex := token.Index()
-		retASTToken, err := obj.Fetch(name, tokenIndex)
+		retASTToken, err := obj.Search(name, tokenIndex)
 		if err != nil {
 			return false
 		}

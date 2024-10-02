@@ -86,6 +86,7 @@ type TokensBuilder interface {
 type Tokens interface {
 	List() []Token
 	Fetch(name string, index uint) (Token, error)
+	Search(name string, idx uint) (Token, error)
 	IsBalanceValid(balance balances.Balance) bool
 	IsSelectorValid(selector selectors.Selector) bool
 	IsChainValid(chain chains.Chain) bool
