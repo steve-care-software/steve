@@ -74,7 +74,7 @@ func fetchGrammarInput() []byte {
 							";
 						;
 
-		connectionBlock: .connectionName .COLON .links .pointSuitesBlock? .SEMI_COLON
+		connectionBlock: .connectionHeader .COLON .links .pointSuitesBlock? .SEMI_COLON
 						---
 							withoutSuite: "
 								father(son): .son .father
@@ -101,7 +101,7 @@ func fetchGrammarInput() []byte {
 							";
 						;
 
-		connectionName: .nameWithCardinality .variableNameInBracket?
+		connectionHeader: .nameWithCardinality .variableNameInBracket?
 					---
 						name: "father";
 						withCardinality: "father+";
@@ -261,7 +261,7 @@ func fetchGrammarInput() []byte {
 					valid: "---";
 				;
 
-		links: .journey .pipeJourney*
+		links: .link .pipeJourney*
 				---
 					oneLine: ".son .father";
 					multipleLine: "
@@ -273,12 +273,12 @@ func fetchGrammarInput() []byte {
 					";
 				;
 
-		pipeJourney: .PIPE .journey
+		pipeJourney: .PIPE .link
 					---
 						valid: "| .son .father";
 					;
 
-		journey: .pointReference[2]
+		link: .pointReference[2]
 				---
 					internal: ".origin .target";
 					external: ".myExternal[origin] .target";

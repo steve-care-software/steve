@@ -8,7 +8,6 @@ import (
 	"github.com/steve-care-software/steve/engine/domain/scripts/specifics/pipelines"
 	"github.com/steve-care-software/steve/engine/domain/scripts/specifics/programs"
 	"github.com/steve-care-software/steve/engine/domain/scripts/specifics/roots"
-	"github.com/steve-care-software/steve/engine/domain/scripts/specifics/schemas"
 	"github.com/steve-care-software/steve/engine/domain/scripts/specifics/transpiles"
 )
 
@@ -35,7 +34,6 @@ type Builder interface {
 	Create() Builder
 	WithGrammar(grammar grammars.Grammar) Builder
 	WithTranspile(transpile transpiles.Transpile) Builder
-	WithSchema(schema schemas.Schema) Builder
 	WithContext(context contexts.Context) Builder
 	WithBridge(bridge bridges.Bridge) Builder
 	WithProgram(program programs.Program) Builder
@@ -51,8 +49,6 @@ type Script interface {
 	Grammar() grammars.Grammar
 	IsTranspile() bool
 	Transpile() transpiles.Transpile
-	IsSchema() bool
-	Schema() schemas.Schema
 	IsContext() bool
 	Context() contexts.Context
 	IsBridge() bool

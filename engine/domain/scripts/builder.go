@@ -10,7 +10,6 @@ import (
 	"github.com/steve-care-software/steve/engine/domain/scripts/specifics/pipelines"
 	"github.com/steve-care-software/steve/engine/domain/scripts/specifics/programs"
 	"github.com/steve-care-software/steve/engine/domain/scripts/specifics/roots"
-	"github.com/steve-care-software/steve/engine/domain/scripts/specifics/schemas"
 	"github.com/steve-care-software/steve/engine/domain/scripts/specifics/transpiles"
 )
 
@@ -18,7 +17,6 @@ type builder struct {
 	hashAdapter hash.Adapter
 	grammar     grammars.Grammar
 	transpile   transpiles.Transpile
-	schema      schemas.Schema
 	context     contexts.Context
 	bridge      bridges.Bridge
 	program     programs.Program
@@ -32,7 +30,6 @@ func createBuilder(
 	out := builder{
 		grammar:   nil,
 		transpile: nil,
-		schema:    nil,
 		context:   nil,
 		bridge:    nil,
 		program:   nil,
@@ -59,12 +56,6 @@ func (app *builder) WithGrammar(grammar grammars.Grammar) Builder {
 // WithTranspile adds a transpile to the builder
 func (app *builder) WithTranspile(transpile transpiles.Transpile) Builder {
 	app.transpile = transpile
-	return app
-}
-
-// WithSchema adds a schema to the builder
-func (app *builder) WithSchema(schema schemas.Schema) Builder {
-	app.schema = schema
 	return app
 }
 
@@ -109,10 +100,6 @@ func (app *builder) Now() (Script, error) {
 		data = append(data, app.transpile.Hash().Bytes())
 	}
 
-	if app.schema != nil {
-		data = append(data, app.schema.Hash().Bytes())
-	}
-
 	if app.context != nil {
 		data = append(data, app.context.Hash().Bytes())
 	}
@@ -148,10 +135,6 @@ func (app *builder) Now() (Script, error) {
 
 	if app.transpile != nil {
 		return createScriptWithTranspile(*pHash, app.transpile), nil
-	}
-
-	if app.schema != nil {
-		return createScriptWithSchema(*pHash, app.schema), nil
 	}
 
 	if app.context != nil {
