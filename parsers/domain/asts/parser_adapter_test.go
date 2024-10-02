@@ -16,13 +16,13 @@ func TestParserAdapter_withBalance_Success(t *testing.T) {
 		
 		assignment: .type .VARIABLE .EQUAL .value
 					[
-						.type[0][0]->FLOAT[0]:
+						.FLOAT[0]:
 							.value[0][0]->floatValue[0]:
 								!.value[0][0]->uintValue[0]
 						;
 
 						.type[0][0]->UINT[0]:
-							.value[0][0]->uintValue[0]:
+							.uintValue[0]:
 								!.value[0][0]->floatValue[0]
 						;
 					];
