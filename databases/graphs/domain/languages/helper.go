@@ -6,36 +6,7 @@ func fetchGrammarInput() []byte {
 		> .root;
 		# .SPACE .TAB .EOL;
 
-		root: .schema
-			---
-				valid: "
-					v1;
-					name: myName;
-
-					son;
-					father;
-					grandFather;
-					grandGrandFather;
-
-					father(son): .son .father
-								| .son .myExternal[father]
-								| .father .grandFather
-								| .grandFather .grandGrandFather
-								---
-									mySuite[.son .grandGrandFather]:
-										> (.son .father .external[grandFather] .grandGrandFather);
-										(.son .father .grandFather .grandGrandFather);
-										!(.son .father .grandFather .grandGrandFather);
-									;
-								;
-
-					grandFather(grandSon): .son .grandFather
-										| .father .grandGrandFather
-										;
-				";
-			;
-
-		schema: .head .instructionPoints .connectionBlocks
+		root: .head .instructionPoints .connectionBlocks
 			---
 				valid: "
 					v1;
@@ -295,7 +266,7 @@ func fetchGrammarInput() []byte {
 					oneLine: ".son .father";
 					multipleLine: "
 						.son .father
-						| .myExternal[father] .grandFather (67)
+						| .myExternal[father] .grandFather 
 						| .grandFather .myExternal[grandGrandFather]
 						| .myExternal[grandFather] .myExternal[grandGrandFather]
 						| .myExternal[grandFather] .grandGrandFather
@@ -307,18 +278,10 @@ func fetchGrammarInput() []byte {
 						valid: "| .son .father";
 					;
 
-		journey: .pointReference[2] .weight?
+		journey: .pointReference[2]
 				---
-					withWeight: ".origin .target (45)";
-					withoutWeight: ".origin .target";
-					withWeightWithExternal: ".myExternal[origin] .target (45)";
-				;
-
-		weight: .PARENTHESIS_OPEN .positiveNumbers .PARENTHESIS_CLOSE
-				---
-					zero: "(0)";
-					multiple: "(45)";
-					float: !"(34.98)";
+					internal: ".origin .target";
+					external: ".myExternal[origin] .target";
 				;
 
 		pointReferences: .pointReference+
