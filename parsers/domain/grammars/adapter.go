@@ -750,9 +750,9 @@ func (app *adapter) bytesToSelector(input []byte) (selectors.Selector, []byte, e
 	}
 
 	builder := app.selectorBuilder.Create()
-	if input[0] == app.tokenReversePrefix {
+	if remaining[0] == app.tokenReversePrefix {
 		builder.IsNot()
-		remaining = input[1:]
+		remaining = remaining[1:]
 	}
 
 	if len(remaining) <= 0 {
