@@ -486,17 +486,7 @@ func (app *adapter) bytesToBlock(input []byte) (blocks.Block, []byte, error) {
 	}
 
 	remaining := retLinesRemaining
-	builder := app.blockBuilder.Create().WithName(blockName)
-	linesList := retLines.List()
-	listLength := len(linesList)
-	if listLength == 1 {
-		builder.WithLine(linesList[0])
-	}
-
-	if listLength > 1 {
-		builder.WithLines(retLines)
-	}
-
+	builder := app.blockBuilder.Create().WithName(blockName).WithLines(retLines)
 	retSuites, retSuitesRemaining, err := app.bytesToSuites(retLinesRemaining)
 	if err == nil {
 		builder.WithSuites(retSuites)

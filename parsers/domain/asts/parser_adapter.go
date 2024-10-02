@@ -117,33 +117,6 @@ func (app *adapter) toInstruction(
 	filterForOmission bool,
 ) (instructions.Instruction, []byte, error) {
 	name := block.Name()
-	if block.HasLine() {
-		line := block.Line()
-		retTokens, retRemaining, err := app.toTokens(
-			grammar,
-			parentValues,
-			line,
-			input,
-			filterForOmission,
-		)
-
-		if err != nil {
-			return nil, nil, err
-		}
-
-		builder := app.instructionBuilder.Create().
-			WithBlock(name).
-			WithLine(uint(0)).
-			WithTokens(retTokens)
-
-		retIns, err := builder.Now()
-		if err != nil {
-			return nil, nil, err
-		}
-
-		return retIns, retRemaining, nil
-	}
-
 	lines := block.Lines().List()
 	for idx, oneLine := range lines {
 		if _, ok := parentValues[name]; !ok {
