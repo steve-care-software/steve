@@ -17,7 +17,8 @@ func fetchGrammarInput() []byte {
 					grandFather;
 					grandGrandFather;
 
-					father[son]: .son .father
+					father(son): .son .father
+								| .son .myExternal[father]
 								| .father .grandFather
 								| .grandFather .grandGrandFather
 								---
@@ -28,7 +29,7 @@ func fetchGrammarInput() []byte {
 									;
 								;
 
-					grandFather[grandSon]: .son .grandFather
+					grandFather(grandSon): .son .grandFather
 										| .father .grandGrandFather
 										;
 				";
@@ -45,7 +46,7 @@ func fetchGrammarInput() []byte {
 					grandFather;
 					grandGrandFather;
 
-					father[son]: .son .father
+					father[0,3](son+): .son .father
 								| .father .grandFather
 								| .grandFather .grandGrandFather
 								---
@@ -56,7 +57,7 @@ func fetchGrammarInput() []byte {
 									;
 								;
 
-					grandFather[grandSon]: .son .grandFather
+					grandFather(grandSon[2,]): .son .grandFather
 										| .father .grandGrandFather
 										;
 				";
@@ -78,11 +79,7 @@ func fetchGrammarInput() []byte {
 						;
 
 		versionInstruction: .LL_V .numbers .SEMI_COLON
-							[
-								!.numbers[0][0]->oneNumber[0][0]->N_ZERO[0];
-							];
 						---
-							versionZero: !"v0;";
 							versionOneNumber: "v1;";
 							versionWithMultipleNumbers: "v123;";
 						;
@@ -90,7 +87,7 @@ func fetchGrammarInput() []byte {
 		connectionBlocks: .connectionBlock+
 						---
 							valid: "
-								father[son]: .son .father
+								father(son): .son .father
 											| .father .grandFather
 											| .grandFather .grandGrandFather
 											---
@@ -100,7 +97,7 @@ func fetchGrammarInput() []byte {
 												;
 											;
 
-								grandFather[grandSon]: .son .grandFather
+								grandFather(grandSon): .son .grandFather
 													| .father .grandGrandFather
 													;
 							";
@@ -109,14 +106,14 @@ func fetchGrammarInput() []byte {
 		connectionBlock: .connectionName .COLON .links .pointSuitesBlock? .SEMI_COLON
 						---
 							withoutSuite: "
-								father[son]: .son .father
+								father(son): .son .father
 										   | .father .grandFather
 										   | .grandFather .grandGrandFather
 										   ;
 							";
 
 							withSuites: "
-									father[son]: .son .father
+									father(son): .son .father
 												| .father .grandFather
 												| .grandFather .grandGrandFather
 												---
@@ -133,16 +130,67 @@ func fetchGrammarInput() []byte {
 							";
 						;
 
-		connectionName: .variableName .variableNameInBracket?
+		connectionName: .nameWithCardinality .variableNameInBracket?
 					---
 						name: "father";
-						nameWithReverse: "father[son]";
+						withCardinality: "father+";
+						nameWithReverse: "father(son)";
 					;
 
-		variableNameInBracket: .BRACKET_OPEN .variableName .BRACKET_CLOSE
+		variableNameInBracket: .PARENTHESIS_OPEN .nameWithCardinality .PARENTHESIS_CLOSE
 							---
-								valid: "[myVariable]";
+								valid: "(myVariable)";
+								withCardinality: "(myVariable+)";
+								withBracketCardinality: "(myVariable[0,])";
 							;
+
+		nameWithCardinality: .variableName .cardinality?
+							---
+								name: "son";
+								withCardinality: "son+";
+								withBracketCardinality: "son[3,]";
+							;
+
+		cardinality: .cardinalityBracketOption
+					| .INTERROGATION_POINT
+					| .STAR
+					| .PLUS
+					---
+							minMax: "[0,23]";
+							minNoMax: "[0,]";
+							specific: "[22]";
+							interrogationPoint: "?";
+							star: "*";
+							plus: "+";
+					;
+
+		cardinalityBracketOption: .BRACKET_OPEN .cardinalityNumberOptions .BRACKET_CLOSE
+								---
+										minMax: "[0,23]";
+										minNoMax: "[0,]";
+										specific: "[22]";
+								;
+
+		cardinalityNumberOptions: .minMax
+								| .minComma
+								| .numbers
+								---
+										minMax: "0,23";
+										minNoMax: "0,";
+										specific: "22";
+								;
+
+
+		minMax: .minComma .numbers
+			  ---
+			  		valid: "0,23";
+			  ;
+
+		minComma: .numbers .COMMA
+				---
+					zero: "0,";
+					nonZero: "23,";
+				;
 
 		pointSuitesBlock: .suitePrefix .pointSuites
 						---
@@ -564,6 +612,7 @@ func fetchGrammarInput() []byte {
 
 		DOT: ".";
 		COLON: ":";
+		COMMA: ",";
 		SEMI_COLON: ";";
 		PARENTHESIS_OPEN: "(";
 		PARENTHESIS_CLOSE: ")";
@@ -573,6 +622,9 @@ func fetchGrammarInput() []byte {
 		HYPHEN: "-";
 		EXCLAMATION_POINT: "!";
 		GREATHER_THAN: ">";
+		INTERROGATION_POINT: "?";
+		STAR: "*";
+		PLUS: "+";
 
 		NAME: "name";
 	`)
