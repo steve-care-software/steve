@@ -1,54 +1,35 @@
 package lines
 
 import (
-	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/executions"
-	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/processors"
+	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/balances"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/tokens"
 )
 
 type line struct {
-	tokens    tokens.Tokens
-	processor processors.Processor
-	syscall   executions.Execution
+	tokens  tokens.Tokens
+	balance balances.Balance
 }
 
 func createLine(
 	tokens tokens.Tokens,
 ) Line {
-	return createLineInternally(tokens, nil, nil)
+	return createLineInternally(tokens, nil)
 }
 
-func createLineWithProcessor(
+func createLineWithBalance(
 	tokens tokens.Tokens,
-	processor processors.Processor,
+	balance balances.Balance,
 ) Line {
-	return createLineInternally(tokens, processor, nil)
-}
-
-func createLineWithSyscall(
-	tokens tokens.Tokens,
-	syscall executions.Execution,
-) Line {
-	return createLineInternally(tokens, nil, syscall)
-}
-
-func createLineWithProcessorAndSyscall(
-	tokens tokens.Tokens,
-	processor processors.Processor,
-	syscall executions.Execution,
-) Line {
-	return createLineInternally(tokens, processor, syscall)
+	return createLineInternally(tokens, balance)
 }
 
 func createLineInternally(
 	tokens tokens.Tokens,
-	processor processors.Processor,
-	syscall executions.Execution,
+	balance balances.Balance,
 ) Line {
 	out := line{
-		tokens:    tokens,
-		processor: processor,
-		syscall:   syscall,
+		tokens:  tokens,
+		balance: balance,
 	}
 
 	return &out
@@ -59,22 +40,12 @@ func (obj *line) Tokens() tokens.Tokens {
 	return obj.tokens
 }
 
-// HasProcessor returns true if there is a processor, false otherwise
-func (obj *line) HasProcessor() bool {
-	return obj.processor != nil
+// HasBalance returns true if there is a balance, false otherwise
+func (obj *line) HasBalance() bool {
+	return obj.balance != nil
 }
 
-// Processor returns the processor, if any
-func (obj *line) Processor() processors.Processor {
-	return obj.processor
-}
-
-// HasSyscall returns true if there is a syscall, false otherwise
-func (obj *line) HasSyscall() bool {
-	return obj.syscall != nil
-}
-
-// Syscall returns the syscall, if any
-func (obj *line) Syscall() executions.Execution {
-	return obj.syscall
+// Balance returns the balance, if any
+func (obj *line) Balance() balances.Balance {
+	return obj.balance
 }

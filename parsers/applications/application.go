@@ -4,46 +4,27 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/steve-care-software/steve/parsers/applications/stackframes"
 	"github.com/steve-care-software/steve/parsers/domain/asts"
 	"github.com/steve-care-software/steve/parsers/domain/asts/instructions"
 	"github.com/steve-care-software/steve/parsers/domain/grammars"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/suites"
-	"github.com/steve-care-software/steve/parsers/domain/stacks"
 )
 
 type application struct {
-	stackFrameApp    stackframes.Application
-	elementsAdapter  instructions.ElementsAdapter
-	astParserAdapter asts.ParserAdapter
-	syscalls         map[string]SyscallFn
+	elementsAdapter instructions.ElementsAdapter
+	astAdapter      asts.Adapter
 }
 
 func createApplication(
-	stackFrameApp stackframes.Application,
 	elementsAdapter instructions.ElementsAdapter,
-	astParserAdapter asts.ParserAdapter,
-	syscalls map[string]SyscallFn,
+	astAdapter asts.Adapter,
 ) Application {
 	out := application{
-		stackFrameApp:    stackFrameApp,
-		elementsAdapter:  elementsAdapter,
-		astParserAdapter: astParserAdapter,
-		syscalls:         syscalls,
+		elementsAdapter: elementsAdapter,
+		astAdapter:      astAdapter,
 	}
 
 	return &out
-}
-
-// Execute interprets the input and returns the stack
-func (app *application) Execute(ast asts.AST) (stacks.Stack, error) {
-	root := ast.Root()
-	app.interpretElement(
-		nil,
-		root,
-	)
-
-	return app.stackFrameApp.Root().Fetch()
 }
 
 // Suites executes all the test suites of the grammar
@@ -87,7 +68,7 @@ func (app *application) interpretSuite(
 	blockName string,
 	suite suites.Suite,
 ) error {
-	ast, retRemaining, err := app.astParserAdapter.ToASTWithRoot(
+	ast, retRemaining, err := app.astAdapter.ToASTWithRoot(
 		grammar,
 		blockName,
 		suite.Input(),
@@ -102,30 +83,13 @@ func (app *application) interpretSuite(
 		return errors.New(str)
 	}
 
-	_, err = app.Execute(ast)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return app.execute(ast)
 }
 
 func (app *application) interpretInstruction(
 	instruction instructions.Instruction,
 ) error {
 	tokens := instruction.Tokens()
-	if instruction.HasSyscall() {
-		syscall := instruction.Syscall()
-		err := app.interpretSyscall(
-			tokens,
-			syscall,
-		)
-
-		if err != nil {
-			return err
-		}
-	}
-
 	return app.interpretTokens(
 		tokens,
 	)
@@ -183,7 +147,7 @@ func (app *application) interpretElement(
 	currentTokens instructions.Tokens,
 	element instructions.Element,
 ) error {
-	if element.IsRule() {
+	if element.IsConstant() {
 		return nil
 	}
 
@@ -193,93 +157,10 @@ func (app *application) interpretElement(
 	)
 }
 
-func (app *application) interpretSyscall(
-	currentTokens instructions.Tokens,
-	sysCall instructions.Syscall,
-) error {
-	fnName := sysCall.FuncName()
-	mpParams := map[string][]byte{}
-	if sysCall.HasParameters() {
-		parameters := sysCall.Parameters()
-		retMapParams, err := app.fetchParameters(
-			currentTokens,
-			parameters,
-		)
-
-		if err != nil {
-			str := fmt.Sprintf("there was an error while fetching the syscall (sysCallFn: %s) parameters: %s", fnName, err.Error())
-			return errors.New(str)
-		}
-
-		mpParams = retMapParams
-	}
-
-	if fn, ok := app.syscalls[fnName]; ok {
-		err := fn(mpParams)
-		if err != nil {
-			return err
-		}
-	}
-
-	str := fmt.Sprintf("the sysCall (sysCallFn: %s) does not exists", fnName)
-	return errors.New(str)
-}
-
-func (app *application) fetchParameters(
-	currentTokens instructions.Tokens,
-	parameters instructions.Parameters,
-) (map[string][]byte, error) {
-	output := map[string][]byte{}
-	list := parameters.List()
-	for _, oneParameter := range list {
-		name, value, err := app.fetchParameter(
-			currentTokens,
-			oneParameter,
-		)
-
-		if err != nil {
-			return nil, err
-		}
-
-		output[name] = value
-	}
-
-	return output, nil
-}
-
-func (app *application) fetchParameter(
-	currentTokens instructions.Tokens,
-	parameter instructions.Parameter,
-) (string, []byte, error) {
-	value := parameter.Value()
-	retBytes, err := app.fetchValue(
-		currentTokens,
-		value,
+func (app *application) execute(ast asts.AST) error {
+	root := ast.Root()
+	return app.interpretElement(
+		nil,
+		root,
 	)
-
-	if err != nil {
-		return "", nil, err
-	}
-
-	return parameter.Name(), retBytes, nil
-}
-
-func (app *application) fetchValue(
-	currentTokens instructions.Tokens,
-	value instructions.Value,
-) ([]byte, error) {
-	if value.IsBytes() {
-		return value.Bytes(), nil
-	}
-
-	reference := value.Reference()
-	element := reference.Element()
-	index := reference.Index()
-	retToken, err := currentTokens.Fetch(element, index)
-	if err != nil {
-		return nil, err
-	}
-
-	elements := retToken.Elements()
-	return app.elementsAdapter.ToBytes(elements)
 }

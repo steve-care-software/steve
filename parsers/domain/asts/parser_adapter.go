@@ -9,16 +9,13 @@ import (
 	"github.com/steve-care-software/steve/parsers/domain/grammars"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines"
-	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/executions"
-	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/executions/parameters"
-	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/executions/parameters/values"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/tokens"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/tokens/elements"
-	"github.com/steve-care-software/steve/parsers/domain/grammars/rules"
+	comnstants_elements "github.com/steve-care-software/steve/parsers/domain/grammars/constants/tokens/elements"
 )
 
-type parserAdapter struct {
-	grammarAdapter      grammars.ParserAdapter
+type adapter struct {
+	grammarAdapter      grammars.Adapter
 	builder             Builder
 	instructionsBuilder instructions.Builder
 	instructionBuilder  instructions.InstructionBuilder
@@ -26,16 +23,11 @@ type parserAdapter struct {
 	tokenBuilder        instructions.TokenBuilder
 	elementsBuilder     instructions.ElementsBuilder
 	elementBuilder      instructions.ElementBuilder
-	ruleBuilder         rules.RuleBuilder
-	syscallBuilder      instructions.SyscallBuilder
-	parametersBuilder   instructions.ParametersBuilder
-	parameterBuilder    instructions.ParameterBuilder
-	valueBuilder        instructions.ValueBuilder
-	referenceBuilder    instructions.ReferenceBuilder
+	constantBuilder     instructions.ConstantBuilder
 }
 
-func createParserAdapter(
-	grammarAdapter grammars.ParserAdapter,
+func createAdapter(
+	grammarAdapter grammars.Adapter,
 	builder Builder,
 	instructionsBuilder instructions.Builder,
 	instructionBuilder instructions.InstructionBuilder,
@@ -43,14 +35,9 @@ func createParserAdapter(
 	tokenBuilder instructions.TokenBuilder,
 	elementsBuilder instructions.ElementsBuilder,
 	elementBuilder instructions.ElementBuilder,
-	ruleBuilder rules.RuleBuilder,
-	syscallBuilder instructions.SyscallBuilder,
-	parametersBuilder instructions.ParametersBuilder,
-	parameterBuilder instructions.ParameterBuilder,
-	valueBuilder instructions.ValueBuilder,
-	referenceBuilder instructions.ReferenceBuilder,
-) ParserAdapter {
-	out := parserAdapter{
+	constantBuilder instructions.ConstantBuilder,
+) Adapter {
+	out := adapter{
 		grammarAdapter:      grammarAdapter,
 		builder:             builder,
 		instructionsBuilder: instructionsBuilder,
@@ -59,19 +46,14 @@ func createParserAdapter(
 		tokenBuilder:        tokenBuilder,
 		elementsBuilder:     elementsBuilder,
 		elementBuilder:      elementBuilder,
-		ruleBuilder:         ruleBuilder,
-		syscallBuilder:      syscallBuilder,
-		parametersBuilder:   parametersBuilder,
-		parameterBuilder:    parameterBuilder,
-		valueBuilder:        valueBuilder,
-		referenceBuilder:    referenceBuilder,
+		constantBuilder:     constantBuilder,
 	}
 
 	return &out
 }
 
 // ToAST takes the grammar and input and converts them to a ast instance and the remaining data
-func (app *parserAdapter) ToAST(grammar grammars.Grammar, input []byte) (AST, []byte, error) {
+func (app *adapter) ToAST(grammar grammars.Grammar, input []byte) (AST, []byte, error) {
 	root := grammar.Root()
 	retElement, retRemaining, err := app.toElement(grammar, map[string]map[int][]byte{}, root, input, true)
 	if err != nil {
@@ -90,7 +72,7 @@ func (app *parserAdapter) ToAST(grammar grammars.Grammar, input []byte) (AST, []
 }
 
 // ToASTWithRoot creates a ast but changes the root block of the grammar
-func (app *parserAdapter) ToASTWithRoot(grammar grammars.Grammar, rootBlockName string, input []byte) (AST, []byte, error) {
+func (app *adapter) ToASTWithRoot(grammar grammars.Grammar, rootBlockName string, input []byte) (AST, []byte, error) {
 	rootBlock, err := grammar.Blocks().Fetch(rootBlockName)
 	if err != nil {
 		return nil, nil, err
@@ -127,7 +109,7 @@ func (app *parserAdapter) ToASTWithRoot(grammar grammars.Grammar, rootBlockName 
 	return ast, retInstructionRemaining, nil
 }
 
-func (app *parserAdapter) toInstruction(
+func (app *adapter) toInstruction(
 	grammar grammars.Grammar,
 	parentValues map[string]map[int][]byte,
 	block blocks.Block,
@@ -135,43 +117,6 @@ func (app *parserAdapter) toInstruction(
 	filterForOmission bool,
 ) (instructions.Instruction, []byte, error) {
 	name := block.Name()
-	if block.HasLine() {
-		line := block.Line()
-		retTokens, retRemaining, err := app.toTokens(
-			grammar,
-			parentValues,
-			line,
-			input,
-			filterForOmission,
-		)
-
-		if err != nil {
-			return nil, nil, err
-		}
-
-		builder := app.instructionBuilder.Create().
-			WithBlock(name).
-			WithLine(uint(0)).
-			WithTokens(retTokens)
-
-		if line.HasSyscall() {
-			syscall := line.Syscall()
-			retSyscall, err := app.toSysCall(syscall)
-			if err != nil {
-				return nil, nil, err
-			}
-
-			builder.WithSyscall(retSyscall)
-		}
-
-		retIns, err := builder.Now()
-		if err != nil {
-			return nil, nil, err
-		}
-
-		return retIns, retRemaining, nil
-	}
-
 	lines := block.Lines().List()
 	for idx, oneLine := range lines {
 		if _, ok := parentValues[name]; !ok {
@@ -202,20 +147,19 @@ func (app *parserAdapter) toInstruction(
 			continue
 		}
 
+		// if there is a balance and it cannot validate against the token's AST, skip the line:
+		if oneLine.HasBalance() {
+			balance := oneLine.Balance()
+			isValid := retTokens.IsBalanceValid(balance)
+			if !isValid {
+				continue
+			}
+		}
+
 		builder := app.instructionBuilder.Create().
 			WithBlock(name).
 			WithLine(uint(idx)).
 			WithTokens(retTokens)
-
-		if oneLine.HasSyscall() {
-			syscall := oneLine.Syscall()
-			retSyscall, err := app.toSysCall(syscall)
-			if err != nil {
-				return nil, nil, err
-			}
-
-			builder.WithSyscall(retSyscall)
-		}
 
 		retIns, err := builder.Now()
 		if err != nil {
@@ -230,7 +174,7 @@ func (app *parserAdapter) toInstruction(
 	return nil, nil, errors.New(str)
 }
 
-func (app *parserAdapter) toTokens(
+func (app *adapter) toTokens(
 	grammar grammars.Grammar,
 	parentValues map[string]map[int][]byte,
 	line lines.Line,
@@ -271,7 +215,7 @@ func (app *parserAdapter) toTokens(
 	return retTokens, remaining, nil
 }
 
-func (app *parserAdapter) toToken(
+func (app *adapter) toToken(
 	grammar grammars.Grammar,
 	parentValues map[string]map[int][]byte,
 	token tokens.Token,
@@ -355,8 +299,8 @@ func (app *parserAdapter) toToken(
 			}
 
 			name := token.Name()
-			rule, err := app.ruleBuilder.Create().
-				WithBytes(accumulated).
+			constant, err := app.constantBuilder.Create().
+				WithValue(accumulated).
 				WithName(name).
 				Now()
 
@@ -365,7 +309,7 @@ func (app *parserAdapter) toToken(
 			}
 
 			retElement, err := app.elementBuilder.Create().
-				WithRule(rule).
+				WithConstant(constant).
 				Now()
 
 			if err != nil {
@@ -420,7 +364,7 @@ func (app *parserAdapter) toToken(
 	return retToken, remaining, nil
 }
 
-func (app *parserAdapter) toElement(
+func (app *adapter) toElement(
 	grammar grammars.Grammar,
 	parentValues map[string]map[int][]byte,
 	element elements.Element,
@@ -438,19 +382,24 @@ func (app *parserAdapter) toElement(
 	builder := app.elementBuilder.Create()
 	if element.IsRule() {
 		ruleName := element.Rule()
-		rule, err := grammar.Rules().Fetch(ruleName)
+		ruleBytes, retRemaining, err := app.ruleNameToBytes(
+			grammar,
+			ruleName,
+			remaining,
+			filterForOmission,
+		)
+
 		if err != nil {
 			return nil, nil, err
 		}
 
-		ruleBytes := rule.Bytes()
-		if !bytes.HasPrefix(remaining, ruleBytes) {
-			str := fmt.Sprintf("the rule (name: %s) could not be found in the input bytes", ruleName)
-			return nil, nil, errors.New(str)
+		constant, err := app.constantBuilder.Create().WithName(ruleName).WithValue(ruleBytes).Now()
+		if err != nil {
+			return nil, nil, err
 		}
 
-		builder.WithRule(rule)
-		remaining = remaining[len(ruleBytes):]
+		builder.WithConstant(constant)
+		remaining = retRemaining
 	}
 
 	if element.IsBlock() {
@@ -476,6 +425,28 @@ func (app *parserAdapter) toElement(
 		remaining = retInstructionRemaining
 	}
 
+	if element.IsConstant() {
+		constantName := element.Constant()
+		retValue, retRemaining, err := app.constantNameToBytes(
+			grammar,
+			constantName,
+			remaining,
+			filterForOmission,
+		)
+
+		if err != nil {
+			return nil, nil, err
+		}
+
+		constant, err := app.constantBuilder.Create().WithName(constantName).WithValue(retValue).Now()
+		if err != nil {
+			return nil, nil, err
+		}
+
+		builder.WithConstant(constant)
+		remaining = retRemaining
+	}
+
 	ins, err := builder.Now()
 	if err != nil {
 		return nil, nil, err
@@ -491,102 +462,109 @@ func (app *parserAdapter) toElement(
 	return ins, remaining, nil
 }
 
-func (app *parserAdapter) toSysCall(
-	execution executions.Execution,
-) (instructions.Syscall, error) {
-	funcName := execution.FuncName()
-	builder := app.syscallBuilder.Create().
-		WithFuncName(funcName)
-
-	if execution.HasParameters() {
-		parameters := execution.Parameters()
-		retParameters, err := app.toParameters(
-			parameters,
-		)
-
-		if err != nil {
-			return nil, err
-		}
-
-		builder.WithParameters(retParameters)
-	}
-
-	return builder.Now()
-}
-
-func (app *parserAdapter) toParameters(
-	parameters parameters.Parameters,
-) (instructions.Parameters, error) {
-	list := parameters.List()
-	output := []instructions.Parameter{}
-	for _, oneParameter := range list {
-		retParameter, err := app.toParameter(
-			oneParameter,
-		)
-
-		if err != nil {
-			return nil, err
-		}
-
-		output = append(output, retParameter)
-	}
-
-	ins, err := app.parametersBuilder.Create().
-		WithList(output).
-		Now()
-
+func (app *adapter) constantNameToBytes(
+	grammar grammars.Grammar,
+	name string,
+	input []byte,
+	filterForOmission bool,
+) ([]byte, []byte, error) {
+	constant, err := grammar.Constants().Fetch(name)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return ins, nil
-}
-
-func (app *parserAdapter) toParameter(
-	parameter parameters.Parameter,
-) (instructions.Parameter, error) {
-	value := parameter.Value()
-	retValue, err := app.toValue(value)
-	if err != nil {
-		return nil, err
+	value := []byte{}
+	remaining := input
+	if filterForOmission {
+		remaining = app.filterOmissions(
+			grammar,
+			remaining,
+		)
 	}
 
-	name := parameter.Name()
-	return app.parameterBuilder.Create().
-		WithName(name).
-		WithValue(retValue).
-		Now()
-}
+	tokensList := constant.Tokens().List()
+	for _, oneToken := range tokensList {
+		amount := oneToken.Amount()
+		element := oneToken.Element()
 
-func (app *parserAdapter) toValue(
-	value values.Value,
-) (instructions.Value, error) {
-	builder := app.valueBuilder.Create()
-	if value.IsBytes() {
-		bytes := value.Bytes()
-		builder.WithBytes(bytes)
-	}
+		casted := int(amount)
+		for i := 0; i < casted; i++ {
+			elementBytes, retRemaining, err := app.constantElementToBytes(
+				grammar,
+				element,
+				remaining,
+				filterForOmission,
+			)
 
-	if value.IsReference() {
-		reference := value.Reference()
-		element := reference.Element()
-		index := reference.Index()
-		retRef, err := app.referenceBuilder.Create().
-			WithElement(element.Name()).
-			WithIndex(index).
-			Now()
+			if err != nil {
+				return nil, nil, err
+			}
 
-		if err != nil {
-			return nil, err
+			value = append(value, elementBytes...)
+			remaining = retRemaining
 		}
-
-		builder.WithReference(retRef)
 	}
 
-	return builder.Now()
+	return value, remaining, nil
 }
 
-func (app *parserAdapter) filterOmissions(
+func (app *adapter) constantElementToBytes(
+	grammar grammars.Grammar,
+	element comnstants_elements.Element,
+	input []byte,
+	filterForOmission bool,
+) ([]byte, []byte, error) {
+	remaining := input
+	if filterForOmission {
+		remaining = app.filterOmissions(
+			grammar,
+			remaining,
+		)
+	}
+
+	if element.IsConstant() {
+		name := element.Constant()
+		return app.constantNameToBytes(grammar, name, input, filterForOmission)
+	}
+
+	ruleName := element.Rule()
+	return app.ruleNameToBytes(
+		grammar,
+		ruleName,
+		remaining,
+		filterForOmission,
+	)
+}
+
+func (app *adapter) ruleNameToBytes(
+	grammar grammars.Grammar,
+	ruleName string,
+	input []byte,
+	filterForOmission bool,
+) ([]byte, []byte, error) {
+	remaining := input
+	if filterForOmission {
+		remaining = app.filterOmissions(
+			grammar,
+			remaining,
+		)
+	}
+
+	rule, err := grammar.Rules().Fetch(ruleName)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	ruleBytes := rule.Bytes()
+	if !bytes.HasPrefix(remaining, ruleBytes) {
+		str := fmt.Sprintf("the rule (name: %s) could not be found in the input bytes", ruleName)
+		return nil, nil, errors.New(str)
+	}
+
+	return ruleBytes, remaining[len(ruleBytes):], nil
+}
+
+func (app *adapter) filterOmissions(
 	grammar grammars.Grammar,
 	input []byte,
 ) []byte {

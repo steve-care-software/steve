@@ -1,6 +1,10 @@
 package instructions
 
-import "github.com/steve-care-software/steve/parsers/domain/grammars/rules"
+import (
+	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/balances"
+	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/balances/selectors"
+	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/balances/selectors/chains"
+)
 
 // NewBuilder creates a new builder
 func NewBuilder() Builder {
@@ -37,29 +41,9 @@ func NewElementBuilder() ElementBuilder {
 	return createElementBuilder()
 }
 
-// NewSyscallBuilder creates a new syscall builder
-func NewSyscallBuilder() SyscallBuilder {
-	return createSyscallBuilder()
-}
-
-// NewParametersBuilder creates a new parameters builder
-func NewParametersBuilder() ParametersBuilder {
-	return createParametersBuilder()
-}
-
-// NewParameterBuilder creates a new parameter builder
-func NewParameterBuilder() ParameterBuilder {
-	return createParameterBuilder()
-}
-
-// NewValueBuilder creates a new value builder
-func NewValueBuilder() ValueBuilder {
-	return createValueBuilder()
-}
-
-// NewReferenceBuilder creates a new reference builder
-func NewReferenceBuilder() ReferenceBuilder {
-	return createReferenceBuilder()
+// NewConstantBuilder creates a new constant builder
+func NewConstantBuilder() ConstantBuilder {
+	return createConstantBuilder()
 }
 
 // Builder represents the instructions builder
@@ -81,7 +65,6 @@ type InstructionBuilder interface {
 	WithBlock(block string) InstructionBuilder
 	WithLine(line uint) InstructionBuilder
 	WithTokens(tokens Tokens) InstructionBuilder
-	WithSyscall(syscall Syscall) InstructionBuilder
 	Now() (Instruction, error)
 }
 
@@ -90,8 +73,6 @@ type Instruction interface {
 	Block() string
 	Line() uint
 	Tokens() Tokens
-	HasSyscall() bool
-	Syscall() Syscall
 }
 
 // TokensBuilder represents the tokens builder
@@ -105,6 +86,9 @@ type TokensBuilder interface {
 type Tokens interface {
 	List() []Token
 	Fetch(name string, index uint) (Token, error)
+	IsBalanceValid(balance balances.Balance) bool
+	IsSelectorValid(selector selectors.Selector) bool
+	IsChainValid(chain chains.Chain) bool
 }
 
 // TokenBuilder represents the token builder
@@ -137,12 +121,13 @@ type ElementsBuilder interface {
 // Elements represents elements
 type Elements interface {
 	List() []Element
+	Fetch(idx uint) (Element, error)
 }
 
 // ElementBuilder represents the element builder
 type ElementBuilder interface {
 	Create() ElementBuilder
-	WithRule(rule rules.Rule) ElementBuilder
+	WithConstant(constant Constant) ElementBuilder
 	WithInstruction(instruction Instruction) ElementBuilder
 	Now() (Element, error)
 }
@@ -150,79 +135,24 @@ type ElementBuilder interface {
 // Element represents an element
 type Element interface {
 	Name() string
-	IsRule() bool
-	Rule() rules.Rule
+	IsChainValid(chain chains.Chain) bool
+	IsConstant() bool
+	Constant() Constant
 	IsInstruction() bool
 	Instruction() Instruction
 }
 
-// SyscallBuilder represents the syscall builder
-type SyscallBuilder interface {
-	Create() SyscallBuilder
-	WithFuncName(fnName string) SyscallBuilder
-	WithParameters(parameters Parameters) SyscallBuilder
-	Now() (Syscall, error)
+// ConstantBuilder represents the constant builder
+type ConstantBuilder interface {
+	Create() ConstantBuilder
+	WithName(name string) ConstantBuilder
+	WithValue(value []byte) ConstantBuilder
+	Now() (Constant, error)
 }
 
-// Syscall represents a syscall
-type Syscall interface {
-	FuncName() string
-	HasParameters() bool
-	Parameters() Parameters
-}
-
-// ParametersBuilder represents the parameters builder
-type ParametersBuilder interface {
-	Create() ParametersBuilder
-	WithList(list []Parameter) ParametersBuilder
-	Now() (Parameters, error)
-}
-
-// Parameters represents parameters
-type Parameters interface {
-	List() []Parameter
-}
-
-// ParameterBuilder represents the parameter builder
-type ParameterBuilder interface {
-	Create() ParameterBuilder
-	WithName(name string) ParameterBuilder
-	WithValue(value Value) ParameterBuilder
-	Now() (Parameter, error)
-}
-
-// Parameter represents an execution parameter
-type Parameter interface {
+// Constant represents a constant
+type Constant interface {
 	Name() string
-	Value() Value
-}
-
-// ValueBuilder represents the value builder
-type ValueBuilder interface {
-	Create() ValueBuilder
-	WithReference(reference Reference) ValueBuilder
-	WithBytes(bytes []byte) ValueBuilder
-	Now() (Value, error)
-}
-
-// Value represents a value
-type Value interface {
-	IsReference() bool
-	Reference() Reference
-	IsBytes() bool
-	Bytes() []byte
-}
-
-// ReferenceBuilder represents the reference builder
-type ReferenceBuilder interface {
-	Create() ReferenceBuilder
-	WithElement(element string) ReferenceBuilder
-	WithIndex(index uint) ReferenceBuilder
-	Now() (Reference, error)
-}
-
-// Reference represents a reference
-type Reference interface {
-	Element() string
-	Index() uint
+	Value() []byte
+	IsChainValid(chain chains.Chain) bool
 }

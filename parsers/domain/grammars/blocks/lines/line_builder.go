@@ -3,22 +3,19 @@ package lines
 import (
 	"errors"
 
-	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/executions"
-	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/processors"
+	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/balances"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/tokens"
 )
 
 type lineBuilder struct {
-	tokens    tokens.Tokens
-	processor processors.Processor
-	syscall   executions.Execution
+	tokens  tokens.Tokens
+	balance balances.Balance
 }
 
 func createLineBuilder() LineBuilder {
 	out := lineBuilder{
-		tokens:    nil,
-		processor: nil,
-		syscall:   nil,
+		tokens:  nil,
+		balance: nil,
 	}
 
 	return &out
@@ -35,15 +32,9 @@ func (app *lineBuilder) WithTokens(tokens tokens.Tokens) LineBuilder {
 	return app
 }
 
-// WithProcessor adds a processor to the builder
-func (app *lineBuilder) WithProcessor(processor processors.Processor) LineBuilder {
-	app.processor = processor
-	return app
-}
-
-// WithSyscall adds a syscall to the builder
-func (app *lineBuilder) WithSyscall(syscall executions.Execution) LineBuilder {
-	app.syscall = syscall
+// WithBalance adds a balance to the builder
+func (app *lineBuilder) WithBalance(balance balances.Balance) LineBuilder {
+	app.balance = balance
 	return app
 }
 
@@ -53,16 +44,8 @@ func (app *lineBuilder) Now() (Line, error) {
 		return nil, errors.New("there must be at least 1 Token in order to build a Line instance")
 	}
 
-	if app.processor != nil && app.syscall != nil {
-		return createLineWithProcessorAndSyscall(app.tokens, app.processor, app.syscall), nil
-	}
-
-	if app.processor != nil {
-		return createLineWithProcessor(app.tokens, app.processor), nil
-	}
-
-	if app.syscall != nil {
-		return createLineWithSyscall(app.tokens, app.syscall), nil
+	if app.balance != nil {
+		return createLineWithBalance(app.tokens, app.balance), nil
 	}
 
 	return createLine(app.tokens), nil

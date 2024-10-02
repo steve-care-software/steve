@@ -2,6 +2,16 @@ package constants
 
 import "github.com/steve-care-software/steve/parsers/domain/grammars/constants/tokens"
 
+// NewBuilder creates a new builder instance
+func NewBuilder() Builder {
+	return createBuilder()
+}
+
+// NewConstantBuilder creates a new constant builder
+func NewConstantBuilder() ConstantBuilder {
+	return createConstantBuilder()
+}
+
 // Builder represents the constants builder
 type Builder interface {
 	Create() Builder
@@ -12,6 +22,7 @@ type Builder interface {
 // Constants represents constants
 type Constants interface {
 	List() []Constant
+	Fetch(name string) (Constant, error)
 }
 
 // ConstantBuilder represents the constant builder

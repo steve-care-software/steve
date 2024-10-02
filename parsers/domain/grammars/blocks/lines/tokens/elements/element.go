@@ -48,6 +48,10 @@ func (obj *element) Name() string {
 		return obj.block
 	}
 
+	if obj.IsConstant() {
+		return obj.constant
+	}
+
 	return obj.rule
 }
 

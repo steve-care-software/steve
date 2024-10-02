@@ -1,8 +1,7 @@
 package lines
 
 import (
-	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/executions"
-	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/processors"
+	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/balances"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/tokens"
 )
 
@@ -32,16 +31,13 @@ type Lines interface {
 type LineBuilder interface {
 	Create() LineBuilder
 	WithTokens(tokens tokens.Tokens) LineBuilder
-	WithProcessor(processor processors.Processor) LineBuilder
-	WithSyscall(syscall executions.Execution) LineBuilder
+	WithBalance(balance balances.Balance) LineBuilder
 	Now() (Line, error)
 }
 
 // Line represents a variable
 type Line interface {
 	Tokens() tokens.Tokens
-	HasProcessor() bool
-	Processor() processors.Processor
-	HasSyscall() bool
-	Syscall() executions.Execution
+	HasBalance() bool
+	Balance() balances.Balance
 }

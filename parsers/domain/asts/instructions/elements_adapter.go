@@ -76,9 +76,9 @@ func (app *elementsAdapter) elementsToBytes(
 func (app *elementsAdapter) elementToBytes(
 	element Element,
 ) ([]byte, error) {
-	if element.IsRule() {
-		rule := element.Rule()
-		return rule.Bytes(), nil
+	if element.IsConstant() {
+		rule := element.Constant()
+		return rule.Value(), nil
 	}
 
 	instruction := element.Instruction()

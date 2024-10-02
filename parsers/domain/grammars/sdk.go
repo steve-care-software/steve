@@ -1,23 +1,19 @@
 package grammars
 
 import (
-	"errors"
-	"math/big"
-
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines"
-	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/executions"
-	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/executions/parameters"
-	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/executions/parameters/values"
-	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/executions/parameters/values/references"
-	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/processors"
+	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/balances"
+	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/balances/selectors"
+	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/balances/selectors/chains"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/tokens"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/tokens/cardinalities"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/tokens/elements"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/tokens/reverses"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/suites"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/constants"
-	"github.com/steve-care-software/steve/parsers/domain/grammars/resources"
+	constant_tokens "github.com/steve-care-software/steve/parsers/domain/grammars/constants/tokens"
+	constant_elements "github.com/steve-care-software/steve/parsers/domain/grammars/constants/tokens/elements"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/rules"
 )
 
@@ -100,9 +96,6 @@ const cardinalitySeparator = ","
 const cardinalityZeroPlus = "*"
 const cardinalityOnePlus = "+"
 const cardinalityOptional = "?"
-const indexOpen = "["
-const indexClose = "]"
-const parameterSeparator = ":"
 const tokenReversePrefix = "!"
 const tokenReverseEscapePrefix = "["
 const tokenReverseEscapeSuffix = "]"
@@ -123,53 +116,35 @@ const omissionPrefix = "#"
 const omissionSuffix = ";"
 const filterBytes = ` 	
 ` // space, tab and eol
-const sysCallPrefix = "("
-const sysCallSuffix = ")"
 
-// NewComposeAdapter creates a new composer adapter
-func NewComposeAdapter() ComposeAdapter {
-	return createComposeAdapter(
-		map[string]CoreFn{
-			"math_operation_arithmetic_addition": func(input map[string][]byte) ([]byte, error) {
-				if firstBytes, ok := input["first"]; ok {
-					if secondBytes, ok := input["second"]; ok {
-						pFirst, _ := big.NewInt(int64(0)).SetString(string(firstBytes), 10)
-						if pFirst == nil {
-							return nil, errors.New("the first value could not be converted to a number")
-						}
+const constantNamePrefix = "_"
+const selectorChainElementPrefix = "->"
+const selectorOperatorAnd = "&&"
+const selectorOperatorOr = "||"
+const selectorOperatorXor = "<>"
+const openParenthesis = "("
+const closeParenthesis = ")"
 
-						pSecond, _ := big.NewInt(int64(0)).SetString(string(secondBytes), 10)
-						if pSecond == nil {
-							return nil, errors.New("the second value could not be converted to a number")
-						}
-
-						return []byte(pFirst.Add(pFirst, pSecond).String()), nil
-					}
-
-					return nil, errors.New("the second value was not defined")
-				}
-
-				return nil, errors.New("the first value was not defined")
-			},
-		},
-	)
-}
-
-// NewParserAdapter creates a new parser adapter
-func NewParserAdapter() ParserAdapter {
+// NewAdapter creates a new adapter
+func NewAdapter() Adapter {
 	grammarBuilder := NewBuilder()
+	constantsBuilder := constants.NewBuilder()
+	constantBuilder := constants.NewConstantBuilder()
+	constantTokensBuilder := constant_tokens.NewBuilder()
+	constantTokenBuilder := constant_tokens.NewTokenBuilder()
+	constantElementBuilder := constant_elements.NewBuilder()
 	blocksBuilder := blocks.NewBuilder()
 	blockBuilder := blocks.NewBlockBuilder()
 	suitesBuilder := suites.NewBuilder()
 	suiteBuilder := suites.NewSuiteBuilder()
 	linesBuilder := lines.NewBuilder()
 	lineBuilder := lines.NewLineBuilder()
-	processorBuilder := processors.NewBuilder()
-	executionBuilder := executions.NewBuilder()
-	parametersBuilder := parameters.NewBuilder()
-	parameterBuilder := parameters.NewParameterBuilder()
-	valueBuilder := values.NewBuilder()
-	referenceBuilder := references.NewBuilder()
+	balanceBuilder := balances.NewBuilder()
+	selectorsBuilder := selectors.NewBuilder()
+	selectorBuilder := selectors.NewSelectorBuilder()
+	selectorChainBuilder := chains.NewBuilder()
+	selectorChainTokenBuilder := chains.NewTokenBuilder()
+	selectorChainElementBuilder := chains.NewElementBuilder()
 	tokensBuilder := tokens.NewBuilder()
 	tokenBuilder := tokens.NewTokenBuilder()
 	reverseBuilder := reverses.NewBuilder()
@@ -183,20 +158,25 @@ func NewParserAdapter() ParserAdapter {
 	possibleUpperCaseLetters := createPossibleUpperCaseLetters()
 	possibleNumbers := createPossibleNumbers()
 	possibleFuncNameCharacters := createPossibleFuncNameCharacters()
-	return createParserAdapter(
+	return createAdapter(
 		grammarBuilder,
+		constantsBuilder,
+		constantBuilder,
+		constantTokensBuilder,
+		constantTokenBuilder,
+		constantElementBuilder,
 		blocksBuilder,
 		blockBuilder,
 		suitesBuilder,
 		suiteBuilder,
 		linesBuilder,
 		lineBuilder,
-		processorBuilder,
-		executionBuilder,
-		parametersBuilder,
-		parameterBuilder,
-		valueBuilder,
-		referenceBuilder,
+		balanceBuilder,
+		selectorsBuilder,
+		selectorBuilder,
+		selectorChainBuilder,
+		selectorChainTokenBuilder,
+		selectorChainElementBuilder,
 		tokensBuilder,
 		tokenBuilder,
 		reverseBuilder,
@@ -239,11 +219,13 @@ func NewParserAdapter() ParserAdapter {
 		[]byte(cardinalityZeroPlus)[0],
 		[]byte(cardinalityOnePlus)[0],
 		[]byte(cardinalityOptional)[0],
-		[]byte(indexOpen)[0],
-		[]byte(indexClose)[0],
-		[]byte(parameterSeparator)[0],
-		[]byte(sysCallPrefix)[0],
-		[]byte(sysCallSuffix)[0],
+		[]byte(constantNamePrefix)[0],
+		[]byte(selectorChainElementPrefix),
+		[]byte(selectorOperatorAnd),
+		[]byte(selectorOperatorOr),
+		[]byte(selectorOperatorXor),
+		[]byte(openParenthesis)[0],
+		[]byte(closeParenthesis)[0],
 	)
 }
 
@@ -252,19 +234,10 @@ func NewBuilder() Builder {
 	return createBuilder()
 }
 
-// ParserAdapter represents the grammar parser adapter
-type ParserAdapter interface {
+// Adapter represents the adapter
+type Adapter interface {
 	// ToGrammar takes the input and converts it to a grammar instance and the remaining data
 	ToGrammar(input []byte) (Grammar, []byte, error)
-
-	// ToBytes takes a grammar and returns the bytes
-	ToBytes(grammar Grammar) ([]byte, error)
-}
-
-// ComposeAdapter represents the grammar compose adapter
-type ComposeAdapter interface {
-	// ToBytes takes a grammar and a blockname and returns its bytes
-	ToBytes(grammar Grammar, blockName string) ([]byte, error)
 }
 
 // Builder represents the grammar builder
@@ -275,7 +248,6 @@ type Builder interface {
 	WithRules(rules rules.Rules) Builder
 	WithBlocks(blocks blocks.Blocks) Builder
 	WithOmissions(omissions elements.Elements) Builder
-	WithResources(resources resources.Resources) Builder
 	WithConstants(constants constants.Constants) Builder
 	Now() (Grammar, error)
 }
@@ -288,8 +260,6 @@ type Grammar interface {
 	Blocks() blocks.Blocks
 	HasOmissions() bool
 	Omissions() elements.Elements
-	HasResources() bool
-	Resources() resources.Resources
 	HasConstants() bool
 	Constants() constants.Constants
 }

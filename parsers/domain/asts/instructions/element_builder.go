@@ -2,18 +2,16 @@ package instructions
 
 import (
 	"errors"
-
-	"github.com/steve-care-software/steve/parsers/domain/grammars/rules"
 )
 
 type elementBuilder struct {
-	rule        rules.Rule
+	constant    Constant
 	instruction Instruction
 }
 
 func createElementBuilder() ElementBuilder {
 	out := elementBuilder{
-		rule:        nil,
+		constant:    nil,
 		instruction: nil,
 	}
 
@@ -25,9 +23,9 @@ func (app *elementBuilder) Create() ElementBuilder {
 	return createElementBuilder()
 }
 
-// WithRule adds a rule to the elementBuilder
-func (app *elementBuilder) WithRule(rule rules.Rule) ElementBuilder {
-	app.rule = rule
+// WithConstant adds a constant to the elementBuilder
+func (app *elementBuilder) WithConstant(constant Constant) ElementBuilder {
+	app.constant = constant
 	return app
 }
 
@@ -39,8 +37,8 @@ func (app *elementBuilder) WithInstruction(instruction Instruction) ElementBuild
 
 // Now builds a new Element instance
 func (app *elementBuilder) Now() (Element, error) {
-	if app.rule != nil {
-		return createElementWithRule(app.rule), nil
+	if app.constant != nil {
+		return createElementWithConstant(app.constant), nil
 	}
 
 	if app.instruction != nil {

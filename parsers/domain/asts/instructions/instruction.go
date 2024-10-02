@@ -1,10 +1,9 @@
 package instructions
 
 type instruction struct {
-	block   string
-	line    uint
-	tokens  Tokens
-	syscall Syscall
+	block  string
+	line   uint
+	tokens Tokens
 }
 
 func createInstruction(
@@ -16,35 +15,17 @@ func createInstruction(
 		block,
 		line,
 		tokens,
-		nil,
 	)
 }
-
-func createInstructionWithSyscall(
-	block string,
-	line uint,
-	tokens Tokens,
-	syscall Syscall,
-) Instruction {
-	return createInstructionInternally(
-		block,
-		line,
-		tokens,
-		syscall,
-	)
-}
-
 func createInstructionInternally(
 	block string,
 	line uint,
 	tokens Tokens,
-	syscall Syscall,
 ) Instruction {
 	out := instruction{
-		block:   block,
-		line:    line,
-		tokens:  tokens,
-		syscall: syscall,
+		block:  block,
+		line:   line,
+		tokens: tokens,
 	}
 
 	return &out
@@ -63,14 +44,4 @@ func (obj *instruction) Line() uint {
 // Tokens returns the tokens
 func (obj *instruction) Tokens() Tokens {
 	return obj.tokens
-}
-
-// HasSyscall returns true if there is a syscall, false otherwise
-func (obj *instruction) HasSyscall() bool {
-	return obj.syscall != nil
-}
-
-// Syscall returns the syscall, if any
-func (obj *instruction) Syscall() Syscall {
-	return obj.syscall
 }

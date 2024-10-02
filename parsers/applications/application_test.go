@@ -3,31 +3,8 @@ package applications
 import (
 	"testing"
 
-	"github.com/steve-care-software/steve/engine/domain/scripts/specifics/transpiles"
 	"github.com/steve-care-software/steve/parsers/domain/grammars"
 )
-
-func TestApplication_transpileGrammar_execTestSuites_Success(t *testing.T) {
-	grammarInput := transpiles.FetchGrammarInput()
-	grammarParserAdapter := grammars.NewParserAdapter()
-	retGrammar, _, err := grammarParserAdapter.ToGrammar(grammarInput)
-	if err != nil {
-		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
-		return
-	}
-
-	if err != nil {
-		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
-		return
-	}
-
-	application := NewApplication()
-	err = application.Suites(retGrammar)
-	if err != nil {
-		t.Errorf("there was an error while running the grammar test suites: %s", err.Error())
-		return
-	}
-}
 
 func TestApplication_grammar_withSuites_Success(t *testing.T) {
 	grammarInput := []byte(`
@@ -72,7 +49,7 @@ func TestApplication_grammar_withSuites_Success(t *testing.T) {
 					;
 
 
-		uintAssignment: (cursor_push .numbers:value "0":kind) .typeUintDefinition .EQUAL .numbers
+		uintAssignment: .typeUintDefinition .EQUAL .numbers
 						---
 							uint8: "uint8 myVariable = 45";
 							uint16: "uint16 myVariable = 45";
@@ -422,8 +399,8 @@ func TestApplication_grammar_withSuites_Success(t *testing.T) {
 ";
 	`)
 
-	grammarParserAdapter := grammars.NewParserAdapter()
-	retGrammar, _, err := grammarParserAdapter.ToGrammar(grammarInput)
+	grammarAdapter := grammars.NewAdapter()
+	retGrammar, _, err := grammarAdapter.ToGrammar(grammarInput)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
