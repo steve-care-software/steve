@@ -1,4 +1,4 @@
-package languages
+package schemas
 
 import (
 	"testing"
@@ -8,7 +8,7 @@ import (
 )
 
 func TestGrammar_executeSuites_Success(t *testing.T) {
-	grammarInput := FetchGrammarInput()
+	grammarInput := fetchGrammarInput()
 	grammarParserAdapter := grammars.NewAdapter()
 	retGrammar, retRemaining, err := grammarParserAdapter.ToGrammar(grammarInput)
 	if err != nil {

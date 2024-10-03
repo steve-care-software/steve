@@ -1,4 +1,4 @@
-package languages
+package schemas
 
 func fetchGrammarInput() []byte {
 	return []byte(`
