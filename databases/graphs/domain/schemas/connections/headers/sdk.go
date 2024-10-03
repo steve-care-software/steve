@@ -1,7 +1,7 @@
 package headers
 
 import (
-	"github.com/steve-care-software/steve/databases/graphs/domain/languages/connections/headers/names"
+	"github.com/steve-care-software/steve/databases/graphs/domain/schemas/connections/headers/names"
 )
 
 // NewBuilder creates a new builder

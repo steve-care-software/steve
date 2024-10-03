@@ -1,6 +1,6 @@
 package links
 
-import "github.com/steve-care-software/steve/databases/graphs/domain/languages/connections/links/references"
+import "github.com/steve-care-software/steve/databases/graphs/domain/schemas/connections/links/references"
 
 // NewBuilder creates a new builder instance
 func NewBuilder() Builder {

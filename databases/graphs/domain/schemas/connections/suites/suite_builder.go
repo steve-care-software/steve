@@ -3,8 +3,8 @@ package suites
 import (
 	"errors"
 
-	"github.com/steve-care-software/steve/databases/graphs/domain/languages/connections/links/references"
-	"github.com/steve-care-software/steve/databases/graphs/domain/languages/connections/suites/expectations"
+	"github.com/steve-care-software/steve/databases/graphs/domain/schemas/connections/links/references"
+	"github.com/steve-care-software/steve/databases/graphs/domain/schemas/connections/suites/expectations"
 )
 
 type suiteBuilder struct {

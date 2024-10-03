@@ -3,7 +3,7 @@ package references
 import (
 	"errors"
 
-	"github.com/steve-care-software/steve/databases/graphs/domain/languages/connections/links/references/externals"
+	"github.com/steve-care-software/steve/databases/graphs/domain/schemas/connections/links/references/externals"
 )
 
 type referenceBuilder struct {

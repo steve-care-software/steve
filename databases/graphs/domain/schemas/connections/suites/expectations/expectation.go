@@ -1,6 +1,6 @@
 package expectations
 
-import "github.com/steve-care-software/steve/databases/graphs/domain/languages/connections/links/references"
+import "github.com/steve-care-software/steve/databases/graphs/domain/schemas/connections/links/references"
 
 type expectation struct {
 	references references.References

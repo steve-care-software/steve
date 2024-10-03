@@ -1,9 +1,9 @@
 package connections
 
 import (
-	"github.com/steve-care-software/steve/databases/graphs/domain/languages/connections/headers"
-	"github.com/steve-care-software/steve/databases/graphs/domain/languages/connections/links"
-	"github.com/steve-care-software/steve/databases/graphs/domain/languages/connections/suites"
+	"github.com/steve-care-software/steve/databases/graphs/domain/schemas/connections/headers"
+	"github.com/steve-care-software/steve/databases/graphs/domain/schemas/connections/links"
+	"github.com/steve-care-software/steve/databases/graphs/domain/schemas/connections/suites"
 )
 
 type connection struct {

@@ -1,6 +1,6 @@
 package names
 
-import "github.com/steve-care-software/steve/databases/graphs/domain/languages/connections/headers/names/cardinalities"
+import "github.com/steve-care-software/steve/databases/graphs/domain/schemas/connections/headers/names/cardinalities"
 
 type name struct {
 	name        string

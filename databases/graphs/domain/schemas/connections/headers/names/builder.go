@@ -3,7 +3,7 @@ package names
 import (
 	"errors"
 
-	"github.com/steve-care-software/steve/databases/graphs/domain/languages/connections/headers/names/cardinalities"
+	"github.com/steve-care-software/steve/databases/graphs/domain/schemas/connections/headers/names/cardinalities"
 )
 
 type builder struct {

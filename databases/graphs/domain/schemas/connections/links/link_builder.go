@@ -3,7 +3,7 @@ package links
 import (
 	"errors"
 
-	"github.com/steve-care-software/steve/databases/graphs/domain/languages/connections/links/references"
+	"github.com/steve-care-software/steve/databases/graphs/domain/schemas/connections/links/references"
 )
 
 type linkBuilder struct {

@@ -1,6 +1,6 @@
 package references
 
-import "github.com/steve-care-software/steve/databases/graphs/domain/languages/connections/links/references/externals"
+import "github.com/steve-care-software/steve/databases/graphs/domain/schemas/connections/links/references/externals"
 
 type reference struct {
 	internal string

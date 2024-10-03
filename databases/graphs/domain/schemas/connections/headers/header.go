@@ -1,6 +1,6 @@
 package headers
 
-import "github.com/steve-care-software/steve/databases/graphs/domain/languages/connections/headers/names"
+import "github.com/steve-care-software/steve/databases/graphs/domain/schemas/connections/headers/names"
 
 type header struct {
 	name    names.Name
