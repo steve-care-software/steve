@@ -401,15 +401,17 @@ func (app *adapter) links(tokens instructions.Tokens) (links.Links, error) {
 		links[0][0]->link[0][0]->pointReference;
 	`))
 
-	if err == nil {
-		link, err := app.link(retElements)
-		if err != nil {
-			return nil, err
-		}
+	if err != nil {
+		return nil, err
+	}
 
-		return app.linksBuilder.Create().WithList([]links.Link{
-			link,
-		}).Now()
+	firstLink, err := app.link(retElements)
+	if err != nil {
+		return nil, err
+	}
+
+	output := []links.Link{
+		firstLink,
 	}
 
 	retElements, _, err = app.query(tokens, []byte(`
@@ -418,34 +420,31 @@ func (app *adapter) links(tokens instructions.Tokens) (links.Links, error) {
 		links[0][0]->pipeJourney;
 	`))
 
-	if err != nil {
-		return nil, err
-	}
+	if err == nil {
+		list := retElements.List()
+		for _, oneElement := range list {
+			retTokens, err := app.elementToTokens(oneElement)
+			if err != nil {
+				return nil, err
+			}
 
-	output := []links.Link{}
-	list := retElements.List()
-	for _, oneElement := range list {
-		retTokens, err := app.elementToTokens(oneElement)
-		if err != nil {
-			return nil, err
+			retElements, _, err = app.query(retTokens, []byte(`
+				v1;
+				name: mySelector;
+				link[0][0]->pointReference;
+			`))
+
+			if err != nil {
+				break
+			}
+
+			retLink, err := app.link(retElements)
+			if err != nil {
+				return nil, err
+			}
+
+			output = append(output, retLink)
 		}
-
-		retElements, _, err = app.query(retTokens, []byte(`
-			v1;
-			name: mySelector;
-			links;
-		`))
-
-		if err != nil {
-			return nil, err
-		}
-
-		retLink, err := app.link(retElements)
-		if err != nil {
-			return nil, err
-		}
-
-		output = append(output, retLink)
 	}
 
 	return app.linksBuilder.Create().
@@ -643,10 +642,10 @@ func (app *adapter) cardinality(tokens instructions.Tokens) (cardinalities.Cardi
 
 func (app *adapter) cardinalitySymbol(tokens instructions.Tokens) (cardinalities.Cardinality, error) {
 	_, _, err := app.query(tokens, []byte(`
-	v1;
-	name: mySelector;
-	cardinality[0][0]->INTERROGATION_POINT[0][0];
-`))
+		v1;
+		name: mySelector;
+		cardinality[0][0]->INTERROGATION_POINT[0][0];
+	`))
 
 	builder := app.cardinalityBuilder.Create()
 	if err == nil {
@@ -654,20 +653,20 @@ func (app *adapter) cardinalitySymbol(tokens instructions.Tokens) (cardinalities
 	}
 
 	_, _, err = app.query(tokens, []byte(`
-	v1;
-	name: mySelector;
-	cardinality[0][0]->STAR[0][0];
-`))
+		v1;
+		name: mySelector;
+		cardinality[0][0]->STAR[0][0];
+	`))
 
 	if err == nil {
 		return builder.WithMin(0).Now()
 	}
 
 	_, _, err = app.query(tokens, []byte(`
-	v1;
-	name: mySelector;
-	cardinality[0][0]->PLUS[0][0];
-`))
+		v1;
+		name: mySelector;
+		cardinality[0][0]->PLUS[0][0];
+	`))
 
 	if err != nil {
 		return nil, err

@@ -42,6 +42,8 @@ func TestAdapter_Success(t *testing.T) {
 		grandFather(grandSon*): .son .grandFather
 								| .father .grandGrandFather
 								;
+
+		grandFather(grandSon*): .son .grandFather;
 	`)
 
 	remaining := []byte("this is the remaining")
