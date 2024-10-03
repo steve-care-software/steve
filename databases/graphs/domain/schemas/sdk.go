@@ -27,7 +27,8 @@ func NewAdapterFactory() AdapterFactory {
 	connectionBuilder := connections.NewConnectionBuilder()
 	suitesBuilder := suites.NewBuilder()
 	suiteBuilder := suites.NewSuiteBuilder()
-	expectationBuilder := expectations.NewBuilder()
+	expectationsBuilder := expectations.NewBuilder()
+	expectationBuilder := expectations.NewExpectationBuilder()
 	linksBuilder := links.NewBuilder()
 	linkBuilder := links.NewLinkBuilder()
 	referencesBuilder := references.NewBuilder()
@@ -47,6 +48,7 @@ func NewAdapterFactory() AdapterFactory {
 		connectionBuilder,
 		suitesBuilder,
 		suiteBuilder,
+		expectationsBuilder,
 		expectationBuilder,
 		linksBuilder,
 		linkBuilder,

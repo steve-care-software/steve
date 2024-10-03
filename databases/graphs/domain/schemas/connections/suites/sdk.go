@@ -1,7 +1,7 @@
 package suites
 
 import (
-	"github.com/steve-care-software/steve/databases/graphs/domain/schemas/connections/links/references"
+	"github.com/steve-care-software/steve/databases/graphs/domain/schemas/connections/links"
 	"github.com/steve-care-software/steve/databases/graphs/domain/schemas/connections/suites/expectations"
 )
 
@@ -31,14 +31,14 @@ type Suites interface {
 type SuiteBuilder interface {
 	Create() SuiteBuilder
 	WithName(name string) SuiteBuilder
-	WithReference(reference references.Reference) SuiteBuilder
-	WithExpectation(expectation expectations.Expectation) SuiteBuilder
+	WithLink(link links.Link) SuiteBuilder
+	WithExpectations(expectation expectations.Expectations) SuiteBuilder
 	Now() (Suite, error)
 }
 
 // Suite represents a suite
 type Suite interface {
 	Name() string
-	Reference() references.Reference
-	Expectation() expectations.Expectation
+	Link() links.Link
+	Expectations() expectations.Expectations
 }

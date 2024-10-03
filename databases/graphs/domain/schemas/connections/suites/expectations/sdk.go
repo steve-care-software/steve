@@ -7,11 +7,28 @@ func NewBuilder() Builder {
 	return createBuilder()
 }
 
-// Builder represents the expectation builder
+// NewExpectationBuilder creates a new expectation builder
+func NewExpectationBuilder() ExpectationBuilder {
+	return createExpectationBuilder()
+}
+
+// Builder represents the expectations builder
 type Builder interface {
 	Create() Builder
-	WithReferences(references references.References) Builder
-	IsFail() Builder
+	WithList(list []Expectation) Builder
+	Now() (Expectations, error)
+}
+
+// Expectations represents expectations
+type Expectations interface {
+	List() []Expectation
+}
+
+// ExpectationBuilder represents the expectation builder
+type ExpectationBuilder interface {
+	Create() ExpectationBuilder
+	WithReferences(references references.References) ExpectationBuilder
+	IsFail() ExpectationBuilder
 	Now() (Expectation, error)
 }
 

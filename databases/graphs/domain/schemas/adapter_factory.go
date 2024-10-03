@@ -26,7 +26,8 @@ type adapterFactory struct {
 	connectionBuilder       connections.ConnectionBuilder
 	suitesBuilder           suites.Builder
 	suiteBuilder            suites.SuiteBuilder
-	expectationBuilder      expectations.Builder
+	expectationsBuilder     expectations.Builder
+	expectationBuilder      expectations.ExpectationBuilder
 	linksBuilder            links.Builder
 	linkBuilder             links.LinkBuilder
 	referencesBuilder       references.Builder
@@ -48,7 +49,8 @@ func createAdapterFactory(
 	connectionBuilder connections.ConnectionBuilder,
 	suitesBuilder suites.Builder,
 	suiteBuilder suites.SuiteBuilder,
-	expectationBuilder expectations.Builder,
+	expectationsBuilder expectations.Builder,
+	expectationBuilder expectations.ExpectationBuilder,
 	linksBuilder links.Builder,
 	linkBuilder links.LinkBuilder,
 	referencesBuilder references.Builder,
@@ -69,6 +71,7 @@ func createAdapterFactory(
 		connectionBuilder:       connectionBuilder,
 		suitesBuilder:           suitesBuilder,
 		suiteBuilder:            suiteBuilder,
+		expectationsBuilder:     expectationsBuilder,
 		expectationBuilder:      expectationBuilder,
 		linksBuilder:            linksBuilder,
 		linkBuilder:             linkBuilder,
@@ -105,6 +108,7 @@ func (app *adapterFactory) Create() (Adapter, error) {
 		app.connectionBuilder,
 		app.suitesBuilder,
 		app.suiteBuilder,
+		app.expectationsBuilder,
 		app.expectationBuilder,
 		app.linksBuilder,
 		app.linkBuilder,

@@ -215,6 +215,7 @@ func fetchGrammarInput() []byte {
 						---
 							valid: "
 								!(.son .father .external[grandFather] .grandGrandFather);
+								!(.son .father .external[grandFather] .grandGrandFather);
 								(.son .father .external[grandFather] .grandGrandFather);
 								!(.son .father .external[grandFather] .grandGrandFather);
 								(.son .father .external[grandFather] .grandGrandFather);

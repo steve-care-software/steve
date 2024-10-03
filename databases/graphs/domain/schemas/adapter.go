@@ -30,7 +30,8 @@ type adapter struct {
 	connectionBuilder       connections.ConnectionBuilder
 	suitesBuilder           suites.Builder
 	suiteBuilder            suites.SuiteBuilder
-	expectationBuilder      expectations.Builder
+	expectationsBuilder     expectations.Builder
+	expectationBuilder      expectations.ExpectationBuilder
 	linksBuilder            links.Builder
 	linkBuilder             links.LinkBuilder
 	referencesBuilder       references.Builder
@@ -51,7 +52,8 @@ func createAdapter(
 	connectionBuilder connections.ConnectionBuilder,
 	suitesBuilder suites.Builder,
 	suiteBuilder suites.SuiteBuilder,
-	expectationBuilder expectations.Builder,
+	expectationsBuilder expectations.Builder,
+	expectationBuilder expectations.ExpectationBuilder,
 	linksBuilder links.Builder,
 	linkBuilder links.LinkBuilder,
 	referencesBuilder references.Builder,
@@ -71,6 +73,7 @@ func createAdapter(
 		connectionBuilder:       connectionBuilder,
 		suitesBuilder:           suitesBuilder,
 		suiteBuilder:            suiteBuilder,
+		expectationsBuilder:     expectationsBuilder,
 		expectationBuilder:      expectationBuilder,
 		linksBuilder:            linksBuilder,
 		linkBuilder:             linkBuilder,
@@ -244,8 +247,151 @@ func (app *adapter) connection(tokens instructions.Tokens) (connections.Connecti
 		WithHeader(retHeader).
 		WithLinks(retLinks)
 
+	retSuites, err := app.suites(tokens)
+	if err == nil {
+		builder.WithSuites(retSuites)
+	}
+
 	return builder.Now()
 
+}
+
+func (app *adapter) suites(tokens instructions.Tokens) (suites.Suites, error) {
+	retElements, _, err := app.query(tokens, []byte(`
+		v1;
+		name: mySelector;
+		pointSuitesBlock[0][0]->pointSuites[0][0]->pointSuite;
+	`))
+
+	if err != nil {
+		return nil, err
+	}
+
+	output := []suites.Suite{}
+	list := retElements.List()
+	for _, oneElement := range list {
+		retTokens, err := app.elementToTokens(oneElement)
+		if err != nil {
+			return nil, err
+		}
+
+		retLink, err := app.suite(retTokens)
+		if err != nil {
+			return nil, err
+		}
+
+		output = append(output, retLink)
+	}
+
+	return app.suitesBuilder.Create().
+		WithList(output).
+		Now()
+}
+
+func (app *adapter) suite(tokens instructions.Tokens) (suites.Suite, error) {
+	_, retNameElement, err := app.query(tokens, []byte(`
+		v1;
+		name: mySelector;
+		variableName[0][0];
+	`))
+
+	if err != nil {
+		return nil, err
+	}
+
+	retReferenceElements, _, err := app.query(tokens, []byte(`
+		v1;
+		name: mySelector;
+		pointReference;
+	`))
+
+	if err != nil {
+		return nil, err
+	}
+
+	retLink, err := app.link(retReferenceElements)
+	if err != nil {
+		return nil, err
+	}
+
+	retExpectations, err := app.expectations(tokens)
+	if err != nil {
+		return nil, err
+	}
+
+	return app.suiteBuilder.Create().
+		WithName(string(retNameElement.Value())).
+		WithLink(retLink).
+		WithExpectations(retExpectations).
+		Now()
+}
+
+func (app *adapter) expectations(tokens instructions.Tokens) (expectations.Expectations, error) {
+	retElements, _, err := app.query(tokens, []byte(`
+		v1;
+		name: mySelector;
+		suiteInstructions[0][0]->suiteOptionInstruction;
+	`))
+
+	if err != nil {
+		return nil, err
+	}
+
+	output := []expectations.Expectation{}
+	list := retElements.List()
+	for _, oneElement := range list {
+		retTokens, err := app.elementToTokens(oneElement)
+		if err != nil {
+			return nil, err
+		}
+
+		retExpectation, err := app.expectation(retTokens)
+		if err != nil {
+			return nil, err
+		}
+
+		output = append(output, retExpectation)
+	}
+
+	return app.expectationsBuilder.Create().
+		WithList(output).
+		Now()
+}
+
+func (app *adapter) expectation(tokens instructions.Tokens) (expectations.Expectation, error) {
+	retFail, _, err := app.query(tokens, []byte(`
+		v1;
+		name: mySelector;
+		suiteOption[0][0]->suiteInvalidLink[0][0]->suiteReferencesInParenthesis[0][0]->pointReferences[0][0]->pointReference;
+	`))
+
+	builder := app.expectationBuilder.Create()
+	if err == nil {
+		retReferences, err := app.references(retFail)
+		if err != nil {
+			return nil, err
+		}
+
+		builder.IsFail().
+			WithReferences(retReferences)
+	}
+
+	retSuccess, _, err := app.query(tokens, []byte(`
+		v1;
+		name: mySelector;
+		suiteOption[0][0]->suiteReferencesInParenthesis[0][0]->pointReferences[0][0]->pointReference;
+	`))
+
+	if err == nil {
+		retReferences, err := app.references(retSuccess)
+		if err != nil {
+			return nil, err
+		}
+
+		builder.WithReferences(retReferences)
+	}
+
+	return builder.Now()
 }
 
 func (app *adapter) links(tokens instructions.Tokens) (links.Links, error) {
@@ -337,6 +483,28 @@ func (app *adapter) link(elements instructions.Elements) (links.Link, error) {
 
 	return builder.Now()
 
+}
+
+func (app *adapter) references(elements instructions.Elements) (references.References, error) {
+	output := []references.Reference{}
+	list := elements.List()
+	for _, oneElement := range list {
+		retTokens, err := app.elementToTokens(oneElement)
+		if err != nil {
+			return nil, err
+		}
+
+		retReferemce, err := app.reference(retTokens)
+		if err != nil {
+			return nil, err
+		}
+
+		output = append(output, retReferemce)
+	}
+
+	return app.referencesBuilder.Create().
+		WithList(output).
+		Now()
 }
 
 func (app *adapter) reference(tokens instructions.Tokens) (references.Reference, error) {
