@@ -27,3 +27,8 @@ func (obj *token) Name() string {
 func (obj *token) Elements() Elements {
 	return obj.elements
 }
+
+// Value returns the value of the token
+func (obj *token) Value() []byte {
+	return obj.elements.Value()
+}

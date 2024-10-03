@@ -34,3 +34,13 @@ func (obj *elements) Fetch(idx uint) (Element, error) {
 
 	return obj.list[idx], nil
 }
+
+// Value returns the value of the elements
+func (obj *elements) Value() []byte {
+	output := []byte{}
+	for _, oneElement := range obj.list {
+		output = append(output, oneElement.Value()...)
+	}
+
+	return output
+}

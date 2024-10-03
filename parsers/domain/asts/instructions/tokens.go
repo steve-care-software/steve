@@ -31,6 +31,16 @@ func (obj *tokens) List() []Token {
 	return obj.list
 }
 
+// Value returns the value of the tokens
+func (obj *tokens) Value() []byte {
+	output := []byte{}
+	for _, oneToken := range obj.list {
+		output = append(output, oneToken.Value()...)
+	}
+
+	return output
+}
+
 // Fetch fetches a token by name and index
 func (obj *tokens) Fetch(name string, idx uint) (Token, error) {
 	if ins, ok := obj.mp[name]; ok {
@@ -45,6 +55,49 @@ func (obj *tokens) Fetch(name string, idx uint) (Token, error) {
 
 	str := fmt.Sprintf("the token (name: %s) does not exists", name)
 	return nil, errors.New(str)
+}
+
+// Select executes a select query
+func (obj *tokens) Select(chain chains.Chain) (Elements, Element, error) {
+	elementName := chain.Element().Name()
+	if chain.HasToken() {
+		chainToken := chain.Token()
+		tokenIndex := chainToken.Index()
+		retToken, err := obj.Fetch(elementName, tokenIndex)
+		if err != nil {
+			return nil, nil, err
+		}
+
+		if chainToken.HasElement() {
+			chainElement := chainToken.Element()
+			elementIndex := chainElement.Index()
+			retElement, err := retToken.Elements().Fetch(elementIndex)
+			if err != nil {
+				return nil, nil, err
+			}
+
+			if chainElement.HasChain() {
+				retChain := chainElement.Chain()
+				if retElement.IsConstant() {
+					return nil, nil, errors.New("the element was expected to contain an Instruction")
+				}
+
+				return retElement.Instruction().Tokens().Select(retChain)
+			}
+
+			return nil, retElement, nil
+
+		}
+
+		return retToken.Elements(), nil, nil
+	}
+
+	retToken, err := obj.Fetch(elementName, 0)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return retToken.Elements(), nil, nil
 }
 
 // Search search for instruction/token by name

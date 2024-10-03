@@ -8,7 +8,6 @@ import (
 	"github.com/steve-care-software/steve/engine/domain/scripts/specifics/pipelines"
 	"github.com/steve-care-software/steve/engine/domain/scripts/specifics/programs"
 	"github.com/steve-care-software/steve/engine/domain/scripts/specifics/roots"
-	"github.com/steve-care-software/steve/engine/domain/scripts/specifics/schemas"
 	"github.com/steve-care-software/steve/engine/domain/scripts/specifics/transpiles"
 )
 
@@ -16,7 +15,6 @@ type script struct {
 	hash      hash.Hash
 	grammar   grammars.Grammar
 	transpile transpiles.Transpile
-	schema    schemas.Schema
 	context   contexts.Context
 	bridge    bridges.Bridge
 	program   programs.Program
@@ -31,7 +29,6 @@ func createScriptWithGrammar(
 	return createScriptInternally(
 		hash,
 		grammar,
-		nil,
 		nil,
 		nil,
 		nil,
@@ -54,24 +51,6 @@ func createScriptWithTranspile(
 		nil,
 		nil,
 		nil,
-		nil,
-	)
-}
-
-func createScriptWithSchema(
-	hash hash.Hash,
-	schema schemas.Schema,
-) Script {
-	return createScriptInternally(
-		hash,
-		nil,
-		nil,
-		schema,
-		nil,
-		nil,
-		nil,
-		nil,
-		nil,
 	)
 }
 
@@ -81,7 +60,6 @@ func createScriptWithContext(
 ) Script {
 	return createScriptInternally(
 		hash,
-		nil,
 		nil,
 		nil,
 		context,
@@ -98,7 +76,6 @@ func createScriptWithBridge(
 ) Script {
 	return createScriptInternally(
 		hash,
-		nil,
 		nil,
 		nil,
 		nil,
@@ -119,7 +96,6 @@ func createScriptWithProgram(
 		nil,
 		nil,
 		nil,
-		nil,
 		program,
 		nil,
 		nil,
@@ -132,7 +108,6 @@ func createScriptWithPipeline(
 ) Script {
 	return createScriptInternally(
 		hash,
-		nil,
 		nil,
 		nil,
 		nil,
@@ -155,7 +130,6 @@ func createScriptWithRoot(
 		nil,
 		nil,
 		nil,
-		nil,
 		root,
 	)
 }
@@ -164,7 +138,6 @@ func createScriptInternally(
 	hash hash.Hash,
 	grammar grammars.Grammar,
 	transpile transpiles.Transpile,
-	schema schemas.Schema,
 	context contexts.Context,
 	bridge bridges.Bridge,
 	program programs.Program,
@@ -175,7 +148,6 @@ func createScriptInternally(
 		hash:      hash,
 		grammar:   grammar,
 		transpile: transpile,
-		schema:    schema,
 		context:   context,
 		bridge:    bridge,
 		program:   program,
@@ -209,16 +181,6 @@ func (obj *script) IsTranspile() bool {
 // Transpile returns the transpile, if any
 func (obj *script) Transpile() transpiles.Transpile {
 	return obj.transpile
-}
-
-// IsSchema returns true if there is a schema, false otherwise
-func (obj *script) IsSchema() bool {
-	return obj.schema != nil
-}
-
-// Schema returns the schema, if any
-func (obj *script) Schema() schemas.Schema {
-	return obj.schema
 }
 
 // IsContext returns true if there is a context, false otherwise
