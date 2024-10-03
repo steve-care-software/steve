@@ -100,19 +100,20 @@ func fetchGrammarInput() []byte {
 							";
 						;
 
-		connectionHeader: .nameWithCardinality .variableNameInBracket?
-					---
-						name: "father";
-						withCardinality: "father+";
-						nameWithReverse: "father(son)";
-					;
+		connectionHeader: .nameWithCardinality .variableNameInParenthesis?
+						---
+							name: "father";
+							withCardinality: "father+";
+							nameWithReverse: "father(son)";
+							nameWithReverseCardinality: "father[0,2](son[0,])";
+						;
 
-		variableNameInBracket: .PARENTHESIS_OPEN .nameWithCardinality .PARENTHESIS_CLOSE
-							---
-								valid: "(myVariable)";
-								withCardinality: "(myVariable+)";
-								withBracketCardinality: "(myVariable[0,])";
-							;
+		variableNameInParenthesis: .PARENTHESIS_OPEN .nameWithCardinality .PARENTHESIS_CLOSE
+								---
+									valid: "(myVariable)";
+									withCardinality: "(myVariable+)";
+									withBracketCardinality: "(myVariable[0,])";
+								;
 
 		nameWithCardinality: .variableName .cardinality?
 							---

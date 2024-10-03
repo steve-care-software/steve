@@ -87,7 +87,7 @@ type Tokens interface {
 	List() []Token
 	Value() []byte
 	Fetch(name string, index uint) (Token, error)
-	Select(chain chains.Chain) (Element, error)
+	Select(chain chains.Chain) (Elements, Element, error)
 	IsBalanceValid(balance balances.Balance) bool
 	IsSelectorValid(selector selectors.Selector) bool
 	IsChainValid(chain chains.Chain) bool

@@ -58,14 +58,14 @@ func (obj *tokens) Fetch(name string, idx uint) (Token, error) {
 }
 
 // Select executes a select query
-func (obj *tokens) Select(chain chains.Chain) (Element, error) {
+func (obj *tokens) Select(chain chains.Chain) (Elements, Element, error) {
 	elementName := chain.Element().Name()
 	if chain.HasToken() {
 		chainToken := chain.Token()
 		tokenIndex := chainToken.Index()
 		retToken, err := obj.Fetch(elementName, tokenIndex)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 
 		if chainToken.HasElement() {
@@ -73,31 +73,31 @@ func (obj *tokens) Select(chain chains.Chain) (Element, error) {
 			elementIndex := chainElement.Index()
 			retElement, err := retToken.Elements().Fetch(elementIndex)
 			if err != nil {
-				return nil, err
+				return nil, nil, err
 			}
 
 			if chainElement.HasChain() {
 				retChain := chainElement.Chain()
 				if retElement.IsConstant() {
-					return nil, errors.New("the element was expected to contain an Instruction")
+					return nil, nil, errors.New("the element was expected to contain an Instruction")
 				}
 
 				return retElement.Instruction().Tokens().Select(retChain)
 			}
 
-			return retElement, nil
+			return nil, retElement, nil
 
 		}
 
-		return retToken.Elements().Fetch(0)
+		return retToken.Elements(), nil, nil
 	}
 
 	retToken, err := obj.Fetch(elementName, 0)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return retToken.Elements().Fetch(0)
+	return retToken.Elements(), nil, nil
 }
 
 // Search search for instruction/token by name

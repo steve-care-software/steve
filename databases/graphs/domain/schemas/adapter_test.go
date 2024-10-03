@@ -1,7 +1,7 @@
 package schemas
 
 import (
-	"errors"
+	"bytes"
 	"testing"
 )
 
@@ -14,12 +14,16 @@ func TestAdapter_Success(t *testing.T) {
 
 	input := []byte(`
 		v1;
-		name: myName;
+		name: mySchema;
 
 		son;
 		father;
 		grandFather;
 		grandGrandFather;
+
+		father[1](son[0,]): .mySchema[son] .grandFather
+							| .father .grandGrandFather
+							;
 
 		father[0,3](son+): .son .father
 							| .father .grandFather
@@ -31,16 +35,36 @@ func TestAdapter_Success(t *testing.T) {
 								;
 							;
 
-		grandFather(grandSon[2,]): .son .grandFather
+		grandFather?(grandSon[2,]): .son .grandFather
+								| .father .grandGrandFather
+								;
+
+		grandFather(grandSon*): .son .grandFather
 								| .father .grandGrandFather
 								;
 	`)
 
-	_, _, err = adapter.ToSchema(input)
+	remaining := []byte("this is the remaining")
+
+	retSchema, retRemaining, err := adapter.ToSchema(append(input, remaining...))
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
 	}
 
-	panic(errors.New("stop"))
+	if !bytes.Equal(remaining, retRemaining) {
+		t.Errorf("the returned remaining is invalid")
+		return
+	}
+
+	header := retSchema.Header()
+	if header.Version() != 1 {
+		t.Errorf("the version was expected to be %d, %d returned", 1, header.Version())
+		return
+	}
+
+	if header.Name() != "mySchema" {
+		t.Errorf("the name was expected to be '%s', '%s' returned", "mySchema", header.Name())
+		return
+	}
 }

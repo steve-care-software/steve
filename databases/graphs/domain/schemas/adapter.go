@@ -131,7 +131,7 @@ func (app *adapter) schema(element instructions.Element) (Schema, error) {
 }
 
 func (app *adapter) head(tokens instructions.Tokens) (headers.Header, error) {
-	retVersionBytes, err := app.query(tokens, []byte(`
+	retVersionElements, _, err := app.query(tokens, []byte(`
 		v1;
 		name: mySelector;
 		head[0][0]->versionInstruction[0][0]->numbers;
@@ -141,7 +141,7 @@ func (app *adapter) head(tokens instructions.Tokens) (headers.Header, error) {
 		return nil, err
 	}
 
-	retNameBytes, err := app.query(tokens, []byte(`
+	retNameElements, _, err := app.query(tokens, []byte(`
 		v1;
 		name: mySelector;
 		head[0][0]->nameInstruction[0][0]->variableName;
@@ -151,46 +151,451 @@ func (app *adapter) head(tokens instructions.Tokens) (headers.Header, error) {
 		return nil, err
 	}
 
-	version, err := strconv.Atoi(string(retVersionBytes))
+	version, err := strconv.Atoi(string(retVersionElements.Value()))
 	if err != nil {
 		return nil, err
 	}
 
 	return app.headerBuilder.Create().
-		WithName(string(retNameBytes)).
+		WithName(string(retNameElements.Value())).
 		WithVersion(uint(version)).
 		Now()
 }
 
-func (app *adapter) query(tokens instructions.Tokens, script []byte) ([]byte, error) {
-	query, remaining, err := app.queryAdapter.ToQuery(script)
+func (app *adapter) points(tokens instructions.Tokens) ([]string, error) {
+	retElements, _, err := app.query(tokens, []byte(`
+		v1;
+		name: mySelector;
+		instructionPoints[0][0]->instructionPoint;
+	`))
+
 	if err != nil {
 		return nil, err
+	}
+
+	output := []string{}
+	elementsList := retElements.List()
+	for _, oneElement := range elementsList {
+		retTokens, err := app.elementToTokens(oneElement)
+		if err != nil {
+			return nil, err
+		}
+
+		tokensList := retTokens.List()
+		for _, oneToken := range tokensList {
+			element, err := oneToken.Elements().Fetch(0)
+			if err != nil {
+				return nil, err
+			}
+
+			if element.Name() == "variableName" {
+				output = append(output, string(element.Value()))
+			}
+		}
+	}
+
+	return output, nil
+}
+
+func (app *adapter) connections(tokens instructions.Tokens) (connections.Connections, error) {
+	retElements, _, err := app.query(tokens, []byte(`
+		v1;
+		name: mySelector;
+		connectionBlocks[0][0]->connectionBlock;
+	`))
+
+	if err != nil {
+		return nil, err
+	}
+
+	output := []connections.Connection{}
+	elementsList := retElements.List()
+	for _, oneElement := range elementsList {
+		retTokens, err := app.elementToTokens(oneElement)
+		if err != nil {
+			return nil, err
+		}
+
+		retConnection, err := app.connection(retTokens)
+		if err != nil {
+			return nil, err
+		}
+
+		output = append(output, retConnection)
+	}
+
+	return app.connectionsBuilder.Create().
+		WithList(output).
+		Now()
+}
+
+func (app *adapter) connection(tokens instructions.Tokens) (connections.Connection, error) {
+	retHeader, err := app.header(tokens)
+	if err != nil {
+		return nil, err
+	}
+
+	retLinks, err := app.links(tokens)
+	if err != nil {
+		return nil, err
+	}
+
+	builder := app.connectionBuilder.Create().
+		WithHeader(retHeader).
+		WithLinks(retLinks)
+
+	return builder.Now()
+
+}
+
+func (app *adapter) links(tokens instructions.Tokens) (links.Links, error) {
+	retElements, _, err := app.query(tokens, []byte(`
+		v1;
+		name: mySelector;
+		links[0][0]->link[0][0]->pointReference;
+	`))
+
+	if err == nil {
+		link, err := app.link(retElements)
+		if err != nil {
+			return nil, err
+		}
+
+		return app.linksBuilder.Create().WithList([]links.Link{
+			link,
+		}).Now()
+	}
+
+	retElements, _, err = app.query(tokens, []byte(`
+		v1;
+		name: mySelector;
+		links[0][0]->pipeJourney;
+	`))
+
+	if err != nil {
+		return nil, err
+	}
+
+	output := []links.Link{}
+	list := retElements.List()
+	for _, oneElement := range list {
+		retTokens, err := app.elementToTokens(oneElement)
+		if err != nil {
+			return nil, err
+		}
+
+		retElements, _, err = app.query(retTokens, []byte(`
+			v1;
+			name: mySelector;
+			links;
+		`))
+
+		if err != nil {
+			return nil, err
+		}
+
+		retLink, err := app.link(retElements)
+		if err != nil {
+			return nil, err
+		}
+
+		output = append(output, retLink)
+	}
+
+	return app.linksBuilder.Create().
+		WithList(output).
+		Now()
+
+}
+
+func (app *adapter) link(elements instructions.Elements) (links.Link, error) {
+	list := elements.List()
+	if len(list) != 2 {
+		str := fmt.Sprintf("%d references were expected in the link, %d provided", 2, len(list))
+		return nil, errors.New(str)
+	}
+
+	builder := app.linkBuilder.Create()
+	for idx, oneElement := range list {
+		retTokens, err := app.elementToTokens(oneElement)
+		if err != nil {
+			return nil, err
+		}
+
+		retReference, err := app.reference(retTokens)
+		if err != nil {
+			return nil, err
+		}
+
+		if idx <= 0 {
+			builder.WithOrigin(retReference)
+			continue
+		}
+
+		builder.WithTarget(retReference)
+	}
+
+	return builder.Now()
+
+}
+
+func (app *adapter) reference(tokens instructions.Tokens) (references.Reference, error) {
+	_, retElement, err := app.query(tokens, []byte(`
+		v1;
+		name: mySelector;
+		reference[0][0]->variableName[0][0];
+	`))
+
+	if err == nil {
+		return app.referenceBuilder.Create().
+			WithInternal(string(retElement.Name())).
+			Now()
+	}
+
+	_, retSchemaElement, err := app.query(tokens, []byte(`
+		v1;
+		name: mySelector;
+		externalPointReference[0][0]->reference[0][0]->variableName[0][0];
+	`))
+
+	if err != nil {
+		return nil, err
+	}
+
+	_, retPointElement, err := app.query(tokens, []byte(`
+		v1;
+		name: mySelector;
+		externalPointReference[0][0]->variableName[0][0];
+	`))
+
+	if err != nil {
+		return nil, err
+	}
+
+	external, err := app.externalBuilder.Create().
+		WithSchema(string(retSchemaElement.Value())).
+		WithPoint(string(retPointElement.Value())).
+		Now()
+
+	if err != nil {
+		return nil, err
+	}
+
+	return app.referenceBuilder.Create().
+		WithExternal(external).
+		Now()
+
+}
+
+func (app *adapter) header(tokens instructions.Tokens) (connection_headers.Header, error) {
+	name, err := app.name(tokens)
+	if err != nil {
+		return nil, err
+	}
+
+	builder := app.connectionHeaderBuilder.Create().WithName(name)
+	reverse, err := app.reverse(tokens)
+	if err == nil {
+		builder.WithReverse(reverse)
+	}
+
+	return builder.Now()
+}
+
+func (app *adapter) reverse(tokens instructions.Tokens) (names.Name, error) {
+	_, retElement, err := app.query(tokens, []byte(`
+		v1;
+		name: mySelector;
+		connectionHeader[0][0]->variableNameInParenthesis[0][0]->nameWithCardinality[0][0];
+	`))
+
+	if err != nil {
+		return nil, err
+	}
+
+	builder := app.nameBuilder.Create().
+		WithName(string(retElement.Value()))
+
+	retCardinality, err := app.cardinality(tokens)
+	if err == nil {
+		builder.WithCardinality(retCardinality)
+	}
+
+	return builder.Now()
+}
+
+func (app *adapter) name(tokens instructions.Tokens) (names.Name, error) {
+	_, retElement, err := app.query(tokens, []byte(`
+		v1;
+		name: mySelector;
+		connectionHeader[0][0]->nameWithCardinality[0][0]->variableName[0][0];
+	`))
+
+	if err != nil {
+		return nil, err
+	}
+
+	builder := app.nameBuilder.Create().
+		WithName(string(retElement.Value()))
+
+	retCardinality, err := app.cardinality(tokens)
+	if err == nil {
+		builder.WithCardinality(retCardinality)
+	}
+
+	return builder.Now()
+}
+
+func (app *adapter) cardinality(tokens instructions.Tokens) (cardinalities.Cardinality, error) {
+	retMinMax, err := app.cardinalityMinMax(tokens)
+	if err == nil {
+		return retMinMax, nil
+	}
+
+	retMinNoMax, err := app.cardinalityMinNoMax(tokens)
+	if err == nil {
+		return retMinNoMax, nil
+	}
+
+	retSpecific, err := app.cardinalitySpecific(tokens)
+	if err == nil {
+		return retSpecific, nil
+	}
+
+	retSymbol, err := app.cardinalitySymbol(tokens)
+	if err == nil {
+		return retSymbol, nil
+	}
+
+	return app.cardinalityBuilder.Create().
+		WithMin(uint(1)).
+		WithMax(uint(1)).
+		Now()
+}
+
+func (app *adapter) cardinalitySymbol(tokens instructions.Tokens) (cardinalities.Cardinality, error) {
+	_, _, err := app.query(tokens, []byte(`
+	v1;
+	name: mySelector;
+	cardinality[0][0]->INTERROGATION_POINT[0][0];
+`))
+
+	builder := app.cardinalityBuilder.Create()
+	if err == nil {
+		return builder.WithMin(0).WithMax(uint(1)).Now()
+	}
+
+	_, _, err = app.query(tokens, []byte(`
+	v1;
+	name: mySelector;
+	cardinality[0][0]->STAR[0][0];
+`))
+
+	if err == nil {
+		return builder.WithMin(0).Now()
+	}
+
+	_, _, err = app.query(tokens, []byte(`
+	v1;
+	name: mySelector;
+	cardinality[0][0]->PLUS[0][0];
+`))
+
+	if err != nil {
+		return nil, err
+	}
+
+	return builder.WithMin(1).Now()
+}
+
+func (app *adapter) cardinalitySpecific(tokens instructions.Tokens) (cardinalities.Cardinality, error) {
+	_, retMinElement, err := app.query(tokens, []byte(`
+		v1;
+		name: mySelector;
+		cardinality[0][0]->cardinalityBracketOption[0][0]->cardinalityNumberOptions[0][0]->numbers[0][0];
+	`))
+
+	if err != nil {
+		return nil, err
+	}
+
+	specific, err := strconv.Atoi(string(retMinElement.Value()))
+	if err != nil {
+		return nil, err
+	}
+
+	return app.cardinalityBuilder.Create().
+		WithMin(uint(specific)).
+		WithMax(uint(specific)).
+		Now()
+}
+
+func (app *adapter) cardinalityMinNoMax(tokens instructions.Tokens) (cardinalities.Cardinality, error) {
+	_, retMinElement, err := app.query(tokens, []byte(`
+		v1;
+		name: mySelector;
+		cardinality[0][0]->cardinalityBracketOption[0][0]->cardinalityNumberOptions[0][0]->minComma[0][0]->numbers[0][0];
+	`))
+
+	if err != nil {
+		return nil, err
+	}
+
+	min, err := strconv.Atoi(string(retMinElement.Value()))
+	if err != nil {
+		return nil, err
+	}
+
+	return app.cardinalityBuilder.Create().WithMin(uint(min)).Now()
+}
+
+func (app *adapter) cardinalityMinMax(tokens instructions.Tokens) (cardinalities.Cardinality, error) {
+	_, retMinElement, err := app.query(tokens, []byte(`
+		v1;
+		name: mySelector;
+		cardinality[0][0]->cardinalityBracketOption[0][0]->cardinalityNumberOptions[0][0]->minMax[0][0]->minComma[0][0]->numbers[0][0];
+	`))
+
+	if err != nil {
+		return nil, err
+	}
+
+	min, err := strconv.Atoi(string(retMinElement.Value()))
+	if err != nil {
+		return nil, err
+	}
+
+	_, retMaxElement, err := app.query(tokens, []byte(`
+		v1;
+		name: mySelector;
+		cardinality[0][0]->cardinalityBracketOption[0][0]->cardinalityNumberOptions[0][0]->minMax[0][0]->numbers[0][0];
+	`))
+
+	if err != nil {
+		return nil, err
+	}
+
+	max, err := strconv.Atoi(string(retMaxElement.Value()))
+	if err != nil {
+		return nil, err
+	}
+
+	return app.cardinalityBuilder.Create().WithMin(uint(min)).WithMax(uint(max)).Now()
+}
+
+func (app *adapter) query(tokens instructions.Tokens, script []byte) (instructions.Elements, instructions.Element, error) {
+	query, remaining, err := app.queryAdapter.ToQuery(script)
+	if err != nil {
+		return nil, nil, err
 	}
 
 	if len(remaining) > 0 {
 		str := fmt.Sprintf("the script (%s) contains a remaining (%s)", script, remaining)
-		return nil, errors.New(str)
+		return nil, nil, errors.New(str)
 	}
 
 	chain := query.Chain()
-	retElement, err := tokens.Select(chain)
-	if err != nil {
-		return nil, err
-	}
-
-	return retElement.Value(), nil
-}
-
-func (app *adapter) points(tokens instructions.Tokens) ([]string, error) {
-	fmt.Printf("\n%v\n", tokens)
-
-	panic(errors.New("stop"))
-	return nil, nil
-}
-
-func (app *adapter) connections(tokens instructions.Tokens) (connections.Connections, error) {
-	return nil, nil
+	return tokens.Select(chain)
 }
 
 func (app *adapter) tokenToFirstInstructionTokens(token instructions.Token) (instructions.Tokens, error) {
