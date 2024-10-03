@@ -85,8 +85,8 @@ type TokensBuilder interface {
 // Tokens represents tokens
 type Tokens interface {
 	List() []Token
+	Value() []byte
 	Fetch(name string, index uint) (Token, error)
-	Search(name string, idx uint) (Token, error)
 	IsBalanceValid(balance balances.Balance) bool
 	IsSelectorValid(selector selectors.Selector) bool
 	IsChainValid(chain chains.Chain) bool
@@ -104,6 +104,7 @@ type TokenBuilder interface {
 type Token interface {
 	Name() string
 	Elements() Elements
+	Value() []byte
 }
 
 // ElementsAdapter represents the elements adapter
@@ -123,6 +124,7 @@ type ElementsBuilder interface {
 type Elements interface {
 	List() []Element
 	Fetch(idx uint) (Element, error)
+	Value() []byte
 }
 
 // ElementBuilder represents the element builder
@@ -136,6 +138,7 @@ type ElementBuilder interface {
 // Element represents an element
 type Element interface {
 	Name() string
+	Value() []byte
 	IsChainValid(chain chains.Chain) bool
 	IsConstant() bool
 	Constant() Constant

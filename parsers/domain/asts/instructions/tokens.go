@@ -31,6 +31,16 @@ func (obj *tokens) List() []Token {
 	return obj.list
 }
 
+// Value returns the value of the tokens
+func (obj *tokens) Value() []byte {
+	output := []byte{}
+	for _, oneToken := range obj.list {
+		output = append(output, oneToken.Value()...)
+	}
+
+	return output
+}
+
 // Fetch fetches a token by name and index
 func (obj *tokens) Fetch(name string, idx uint) (Token, error) {
 	if ins, ok := obj.mp[name]; ok {

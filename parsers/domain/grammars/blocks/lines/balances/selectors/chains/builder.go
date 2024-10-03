@@ -43,10 +43,6 @@ func (app *builder) Now() (Chain, error) {
 		return nil, errors.New("the element is mandatory in order to build a Chain instance")
 	}
 
-	if app.token == nil {
-		return nil, errors.New("the token is mandatory in order to build a Chain instance")
-	}
-
 	if app.token != nil {
 		return createChainWithToken(
 			app.element,
