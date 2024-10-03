@@ -18,10 +18,12 @@ import (
 	"github.com/steve-care-software/steve/parsers/domain/asts"
 	"github.com/steve-care-software/steve/parsers/domain/asts/instructions"
 	"github.com/steve-care-software/steve/parsers/domain/grammars"
+	"github.com/steve-care-software/steve/parsers/domain/queries"
 )
 
 type adapter struct {
 	astAdapter              asts.Adapter
+	queryAdapter            queries.Adapter
 	builder                 Builder
 	headerBuilder           headers.Builder
 	connectionsBuilder      connections.Builder
@@ -42,6 +44,7 @@ type adapter struct {
 
 func createAdapter(
 	astAdapter asts.Adapter,
+	queryAdapter queries.Adapter,
 	builder Builder,
 	headerBuilder headers.Builder,
 	connectionsBuilder connections.Builder,
@@ -61,6 +64,7 @@ func createAdapter(
 ) Adapter {
 	out := adapter{
 		astAdapter:              astAdapter,
+		queryAdapter:            queryAdapter,
 		builder:                 builder,
 		headerBuilder:           headerBuilder,
 		connectionsBuilder:      connectionsBuilder,
@@ -104,32 +108,17 @@ func (app *adapter) schema(element instructions.Element) (Schema, error) {
 		return nil, err
 	}
 
-	retHeadToken, err := tokens.Fetch("head", 0)
+	retHead, err := app.head(tokens)
 	if err != nil {
 		return nil, err
 	}
 
-	retPointsToken, err := tokens.Fetch("instructionPoints", 0)
+	retPoints, err := app.points(tokens)
 	if err != nil {
 		return nil, err
 	}
 
-	retConnectionsToken, err := tokens.Fetch("connectionBlocks", 0)
-	if err != nil {
-		return nil, err
-	}
-
-	retHead, err := app.head(retHeadToken)
-	if err != nil {
-		return nil, err
-	}
-
-	retPoints, err := app.points(retPointsToken)
-	if err != nil {
-		return nil, err
-	}
-
-	retConnections, err := app.connections(retConnectionsToken)
+	retConnections, err := app.connections(tokens)
 	if err != nil {
 		return nil, err
 	}
@@ -141,46 +130,66 @@ func (app *adapter) schema(element instructions.Element) (Schema, error) {
 		Now()
 }
 
-func (app *adapter) head(token instructions.Token) (headers.Header, error) {
-	tokens, err := app.tokenToFirstInstructionTokens(token)
+func (app *adapter) head(tokens instructions.Tokens) (headers.Header, error) {
+	retVersionBytes, err := app.query(tokens, []byte(`
+		v1;
+		name: mySelector;
+		head[0][0]->versionInstruction[0][0]->numbers;
+	`))
+
 	if err != nil {
 		return nil, err
 	}
 
-	retVersionToken, err := tokens.Fetch("versionInstruction", 0)
+	retNameBytes, err := app.query(tokens, []byte(`
+		v1;
+		name: mySelector;
+		head[0][0]->nameInstruction[0][0]->variableName;
+	`))
+
 	if err != nil {
 		return nil, err
 	}
 
-	versionNumber, err := app.versionInstruction(retVersionToken)
+	version, err := strconv.Atoi(string(retVersionBytes))
 	if err != nil {
 		return nil, err
 	}
 
-	fmt.Printf("\nhead: %d\n", versionNumber)
+	return app.headerBuilder.Create().
+		WithName(string(retNameBytes)).
+		WithVersion(uint(version)).
+		Now()
+}
+
+func (app *adapter) query(tokens instructions.Tokens, script []byte) ([]byte, error) {
+	query, remaining, err := app.queryAdapter.ToQuery(script)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(remaining) > 0 {
+		str := fmt.Sprintf("the script (%s) contains a remaining (%s)", script, remaining)
+		return nil, errors.New(str)
+	}
+
+	chain := query.Chain()
+	retElement, err := tokens.Select(chain)
+	if err != nil {
+		return nil, err
+	}
+
+	return retElement.Value(), nil
+}
+
+func (app *adapter) points(tokens instructions.Tokens) ([]string, error) {
+	fmt.Printf("\n%v\n", tokens)
+
+	panic(errors.New("stop"))
 	return nil, nil
 }
 
-func (app *adapter) versionInstruction(token instructions.Token) (int, error) {
-	tokens, err := app.tokenToFirstInstructionTokens(token)
-	if err != nil {
-		return 0, err
-	}
-
-	retNumberToken, err := tokens.Fetch("numbers", 0)
-	if err != nil {
-		return 0, err
-	}
-
-	retBytes := retNumberToken.Value()
-	return strconv.Atoi(string(retBytes))
-}
-
-func (app *adapter) points(token instructions.Token) ([]string, error) {
-	return nil, nil
-}
-
-func (app *adapter) connections(token instructions.Token) (connections.Connections, error) {
+func (app *adapter) connections(tokens instructions.Tokens) (connections.Connections, error) {
 	return nil, nil
 }
 

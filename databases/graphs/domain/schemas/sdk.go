@@ -13,12 +13,14 @@ import (
 	"github.com/steve-care-software/steve/databases/graphs/domain/schemas/headers"
 	"github.com/steve-care-software/steve/parsers/domain/asts"
 	"github.com/steve-care-software/steve/parsers/domain/grammars"
+	"github.com/steve-care-software/steve/parsers/domain/queries"
 )
 
 // NewAdapterFactory creates a new adapter factory
 func NewAdapterFactory() AdapterFactory {
 	astAdapter := asts.NewAdapter()
 	parserAdapter := grammars.NewAdapter()
+	queryAdapterFactory := queries.NewAdapterFactory()
 	builder := NewBuilder()
 	headerBuilder := headers.NewBuilder()
 	connectionsBuilder := connections.NewBuilder()
@@ -38,6 +40,7 @@ func NewAdapterFactory() AdapterFactory {
 	return createAdapterFactory(
 		astAdapter,
 		parserAdapter,
+		queryAdapterFactory,
 		builder,
 		headerBuilder,
 		connectionsBuilder,

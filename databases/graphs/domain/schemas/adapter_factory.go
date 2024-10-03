@@ -13,11 +13,13 @@ import (
 	"github.com/steve-care-software/steve/databases/graphs/domain/schemas/headers"
 	"github.com/steve-care-software/steve/parsers/domain/asts"
 	"github.com/steve-care-software/steve/parsers/domain/grammars"
+	"github.com/steve-care-software/steve/parsers/domain/queries"
 )
 
 type adapterFactory struct {
 	astAdapter              asts.Adapter
 	parserAdapter           grammars.Adapter
+	queryAdapterFactory     queries.AdapterFactory
 	builder                 Builder
 	headerBuilder           headers.Builder
 	connectionsBuilder      connections.Builder
@@ -39,6 +41,7 @@ type adapterFactory struct {
 func createAdapterFactory(
 	astAdapter asts.Adapter,
 	parserAdapter grammars.Adapter,
+	queryAdapterFactory queries.AdapterFactory,
 	builder Builder,
 	headerBuilder headers.Builder,
 	connectionsBuilder connections.Builder,
@@ -59,6 +62,7 @@ func createAdapterFactory(
 	out := adapterFactory{
 		astAdapter:              astAdapter,
 		parserAdapter:           parserAdapter,
+		queryAdapterFactory:     queryAdapterFactory,
 		builder:                 builder,
 		headerBuilder:           headerBuilder,
 		connectionsBuilder:      connectionsBuilder,
@@ -87,8 +91,14 @@ func (app *adapterFactory) Create() (Adapter, error) {
 		return nil, err
 	}
 
+	queryAdapter, err := app.queryAdapterFactory.Create()
+	if err != nil {
+		return nil, err
+	}
+
 	return createAdapter(
 		app.astAdapter,
+		queryAdapter,
 		app.builder,
 		app.headerBuilder,
 		app.connectionsBuilder,
