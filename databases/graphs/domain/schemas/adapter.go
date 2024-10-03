@@ -184,17 +184,17 @@ func (app *adapter) points(tokens instructions.Tokens) ([]string, error) {
 			return nil, err
 		}
 
-		tokensList := retTokens.List()
-		for _, oneToken := range tokensList {
-			element, err := oneToken.Elements().Fetch(0)
-			if err != nil {
-				return nil, err
-			}
+		_, retElement, err := app.query(retTokens, []byte(`
+			v1;
+			name: mySelector;
+			variableName[0][0];
+		`))
 
-			if element.Name() == "variableName" {
-				output = append(output, string(element.Value()))
-			}
+		if err != nil {
+			return nil, err
 		}
+
+		output = append(output, string(retElement.Value()))
 	}
 
 	return output, nil
