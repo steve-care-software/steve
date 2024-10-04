@@ -86,10 +86,37 @@ func fetchGrammarInput() []byte {
 				;
 
 		assignable: .programCall
+				  | .queryWrite
+				  | .querySelect
 				  | .keyValues
 				  | .primitiveValue
 				  | .variableName
 					---
+						queryWrite: "
+							delete:
+								.mySchema[myPoint];
+								.myOtherSchema[myOtherPoint];
+							;
+						";
+
+						querySelect: "
+							select:
+								.mySchema[myPoint];
+								.mySchema[mySecondPoint];
+								condition:
+									(
+										.mySchema[myPoint]: @myVariable <> 
+											.mySchema[secondPoint]: @myOtherVar
+									) && (
+											.mySchema[other]: @myVariable || (
+												.mySchema[myPoint]: @myVariable && 
+													.mySchema[secondPoint]: @myOtherVar
+											)
+										)
+								;
+							;
+						";
+
 						map: "
 								myKeyname: 34;
 								second:
