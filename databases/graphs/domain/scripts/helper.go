@@ -160,6 +160,10 @@ func fetchGrammarInput() []byte {
 					casting: "
 						float32 myFloat := myInt.(float32);
 					";
+
+					selector: "
+							selector mySelector := ->myChain[0][0]->myChain[0][0]->myChain[0][0]->_myConstant;
+						";
 				;
 
 		assignmentSymbol: .COLON? .EQUAL
@@ -188,7 +192,8 @@ func fetchGrammarInput() []byte {
 		assignableOptions: .assignable .commaAssignable*;
 		commaAssignable: .COMMA .assignable;
 
-		assignable: .queryInsertUpdate
+		assignable: .selector
+				  | .queryInsertUpdate
 				  | .queryDelete
 				  | .querySelect
 				  | .queryBridges
@@ -278,7 +283,71 @@ func fetchGrammarInput() []byte {
 						primitive: "34.0";
 						variable: "myVariable";
 						casting: "myVariable.(float32)";
+
+						selector: "
+							->myChain[0][0]->myChain[0][0]->myChain[0][0]->RULE
+						";
 					;
+
+		selector: .ARROW .chain
+				---
+					valid: "->myChain[0][0]->myChain[0][0]->myChain[0][0]->RULE";
+				;
+
+		chain: .elementName .selectorToken?
+			---
+				index: "myChain";
+				withToken: "myChain[0]";
+				withTokenElement: "myChain[0][0]";
+				withTokenElementChain: "myChain[0][0]->myToken";
+				complex: "myChain[0][0]->myChain[0][0]->myChain[0][0]->RULE";
+			;
+
+		selectorToken: .index .selectorElement?
+					---
+						index: "[0]";
+						withElement: "[0][1]->myToken";
+					;
+
+		selectorElement: .index .selector?
+				---
+					index: "[0]";
+					withChain: "[0]->myToken";
+				;
+
+		elementName: .variableName
+					| .constantName
+					| .ruleName
+					---
+						block: "myBlock";
+						constant: "_myConstant";
+						rule: "MY_RULE";
+					;
+
+		constantName: .UNDERSCORE .variableName
+					---
+						valid: "_myConstant";
+					;
+
+		index: .BRACKET_OPEN .numbers .BRACKET_CLOSE
+					---
+						zero: "[0]";
+						anyNumber: "[23]";
+					;
+
+		ruleName: .oneUpperCaseLetter .ruleNameCharacter+
+				---
+					oneCharacter: !"A";
+					valid: "MY_RULE";
+					beginWithUnderscore: !"_A";
+				;
+
+		ruleNameCharacter: .oneUpperCaseLetter
+						 | .UNDERSCORE
+						 ---
+						 	letter: "A";
+							underscore: "_";
+						 ;
 
 		variableCasting: .variableName .DOT .PARENTHESIS_OPEN .type .PARENTHESIS_CLOSE
 						---
@@ -433,6 +502,7 @@ func fetchGrammarInput() []byte {
 					;
 
 		engineType: .SELECTOR
+				  | .AST
 				  | .ROUTE
 				  | .SELECT
 				  | .INSERT
@@ -441,6 +511,7 @@ func fetchGrammarInput() []byte {
 				  | .BRIDGES
 				  ---
 						selector: "selector";
+						ast: "ast";
 						select: "select";
 						route: "route";
 						insert: "insert";
@@ -1044,6 +1115,7 @@ func fetchGrammarInput() []byte {
 		SLASH: "/";
 		EQUAL: "=";
 		PERCENT: "%";
+		UNDERSCORE: "_";
 
 		NAME: "name";
 		SELECT: "select";
@@ -1062,10 +1134,12 @@ func fetchGrammarInput() []byte {
 		SET: "set";
 		SORTED_SET: "sortedSet";
 		SELECTOR: "selector";
+		AST: "ast";
 		ROUTE: "route";
 		BRIDGES: "bridges";
 		TRUE: "true";
 		FALSE: "false";
 		IF: "if";
+		ARROW: "->";
 	`)
 }
