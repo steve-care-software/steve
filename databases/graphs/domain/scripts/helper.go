@@ -32,6 +32,38 @@ func fetchGrammarInput() []byte {
 						;
 					";
 
+					querySelect: "
+							select mySelect :=
+								.mySchema[myPoint];
+								.mySchema[mySecondPoint];
+								condition:
+									(
+										.mySchema[myPoint]: @myVariable <> 
+											.mySchema[secondPoint]: @myOtherVar
+									) && (
+											.mySchema[other]: @myVariable || (
+												.mySchema[myPoint]: @myVariable && 
+													.mySchema[secondPoint]: @myOtherVar
+											)
+										)
+								;
+							;
+						";
+
+					bridges: "
+							bridges myBridge :=
+								22:
+									.myOriginSchema[myPoint]: @myOtherValue;
+									.myTargetSchea[myPoint]: @myValue;
+								;
+
+								43:
+									.myOriginSchema[myPoint]: @myOtherValue;
+									.myTargetSchea[myPoint]: @myValue;
+								;
+							;
+						";
+
 					map: "
 						map myMap := [
 							myKeyname: 34;
@@ -77,23 +109,35 @@ func fetchGrammarInput() []byte {
 		assignableOptions: .assignable .commaAssignable*;
 		commaAssignable: .COMMA .assignable;
 
-		assignable: .queryWrite
+		assignable: .queryInsertUpdate
 				  | .querySelect
+				  | .queryBridges
 				  | .map
 				  | .programCall
 				  | .primitiveValue
 				  | .variableCasting
 				  | .variableName
 					---
-						queryWrite: "
-							delete:
+						queryDelete: "
 								.mySchema[myPoint];
 								.myOtherSchema[myOtherPoint];
 							
 						";
 
+						queryBridge: "
+								22:
+									.myOriginSchema[myPoint]: @myOtherValue;
+									.myTargetSchea[myPoint]: @myValue;
+								;
+
+								43:
+									.myOriginSchema[myPoint]: @myOtherValue;
+									.myTargetSchea[myPoint]: @myValue;
+								;
+							
+						";
+
 						querySelect: "
-							select:
 								.mySchema[myPoint];
 								.mySchema[mySecondPoint];
 								condition:
@@ -297,17 +341,19 @@ func fetchGrammarInput() []byte {
 
 		engineType: .SELECTOR
 				  | .ROUTE
+				  | .SELECT
 				  | .INSERT
 				  | .UPDATE
 				  | .DELETE
-				  | .IDENTITY
+				  | .BRIDGES
 				  ---
 						selector: "selector";
+						select: "select";
 						route: "route";
 						insert: "insert";
 						update: "update";
 						delete: "delete";
-						identity: "identity";
+						bridges: "bridges";
 				  ;
 		
 		primitiveType: .numericType
@@ -383,18 +429,16 @@ func fetchGrammarInput() []byte {
 					valid: "16";
 				;
 
-		queryWrite: .queryAssignmentWrite
+		queryInsertUpdate: .queryAssignmentWrite
 				  | .queryDelete
 				  ---
 				  		delete: "
-							delete:
 								.mySchema[myPoint];
 								.myOtherSchema[myOtherPoint];
 							
 						";
 
 						assignmentWrite: "
-							insert:
 								.mySchema[myPoint]:
 									.mySubSchema[mySubPoint]: @myVariable;
 									.mySubSchema[other]: @myVariable;
@@ -406,10 +450,9 @@ func fetchGrammarInput() []byte {
 						";
 				  ;
 
-		queryDelete: .DELETE .COLON .pointReferenceLines .condition?
+		queryDelete: .pointReferenceLines .condition?
 					---
 						withCondition: "
-							delete:
 								.mySchema[myPoint];
 								condition:
 									.mySchema[myPoint]: @myVariable && 
@@ -419,17 +462,15 @@ func fetchGrammarInput() []byte {
 						";
 
 						withoutCondition: "
-							delete:
 								.mySchema[myPoint];
 								.myOtherSchema[myOtherPoint];
 							
 						";
 					;
 
-		queryAssignmentWrite: .queryWriteKeyword .COLON .queryAssignment .condition?
+		queryAssignmentWrite: .queryAssignment .condition?
 						---
-							insertWithCondition: "
-								insert:
+							withCondition: "
 									.mySchema[myPoint]:
 										.mySubSchema[mySubPoint]: @myVariable;
 										.mySubSchema[other]: @myVariable;
@@ -452,32 +493,7 @@ func fetchGrammarInput() []byte {
 								
 							";
 
-							updateWithCondition: "
-								update:
-									.mySchema[myPoint]:
-										.mySubSchema[mySubPoint]: @myVariable;
-										.mySubSchema[other]: @myVariable;
-										.mySubSchema[third]: 
-											.mySubSchema[mySubPoint]: @myVariable;
-										;
-									;
-
-									condition:
-										(
-											.mySchema[myPoint]: @myVariable <> 
-												.mySchema[secondPoint]: @myOtherVar
-										) && (
-												.mySchema[other]: @myVariable || (
-													.mySchema[myPoint]: @myVariable && 
-														.mySchema[secondPoint]: @myOtherVar
-												)
-											)
-									;
-								
-							";
-
-							insertWithoutCondition: "
-								insert:
+							withoutCondition: "
 									.mySchema[myPoint]:
 										.mySubSchema[mySubPoint]: @myVariable;
 										.mySubSchema[other]: @myVariable;
@@ -487,25 +503,6 @@ func fetchGrammarInput() []byte {
 									;
 								
 							";
-
-							updateWithoutCondition: "
-								update:
-									.mySchema[myPoint]:
-										.mySubSchema[mySubPoint]: @myVariable;
-										.mySubSchema[other]: @myVariable;
-										.mySubSchema[third]: 
-											.mySubSchema[mySubPoint]: @myVariable;
-										;
-									;
-								
-							";
-						;
-		
-		queryWriteKeyword: .INSERT
-						| .UPDATE
-						---
-							insert: "insert";
-							update: "update";
 						;
 
 		queryAssignment: .externalPointReference .COLON .queryAssignable+ .SEMI_COLON
@@ -535,10 +532,9 @@ func fetchGrammarInput() []byte {
 						| .queryAssignment
 						;
 
-		querySelect: .SELECT .COLON .pointReferenceLines .condition?
+		querySelect:.pointReferenceLines .condition?
 				---
 					withCondition: "
-							select:
 								.mySchema[myPoint];
 								.mySchema[mySecondPoint];
 								condition:
@@ -556,7 +552,6 @@ func fetchGrammarInput() []byte {
 					";
 
 					withoutCondition: "
-							select:
 								.mySchema[myPoint];
 								.mySchema[mySecondPoint];
 							
@@ -640,6 +635,36 @@ func fetchGrammarInput() []byte {
 							and: "&&";
 							or: "||";
 							xor: "<>";
+						;
+
+		queryBridges: .bridgeWeight+
+					---
+						valid: "
+								22:
+									.myOriginSchema[myPoint]: @myOtherValue;
+									.myTargetSchea[myPoint]: @myValue;
+								;
+
+								43:
+									.myOriginSchema[myPoint]: @myOtherValue;
+									.myTargetSchea[myPoint]: @myValue;
+								;
+						";
+					;
+
+		bridgeWeight: .numbers .COLON .queryVariableLine[2] .SEMI_COLON
+					---
+						valid: "
+							22:
+								.myOriginSchema[myPoint]: @myOtherValue;
+								.myTargetSchea[myPoint]: @myValue;
+							;
+						";
+					;
+
+		queryVariableLine: .queryVariable .SEMI_COLON
+						---
+							valid: ".mySchema[myPoint]: @myVariable;";
 						;
 
 		queryVariable: .externalPointReference .COLON .queryVariableName
@@ -963,7 +988,7 @@ func fetchGrammarInput() []byte {
 		SORTED_SET: "sortedSet";
 		SELECTOR: "selector";
 		ROUTE: "route";
-		IDENTITY: "identity";
+		BRIDGES: "bridges";
 		TRUE: "true";
 		FALSE: "false";
 	`)
