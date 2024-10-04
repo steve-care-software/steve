@@ -6,6 +6,21 @@ func fetchGrammarInput() []byte {
 		> .reference;
 		# .SPACE .TAB .EOL;
 
+		instructions: .instruction+;
+
+		instruction: .assignment
+				   | .conditionalInstructions
+				   ;
+
+		conditionalInstructions: .IF .operation .COLON .instructions .SEMI_COLON
+								---
+									valid: "
+										if (myValue > 12):
+											uint8 myVariable = 14;
+										;
+									";
+								;
+
 		operation: .assignable .operatorAssignable*
 				 | .PARENTHESIS_OPEN .operation .PARENTHESIS_CLOSE
 				---
@@ -1026,5 +1041,6 @@ func fetchGrammarInput() []byte {
 		BRIDGES: "bridges";
 		TRUE: "true";
 		FALSE: "false";
+		IF: "if";
 	`)
 }
