@@ -6,6 +6,118 @@ func fetchGrammarInput() []byte {
 		> .reference;
 		# .SPACE .TAB .EOL;
 
+		type: .engineType
+			| .primitiveType
+			| .containerType
+			---
+				engine: "selector";
+				primitive: "bool";
+				container: "map[string]";
+				complex: "map[list[set[sortedSet[string]]]]";
+			;
+
+		containerType: .containerName .BRACKET_OPEN .type .BRACKET_CLOSE
+					---
+						complex: "map[list[set[sortedSet[string]]]]";
+					;
+		
+		containerName: .MAP
+					| .LIST
+					| .SET
+					| .SORTED_SET
+					---
+						map: "map";
+						list: "list";
+						set: "set";
+						sortedSet: "sortedSet";
+					;
+
+		engineType: .SELECTOR
+				  | .ROUTE
+				  | .INSERT
+				  | .UPDATE
+				  | .DELETE
+				  ---
+						selector: "selector";
+						route: "route";
+						insert: "insert";
+						update: "update";
+						delete: "delete";
+				  ;
+		
+		primitiveType: .numericType
+					| .BOOL
+					| .STRING
+					---
+						numeric: "int16";
+						bool: "bool";
+						string: "string";
+					;
+
+		numericType: .floatType
+					| .intType
+					| .uintType
+					---
+						int: "int8";
+						uint: "uint16";
+						float: "float32";
+					;
+
+		floatType: .FLOAT .floatSize
+				---
+					thirtyTwo: "float32";
+					sixtyFour: "float64";
+				;
+		
+		floatSize: .thirtyTwo
+				| .sixtyFour
+				---
+					thirtyTwo: "32";
+					sixtyFour: "64";
+				;
+
+		intType: .INT .intSize
+				---
+					height: "int8";
+					sixteen: "int16";
+					thirtyTwo: "int32";
+					sixtyFour: "int64";
+				;
+
+		uintType: .UINT .intSize
+				---
+					height: "uint8";
+					sixteen: "uint16";
+					thirtyTwo: "uint32";
+					sixtyFour: "uint64";
+				;
+
+		intSize: .N_HEIGHT
+				| .sixteen
+				| .thirtyTwo
+				| .sixtyFour
+				---
+					height: "8";
+					sixteen: "16";
+					thirtyTwo: "32";
+					sixtyFour: "64";
+				;
+
+		sixtyFour: .N_SIX .N_FOUR
+				---
+					valid: "64";
+				;
+
+		thirtyTwo: .N_THREE .N_TWO
+				---
+					valid: "32";
+				;
+
+		sixteen: .N_ONE .N_SIX
+				---
+					valid: "16";
+				;
+
 		queryWrite: .queryAssignmentWrite
 				  | .queryDelete
 				  ---
@@ -566,5 +678,17 @@ func fetchGrammarInput() []byte {
 		UPDATE: "update";
 		DELETE: "delete";
 		DROP: "drop";
+		INT: "int";
+		UINT: "uint";
+		FLOAT: "float";
+		BOOL: "bool";
+		STRING: "string";
+		MAP: "map";
+		LIST: "list";
+		SET: "set";
+		SORTED_SET: "sortedSet";
+
+		SELECTOR: "selector";
+		ROUTE: "route";
 	`)
 }
