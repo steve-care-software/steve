@@ -6,80 +6,123 @@ func fetchGrammarInput() []byte {
 		> .reference;
 		# .SPACE .TAB .EOL;
 
-		queryWrite: .queryWriteKeyword .COLON .queryAssignment .condition? .SEMI_COLON
+		queryWrite: .queryAssignmentWrite
+				  | .queryDelete
+				  ---
+				  		delete: "
+							delete:
+								.mySchema[myPoint];
+								.myOtherSchema[myOtherPoint];
+							;
+						";
+
+						assignmentWrite: "
+							insert:
+								.mySchema[myPoint]:
+									.mySubSchema[mySubPoint]: @myVariable;
+									.mySubSchema[other]: @myVariable;
+									.mySubSchema[third]: 
+										.mySubSchema[mySubPoint]: @myVariable;
+									;
+								;
+							;
+						";
+				  ;
+
+		queryDelete: .DELETE .COLON .pointReferenceLines .condition? .SEMI_COLON
 					---
-						insertWithCondition: "
-							insert:
-								.mySchema[myPoint]:
-									.mySubSchema[mySubPoint]: @myVariable;
-									.mySubSchema[other]: @myVariable;
-									.mySubSchema[third]: 
-										.mySubSchema[mySubPoint]: @myVariable;
-									;
-								;
-
+						withCondition: "
+							delete:
+								.mySchema[myPoint];
 								condition:
-									(
-										.mySchema[myPoint]: @myVariable <> 
-											.mySchema[secondPoint]: @myOtherVar
-									) && (
-											.mySchema[other]: @myVariable || (
-												.mySchema[myPoint]: @myVariable && 
-													.mySchema[secondPoint]: @myOtherVar
-											)
-										)
+									.mySchema[myPoint]: @myVariable && 
+										.mySchema[secondPoint]: @myOtherVar
 								;
 							;
 						";
 
-						updateWithCondition: "
-							update:
-								.mySchema[myPoint]:
-									.mySubSchema[mySubPoint]: @myVariable;
-									.mySubSchema[other]: @myVariable;
-									.mySubSchema[third]: 
-										.mySubSchema[mySubPoint]: @myVariable;
-									;
-								;
-
-								condition:
-									(
-										.mySchema[myPoint]: @myVariable <> 
-											.mySchema[secondPoint]: @myOtherVar
-									) && (
-											.mySchema[other]: @myVariable || (
-												.mySchema[myPoint]: @myVariable && 
-													.mySchema[secondPoint]: @myOtherVar
-											)
-										)
-								;
-							;
-						";
-
-						insertWithoutCondition: "
-							insert:
-								.mySchema[myPoint]:
-									.mySubSchema[mySubPoint]: @myVariable;
-									.mySubSchema[other]: @myVariable;
-									.mySubSchema[third]: 
-										.mySubSchema[mySubPoint]: @myVariable;
-									;
-								;
-							;
-						";
-
-						updateWithoutCondition: "
-							update:
-								.mySchema[myPoint]:
-									.mySubSchema[mySubPoint]: @myVariable;
-									.mySubSchema[other]: @myVariable;
-									.mySubSchema[third]: 
-										.mySubSchema[mySubPoint]: @myVariable;
-									;
-								;
+						withoutCondition: "
+							delete:
+								.mySchema[myPoint];
+								.myOtherSchema[myOtherPoint];
 							;
 						";
 					;
+
+		queryAssignmentWrite: .queryWriteKeyword .COLON .queryAssignment .condition? .SEMI_COLON
+						---
+							insertWithCondition: "
+								insert:
+									.mySchema[myPoint]:
+										.mySubSchema[mySubPoint]: @myVariable;
+										.mySubSchema[other]: @myVariable;
+										.mySubSchema[third]: 
+											.mySubSchema[mySubPoint]: @myVariable;
+										;
+									;
+
+									condition:
+										(
+											.mySchema[myPoint]: @myVariable <> 
+												.mySchema[secondPoint]: @myOtherVar
+										) && (
+												.mySchema[other]: @myVariable || (
+													.mySchema[myPoint]: @myVariable && 
+														.mySchema[secondPoint]: @myOtherVar
+												)
+											)
+									;
+								;
+							";
+
+							updateWithCondition: "
+								update:
+									.mySchema[myPoint]:
+										.mySubSchema[mySubPoint]: @myVariable;
+										.mySubSchema[other]: @myVariable;
+										.mySubSchema[third]: 
+											.mySubSchema[mySubPoint]: @myVariable;
+										;
+									;
+
+									condition:
+										(
+											.mySchema[myPoint]: @myVariable <> 
+												.mySchema[secondPoint]: @myOtherVar
+										) && (
+												.mySchema[other]: @myVariable || (
+													.mySchema[myPoint]: @myVariable && 
+														.mySchema[secondPoint]: @myOtherVar
+												)
+											)
+									;
+								;
+							";
+
+							insertWithoutCondition: "
+								insert:
+									.mySchema[myPoint]:
+										.mySubSchema[mySubPoint]: @myVariable;
+										.mySubSchema[other]: @myVariable;
+										.mySubSchema[third]: 
+											.mySubSchema[mySubPoint]: @myVariable;
+										;
+									;
+								;
+							";
+
+							updateWithoutCondition: "
+								update:
+									.mySchema[myPoint]:
+										.mySubSchema[mySubPoint]: @myVariable;
+										.mySubSchema[other]: @myVariable;
+										.mySubSchema[third]: 
+											.mySubSchema[mySubPoint]: @myVariable;
+										;
+									;
+								;
+							";
+						;
 		
 		queryWriteKeyword: .INSERT
 						| .UPDATE
@@ -521,5 +564,7 @@ func fetchGrammarInput() []byte {
 		CONDITION: "condition";
 		INSERT: "insert";
 		UPDATE: "update";
+		DELETE: "delete";
+		DROP: "drop";
 	`)
 }
