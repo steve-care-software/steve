@@ -806,7 +806,7 @@ func fetchGrammarInput() []byte {
 					";
 				;
 
-		condition: .CONDITION .COLON .conditionClause .SEMI_COLON
+		condition: .CONDITION .COLON .operationCondition .SEMI_COLON
 				---
 					valid: "
 						condition: 
@@ -823,7 +823,8 @@ func fetchGrammarInput() []byte {
 					";
 				;
 
-		conditionClause: .conditionElement .logicalOperator .conditionElement
+		operationCondition: .conditionElement .operatorConditionClause*
+					   | .PARENTHESIS_OPEN .operationCondition .PARENTHESIS_CLOSE
 						---
 							and: "
 								.mySchema[myPoint]: @myVariable && .mySchema[secondPoint]: @myOtherVar
@@ -846,12 +847,15 @@ func fetchGrammarInput() []byte {
 											.mySchema[myPoint]: @myVariable && 
 												.mySchema[secondPoint]: @myOtherVar
 										)
-									)
+									) && .mySchema[myPoint]: @myVariable
 							";
 						;
 
-		conditionElement: .PARENTHESIS_OPEN .conditionClause .PARENTHESIS_CLOSE
-						| .queryVariable
+		operatorConditionClause: .logicalOperator .conditionElement;
+		
+
+		conditionElement: .queryVariable
+						| .PARENTHESIS_OPEN .operationCondition .PARENTHESIS_CLOSE
 						---
 							variable: "
 								.mySchema[myPoint]: @myVariable
