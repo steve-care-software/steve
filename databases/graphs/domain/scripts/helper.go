@@ -10,6 +10,31 @@ func fetchGrammarInput() []byte {
 
 		instruction: .assignment
 				   | .conditionalInstructions
+				   | .programCall
+					---
+						conditionalInstrcuctions: "
+							if (myValue > 12):
+								uint8 myVariable = 14;
+							;
+						";
+
+						assignment: "
+							uint8 myVariable = 14;
+						";
+
+						programCall: "
+							.first .second .third: [
+								myKeyname: 34;
+								again: [
+									voila: true;
+									again: [
+										number: 23;
+										again: 23;
+									];
+									third: true;
+								];
+							]
+						";
 				   ;
 
 		conditionalInstructions: .IF .operation .COLON .instructions .SEMI_COLON
