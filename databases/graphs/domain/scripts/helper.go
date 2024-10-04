@@ -6,9 +6,83 @@ func fetchGrammarInput() []byte {
 		> .reference;
 		# .SPACE .TAB .EOL;
 
-		assignable: .variableName
+		assignment: .type? .assignee .assignmentSymbol .assignableLine
+				---
+					simple: "
+						uint8 myVariable := 8;
+					";
+
+					map: "
+						map myMap :=
+							myKeyname: 34;
+							second:
+								other: true;
+								yes:
+									sub: false;
+									other: true;
+								;
+							;
+						;
+					";
+
+					reAssignment: "
+						myMap =
+							myKeyname: 34;
+							second:
+								other: true;
+								yes:
+									sub: false;
+									other: true;
+								;
+							;
+						;
+					";
+				;
+
+		assignmentSymbol: .COLON? .EQUAL
+						---
+							assignment: ":=";
+							reAssignment: "=";
+						;
+
+		assignee: .variableName
 				---
 					variable: "myVariable";
+				;
+
+		assignable: .keyValues
+				  | .primitiveValue
+				  | .variableName
+					---
+						map: "
+								myKeyname: 34;
+								second:
+									other: true;
+									yes:
+										sub: false;
+										other: true;
+									;
+								;
+						";
+						primitive: "34.0";
+						variable: "myVariable";
+					;
+
+		assignableLine: .assignable .SEMI_COLON;
+
+		keyValues: .keyValue+
+				---
+					valid: "
+						myKeyname: 34;
+						secondKey: \"some value\";
+					";
+				;
+
+		keyValue: .variableName .COLON .assignable .SEMI_COLON
+				---
+					simple: "
+						myKeyname: 34;
+					";
 				;
 
 		primitiveValue: .numericValue
@@ -57,24 +131,24 @@ func fetchGrammarInput() []byte {
 		type: .engineType
 			| .primitiveType
 			| .containerType
+			| .MAP
 			---
 				engine: "selector";
 				primitive: "bool";
-				container: "map[string]";
-				complex: "map[list[set[sortedSet[string]]]]";
+				container: "set[string]";
+				complex: "set[list[set[sortedSet[string]]]]";
+				map: "map";
 			;
 
 		containerType: .containerName .BRACKET_OPEN .type .BRACKET_CLOSE
 					---
-						complex: "map[list[set[sortedSet[string]]]]";
+						complex: "set[list[set[sortedSet[string]]]]";
 					;
 		
-		containerName: .MAP
-					| .LIST
+		containerName: .LIST
 					| .SET
 					| .SORTED_SET
 					---
-						map: "map";
 						list: "list";
 						set: "set";
 						sortedSet: "sortedSet";
@@ -722,6 +796,7 @@ func fetchGrammarInput() []byte {
 		XOR: "<>";
 		QUOTE: "\"";
 		BACKSLASH: "\\";
+		EQUAL: "=";
 
 		NAME: "name";
 		SELECT: "select";
