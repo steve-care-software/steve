@@ -6,6 +6,54 @@ func fetchGrammarInput() []byte {
 		> .reference;
 		# .SPACE .TAB .EOL;
 
+		assignable: .variableName
+				---
+					variable: "myVariable";
+				;
+
+		primitiveValue: .numericValue
+					  | .boolValue
+					  | .stringValue
+					  ---
+					  		numeric: "34.0";
+							bool: "true";
+							string: "\"this is 13 string values!\"";
+					  ;
+
+		numericValue: .floatValue
+					| .intValue
+					---
+						negativeFloat: "-34.0";
+						float: "34.0";
+
+						negativeInt: "-34";
+						int: "34";
+					;
+
+		boolValue: .TRUE
+				| .FALSE
+				---
+					true: "true";
+					false: "false";
+				;
+
+		stringValue: .QUOTE ![.BACKSLASH].QUOTE .QUOTE
+					---
+						stringInQuotes: "\"this is 13 \\\" string values!\"";
+					;
+
+		floatValue: .intValue .DOT .numbers
+				---
+					negative: "-34.0";
+					positive: "34.0";
+				;
+
+		intValue: .HYPHEN? .numbers
+				---
+					negative: "-45";
+					positive: "-45";
+				;
+
 		type: .engineType
 			| .primitiveType
 			| .containerType
@@ -37,12 +85,14 @@ func fetchGrammarInput() []byte {
 				  | .INSERT
 				  | .UPDATE
 				  | .DELETE
+				  | .IDENTITY
 				  ---
 						selector: "selector";
 						route: "route";
 						insert: "insert";
 						update: "update";
 						delete: "delete";
+						identity: "identity";
 				  ;
 		
 		primitiveType: .numericType
@@ -670,6 +720,8 @@ func fetchGrammarInput() []byte {
 		AND: "&&";
 		OR: "||";
 		XOR: "<>";
+		QUOTE: "\"";
+		BACKSLASH: "\\";
 
 		NAME: "name";
 		SELECT: "select";
@@ -687,8 +739,10 @@ func fetchGrammarInput() []byte {
 		LIST: "list";
 		SET: "set";
 		SORTED_SET: "sortedSet";
-
 		SELECTOR: "selector";
 		ROUTE: "route";
+		IDENTITY: "identity";
+		TRUE: "true";
+		FALSE: "false";
 	`)
 }
