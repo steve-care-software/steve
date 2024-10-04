@@ -10,7 +10,8 @@ func fetchGrammarInput() []byte {
 
 		instruction: .assignment
 				   | .conditionalInstructions
-				   | .programCall
+				   | .programCallInstruction
+				   | .forInstruction
 					---
 						conditionalInstrcuctions: "
 							if (myValue > 12):
@@ -33,9 +34,101 @@ func fetchGrammarInput() []byte {
 									];
 									third: true;
 								];
-							]
+							];
+						";
+
+						for: "
+							for i->5:
+								myValue = (myValue + 1);
+							;
 						";
 				   ;
+
+		programCallInstruction: .programCall .SEMI_COLON;
+
+		forInstruction: .forIndex
+					  | .forKeyValue
+					  ---
+						index: "
+							for i->5:
+								myValue = (myValue + 1);
+							;
+						";
+
+						keyValue: "
+							for keyname, _ := myVariable:
+								uint8 myValue := 78;
+							;
+						";
+					  ;
+
+		forIndex: .FOR .forUntilClause? .COLON .instructions .SEMI_COLON
+				---
+					withUntilClause: "
+						for i->5:
+							myValue = (myValue + 1);
+						;
+					";
+
+					withoutUntilClause: "
+						for:
+							myValue = (myValue + 1);
+						;
+					";
+				;
+
+		forUntilClause: .variableName .ARROW .numbers 
+						---
+							valid: "i->5";
+						;
+
+		forKeyValue: .FOR .variableCommaVariable .firstAssignmentSymbol .iterable .COLON .instructions .SEMI_COLON
+					---
+						variable: "
+								for _, myValue := myVariable:
+									uint8 myValue := 78;
+								;
+						";
+
+						map: "
+								for _, myValue := [
+									myVariable: 12;
+									other: [
+										yes: true;
+										other: false;
+									];
+								]:
+									uint8 myValue := 78;
+								;
+						";
+					;
+		
+		variableCommaVariable: .forKeyValueName .COMMA .forKeyValueName;
+
+		forKeyValueName: .variableName
+					   | .UNDERSCORE
+					   ;
+
+		iterable: .listMap
+				| .variableName
+				---
+					map: "
+						[
+							myKeyname: 34;
+							again: [
+								voila: true;
+							];
+						]
+					";
+
+					list: "
+						[
+							23,
+							25,
+							33
+						]
+					";
+				;
 
 		conditionalInstructions: .IF .operation .COLON .instructions .SEMI_COLON
 								---
@@ -166,7 +259,13 @@ func fetchGrammarInput() []byte {
 						";
 				;
 
-		assignmentSymbol: .COLON? .EQUAL
+		firstAssignmentSymbol: .COLON .EQUAL
+							---
+								assignment: ":=";
+							;
+
+		assignmentSymbol: .firstAssignmentSymbol
+						| .EQUAL
 						---
 							assignment: ":=";
 							reAssignment: "=";
@@ -197,7 +296,7 @@ func fetchGrammarInput() []byte {
 				  | .queryDelete
 				  | .querySelect
 				  | .queryBridges
-				  | .map
+				  | .listMap
 				  | .programCall
 				  | .primitiveValue
 				  | .variableCasting
@@ -380,6 +479,12 @@ func fetchGrammarInput() []byte {
 							]
 						";
 					;
+
+		listMap: .map
+				| .list
+				;
+
+		list: .BRACKET_OPEN .assignableOptions .BRACKET_CLOSE;
 
 		colonMap: .COLON .map;
 
@@ -1141,5 +1246,6 @@ func fetchGrammarInput() []byte {
 		FALSE: "false";
 		IF: "if";
 		ARROW: "->";
+		FOR: "for";
 	`)
 }
