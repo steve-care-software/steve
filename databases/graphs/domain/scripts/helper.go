@@ -6,10 +6,24 @@ func fetchGrammarInput() []byte {
 		> .reference;
 		# .SPACE .TAB .EOL;
 
-		assignment: .assigneesCommaSeparated .assignmentSymbol .assignableLine
+		assignment: .assigneesCommaSeparated .assignmentSymbol .assignableLines
 				---
 					simple: "
 						uint8 myVariable := 8;
+					";
+
+					multiple: "
+						uint8 myVariable, myAlreadyDeclared, map myMap :=
+							8;
+							32;
+							second:
+								other: true;
+								yes:
+									sub: false;
+									other: true;
+								;
+							;
+						;
 					";
 
 					map: "
@@ -115,6 +129,7 @@ func fetchGrammarInput() []byte {
 						";
 					;
 
+		assignableLines: .assignableLine+;
 		assignableLine: .assignable .SEMI_COLON;
 
 		colonKeyValues: .COLON .keyValues
