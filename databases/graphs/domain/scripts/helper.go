@@ -6,6 +6,45 @@ func fetchGrammarInput() []byte {
 		> .reference;
 		# .SPACE .TAB .EOL;
 
+		operation: .assignable .operatorAssignable*
+				 | .PARENTHESIS_OPEN .operation .PARENTHESIS_CLOSE
+				---
+					complex: "
+							(
+								(
+									(myVariable < 23) && (myValue + 12)
+								) || (
+								 	myVariable * (
+										(34 * 12 + 46) + 54 * 21
+									)
+								 ) && myValue
+							)
+					";
+				;
+
+		operatorAssignable: .operator .assignable;
+
+		operator: .arithmeticOperator
+				| .relationalOperator
+				| .equalOperator
+				| .logicalOperator
+				;
+
+		arithmeticOperator: .PLUS
+						  | .HYPHEN
+						  | .STAR
+						  | .SLASH
+						  | .PERCENT
+						  ;
+
+		relationalOperator: .SMALLER_THAN .EQUAL?
+						  | .GREATHER_THAN .EQUAL?
+						  ;
+
+		equalOperator: .EXCLAMATION_POINT .EQUAL
+					 | .EQUAL[2]
+					 ;
+
 		assignment: .assigneesCommaSeparated .assignmentSymbol .assignableOptions .SEMI_COLON
 				---
 					simple: "
@@ -110,6 +149,7 @@ func fetchGrammarInput() []byte {
 		commaAssignable: .COMMA .assignable;
 
 		assignable: .queryInsertUpdate
+				  | .queryDelete
 				  | .querySelect
 				  | .queryBridges
 				  | .map
@@ -117,10 +157,23 @@ func fetchGrammarInput() []byte {
 				  | .primitiveValue
 				  | .variableCasting
 				  | .variableName
+				  | .PARENTHESIS_OPEN .operation .PARENTHESIS_CLOSE
 					---
+
 						queryDelete: "
 								.mySchema[myPoint];
 								.myOtherSchema[myOtherPoint];
+							
+						";
+
+						queryInsertUpdate: "
+								.mySchema[myPoint]:
+									.mySubSchema[mySubPoint]: @myVariable;
+									.mySubSchema[other]: @myVariable;
+									.mySubSchema[third]: 
+										.mySubSchema[mySubPoint]: @myVariable;
+									;
+								;
 							
 						";
 
@@ -429,27 +482,6 @@ func fetchGrammarInput() []byte {
 					valid: "16";
 				;
 
-		queryInsertUpdate: .queryAssignmentWrite
-				  | .queryDelete
-				  ---
-				  		delete: "
-								.mySchema[myPoint];
-								.myOtherSchema[myOtherPoint];
-							
-						";
-
-						assignmentWrite: "
-								.mySchema[myPoint]:
-									.mySubSchema[mySubPoint]: @myVariable;
-									.mySubSchema[other]: @myVariable;
-									.mySubSchema[third]: 
-										.mySubSchema[mySubPoint]: @myVariable;
-									;
-								;
-							
-						";
-				  ;
-
 		queryDelete: .pointReferenceLines .condition?
 					---
 						withCondition: "
@@ -468,7 +500,7 @@ func fetchGrammarInput() []byte {
 						";
 					;
 
-		queryAssignmentWrite: .queryAssignment .condition?
+		queryInsertUpdate: .queryAssignment .condition?
 						---
 							withCondition: "
 									.mySchema[myPoint]:
@@ -959,6 +991,7 @@ func fetchGrammarInput() []byte {
 		HYPHEN: "-";
 		EXCLAMATION_POINT: "!";
 		GREATHER_THAN: ">";
+		SMALLER_THAN: "<";
 		INTERROGATION_POINT: "?";
 		STAR: "*";
 		PLUS: "+";
@@ -968,7 +1001,9 @@ func fetchGrammarInput() []byte {
 		XOR: "<>";
 		QUOTE: "\"";
 		BACKSLASH: "\\";
+		SLASH: "/";
 		EQUAL: "=";
+		PERCENT: "%";
 
 		NAME: "name";
 		SELECT: "select";
