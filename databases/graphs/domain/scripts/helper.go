@@ -113,8 +113,12 @@ func fetchGrammarInput() []byte {
 						";
 					;
 
-		programCall: .references .colonKeyValues?
+		programCall: .COMMERCIAL_A? .references .colonKeyValues?
 					---
+						engine: "
+							@.first .second .third
+						";
+
 						simple: "
 							.first .second .third
 						";
