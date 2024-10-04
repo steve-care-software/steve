@@ -6,7 +6,7 @@ func fetchGrammarInput() []byte {
 		> .reference;
 		# .SPACE .TAB .EOL;
 
-		assignment: .type? .assignee .assignmentSymbol .assignableLine
+		assignment: .assigneesCommaSeparated .assignmentSymbol .assignableLine
 				---
 					simple: "
 						uint8 myVariable := 8;
@@ -37,6 +37,15 @@ func fetchGrammarInput() []byte {
 							;
 						;
 					";
+
+					programCall: "
+						uint8 myOutput := .first .second .third:
+							myKeyname: 34;
+							second: 
+								value: false;
+							;
+						;
+					";
 				;
 
 		assignmentSymbol: .COLON? .EQUAL
@@ -45,12 +54,25 @@ func fetchGrammarInput() []byte {
 							reAssignment: "=";
 						;
 
-		assignee: .variableName
+		assigneesCommaSeparated: .assignee .commaAssignee*
+								---
+									single: "uint8 myVariable";
+									list: "uint8 myVariable, myVariable, uint8 myThird";
+								;
+
+		commaAssignee: .COMMA .assignee
+					---
+						valid: ", myVariable";
+					;
+
+		assignee: .type? .variableName
 				---
 					variable: "myVariable";
+					variableWithType: "uint8 myVariable";
 				;
 
-		assignable: .keyValues
+		assignable: .programCall
+				  | .keyValues
 				  | .primitiveValue
 				  | .variableName
 					---
@@ -66,9 +88,43 @@ func fetchGrammarInput() []byte {
 						";
 						primitive: "34.0";
 						variable: "myVariable";
+
+						programCall: "
+							.first .second .third:
+								myKeyname: 34;
+								second: 
+									value: false;
+								;
+							
+						";
+					;
+
+		programCall: .references .colonKeyValues?
+					---
+						simple: "
+							.first .second .third
+						";
+
+						withParams: "
+							.first .second .third:
+								myKeyname: 34;
+								second: 
+									value: false;
+								;
+							
+						";
 					;
 
 		assignableLine: .assignable .SEMI_COLON;
+
+		colonKeyValues: .COLON .keyValues
+					---
+						valid: "
+							:
+								myKeyname: 34;
+								secondKey: \"some value\";
+						";
+					;
 
 		keyValues: .keyValue+
 				---
@@ -530,6 +586,12 @@ func fetchGrammarInput() []byte {
 								valid: ".mySchema[myPoint]";
 							;
 
+		references: .reference+
+					---
+						valid: "
+							.first .second .third
+						";
+					;
 		reference: .DOT .variableName
 				---
 					withDot: ".myReference";
