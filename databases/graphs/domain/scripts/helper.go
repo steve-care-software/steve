@@ -1,10 +1,141 @@
-package queries
+package scripts
+
+//COMMERCIAL_A
 
 func fetchGrammarInput() []byte {
 	return []byte(`
 		v1;
 		> .reference;
 		# .SPACE .TAB .EOL;
+
+		querySelect: .SELECT .COLON .pointReferenceLines .condition .SEMI_COLON
+				---
+					valid: "
+							select:
+								.mySchema[myPoint];
+								.mySchema[mySecondPoint];
+								condition:
+									(
+										.mySchema[myPoint]: @myVariable <> 
+											.mySchema[secondPoint]: @myOtherVar
+									) && (
+											.mySchema[other]: @myVariable || (
+												.mySchema[myPoint]: @myVariable && 
+													.mySchema[secondPoint]: @myOtherVar
+											)
+										)
+								;
+							;
+					";
+				;
+
+		condition: .CONDITION .COLON .conditionClause .SEMI_COLON
+				---
+					valid: "
+						condition: 
+							(
+								.mySchema[myPoint]: @myVariable <> 
+									.mySchema[secondPoint]: @myOtherVar
+							) && (
+									.mySchema[other]: @myVariable || (
+										.mySchema[myPoint]: @myVariable && 
+											.mySchema[secondPoint]: @myOtherVar
+									)
+								)
+						;
+					";
+				;
+
+		conditionClause: .conditionElement .logicalOperator .conditionElement
+						---
+							and: "
+								.mySchema[myPoint]: @myVariable && .mySchema[secondPoint]: @myOtherVar
+							";
+
+							or: "
+								.mySchema[myPoint]: @myVariable || .mySchema[secondPoint]: @myOtherVar
+							";
+
+							xor: "
+								.mySchema[myPoint]: @myVariable <> .mySchema[secondPoint]: @myOtherVar
+							";
+
+							complex: "
+								(
+									.mySchema[myPoint]: @myVariable <> 
+										.mySchema[secondPoint]: @myOtherVar
+								) && (
+										.mySchema[other]: @myVariable || (
+											.mySchema[myPoint]: @myVariable && 
+												.mySchema[secondPoint]: @myOtherVar
+										)
+									)
+							";
+						;
+
+		conditionElement: .PARENTHESIS_OPEN .conditionClause .PARENTHESIS_CLOSE
+						| .queryVariable
+						---
+							variable: "
+								.mySchema[myPoint]: @myVariable
+							";
+
+							logical: "
+								(.mySchema[myPoint]: @myVariable && .mySchema[secondPoint]: @myOtherVar)
+							";
+
+							complex: "
+								(
+									(
+										.mySchema[myPoint]: @myVariable <> 
+											.mySchema[secondPoint]: @myOtherVar
+									) && (
+											.mySchema[other]: @myVariable || (
+												.mySchema[myPoint]: @myVariable && 
+													.mySchema[secondPoint]: @myOtherVar
+											)
+										)
+								)
+							";
+						;
+		
+		logicalOperator: .AND
+						| .OR
+						| .XOR
+						---
+							and: "&&";
+							or: "||";
+							xor: "<>";
+						;
+		
+		queryVariable: .externalPointReference .COLON .queryVariableName
+							---
+								valid: ".mySchema[myPoint]: @myVariable";
+							;
+
+		queryVariableName: .COMMERCIAL_A .variableName
+						---
+							valid: "@myVariable";
+						;
+
+		pointReferenceLines: .pointReferenceLine+
+							---
+								valid: "
+									.mySchema[myPoint];
+									.mySecondSchema[secondPoint];
+								";
+							;
+
+		pointReferenceLine: .externalPointReference .SEMI_COLON
+							---
+								external: ".mySchema[myPoint];";
+								internal: !".myPoint;";
+							;
+
+		externalPointReference: .reference .BRACKET_OPEN .variableName .BRACKET_CLOSE
+							---
+								valid: ".mySchema[myPoint]";
+							;
 
 		reference: .DOT .variableName
 				---
@@ -266,7 +397,13 @@ func fetchGrammarInput() []byte {
 		INTERROGATION_POINT: "?";
 		STAR: "*";
 		PLUS: "+";
+		COMMERCIAL_A: "@";
+		AND: "&&";
+		OR: "||";
+		XOR: "<>";
 
 		NAME: "name";
+		SELECT: "select";
+		CONDITION: "condition";
 	`)
 }
