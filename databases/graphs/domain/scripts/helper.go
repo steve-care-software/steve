@@ -6,59 +6,48 @@ func fetchGrammarInput() []byte {
 		> .reference;
 		# .SPACE .TAB .EOL;
 
-		assignment: .assigneesCommaSeparated .assignmentSymbol .assignableLines
+		assignment: .assigneesCommaSeparated .assignmentSymbol .assignableOptions .SEMI_COLON
 				---
 					simple: "
 						uint8 myVariable := 8;
 					";
 
-					multiple: "
-						uint8 myVariable, myAlreadyDeclared, map myMap :=
-							8;
-							32;
-							second:
-								other: true;
-								yes:
-									sub: false;
-									other: true;
-								;
-							;
+					complex: "
+						uint8 myVariable, myAlreadyDeclared, map myMap, float32 myFloat :=
+							8,
+							32,
+							myInt.(float32),
+							[
+								myKeyname: 34;
+								again: [
+									voila: true;
+									again: [
+										number: 23;
+										again: 23;
+									];
+									third: true;
+								];
+							],
+							myInt.(float32)
 						;
 					";
 
 					map: "
-						map myMap :=
+						map myMap := [
 							myKeyname: 34;
-							second:
-								other: true;
-								yes:
-									sub: false;
-									other: true;
-								;
-							;
-						;
+							again: [
+								voila: true;
+								again: [
+									number: 23;
+									again: 23;
+								];
+								third: true;
+							];
+						];
 					";
 
-					reAssignment: "
-						myMap =
-							myKeyname: 34;
-							second:
-								other: true;
-								yes:
-									sub: false;
-									other: true;
-								;
-							;
-						;
-					";
-
-					programCall: "
-						uint8 myOutput := .first .second .third:
-							myKeyname: 34;
-							second: 
-								value: false;
-							;
-						;
+					casting: "
+						float32 myFloat := myInt.(float32);
 					";
 				;
 
@@ -85,18 +74,22 @@ func fetchGrammarInput() []byte {
 					variableWithType: "uint8 myVariable";
 				;
 
-		assignable: .programCall
-				  | .queryWrite
+		assignableOptions: .assignable .commaAssignable*;
+		commaAssignable: .COMMA .assignable;
+
+		assignable: .queryWrite
 				  | .querySelect
-				  | .keyValues
+				  | .map
+				  | .programCall
 				  | .primitiveValue
+				  | .variableCasting
 				  | .variableName
 					---
 						queryWrite: "
 							delete:
 								.mySchema[myPoint];
 								.myOtherSchema[myOtherPoint];
-							;
+							
 						";
 
 						querySelect: "
@@ -114,33 +107,50 @@ func fetchGrammarInput() []byte {
 											)
 										)
 								;
-							;
+							
+						";
+
+						programCall: "
+							.first .second .third: [
+								myKeyname: 34;
+								again: [
+									voila: true;
+									again: [
+										number: 23;
+										again: 23;
+									];
+									third: true;
+								];
+							]
 						";
 
 						map: "
+							[
 								myKeyname: 34;
-								second:
-									other: true;
-									yes:
-										sub: false;
-										other: true;
-									;
-								;
+								again: [
+									voila: true;
+									again: [
+										number: 23;
+										again: 23;
+									];
+									third: true;
+								];
+							]
 						";
+
 						primitive: "34.0";
 						variable: "myVariable";
-
-						programCall: "
-							.first .second .third:
-								myKeyname: 34;
-								second: 
-									value: false;
-								;
-							
-						";
+						casting: "myVariable.(float32)";
 					;
 
-		programCall: .COMMERCIAL_A? .references .colonKeyValues?
+		variableCasting: .variableName .DOT .PARENTHESIS_OPEN .type .PARENTHESIS_CLOSE
+						---
+							valid: "
+								myVariable.(set[uint8])
+							";
+						;
+
+		programCall: .COMMERCIAL_A? .references .colonMap?
 					---
 						engine: "
 							@.first .second .third
@@ -151,39 +161,68 @@ func fetchGrammarInput() []byte {
 						";
 
 						withParams: "
-							.first .second .third:
+							.first .second .third: [
 								myKeyname: 34;
-								second: 
-									value: false;
-								;
-							
+								again: [
+									voila: true;
+									again: [
+										number: 23;
+										again: 23;
+									];
+									third: true;
+								];
+							]
 						";
 					;
 
-		assignableLines: .assignableLine+;
-		assignableLine: .assignable .SEMI_COLON;
+		colonMap: .COLON .map;
 
-		colonKeyValues: .COLON .keyValues
-					---
-						valid: "
-							:
-								myKeyname: 34;
-								secondKey: \"some value\";
-						";
-					;
+		map: .BRACKET_OPEN .keyValues .BRACKET_CLOSE
+			---
+				valid: "
+					[
+						myKeyname: 34;
+						again: [
+							voila: true;
+							again: [
+								number: 23;
+								again: 23;
+							];
+							third: true;
+						];
+					]
+				";
+			;
 
 		keyValues: .keyValue+
 				---
 					valid: "
 						myKeyname: 34;
-						secondKey: \"some value\";
+						again: [
+							voila: true;
+							again: [
+								number: 23;
+								again: 23;
+							];
+							third: true;
+						];
 					";
 				;
+
+
 
 		keyValue: .variableName .COLON .assignable .SEMI_COLON
 				---
 					simple: "
 						myKeyname: 34;
+					";
+
+					complex: "
+						myKeyname: [
+							second: [
+								third: 45;
+							];
+						];
 					";
 				;
 
@@ -351,7 +390,7 @@ func fetchGrammarInput() []byte {
 							delete:
 								.mySchema[myPoint];
 								.myOtherSchema[myOtherPoint];
-							;
+							
 						";
 
 						assignmentWrite: "
@@ -363,11 +402,11 @@ func fetchGrammarInput() []byte {
 										.mySubSchema[mySubPoint]: @myVariable;
 									;
 								;
-							;
+							
 						";
 				  ;
 
-		queryDelete: .DELETE .COLON .pointReferenceLines .condition? .SEMI_COLON
+		queryDelete: .DELETE .COLON .pointReferenceLines .condition?
 					---
 						withCondition: "
 							delete:
@@ -376,18 +415,18 @@ func fetchGrammarInput() []byte {
 									.mySchema[myPoint]: @myVariable && 
 										.mySchema[secondPoint]: @myOtherVar
 								;
-							;
+							
 						";
 
 						withoutCondition: "
 							delete:
 								.mySchema[myPoint];
 								.myOtherSchema[myOtherPoint];
-							;
+							
 						";
 					;
 
-		queryAssignmentWrite: .queryWriteKeyword .COLON .queryAssignment .condition? .SEMI_COLON
+		queryAssignmentWrite: .queryWriteKeyword .COLON .queryAssignment .condition?
 						---
 							insertWithCondition: "
 								insert:
@@ -410,7 +449,7 @@ func fetchGrammarInput() []byte {
 												)
 											)
 									;
-								;
+								
 							";
 
 							updateWithCondition: "
@@ -434,7 +473,7 @@ func fetchGrammarInput() []byte {
 												)
 											)
 									;
-								;
+								
 							";
 
 							insertWithoutCondition: "
@@ -446,7 +485,7 @@ func fetchGrammarInput() []byte {
 											.mySubSchema[mySubPoint]: @myVariable;
 										;
 									;
-								;
+								
 							";
 
 							updateWithoutCondition: "
@@ -458,7 +497,7 @@ func fetchGrammarInput() []byte {
 											.mySubSchema[mySubPoint]: @myVariable;
 										;
 									;
-								;
+								
 							";
 						;
 		
@@ -496,7 +535,7 @@ func fetchGrammarInput() []byte {
 						| .queryAssignment
 						;
 
-		querySelect: .SELECT .COLON .pointReferenceLines .condition? .SEMI_COLON
+		querySelect: .SELECT .COLON .pointReferenceLines .condition?
 				---
 					withCondition: "
 							select:
@@ -513,14 +552,14 @@ func fetchGrammarInput() []byte {
 											)
 										)
 								;
-							;
+							
 					";
 
 					withoutCondition: "
 							select:
 								.mySchema[myPoint];
 								.mySchema[mySecondPoint];
-							;
+							
 					";
 				;
 
