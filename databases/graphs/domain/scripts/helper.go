@@ -8,6 +8,7 @@ func fetchGrammarInput() []byte {
 
 		script: .instructions
 			  | .program
+			  | .schema
 			  ---
 					instructions: "
 						uint8 myVariable := 8;
@@ -56,7 +57,76 @@ func fetchGrammarInput() []byte {
 						;
 
 					";
+
+					schema: "
+						head:
+							engine: v1;
+							name: mySchema;
+							access: 
+								read: .first  (0.2);
+								write: 
+									.first;
+									review: .first .second .third (0.1);
+								;
+							;
+						;
+
+						son;
+						father;
+						grandFather;
+						grandGrandFather;
+
+						father[0,3](son+): .son .father
+									| .father .grandFather
+									| .grandFather .grandGrandFather
+									---
+										mySuite[.son .grandGrandFather]:
+											(.son .father .grandFather .grandGrandFather);
+											!(.son .father .grandFather .grandGrandFather);
+										;
+									;
+
+						grandFather(grandSon[2,]): .son .grandFather
+											| .father .grandGrandFather
+											;
+					";
 			  ;
+
+		schema: .head .instructionPoints .connectionBlocks
+			---
+				valid: "
+					head:
+						engine: v1;
+						name: mySchema;
+						access: 
+							read: .first  (0.2);
+							write: 
+								.first;
+								review: .first .second .third (0.1);
+							;
+						;
+					;
+
+					son;
+					father;
+					grandFather;
+					grandGrandFather;
+
+					father[0,3](son+): .son .father
+								| .father .grandFather
+								| .grandFather .grandGrandFather
+								---
+									mySuite[.son .grandGrandFather]:
+										(.son .father .grandFather .grandGrandFather);
+										!(.son .father .grandFather .grandGrandFather);
+									;
+								;
+
+					grandFather(grandSon[2,]): .son .grandFather
+										| .father .grandGrandFather
+										;
+				";
+			;
 
 		program: .head .programContent
 				---
@@ -1338,10 +1408,210 @@ func fetchGrammarInput() []byte {
 								internal: !".myPoint;";
 							;
 
-		externalPointReference: .reference .BRACKET_OPEN .variableName .BRACKET_CLOSE
+		nameInstruction: .NAME .COLON .variableName .SEMI_COLON
+						---
+							valid: "
+								name: myName;
+							";
+						;
+
+		versionInstruction: .LL_V .numbers .SEMI_COLON
+						---
+							versionOneNumber: "v1;";
+							versionWithMultipleNumbers: "v123;";
+						;
+
+		connectionBlocks: .connectionBlock+
+						---
+							valid: "
+								father(son): .son .father
+											| .father .grandFather
+											| .grandFather .grandGrandFather
+											---
+												mySuite[.son .grandGrandFather]:
+													(.son .father .grandFather .grandGrandFather);
+													!(.son .father .grandFather .grandGrandFather);
+												;
+											;
+
+								grandFather(grandSon): .son .grandFather
+													| .father .grandGrandFather
+													;
+							";
+						;
+
+		connectionBlock: .connectionHeader .COLON .links .pointSuitesBlock? .SEMI_COLON
+						---
+							withoutSuite: "
+								father(son): .son .father
+										   | .father .grandFather
+										   | .grandFather .grandGrandFather
+										   ;
+							";
+
+							withSuites: "
+									father(son): .son .father
+												| .father .grandFather
+												| .grandFather .grandGrandFather
+												---
+														first[.son .grandGrandFather]:
+															(.son .father .grandFather .grandGrandFather);
+															!(.son .father .grandFather .grandGrandFather);
+														;
+
+														second[.son .grandGrandFather]:
+															(.son .father .grandFather .grandGrandFather);
+															!(.son .father .grandFather .grandGrandFather);
+														;
+												;
+							";
+						;
+
+		connectionHeader: .nameWithCardinality .variableNameInParenthesis?
+						---
+							name: "father";
+							withCardinality: "father+";
+							nameWithReverse: "father(son)";
+							nameWithReverseCardinality: "father[0,2](son[0,])";
+						;
+
+		variableNameInParenthesis: .PARENTHESIS_OPEN .nameWithCardinality .PARENTHESIS_CLOSE
+								---
+									valid: "(myVariable)";
+									withCardinality: "(myVariable+)";
+									withBracketCardinality: "(myVariable[0,])";
+								;
+
+		nameWithCardinality: .variableName .cardinality?
 							---
-								valid: ".mySchema[myPoint]";
+								name: "son";
+								withCardinality: "son+";
+								withBracketCardinality: "son[3,]";
 							;
+
+		cardinality: .cardinalityBracketOption
+					| .INTERROGATION_POINT
+					| .STAR
+					| .PLUS
+					---
+							minMax: "[0,23]";
+							minNoMax: "[0,]";
+							specific: "[22]";
+							interrogationPoint: "?";
+							star: "*";
+							plus: "+";
+					;
+
+		cardinalityBracketOption: .BRACKET_OPEN .cardinalityNumberOptions .BRACKET_CLOSE
+								---
+										minMax: "[0,23]";
+										minNoMax: "[0,]";
+										specific: "[22]";
+								;
+
+		cardinalityNumberOptions: .minMax
+								| .minComma
+								| .numbers
+								---
+										minMax: "0,23";
+										minNoMax: "0,";
+										specific: "22";
+								;
+
+
+		minMax: .minComma .numbers
+			  ---
+			  		valid: "0,23";
+			  ;
+
+		minComma: .numbers .COMMA
+				---
+					zero: "0,";
+					nonZero: "23,";
+				;
+
+		pointSuitesBlock: .suitePrefix .pointSuites
+						---
+							valid: "
+									---
+										first[.son .grandGrandFather]:
+											(.son .father .grandFather .grandGrandFather);
+											!(.son .father .grandFather .grandGrandFather);
+										;
+
+										second[.son .grandGrandFather]:
+											(.son .father .grandFather .grandGrandFather);
+											!(.son .father .grandFather .grandGrandFather);
+										;
+							";
+						;
+
+		pointSuites: .pointSuite+
+				---
+					single: "
+							mySuite[.son .grandGrandFather]:
+								(.son .father .grandFather .grandGrandFather);
+								!(.son .father .grandFather .grandGrandFather);
+							;
+						";
+
+					multiple: "
+							first[.son .grandGrandFather]:
+								(.son .father .grandFather .grandGrandFather);
+								!(.son .father .grandFather .grandGrandFather);
+							;
+
+							second[.son .grandGrandFather]:
+								(.son .father .grandFather .grandGrandFather);
+								!(.son .father .grandFather .grandGrandFather);
+							;
+						";
+				;
+
+		pointSuite: .variableName .BRACKET_OPEN .pointReference[2] .BRACKET_CLOSE .COLON .suiteInstructions .SEMI_COLON
+				---
+					valid: "
+						mySuite[.son .external[grandGrandFather]]:
+							!(.son .father .external[grandFather] .grandGrandFather);
+							(.son .father .external[grandFather] .grandGrandFather);
+						;
+					";
+				;
+
+		suiteInstructions: .suiteOptionInstruction+
+						---
+							valid: "
+								!(.son .father .external[grandFather] .grandGrandFather);
+								!(.son .father .external[grandFather] .grandGrandFather);
+								(.son .father .external[grandFather] .grandGrandFather);
+								!(.son .father .external[grandFather] .grandGrandFather);
+								(.son .father .external[grandFather] .grandGrandFather);
+							";
+						;
+
+		suiteOptionInstruction: .suiteOption .SEMI_COLON;
+
+		suiteOption: .suiteInvalidLink
+				   | .suiteReferencesInParenthesis
+				   ---
+					invalidLink: "!(.son .father .external[grandFather] .grandGrandFather)";
+					validLink: "(.son .father .external[grandFather] .grandGrandFather)";
+					;
+
+		suiteInvalidLink: .EXCLAMATION_POINT .suiteReferencesInParenthesis
+						---
+							valid: "!(.son .father .external[grandFather] .grandGrandFather)";
+						;
+
+		suiteReferencesInParenthesis: .PARENTHESIS_OPEN .pointReferences .PARENTHESIS_CLOSE
+									---
+										valid: "(.son .external[father] .grandFather .grandGrandFather)";
+									;
+
+		suitePrefix: .HYPHEN[3]
+				---
+					valid: "---";
+				;
 
 		references: .reference+
 					---
@@ -1349,6 +1619,66 @@ func fetchGrammarInput() []byte {
 							.first .second .third
 						";
 					;
+
+		pointReferences: .pointReference+
+						---
+							valid: ".mySchema[myPoint] .myPoint";
+						;
+
+		pointReference: .externalPointReference
+					  | .reference
+					  ---
+							external: ".mySchema[myPoint]";
+							internal: ".myPoint";
+						;
+
+		links: .link .pipeJourney*
+				---
+					oneLine: ".son .father";
+					multipleLine: "
+						.son .father
+						| .myExternal[father] .grandFather 
+						| .grandFather .myExternal[grandGrandFather]
+						| .myExternal[grandFather] .myExternal[grandGrandFather]
+						| .myExternal[grandFather] .grandGrandFather
+					";
+				;
+
+		pipeJourney: .PIPE .link
+					---
+						valid: "| .son .father";
+					;
+
+		link: .pointReference[2]
+				---
+					internal: ".origin .target";
+					external: ".myExternal[origin] .target";
+				;
+
+		externalPointReference: .reference .BRACKET_OPEN .variableName .BRACKET_CLOSE
+							---
+								valid: ".mySchema[myPoint]";
+							;
+
+		instructionPoints: .instructionPoint+
+						---
+							single: "
+								son;
+							";
+
+							multiple: "
+								son;
+								father;
+								grandFather;
+								grandGrandFather;
+							";
+						;
+
+
+		instructionPoint: .variableName .SEMI_COLON
+						---
+							valid: "son;";
+						;
 
 		reference: .DOT .variableName
 				---
