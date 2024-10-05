@@ -6,13 +6,12 @@ func fetchGrammarInput() []byte {
 		> .script;
 		# .SPACE .TAB .EOL;
 
-		script: .instructions
+		script: .programCallLine
 			  | .program
 			  | .schema
 			  ---
-					instructions: "
-						uint8 myVariable := 8;
-						return .first .second .third: [
+					programCall: "
+						.first .second .third: [
 							myKeyname: 34;
 							again: [
 								voila: true;
