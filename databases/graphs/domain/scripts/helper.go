@@ -31,14 +31,15 @@ func fetchGrammarInput() []byte {
 							access:
 								code: 
 									read: .first;
-									write: .first .second;
-									review: .first;
+									write: .first;
 								;
 
 								data: 
 									read: .first;
-									write: .first .second;
-									review: .first;
+									write: 
+										.first;
+										review: .first .second .third;
+									;
 								;
 							;
 							compensation: 0.1, 0.23, 0.45;
@@ -74,14 +75,15 @@ func fetchGrammarInput() []byte {
 							access:
 								code: 
 									read: .first;
-									write: .first .second;
-									review: .first;
+									write: .first;
 								;
 
 								data: 
 									read: .first;
-									write: .first .second;
-									review: .first;
+									write: 
+										.first;
+										review: .first .second .third;
+									;
 								;
 							;
 							compensation: 0.1, 0.23, 0.45;
@@ -184,14 +186,18 @@ func fetchGrammarInput() []byte {
 							access:
 								code: 
 									read: .first;
-									write: .first .second;
-									review: .first;
+									write: 
+										.first;
+										review: .first .second .third;
+									;
 								;
 
 								data: 
 									read: .first;
-									write: .first .second;
-									review: .first;
+									write: 
+										.first;
+										review: .first .second .third;
+									;
 								;
 							;
 							compensation: 0.1, 0.23, 0.45;
@@ -212,14 +218,18 @@ func fetchGrammarInput() []byte {
 							access:
 								code: 
 									read: .first;
-									write: .first .second;
-									review: .first;
+									write: 
+										.first;
+										review: .first .second .third;
+									;
 								;
 
 								data: 
 									read: .first;
-									write: .first .second;
-									review: .first;
+									write: 
+										.first;
+										review: .first .second .third;
+									;
 								;
 							;
 						";
@@ -237,14 +247,18 @@ func fetchGrammarInput() []byte {
 							access:
 								code: 
 									read: .first;
-									write: .first .second;
-									review: .first;
+									write: 
+										.first;
+										review: .first .second .third;
+									;
 								;
 
 								data: 
 									read: .first;
-									write: .first .second;
-									review: .first;
+									write: 
+										.first;
+										review: .first .second .third;
+									;
 								;
 							;
 						";
@@ -263,14 +277,18 @@ func fetchGrammarInput() []byte {
 										access:
 											code: 
 												read: .first;
-												write: .first .second;
-												review: .first;
+												write: 
+													.first;
+													review: .first .second .third;
+												;
 											;
 
 											data: 
 												read: .first;
-												write: .first .second;
-												review: .first;
+												write: 
+													.first;
+													review: .first .second .third;
+												;
 											;
 										;
 									";
@@ -314,13 +332,17 @@ func fetchGrammarInput() []byte {
 							access:
 								code: 
 								read: .first;
-								write: .first .second;
-								review: .first .second .third;
+								write: 
+									.first;
+									review: .first .second .third;
+								;
 							;
 
 							data: 
-								write: .first .second;
-								review: .first .second .third;
+								write: 
+									.first;
+									review: .first .second .third;
+								;
 							;
 						;
 					";
@@ -332,28 +354,34 @@ func fetchGrammarInput() []byte {
 					data: "
 						data: 
 							read: .first;
-							write: .first .second;
-							review: .first .second .third;
+							write: 
+								.first;
+								review: .first .second .third;
+							;
 						;
 					";
 
 					code: "
 						code: 
 							read: .first;
-							write: .first .second;
+							write:.first;
 						;
 					";
 
 					dataAndCode: "
 						code: 
 							read: .first;
-							write: .first .second;
-							review: .first .second .third;
+							write: 
+								.first;
+								review: .first .second .third;
+							;
 						;
 
 						data: 
-							write: .first .second;
-							review: .first .second .third;
+							write: 
+								.first;
+								review: .first .second .third;
+							;
 						;
 					";
 				;
@@ -363,8 +391,8 @@ func fetchGrammarInput() []byte {
 
 		accessKindSuffix: .COLON .roleOptions .SEMI_COLON;
 
-		roleOptions: .roleOptionRead? .roleOptionWriteReview
-				   | .roleOptionRead .roleOptionWriteReview
+		roleOptions: .roleOptionRead? .roleOptionWrite
+				   | .roleOptionRead .roleOptionWrite
 				---
 					read: !"
 						read: .first;
@@ -375,36 +403,44 @@ func fetchGrammarInput() []byte {
 					";
 
 					withRevew: "
-						write: .first;
-						review: .first .second .third;
+						write: 
+							.first;
+							review: .first .second .third;
+						;
 					";
 
 					withReadWrite: "
 						read: .first;
-						write: .first .second;
+						write: 
+							.first;
+							review: .first .second .third;
+						;
 					";
 
 					withReadWriteReview: "
 						read: .first;
-						write: .first .second;
-						review: .first .second .third;
+						write: 
+							.first;
+							review: .first .second .third;
+						;
 					";
 				;
 
-		roleOptionWriteReview: .roleOptionWrite .roleOptionReview?
-							---
-								write: "
-									write: .first;
-								";
+		roleOptionWrite: .WRITE .COLON .references .SEMI_COLON .roleOptionReview? 
+						---
+							write: "
+								write: .first;
+							";
 
-								withRevew: "
-									write: .first;
+							withRevew: "
+								write: 
+									.first;
 									review: .first .second .third;
-								";
-							;
+								;
+							";
+						;
+		roleOptionReview: .REVIEW .roleOptionSuffix .SEMI_COLON;
 
-		roleOptionReview: .REVIEW .roleOptionSuffix;
-		roleOptionWrite: .WRITE .roleOptionSuffix;
 		roleOptionRead: .READ .roleOptionSuffix;
 		roleOptionSuffix:  .COLON .references .SEMI_COLON;
 
