@@ -6,6 +6,268 @@ func fetchGrammarInput() []byte {
 		> .reference;
 		# .SPACE .TAB .EOL;
 
+		head: .HEAD .COLON .headOptions .SEMI_COLON
+			---
+				all: "
+						head:
+							engine: v1;
+							name: myName;
+							access:
+								code: 
+									read: .first;
+									write: .first .second;
+									review: .first;
+								;
+
+								data: 
+									read: .first;
+									write: .first .second;
+									review: .first;
+								;
+							;
+							compensation: 0.1, 0.23, 0.45;
+						;
+				";
+			;
+
+		headOptions: .engine .propertyName .headOptionalOption*
+				  ---
+				  		mandatory: "
+							engine: v1;
+							name: myName;
+						";
+
+						access: "
+							engine: v1;
+							name: myName;
+							access:
+								code: 
+									read: .first;
+									write: .first .second;
+									review: .first;
+								;
+
+								data: 
+									read: .first;
+									write: .first .second;
+									review: .first;
+								;
+							;
+						";
+
+						compensation: "
+							engine: v1;
+							name: myName;
+							compensation: 0.1, 0.23, 0.45;
+						";
+
+						all: "
+							engine: v1;
+							name: myName;
+							compensation: 0.1, 0.23, 0.45;
+							access:
+								code: 
+									read: .first;
+									write: .first .second;
+									review: .first;
+								;
+
+								data: 
+									read: .first;
+									write: .first .second;
+									review: .first;
+								;
+							;
+						";
+
+						nameAtTheEnd: !"
+							engine: v1;
+							compensation: 0.1, 0.23, 0.45;
+							name: myName;
+						";
+				  ;
+
+		headOptionalOption:	.access
+							| .compensation
+							---
+									access: "
+										access:
+											code: 
+												read: .first;
+												write: .first .second;
+												review: .first;
+											;
+
+											data: 
+												read: .first;
+												write: .first .second;
+												review: .first;
+											;
+										;
+									";
+
+									compensation: "
+										compensation: 0.1, 0.23, 0.45;
+									";
+							;
+
+		engine: .ENGINE .COLON .version .SEMI_COLON
+				---
+					versionOneNumber: "engine: v1;";
+					versionWithMultipleNumbers: "engine: v123;";
+				;
+
+		version: .LL_V .numbersExceptZero
+				---
+					versionZero: !"v0";
+					versionOneNumber: "v1";
+					versionWithMultipleNumbers: "v123";
+				;
+
+		numbersExceptZero: .oneNumberExceptZero+
+				---
+					oneNumber: "1";
+					numberWithAllNumbers: !"1234567890";
+					numberWithAllNumbersExceptZero: "123456789";
+					negativeNumberWithAllNumbers: !"-1234567890";
+					oneLettter: !"a";
+					numberZero: !"0";
+				;
+
+		compensation: .COMPENSATION .COLON .threeFloatNumbersBetweenZeroAndOne .SEMI_COLON
+					---
+						valid: "compensation: 0.1, 0.23, 0.45;";
+					;
+
+		access: .ACCESS .COLON .accessKind[2] .SEMI_COLON
+				---
+					valid: "
+						access:
+							code: 
+								read: .first;
+								write: .first .second;
+								review: .first;
+							;
+
+							data: 
+								read: .first;
+								write: .first .second;
+								review: .first;
+							;
+						;
+					";
+				;
+		
+		accessKind: .acessKindName .COLON .roleOptions .SEMI_COLON
+				---
+					allOptionsWithDuplicates: "
+						data: 
+							review: .first;
+							write: .first .second;
+							review: .first;
+							review: .first .second .third;
+							review: .first .second .third;
+						;
+					";
+
+					allOptions: "
+						code: 
+							read: .first;
+							write: .first .second;
+							review: .first;
+						;
+					";
+
+					readOption: "
+						data: 
+							read: .first;
+						;
+					";
+
+					writeOption: "
+						code: 
+							write: .first .second;
+						;
+					";
+
+					reviewOption: "
+						data: 
+							review: .first;
+						;
+					";
+				;
+
+		acessKindName: .CODE
+					| .DATA
+					;
+
+		roleOptions: .roleOption+
+				---
+					reviewOption: "
+						review: .first;
+					";
+
+					writeOption: "
+						write: .first;
+					";
+
+					readOption: "
+						read: .first;
+					";
+
+					threeOptions: "
+						read: .first;
+						write: .first .second;
+						review: .first .second .third;
+					";
+
+					threeOptionsWithDuplicates: "
+						review: .first;
+						write: .first .second;
+						review: .first;
+						review: .first .second .third;
+						review: .first .second .third;
+					";
+				;
+
+		roleOption: .propertyRoleAction .COLON .references .SEMI_COLON
+					---
+						oneRole: "read: .myRole;";
+						multipleRoles: "write: .first .second .third;";
+						review: "review: .myRole;";
+					;
+
+		propertyRoleAction: .READ
+							| .WRITE
+							| .REVIEW
+							;
+
+		propertyName: .NAME .COLON .variableName .SEMI_COLON
+					---
+						valid: "name: myName;";
+					;
+
+		threeFloatNumbersBetweenZeroAndOne: .floatNumberBetweenZeroAndOne .commaFloatNumberBetweenZeroAndOne[2]
+										---
+											three: "0.0, 0.12, 0.134";
+											one: !"0.12";
+											two: !"0.12, 23.32";
+											lastTooBigThree: !"0.0, 0.12, 32.134";
+										;
+
+		commaFloatNumberBetweenZeroAndOne: .COMMA .floatNumberBetweenZeroAndOne
+										---
+											valid: ", 0.12";
+											invalid: !", 32.98";
+										; 
+
+		floatNumberBetweenZeroAndOne: .N_ZERO .DOT .numbers
+									---
+										lessThanZero: "0.23";
+										zero: "0.0";
+										pointZero: !"4556.0";
+									;
+
 		instructions: .instruction+;
 
 		instruction: .uniVarOperation
@@ -1091,27 +1353,41 @@ func fetchGrammarInput() []byte {
 				;
 
 		oneNumber: .N_ZERO
-					| .N_ONE
-					| .N_TWO
-					| .N_THREE
-					| .N_FOUR
-					| .N_FIVE
-					| .N_SIX
-					| .N_SEVEN
-					| .N_HEIGHT
-					| .N_NINE
-					---
-						zero: "0";
-						one: "1";
-						two: "2";
-						three: "3";
-						four: "4";
-						five: "5";
-						six: "6";
-						seven: "7";
-						height: "8";
-						nine: "9";
-					;
+				 | .oneNumberExceptZero
+				 ---
+				   	zero: "0";
+					one: "1";
+					two: "2";
+					three: "3";
+					four: "4";
+					five: "5";
+					six: "6";
+					seven: "7";
+					height: "8";
+					nine: "9";
+				;
+
+		oneNumberExceptZero: .N_ONE
+							| .N_TWO
+							| .N_THREE
+							| .N_FOUR
+							| .N_FIVE
+							| .N_SIX
+							| .N_SEVEN
+							| .N_HEIGHT
+							| .N_NINE
+							---
+								zero: !"0";
+								one: "1";
+								two: "2";
+								three: "3";
+								four: "4";
+								five: "5";
+								six: "6";
+								seven: "7";
+								height: "8";
+								nine: "9";
+							;
 					
 
 		oneUpperCaseLetter: .UL_A
@@ -1348,5 +1624,14 @@ func fetchGrammarInput() []byte {
 		FOR: "for";
 		BREAK: "break";
 		RETURN: "return";
+		READ: "read";
+		WRITE: "write";
+		REVIEW: "review";
+		CODE: "code";
+		DATA: "data";
+		ACCESS: "access";
+		COMPENSATION: "compensation";
+		ENGINE: "engine";
+		HEAD: "head";
 	`)
 }
