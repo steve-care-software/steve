@@ -6,11 +6,12 @@ func fetchGrammarInput() []byte {
 		> .script;
 		# .SPACE .TAB .EOL;
 
-		script: .programCallLine
+		script: .instructions
 			  | .program
 			  ---
-					programCall: "
-						.first .second .third: [
+					instructions: "
+						uint8 myVariable := 8;
+						return .first .second .third: [
 							myKeyname: 34;
 							again: [
 								voila: true;
@@ -440,7 +441,7 @@ func fetchGrammarInput() []byte {
 				   | .conditionLine
 				   | .programCallLine
 				   | .forLine
-				   | .RETURN .SEMI_COLON
+				   | .RETURN .assignable? .SEMI_COLON
 					---
 						uniVarOperation: "
 							myVariable++;
@@ -475,6 +476,20 @@ func fetchGrammarInput() []byte {
 								myValue = (myValue + 1);
 								return;
 							;
+						";
+
+						return: "
+							return;
+						";
+
+						returnWithAssignable: "
+							return [
+								value: true;
+								other: [
+									first: true;
+									second: 44;
+								];
+							];
 						";
 				   ;
 
