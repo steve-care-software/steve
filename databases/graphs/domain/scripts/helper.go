@@ -307,108 +307,105 @@ func fetchGrammarInput() []byte {
 						valid: "compensation: 0.1, 0.23, 0.45;";
 					;
 
-		access: .ACCESS .COLON .accessKind[2] .SEMI_COLON
+		access: .ACCESS .COLON .accessKind .SEMI_COLON
 				---
 					valid: "
-						access:
-							code: 
+							access:
+								code: 
 								read: .first;
 								write: .first .second;
-								review: .first;
+								review: .first .second .third;
 							;
 
 							data: 
-								read: .first;
 								write: .first .second;
-								review: .first;
+								review: .first .second .third;
 							;
 						;
 					";
 				;
 		
-		accessKind: .acessKindName .COLON .roleOptions .SEMI_COLON
+		accessKind: .accessKindCode? .accessKindData
+				  | .accessKindCode .accessKindData?
 				---
-					allOptionsWithDuplicates: "
+					data: "
 						data: 
-							review: .first;
+							read: .first;
 							write: .first .second;
-							review: .first;
-							review: .first .second .third;
 							review: .first .second .third;
 						;
 					";
 
-					allOptions: "
+					code: "
 						code: 
 							read: .first;
 							write: .first .second;
-							review: .first;
 						;
 					";
 
-					readOption: "
-						data: 
-							read: .first;
-						;
-					";
-
-					writeOption: "
+					dataAndCode: "
 						code: 
+							read: .first;
 							write: .first .second;
+							review: .first .second .third;
 						;
-					";
 
-					reviewOption: "
 						data: 
-							review: .first;
+							write: .first .second;
+							review: .first .second .third;
 						;
 					";
 				;
 
-		acessKindName: .CODE
-					| .DATA
-					;
+		accessKindCode: .CODE .accessKindSuffix;
+		accessKindData: .DATA .accessKindSuffix;
 
-		roleOptions: .roleOption+
+		accessKindSuffix: .COLON .roleOptions .SEMI_COLON;
+
+		roleOptions: .roleOptionRead? .roleOptionWriteReview
+				   | .roleOptionRead .roleOptionWriteReview
 				---
-					reviewOption: "
-						review: .first;
+					read: !"
+						read: .first;
 					";
 
-					writeOption: "
+					write: "
 						write: .first;
 					";
 
-					readOption: "
-						read: .first;
-					";
-
-					threeOptions: "
-						read: .first;
-						write: .first .second;
+					withRevew: "
+						write: .first;
 						review: .first .second .third;
 					";
 
-					threeOptionsWithDuplicates: "
-						review: .first;
+					withReadWrite: "
+						read: .first;
 						write: .first .second;
-						review: .first;
-						review: .first .second .third;
+					";
+
+					withReadWriteReview: "
+						read: .first;
+						write: .first .second;
 						review: .first .second .third;
 					";
 				;
 
-		roleOption: .propertyRoleAction .COLON .references .SEMI_COLON
-					---
-						oneRole: "read: .myRole;";
-						multipleRoles: "write: .first .second .third;";
-						review: "review: .myRole;";
-					;
+		roleOptionWriteReview: .roleOptionWrite .roleOptionReview?
+							---
+								write: "
+									write: .first;
+								";
 
-		propertyRoleAction: .READ
-							| .WRITE
-							| .REVIEW
+								withRevew: "
+									write: .first;
+									review: .first .second .third;
+								";
 							;
+
+		roleOptionReview: .REVIEW .roleOptionSuffix;
+		roleOptionWrite: .WRITE .roleOptionSuffix;
+		roleOptionRead: .READ .roleOptionSuffix;
+		roleOptionSuffix:  .COLON .references .SEMI_COLON;
 
 		propertyName: .NAME .COLON .variableName .SEMI_COLON
 					---
