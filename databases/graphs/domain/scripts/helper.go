@@ -28,21 +28,11 @@ func fetchGrammarInput() []byte {
 						head:
 							engine: v1;
 							name: myName;
-							access:
-								code: 
-									read: .first (0.1);
-									write: 
-										.first;
-										review: .first .second .third (0.4);
-									;
-								;
-
-								data: 
-									read: .first;
-									write: 
-										.first;
-										review: .first .second .third;
-									;
+							access: 
+								read: .first;
+								write: 
+									.first;
+									review: .first .second .third;
 								;
 							;
 						;
@@ -74,21 +64,11 @@ func fetchGrammarInput() []byte {
 						head:
 							engine: v1;
 							name: myName;
-							access:
-								code: 
-									read: .first (0.1);
-									write: 
-										.first;
-										review: .first .second .third (0.4);
-									;
-								;
-
-								data: 
-									read: .first;
-									write: 
-										.first;
-										review: .first .second .third;
-									;
+							access: 
+								read: .first;
+								write: 
+									.first;
+									review: .first .second .third;
 								;
 							;
 						;
@@ -187,21 +167,11 @@ func fetchGrammarInput() []byte {
 						head:
 							engine: v1;
 							name: myName;
-							access:
-								code: 
-									read: .first (0.1);
-									write: 
-										.first;
-										review: .first .second .third (0.4);
-									;
-								;
-
-								data: 
-									read: .first;
-									write: 
-										.first;
-										review: .first .second .third;
-									;
+							access: 
+								read: .first;
+								write: 
+									.first;
+									review: .first .second .third;
 								;
 							;
 						;
@@ -231,70 +201,18 @@ func fetchGrammarInput() []byte {
 					numberZero: !"0";
 				;
 
-		access: .ACCESS .COLON .accessKind .SEMI_COLON
+		access: .ACCESS .COLON .roleOptions .SEMI_COLON
 				---
 					valid: "
-							access:
-								code: 
+							access: 
 								read: .first;
 								write: 
 									.first;
 									review: .first .second .third;
 								;
 							;
-
-							data: 
-								write: 
-									.first;
-									review: .first .second .third;
-								;
-							;
-						;
-					";
+						";
 				;
-		
-		accessKind: .accessKindCode? .accessKindData
-				  | .accessKindCode .accessKindData?
-				---
-					data: "
-						data: 
-							read: .first;
-							write: 
-								.first;
-								review: .first .second .third;
-							;
-						;
-					";
-
-					code: "
-						code: 
-							read: .first;
-							write:.first;
-						;
-					";
-
-					dataAndCode: "
-						code: 
-							read: .first;
-							write: 
-								.first;
-								review: .first .second .third;
-							;
-						;
-
-						data: 
-							write: 
-								.first;
-								review: .first .second .third;
-							;
-						;
-					";
-				;
-
-		accessKindCode: .CODE .accessKindSuffix;
-		accessKindData: .DATA .accessKindSuffix;
-
-		accessKindSuffix: .COLON .roleOptions .SEMI_COLON;
 
 		roleOptions: .roleOptionRead? .roleOptionWrite
 				   | .roleOptionRead .roleOptionWrite
