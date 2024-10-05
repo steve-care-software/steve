@@ -3,8 +3,176 @@ package scripts
 func fetchGrammarInput() []byte {
 	return []byte(`
 		v1;
-		> .reference;
+		> .script;
 		# .SPACE .TAB .EOL;
+
+		script: .programCallLine
+			  | .program
+			  ---
+					programCall: "
+						.first .second .third: [
+							myKeyname: 34;
+							again: [
+								voila: true;
+								again: [
+									number: 23;
+									again: 23;
+								];
+								third: true;
+							];
+						];
+					";
+
+					program: "
+						head:
+							engine: v1;
+							name: myName;
+							access:
+								code: 
+									read: .first;
+									write: .first .second;
+									review: .first;
+								;
+
+								data: 
+									read: .first;
+									write: .first .second;
+									review: .first;
+								;
+							;
+							compensation: 0.1, 0.23, 0.45;
+						;
+
+						children:
+							.first;
+							.second;
+							.third;
+						;
+
+						entry:
+							params:
+								uint8 outside:inside?;
+								set[list[map]] there:here;
+							;
+
+							bool myValue := false;
+							if (other > 12):
+								myValue = true;
+							;
+						;
+
+					";
+			  ;
+
+		program: .head .programContent
+				---
+					valid: "
+						head:
+							engine: v1;
+							name: myName;
+							access:
+								code: 
+									read: .first;
+									write: .first .second;
+									review: .first;
+								;
+
+								data: 
+									read: .first;
+									write: .first .second;
+									review: .first;
+								;
+							;
+							compensation: 0.1, 0.23, 0.45;
+						;
+
+						children:
+							.first;
+							.second;
+							.third;
+						;
+
+						entry:
+							params:
+								uint8 outside:inside?;
+								set[list[map]] there:here;
+							;
+
+							bool myValue := false;
+							if (other > 12):
+								myValue = true;
+							;
+						;
+
+					";
+				;
+
+		programContent: .children? .entry
+					  | .children .entry?
+					  | .children .entry
+					  ;
+
+		entry: .ENTRY .COLON .params? .instructions .SEMI_COLON
+			---
+				valid: "
+					entry:
+						bool myValue := false;
+						if (other > 12):
+							myValue = true;
+						;
+					;
+				";
+
+				withParams: "
+					entry:
+						params:
+							uint8 outside:inside?;
+							set[list[map]] there:here;
+						;
+
+						bool myValue := false;
+						if (other > 12):
+							myValue = true;
+						;
+					;
+				";
+			;
+
+		children: .CHILDREN .COLON .referenceSemiColon+ .SEMI_COLON
+				---
+					valid: "
+						children:
+							.first;
+							.second;
+							.third;
+						;
+					";
+				;
+
+		referenceSemiColon: .reference .SEMI_COLON;
+
+		params: .PARAMS .COLON .paramVariables .SEMI_COLON
+			---
+				valid: "
+					params:
+						uint8 outside:inside?;
+						set[list[map]] there:here;
+					;
+				";
+			;
+
+		paramVariables: .paramVariable+;
+
+		paramVariable: .type .variableName .COLON .variableName .INTERROGATION_POINT? .SEMI_COLON
+					---
+						isOptional: "
+							uint8 outside:inside?;
+						";
+
+						isMandatory: "
+							set[list[map]] outside:inside;
+						";
+					;
 
 		head: .HEAD .COLON .headOptions .SEMI_COLON
 			---
@@ -1633,5 +1801,8 @@ func fetchGrammarInput() []byte {
 		COMPENSATION: "compensation";
 		ENGINE: "engine";
 		HEAD: "head";
+		PARAMS: "params";
+		CHILDREN: "children";
+		ENTRY: "entry";
 	`)
 }
