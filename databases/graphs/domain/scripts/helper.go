@@ -10,9 +10,10 @@ func fetchGrammarInput() []byte {
 
 		instruction: .uniVarOperation
 				   | .assignment
-				   | .conditionalInstructions
-				   | .programCallInstruction
-				   | .forInstruction
+				   | .conditionLine
+				   | .programCallLine
+				   | .forLine
+				   | .RETURN .SEMI_COLON
 					---
 						uniVarOperation: "
 							myVariable++;
@@ -45,6 +46,7 @@ func fetchGrammarInput() []byte {
 						for: "
 							for i->5:
 								myValue = (myValue + 1);
+								return;
 							;
 						";
 				   ;
@@ -59,9 +61,9 @@ func fetchGrammarInput() []byte {
 					  | .HYPHEN[2]
 					  ;
 
-		programCallInstruction: .programCall .SEMI_COLON;
+		programCallLine: .programCall .SEMI_COLON;
 
-		forInstruction: .forIndex
+		forLine: .forIndex
 					  | .forKeyValue
 					  ---
 						index: "
@@ -97,7 +99,7 @@ func fetchGrammarInput() []byte {
 							valid: "i->5";
 						;
 
-		forKeyValue: .FOR .variableCommaVariable .firstAssignmentSymbol .iterable .COLON .instructions .SEMI_COLON
+		forKeyValue: .FOR .variableCommaVariable .firstAssignmentSymbol .iterable .COLON .forInstructions .SEMI_COLON
 					---
 						variable: "
 								for _, myValue := myVariable:
@@ -114,9 +116,20 @@ func fetchGrammarInput() []byte {
 									];
 								]:
 									uint8 myValue := 78;
+									break;
 								;
 						";
 					;
+
+		forInstructions: .forInstruction+;
+
+		forInstruction: .instruction
+					  | .BREAK .SEMI_COLON
+					  ---
+					  		instruction: "
+								uint8 myValue := 8;
+							";
+					  ;
 		
 		variableCommaVariable: .forKeyValueName .COMMA .forKeyValueName;
 
@@ -145,7 +158,7 @@ func fetchGrammarInput() []byte {
 					";
 				;
 
-		conditionalInstructions: .IF .operation .COLON .instructions .SEMI_COLON
+		conditionLine: .IF .operation .COLON .instructions .SEMI_COLON
 								---
 									valid: "
 										if (myValue > 12):
@@ -1333,5 +1346,7 @@ func fetchGrammarInput() []byte {
 		IF: "if";
 		ARROW: "->";
 		FOR: "for";
+		BREAK: "break";
+		RETURN: "return";
 	`)
 }
