@@ -30,8 +30,11 @@ func fetchGrammarInput() []byte {
 							name: myName;
 							access:
 								code: 
-									read: .first;
-									write: .first;
+									read: .first (0.1);
+									write: 
+										.first;
+										review: .first .second .third (0.4);
+									;
 								;
 
 								data: 
@@ -42,7 +45,6 @@ func fetchGrammarInput() []byte {
 									;
 								;
 							;
-							compensation: 0.1, 0.23, 0.45;
 						;
 
 						children:
@@ -74,8 +76,11 @@ func fetchGrammarInput() []byte {
 							name: myName;
 							access:
 								code: 
-									read: .first;
-									write: .first;
+									read: .first (0.1);
+									write: 
+										.first;
+										review: .first .second .third (0.4);
+									;
 								;
 
 								data: 
@@ -86,7 +91,6 @@ func fetchGrammarInput() []byte {
 									;
 								;
 							;
-							compensation: 0.1, 0.23, 0.45;
 						;
 
 						children:
@@ -177,7 +181,7 @@ func fetchGrammarInput() []byte {
 						";
 					;
 
-		head: .HEAD .COLON .headOptions .SEMI_COLON
+		head: .HEAD .COLON .engine .propertyName .access? .SEMI_COLON
 			---
 				all: "
 						head:
@@ -185,10 +189,10 @@ func fetchGrammarInput() []byte {
 							name: myName;
 							access:
 								code: 
-									read: .first;
+									read: .first (0.1);
 									write: 
 										.first;
-										review: .first .second .third;
+										review: .first .second .third (0.4);
 									;
 								;
 
@@ -200,103 +204,9 @@ func fetchGrammarInput() []byte {
 									;
 								;
 							;
-							compensation: 0.1, 0.23, 0.45;
 						;
-				";
+					";
 			;
-
-		headOptions: .engine .propertyName .headOptionalOption*
-				  ---
-				  		mandatory: "
-							engine: v1;
-							name: myName;
-						";
-
-						access: "
-							engine: v1;
-							name: myName;
-							access:
-								code: 
-									read: .first;
-									write: 
-										.first;
-										review: .first .second .third;
-									;
-								;
-
-								data: 
-									read: .first;
-									write: 
-										.first;
-										review: .first .second .third;
-									;
-								;
-							;
-						";
-
-						compensation: "
-							engine: v1;
-							name: myName;
-							compensation: 0.1, 0.23, 0.45;
-						";
-
-						all: "
-							engine: v1;
-							name: myName;
-							compensation: 0.1, 0.23, 0.45;
-							access:
-								code: 
-									read: .first;
-									write: 
-										.first;
-										review: .first .second .third;
-									;
-								;
-
-								data: 
-									read: .first;
-									write: 
-										.first;
-										review: .first .second .third;
-									;
-								;
-							;
-						";
-
-						nameAtTheEnd: !"
-							engine: v1;
-							compensation: 0.1, 0.23, 0.45;
-							name: myName;
-						";
-				  ;
-
-		headOptionalOption:	.access
-							| .compensation
-							---
-									access: "
-										access:
-											code: 
-												read: .first;
-												write: 
-													.first;
-													review: .first .second .third;
-												;
-											;
-
-											data: 
-												read: .first;
-												write: 
-													.first;
-													review: .first .second .third;
-												;
-											;
-										;
-									";
-
-									compensation: "
-										compensation: 0.1, 0.23, 0.45;
-									";
-							;
 
 		engine: .ENGINE .COLON .version .SEMI_COLON
 				---
@@ -320,11 +230,6 @@ func fetchGrammarInput() []byte {
 					oneLettter: !"a";
 					numberZero: !"0";
 				;
-
-		compensation: .COMPENSATION .COLON .threeFloatNumbersBetweenZeroAndOne .SEMI_COLON
-					---
-						valid: "compensation: 0.1, 0.23, 0.45;";
-					;
 
 		access: .ACCESS .COLON .accessKind .SEMI_COLON
 				---
@@ -426,42 +331,42 @@ func fetchGrammarInput() []byte {
 					";
 				;
 
-		roleOptionWrite: .WRITE .COLON .references .SEMI_COLON .roleOptionReview? 
+		roleOptionWrite: .WRITE .COLON .referencesCompensation .SEMI_COLON .roleOptionReview? 
 						---
 							write: "
-								write: .first;
+								write: .first (0.2);
 							";
 
 							withRevew: "
 								write: 
 									.first;
-									review: .first .second .third;
+									review: .first .second .third (0.4);
 								;
 							";
 						;
+						
 		roleOptionReview: .REVIEW .roleOptionSuffix .SEMI_COLON;
 
 		roleOptionRead: .READ .roleOptionSuffix;
-		roleOptionSuffix:  .COLON .references .SEMI_COLON;
+		roleOptionSuffix:  .COLON .referencesCompensation .SEMI_COLON;
 
 		propertyName: .NAME .COLON .variableName .SEMI_COLON
 					---
 						valid: "name: myName;";
 					;
 
-		threeFloatNumbersBetweenZeroAndOne: .floatNumberBetweenZeroAndOne .commaFloatNumberBetweenZeroAndOne[2]
-										---
-											three: "0.0, 0.12, 0.134";
-											one: !"0.12";
-											two: !"0.12, 23.32";
-											lastTooBigThree: !"0.0, 0.12, 32.134";
-										;
+		referencesCompensation: .references .floatNumberBetweenZeroAndOneInParenthesis?
+								---
+									valid: "
+										.myReference
+									";
 
-		commaFloatNumberBetweenZeroAndOne: .COMMA .floatNumberBetweenZeroAndOne
-										---
-											valid: ", 0.12";
-											invalid: !", 32.98";
-										; 
+									withCompensation: "
+										.myReference (0.1)
+									";
+								;
+
+		floatNumberBetweenZeroAndOneInParenthesis: .PARENTHESIS_OPEN .floatNumberBetweenZeroAndOne .PARENTHESIS_CLOSE;
 
 		floatNumberBetweenZeroAndOne: .N_ZERO .DOT .numbers
 									---
@@ -1846,7 +1751,6 @@ func fetchGrammarInput() []byte {
 		CODE: "code";
 		DATA: "data";
 		ACCESS: "access";
-		COMPENSATION: "compensation";
 		ENGINE: "engine";
 		HEAD: "head";
 		PARAMS: "params";
