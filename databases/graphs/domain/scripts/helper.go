@@ -306,11 +306,21 @@ func fetchGrammarInput() []byte {
 						valid: ", myVariable";
 					;
 
-		assignee: .type? .variableName
+		assignee: .type? .assigneeName
 				---
 					variable: "myVariable";
+					variableWithIndex: "myVariable[3]";
 					variableWithType: "uint8 myVariable";
 				;
+
+		assigneeName: .variableName .reference* .index?
+					| 
+					---
+						variable: "myVariable";
+						variableWithIndex: "myVariable[3]";
+						references: "myVariable.second.third";
+						referencesWithIndex: "myVariable.second.third[3]";
+					;
 
 		assignableOptions: .assignable .commaAssignable*;
 		commaAssignable: .COMMA .assignable;
@@ -1009,6 +1019,7 @@ func fetchGrammarInput() []byte {
 							.first .second .third
 						";
 					;
+
 		reference: .DOT .variableName
 				---
 					withDot: ".myReference";
