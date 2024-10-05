@@ -8,11 +8,16 @@ func fetchGrammarInput() []byte {
 
 		instructions: .instruction+;
 
-		instruction: .assignment
+		instruction: .uniVarOperation
+				   | .assignment
 				   | .conditionalInstructions
 				   | .programCallInstruction
 				   | .forInstruction
 					---
+						uniVarOperation: "
+							myVariable++;
+						";
+
 						conditionalInstrcuctions: "
 							if (myValue > 12):
 								uint8 myVariable = 14;
@@ -43,6 +48,16 @@ func fetchGrammarInput() []byte {
 							;
 						";
 				   ;
+
+		uniVarOperation: .variableName .uniVarOperator .SEMI_COLON
+						---
+							plus: "myVariable++;";
+							minus: "myVariable--;";
+						;
+
+		uniVarOperator: .PLUS[2]
+					  | .HYPHEN[2]
+					  ;
 
 		programCallInstruction: .programCall .SEMI_COLON;
 
@@ -179,7 +194,16 @@ func fetchGrammarInput() []byte {
 					 ;
 
 		assignment: .assigneesCommaSeparated .assignmentSymbol .assignableOptions .SEMI_COLON
+				  | .variableName .arithmeticOperator .EQUAL .assignable .SEMI_COLON
 				---
+					plusEqual: "
+						myVaraible += 12;
+					";
+
+					mulEqual: "
+						myVaraible *= myVariable;
+					";
+
 					simple: "
 						uint8 myVariable := 8;
 					";
@@ -300,10 +324,10 @@ func fetchGrammarInput() []byte {
 				  | .programCall
 				  | .primitiveValue
 				  | .variableCasting
-				  | .variableName
+				  | .variableNameExpand
 				  | .PARENTHESIS_OPEN .operation .PARENTHESIS_CLOSE
 					---
-
+						
 						queryDelete: "
 								.mySchema[myPoint];
 								.myOtherSchema[myOtherPoint];
@@ -379,6 +403,33 @@ func fetchGrammarInput() []byte {
 							]
 						";
 
+						variableNameExpand: "
+							myValue...
+						";
+
+						mapExpand: "
+							[
+								myKeyname: 34;
+								again: [
+									voila: true;
+									again: [
+										number: 23;
+										again: 23;
+									];
+									third: true;
+								];
+							]...
+						";
+
+						listExpand: "
+							[
+								23,
+								43,
+								54,
+								56
+							]...
+						";
+
 						primitive: "34.0";
 						variable: "myVariable";
 						casting: "myVariable.(float32)";
@@ -387,6 +438,10 @@ func fetchGrammarInput() []byte {
 							->myChain[0][0]->myChain[0][0]->myChain[0][0]->RULE
 						";
 					;
+
+		variableNameExpand: .variableName .treeDots?;
+
+		treeDots: .DOT[3];
 
 		selector: .ARROW .chain
 				---
@@ -480,8 +535,8 @@ func fetchGrammarInput() []byte {
 						";
 					;
 
-		listMap: .map
-				| .list
+		listMap: .map .treeDots?
+				| .list .treeDots?
 				;
 
 		list: .BRACKET_OPEN .assignableOptions .BRACKET_CLOSE;
