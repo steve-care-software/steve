@@ -326,6 +326,7 @@ func fetchGrammarInput() []byte {
 		commaAssignable: .COMMA .assignable;
 
 		assignable: .selector
+				  | .route
 				  | .queryInsertUpdate
 				  | .queryDelete
 				  | .querySelect
@@ -447,11 +448,26 @@ func fetchGrammarInput() []byte {
 						selector: "
 							->myChain[0][0]->myChain[0][0]->myChain[0][0]->RULE
 						";
+
+						route: "
+							> .myOriginSchema[point] .myTargetSchema[point]
+						";
 					;
 
 		variableNameExpand: .variableName .treeDots?;
 
 		treeDots: .DOT[3];
+
+		route: .GREATHER_THAN? .externalPointReference[2]
+			---
+				optimal: "
+					> .myOriginSchema[point] .myTargetSchema[point]
+				";
+
+				normal: "
+					.myOriginSchema[point] .myTargetSchema[point]
+				";
+			;
 
 		selector: .ARROW .chain
 				---
