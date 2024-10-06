@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/steve-care-software/steve/parsers/domain/grammars"
-	"github.com/steve-care-software/steve/parsers/domain/walkers/languages"
+	"github.com/steve-care-software/steve/parsers/domain/walkers/elements"
 )
 
 type testValue struct {
@@ -19,19 +19,19 @@ func TestApplication_withSuites_execute_Success(t *testing.T) {
 		first:second
 	`)
 
-	sequence := languages.Element{
+	sequence := elements.Element{
 		ElementFn: func(input any) (any, error) {
 			fmt.Printf("\n root: %s \n", input)
 			return input, nil
 		},
-		TokenList: &languages.TokenList{
+		TokenList: &elements.TokenList{
 			MapFn: func(elementName string, mp map[string][]any) (any, error) {
 				return &testValue{
 					First:  string(mp["variableName"][0].(string)),
 					Second: string(mp["variableComplex"][0].(string)),
 				}, nil
 			},
-			List: map[string]languages.SelectedTokenList{
+			List: map[string]elements.SelectedTokenList{
 				"variableName": {
 					SelectorScript: []byte(`
 						v1;
@@ -39,8 +39,8 @@ func TestApplication_withSuites_execute_Success(t *testing.T) {
 						variableName[0][0];
 					`),
 
-					Node: &languages.Node{
-						Element: &languages.Element{
+					Node: &elements.Node{
+						Element: &elements.Element{
 							ElementFn: func(input any) (any, error) {
 								return string(input.([]byte)), nil
 							},
@@ -53,8 +53,8 @@ func TestApplication_withSuites_execute_Success(t *testing.T) {
 						name: mySelector;
 						variableComplex[0][0];
 					`),
-					Node: &languages.Node{
-						Element: &languages.Element{
+					Node: &elements.Node{
+						Element: &elements.Element{
 							ElementFn: func(input any) (any, error) {
 								return string(input.([]byte)), nil
 							},

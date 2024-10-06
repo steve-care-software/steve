@@ -10,7 +10,7 @@ import (
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/suites"
 	"github.com/steve-care-software/steve/parsers/domain/queries"
 	"github.com/steve-care-software/steve/parsers/domain/walkers"
-	"github.com/steve-care-software/steve/parsers/domain/walkers/languages"
+	"github.com/steve-care-software/steve/parsers/domain/walkers/elements"
 )
 
 type application struct {
@@ -37,7 +37,7 @@ func createApplication(
 }
 
 // Execute executes the parser application
-func (app *application) Execute(input []byte, grammar grammars.Grammar, ins languages.Element) (any, []byte, error) {
+func (app *application) Execute(input []byte, grammar grammars.Grammar, ins elements.Element) (any, []byte, error) {
 	ast, retRemaining, err := app.astAdapter.ToAST(grammar, input)
 	if err != nil {
 		return nil, nil, err
@@ -52,7 +52,7 @@ func (app *application) Execute(input []byte, grammar grammars.Grammar, ins lang
 	return retIns, retRemaining, nil
 }
 
-func (app *application) element(element instructions.Element, ins languages.Element) (any, error) {
+func (app *application) element(element instructions.Element, ins elements.Element) (any, error) {
 	if element.IsConstant() {
 		value := element.Constant().Value()
 		return app.callElementFn(value, ins.ElementFn)
@@ -85,7 +85,7 @@ func (app *application) callElementFn(value any, fn walkers.ElementFn) (any, err
 func (app *application) tokenList(
 	elementName string,
 	tokensList []instructions.Token,
-	ins languages.TokenList,
+	ins elements.TokenList,
 ) (any, error) {
 	output := map[string][]any{}
 	for _, oneToken := range tokensList {
@@ -108,7 +108,7 @@ func (app *application) tokenList(
 	return ins.MapFn(elementName, output)
 }
 
-func (app *application) token(token instructions.Token, ins languages.Token) (any, error) {
+func (app *application) token(token instructions.Token, ins elements.Token) (any, error) {
 	output := []any{}
 	elementsList := token.Elements().List()
 	for _, oneElement := range elementsList {
@@ -131,7 +131,7 @@ func (app *application) token(token instructions.Token, ins languages.Token) (an
 func (app *application) selectedTokenList(
 	elementName string,
 	tokensList []instructions.Token,
-	ins languages.SelectedTokenList,
+	ins elements.SelectedTokenList,
 ) (any, error) {
 	tokensIns, err := app.tokensBuilder.Create().
 		WithList(tokensList).
@@ -201,7 +201,7 @@ func (app *application) node(
 	tokens instructions.Tokens,
 	token instructions.Token,
 	element instructions.Element,
-	ins languages.Node,
+	ins elements.Node,
 ) (any, error) {
 	if tokens != nil {
 		if ins.TokenList == nil {
