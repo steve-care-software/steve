@@ -1,8 +1,27 @@
 package elements
 
 import (
+	"github.com/steve-care-software/steve/parsers/domain/queries"
 	"github.com/steve-care-software/steve/parsers/domain/walkers"
 )
+
+// NewAdapter creates a new adapter instance
+func NewAdapter() Adapter {
+	queryAdapter, _ := queries.NewAdapterFactory().Create()
+	builder := walkers.NewBuilder()
+	tokenListBuilder := walkers.NewTokenListBuilder()
+	selectedTokenListBuilder := walkers.NewSelectedTokenListBuilder()
+	tokenBuilder := walkers.NewTokenBuilder()
+	nodeBuilder := walkers.NewNodeBuilder()
+	return createAdapter(
+		queryAdapter,
+		builder,
+		tokenListBuilder,
+		selectedTokenListBuilder,
+		tokenBuilder,
+		nodeBuilder,
+	)
+}
 
 // Adapter represents an element adapter
 type Adapter interface {
