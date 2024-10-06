@@ -11,6 +11,11 @@ type MapFn func(elementName string, mp map[string][]any) (any, error)
 // ListFn takes a list of elements and returns an instance
 type ListFn func(list []any) (any, error)
 
+// NewBuilder creates a new builder
+func NewBuilder() Builder {
+	return createBuilder()
+}
+
 // NewTokenListBuilder creates a new token list builder
 func NewTokenListBuilder() TokenListBuilder {
 	return createTokenListBuilder()
