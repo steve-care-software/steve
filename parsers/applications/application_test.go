@@ -1,10 +1,308 @@
 package applications
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/steve-care-software/steve/parsers/domain/grammars"
 )
+
+type testValue struct {
+	First  string
+	Second string
+}
+
+func TestApplication_withSuites_execute_Success(t *testing.T) {
+
+	scriptInput := []byte(`
+		first:second
+	`)
+
+	sequence := Element{
+		ElementFn: func(input any) (any, error) {
+			fmt.Printf("\n root: %s \n", input)
+			return input, nil
+		},
+		TokenList: &TokenList{
+			MapFn: func(elementName string, mp map[string][]any) (any, error) {
+				return &testValue{
+					First:  string(mp["variableName"][0].(string)),
+					Second: string(mp["variableComplex"][0].(string)),
+				}, nil
+			},
+			List: map[string]ChosenTokenList{
+				"variableName": {
+					SelectorScript: []byte(`
+						v1;
+						name: mySelector;
+						variableName[0][0];
+					`),
+
+					Node: &Node{
+						Element: &Element{
+							ElementFn: func(input any) (any, error) {
+								return string(input.([]byte)), nil
+							},
+						},
+					},
+				},
+				"variableComplex": {
+					SelectorScript: []byte(`
+						v1;
+						name: mySelector;
+						variableComplex[0][0];
+					`),
+					Node: &Node{
+						Element: &Element{
+							ElementFn: func(input any) (any, error) {
+								return string(input.([]byte)), nil
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	grammarInput := []byte(`
+		v1;
+		> .pointer;
+		# .SPACE .TAB .EOL;
+
+		pointer: .variableName .COLON .variableComplex
+				---
+					valid: "first:second";
+				;
+
+		variableComplex: .letters+;
+
+		variableName: .oneLowerCaseLetter .letters+
+					---
+						good: "myVariable";
+						firstUpperCaseLetter: !"MyVariable";
+					;
+
+		letters: .uppercaseLetters
+				 | .lowerCaseLetters
+				---
+					oneLowerCaseLetter: "a";
+					lowerCaseLetters: "abcdefghijklmnopqrstuvwxyz";
+					oneUpperCaseLetter: "A";
+					upperCaseLetter: "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+					oneNumber: !"0";
+				;
+
+		uppercaseLetters: .oneUpperCaseLetter+;
+		oneUpperCaseLetter: .UL_A
+							| .UL_B
+							| .UL_C
+							| .UL_D
+							| .UL_E
+							| .UL_F
+							| .UL_G
+							| .UL_H
+							| .UL_I
+							| .UL_J
+							| .UL_K
+							| .UL_L
+							| .UL_M
+							| .UL_N
+							| .UL_O
+							| .UL_P
+							| .UL_Q
+							| .UL_R
+							| .UL_S
+							| .UL_T
+							| .UL_U
+							| .UL_V
+							| .UL_W
+							| .UL_X
+							| .UL_Y
+							| .UL_Z
+							;
+
+		lowerCaseLetters: .oneLowerCaseLetter+
+							---
+						  		oneLowerCaseLetter: "a";
+						  		lowerCaseLetters: "abcdefghijklmnopqrstuvwxyz";
+								oneUpperCaseLetter: !"A";
+								upperCaseLetter: !"ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+								oneNumber: !"0";
+						  	;
+
+		oneLowerCaseLetter: .LL_A
+							| .LL_B
+							| .LL_C
+							| .LL_D
+							| .LL_E
+							| .LL_F
+							| .LL_G
+							| .LL_H
+							| .LL_I
+							| .LL_J
+							| .LL_K
+							| .LL_L
+							| .LL_M
+							| .LL_N
+							| .LL_O
+							| .LL_P
+							| .LL_Q
+							| .LL_R
+							| .LL_S
+							| .LL_T
+							| .LL_U
+							| .LL_V
+							| .LL_W
+							| .LL_X
+							| .LL_Y
+							| .LL_Z
+							;
+
+		numbers: .oneNumber+
+				---
+					oneNumber: "1";
+					numberWithAllNumbers: "1234567890";
+					negativeNumberWithAllNumbers: !"-1234567890";
+					oneLettter: !"a";
+				;
+
+		oneNumber: .N_ZERO
+				   | .N_ONE
+				   | .N_TWO
+				   | .N_THREE
+				   | .N_FOUR
+				   | .N_FIVE
+				   | .N_SIX
+				   | .N_SEVEN
+				   | .N_HEIGHT
+				   | .N_NINE
+				   ---
+				   		zero: "0";
+						one: "1";
+						two: "2";
+						three: "3";
+						four: "4";
+						five: "5";
+						six: "6";
+						seven: "7";
+						height: "8";
+						nine: "9";
+				   ;
+
+		N_ZERO: "0";
+		N_ONE: "1";
+		N_TWO: "2";
+		N_THREE: "3";
+		N_FOUR: "4";
+		N_FIVE: "5";
+		N_SIX: "6";
+		N_SEVEN: "7";
+		N_HEIGHT: "8";
+		N_NINE: "9";
+
+		LL_A: "a";
+		LL_B: "b";
+		LL_C: "c";
+		LL_D: "d";
+		LL_E: "e";
+		LL_F: "f";
+		LL_G: "g";
+		LL_H: "h";
+		LL_I: "i";
+		LL_J: "j";
+		LL_K: "k";
+		LL_L: "l";
+		LL_M: "m";
+		LL_N: "n";
+		LL_O: "o";
+		LL_P: "p";
+		LL_Q: "q";
+		LL_R: "r";
+		LL_S: "s";
+		LL_T: "t";
+		LL_U: "u";
+		LL_V: "v";
+		LL_W: "w";
+		LL_X: "x";
+		LL_Y: "y";
+		LL_Z: "z";
+		
+		UL_A: "A";
+		UL_B: "B";
+		UL_C: "C";
+		UL_D: "D";
+		UL_E: "E";
+		UL_F: "F";
+		UL_G: "G";
+		UL_H: "H";
+		UL_I: "I";
+		UL_J: "J";
+		UL_K: "K";
+		UL_L: "L";
+		UL_M: "M";
+		UL_N: "N";
+		UL_O: "O";
+		UL_P: "P";
+		UL_Q: "Q";
+		UL_R: "R";
+		UL_S: "S";
+		UL_T: "T";
+		UL_U: "U";
+		UL_V: "V";
+		UL_W: "W";
+		UL_X: "X";
+		UL_Y: "Y";
+		UL_Z: "Z";
+
+		COLON: ":";
+
+		SPACE: " ";
+		TAB: "	";
+		EOL: "
+";
+	`)
+
+	grammarAdapter := grammars.NewAdapter()
+	retGrammar, _, err := grammarAdapter.ToGrammar(grammarInput)
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	if err != nil {
+		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
+		return
+	}
+
+	application := NewApplication()
+	err = application.Suites(retGrammar)
+	if err != nil {
+		t.Errorf("there was an error while running the grammar test suites: %s", err.Error())
+		return
+	}
+
+	retOutput, _, err := application.Execute(scriptInput, retGrammar, sequence)
+	if err != nil {
+		t.Errorf("there was an error while running the grammar test suites: %s", err.Error())
+		return
+	}
+
+	if casted, ok := retOutput.(*testValue); ok {
+		if casted.First != "first" {
+			t.Errorf("the first property was expected to be '%s', '%s' returned", casted.First, "first")
+			return
+		}
+
+		if casted.Second != "second" {
+			t.Errorf("the second property was expected to be '%s', '%s' returned", casted.Second, "second")
+			return
+		}
+
+		return
+	}
+
+	t.Error("the returned parsed instance could not be casted properly")
+}
 
 func TestApplication_grammar_withSuites_Success(t *testing.T) {
 	grammarInput := []byte(`
@@ -418,59 +716,3 @@ func TestApplication_grammar_withSuites_Success(t *testing.T) {
 		return
 	}
 }
-
-/*
-func TestApplication_grammar_composeBlock_withReplacement_Success(t *testing.T) {
-	input := []byte(`
-		v1;
-		>.additionInParenthesis;
-		# .SPACE .TAB .EOL;
-
-		additionInParenthesis: .OPEN_PARENTHESIS .addition .CLOSE_PARENTHESIS - .addition;
-		addition: .firstNumber .PLUS .secondNumber - .myReplacement;
-		secondNumber: .N_THREE .N_FOUR .N_FIVE;
-		firstNumber: .N_ONE .N_TWO;
-		myReplacement: .N_ONE .N_THREE;
-
-		replacedNumber: .N_TWO .N_FOUR;
-
-		N_ZERO: "0";
-		N_ONE: "1";
-		N_TWO: "2";
-		N_THREE: "3";
-		N_FOUR: "4";
-		N_FIVE: "5";
-		N_SIX: "6";
-		OPEN_PARENTHESIS: "(";
-		CLOSE_PARENTHESIS: ")";
-		PLUS: "+";
-		SPACE: " ";
-		TAB: "\t\t";
-		EOL: "\n";
-	`)
-
-	application := NewApplication()
-	retGrammar, _, err := application.ParseGrammar(input)
-	if err != nil {
-		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
-		return
-	}
-
-	if err != nil {
-		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
-		return
-	}
-
-	retValue, err := application.ComposeBlock(retGrammar, "additionInParenthesis")
-	if err != nil {
-		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
-		return
-	}
-
-	expected := "13"
-	if string(retValue) != expected {
-		t.Errorf("the returned value is invalid")
-		return
-	}
-}
-*/
