@@ -9,6 +9,8 @@ import (
 	"github.com/steve-care-software/steve/parsers/domain/grammars"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/suites"
 	"github.com/steve-care-software/steve/parsers/domain/queries"
+	"github.com/steve-care-software/steve/parsers/domain/walkers"
+	"github.com/steve-care-software/steve/parsers/domain/walkers/languages"
 )
 
 type application struct {
@@ -35,7 +37,7 @@ func createApplication(
 }
 
 // Execute executes the parser application
-func (app *application) Execute(input []byte, grammar grammars.Grammar, ins Element) (any, []byte, error) {
+func (app *application) Execute(input []byte, grammar grammars.Grammar, ins languages.Element) (any, []byte, error) {
 	ast, retRemaining, err := app.astAdapter.ToAST(grammar, input)
 	if err != nil {
 		return nil, nil, err
@@ -50,7 +52,7 @@ func (app *application) Execute(input []byte, grammar grammars.Grammar, ins Elem
 	return retIns, retRemaining, nil
 }
 
-func (app *application) element(element instructions.Element, ins Element) (any, error) {
+func (app *application) element(element instructions.Element, ins languages.Element) (any, error) {
 	if element.IsConstant() {
 		value := element.Constant().Value()
 		return app.callElementFn(value, ins.ElementFn)
@@ -72,7 +74,7 @@ func (app *application) element(element instructions.Element, ins Element) (any,
 	return app.callElementFn(value, ins.ElementFn)
 }
 
-func (app *application) callElementFn(value any, fn ElementFn) (any, error) {
+func (app *application) callElementFn(value any, fn walkers.ElementFn) (any, error) {
 	if fn == nil {
 		return value, nil
 	}
@@ -83,13 +85,13 @@ func (app *application) callElementFn(value any, fn ElementFn) (any, error) {
 func (app *application) tokenList(
 	elementName string,
 	tokensList []instructions.Token,
-	ins TokenList,
+	ins languages.TokenList,
 ) (any, error) {
 	output := map[string][]any{}
 	for _, oneToken := range tokensList {
 		name := oneToken.Name()
-		if chosenTokenList, ok := ins.List[name]; ok {
-			retValue, err := app.chosenTokenList(name, tokensList, chosenTokenList)
+		if selectedTokenList, ok := ins.List[name]; ok {
+			retValue, err := app.selectedTokenList(name, tokensList, selectedTokenList)
 			if err != nil {
 				return nil, err
 			}
@@ -106,7 +108,7 @@ func (app *application) tokenList(
 	return ins.MapFn(elementName, output)
 }
 
-func (app *application) token(token instructions.Token, ins Token) (any, error) {
+func (app *application) token(token instructions.Token, ins languages.Token) (any, error) {
 	output := []any{}
 	elementsList := token.Elements().List()
 	for _, oneElement := range elementsList {
@@ -126,10 +128,10 @@ func (app *application) token(token instructions.Token, ins Token) (any, error) 
 	return ins.ListFn(output)
 }
 
-func (app *application) chosenTokenList(
+func (app *application) selectedTokenList(
 	elementName string,
 	tokensList []instructions.Token,
-	ins ChosenTokenList,
+	ins languages.SelectedTokenList,
 ) (any, error) {
 	tokensIns, err := app.tokensBuilder.Create().
 		WithList(tokensList).
@@ -199,7 +201,7 @@ func (app *application) node(
 	tokens instructions.Tokens,
 	token instructions.Token,
 	element instructions.Element,
-	ins Node,
+	ins languages.Node,
 ) (any, error) {
 	if tokens != nil {
 		if ins.TokenList == nil {
