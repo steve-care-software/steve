@@ -11,6 +11,11 @@ type MapFn func(elementName string, mp map[string][]any) (any, error)
 // ListFn takes a list of elements and returns an instance
 type ListFn func(list []any) (any, error)
 
+// NewNodeBuilder creates a new node builder
+func NewNodeBuilder() NodeBuilder {
+	return createNodeBuilder()
+}
+
 // Builder represents the walker builder
 type Builder interface {
 	Create() Builder

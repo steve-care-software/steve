@@ -1,7 +1,6 @@
 package applications
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/steve-care-software/steve/parsers/domain/grammars"
@@ -21,7 +20,6 @@ func TestApplication_withSuites_execute_Success(t *testing.T) {
 
 	sequence := elements.Element{
 		ElementFn: func(input any) (any, error) {
-			fmt.Printf("\n root: %s \n", input)
 			return input, nil
 		},
 		TokenList: &elements.TokenList{
