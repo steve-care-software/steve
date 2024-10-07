@@ -2,6 +2,11 @@ package writes
 
 import "github.com/steve-care-software/steve/databases/graphs/domain/scripts/commons/heads/access/permissions"
 
+// NewBuilder creates a new builder
+func NewBuilder() Builder {
+	return createBuilder()
+}
+
 // Builder represents the write builder
 type Builder interface {
 	Create() Builder
