@@ -1,25 +1,49 @@
 package permissions
 
 type permission struct {
-	name         string
+	names        []string
 	compensation float64
 }
 
 func createPermission(
-	name string,
+	names []string,
+) Permission {
+	return createPermissionInternally(
+		names,
+		0.0,
+	)
+}
+
+func createPermissionWithCompensation(
+	names []string,
+	compensation float64,
+) Permission {
+	return createPermissionInternally(
+		names,
+		compensation,
+	)
+}
+
+func createPermissionInternally(
+	names []string,
 	compensation float64,
 ) Permission {
 	out := permission{
-		name:         name,
+		names:        names,
 		compensation: compensation,
 	}
 
 	return &out
 }
 
-// Name returns the name
-func (obj *permission) Name() string {
-	return obj.name
+// Names returns the names
+func (obj *permission) Names() []string {
+	return obj.names
+}
+
+// HasCompensation returns true if there is a compensation, false otherwise
+func (obj *permission) HasCompensation() bool {
+	return obj.compensation > 0.0
 }
 
 // Compensation returns the compensation

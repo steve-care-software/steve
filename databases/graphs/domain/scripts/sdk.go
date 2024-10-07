@@ -26,7 +26,6 @@ func NewAdapterBuilder() AdapterBuilder {
 	headBuilder := heads.NewBuilder()
 	accessBuilder := access.NewBuilder()
 	permissionsBuilder := permissions.NewBuilder()
-	permissionBuilder := permissions.NewPermissionBuilder()
 	writeBuilder := writes.NewBuilder()
 	connectionsBuilder := connections.NewBuilder()
 	connectionBuilder := connections.NewConnectionBuilder()
@@ -48,7 +47,6 @@ func NewAdapterBuilder() AdapterBuilder {
 		headBuilder,
 		accessBuilder,
 		permissionsBuilder,
-		permissionBuilder,
 		writeBuilder,
 		connectionsBuilder,
 		connectionBuilder,

@@ -8,14 +8,12 @@ import (
 	"github.com/steve-care-software/steve/parsers/domain/asts/instructions"
 	"github.com/steve-care-software/steve/parsers/domain/grammars"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/suites"
-	"github.com/steve-care-software/steve/parsers/domain/queries"
 	"github.com/steve-care-software/steve/parsers/domain/walkers"
 )
 
 type application struct {
 	elementsAdapter instructions.ElementsAdapter
 	astAdapter      asts.Adapter
-	queryAdapter    queries.Adapter
 	tokensBuilder   instructions.TokensBuilder
 	walker          walkers.Walker
 }
@@ -23,14 +21,12 @@ type application struct {
 func createApplication(
 	elementsAdapter instructions.ElementsAdapter,
 	astAdapter asts.Adapter,
-	queryAdapter queries.Adapter,
 	tokensBuilder instructions.TokensBuilder,
 	walker walkers.Walker,
 ) Application {
 	out := application{
 		elementsAdapter: elementsAdapter,
 		astAdapter:      astAdapter,
-		queryAdapter:    queryAdapter,
 		tokensBuilder:   tokensBuilder,
 		walker:          walker,
 	}
@@ -153,7 +149,8 @@ func (app *application) selectedTokenList(
 		chain := ins.Chain()
 		retTokensList, retToken, retElement, err := tokensIns.Select(chain)
 		if err != nil {
-			return nil, err
+			str := fmt.Sprintf("the element (name: %s) contains a script that does not match the provided Token instance", elementName)
+			return nil, errors.New(str)
 		}
 
 		tokensIns = nil

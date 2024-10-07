@@ -14,7 +14,7 @@ func NewBuilder() Builder {
 type Builder interface {
 	Create() Builder
 	WithWrite(write writes.Write) Builder
-	WithRead(read permissions.Permissions) Builder
+	WithRead(read permissions.Permission) Builder
 	Now() (Access, error)
 }
 
@@ -22,5 +22,5 @@ type Builder interface {
 type Access interface {
 	Write() writes.Write
 	HasRead() bool
-	Read() permissions.Permissions
+	Read() permissions.Permission
 }

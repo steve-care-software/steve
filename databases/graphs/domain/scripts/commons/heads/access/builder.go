@@ -9,7 +9,7 @@ import (
 
 type builder struct {
 	write writes.Write
-	read  permissions.Permissions
+	read  permissions.Permission
 }
 
 func createBuilder() Builder {
@@ -33,7 +33,7 @@ func (app *builder) WithWrite(write writes.Write) Builder {
 }
 
 // WithRead adds a read to the builder
-func (app *builder) WithRead(read permissions.Permissions) Builder {
+func (app *builder) WithRead(read permissions.Permission) Builder {
 	app.read = read
 	return app
 }

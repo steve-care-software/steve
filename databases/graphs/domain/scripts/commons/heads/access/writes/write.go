@@ -3,26 +3,26 @@ package writes
 import "github.com/steve-care-software/steve/databases/graphs/domain/scripts/commons/heads/access/permissions"
 
 type write struct {
-	modify permissions.Permissions
-	review permissions.Permissions
+	modify permissions.Permission
+	review permissions.Permission
 }
 
 func createWrite(
-	modify permissions.Permissions,
+	modify permissions.Permission,
 ) Write {
 	return createWriteInternally(modify, nil)
 }
 
 func createWriteWithReview(
-	modify permissions.Permissions,
-	review permissions.Permissions,
+	modify permissions.Permission,
+	review permissions.Permission,
 ) Write {
 	return createWriteInternally(modify, review)
 }
 
 func createWriteInternally(
-	modify permissions.Permissions,
-	review permissions.Permissions,
+	modify permissions.Permission,
+	review permissions.Permission,
 ) Write {
 	out := write{
 		modify: modify,
@@ -33,7 +33,7 @@ func createWriteInternally(
 }
 
 // Modify returns the modify
-func (obj *write) Modify() permissions.Permissions {
+func (obj *write) Modify() permissions.Permission {
 	return obj.modify
 }
 
@@ -43,6 +43,6 @@ func (obj *write) HasReview() bool {
 }
 
 // Review returns the review, if any
-func (obj *write) Review() permissions.Permissions {
+func (obj *write) Review() permissions.Permission {
 	return obj.review
 }

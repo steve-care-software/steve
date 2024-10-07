@@ -7,7 +7,7 @@ import (
 
 type access struct {
 	write writes.Write
-	read  permissions.Permissions
+	read  permissions.Permission
 }
 
 func createAccess(
@@ -18,14 +18,14 @@ func createAccess(
 
 func createAccessWithRead(
 	write writes.Write,
-	read permissions.Permissions,
+	read permissions.Permission,
 ) Access {
 	return createAccessInternally(write, read)
 }
 
 func createAccessInternally(
 	write writes.Write,
-	read permissions.Permissions,
+	read permissions.Permission,
 ) Access {
 	out := access{
 		write: write,
@@ -46,6 +46,6 @@ func (obj *access) HasRead() bool {
 }
 
 // Read returns the read, if any
-func (obj *access) Read() permissions.Permissions {
+func (obj *access) Read() permissions.Permission {
 	return obj.read
 }

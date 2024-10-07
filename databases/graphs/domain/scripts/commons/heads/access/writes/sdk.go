@@ -10,14 +10,14 @@ func NewBuilder() Builder {
 // Builder represents the write builder
 type Builder interface {
 	Create() Builder
-	WithModify(modify permissions.Permissions) Builder
-	WithReview(review permissions.Permissions) Builder
+	WithModify(modify permissions.Permission) Builder
+	WithReview(review permissions.Permission) Builder
 	Now() (Write, error)
 }
 
 // Write represents the write permissions
 type Write interface {
-	Modify() permissions.Permissions
+	Modify() permissions.Permission
 	HasReview() bool
-	Review() permissions.Permissions
+	Review() permissions.Permission
 }

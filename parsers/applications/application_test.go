@@ -13,7 +13,6 @@ type testValue struct {
 }
 
 func TestApplication_withSuites_execute_Success(t *testing.T) {
-
 	scriptInput := []byte(`
 		first:second
 	`)

@@ -25,8 +25,7 @@ type adapterBuilder struct {
 	builder                 Builder
 	headBuilder             heads.Builder
 	accessBuilder           access.Builder
-	permissionsBuilder      permissions.Builder
-	permissionBuilder       permissions.PermissionBuilder
+	permissionBuilder       permissions.Builder
 	writeBuilder            writes.Builder
 	connectionsBuilder      connections.Builder
 	connectionBuilder       connections.ConnectionBuilder
@@ -50,8 +49,7 @@ func createAdapterBuilder(
 	builder Builder,
 	headBuilder heads.Builder,
 	accessBuilder access.Builder,
-	permissionsBuilder permissions.Builder,
-	permissionBuilder permissions.PermissionBuilder,
+	permissionBuilder permissions.Builder,
 	writeBuilder writes.Builder,
 	connectionsBuilder connections.Builder,
 	connectionBuilder connections.ConnectionBuilder,
@@ -73,7 +71,6 @@ func createAdapterBuilder(
 		builder:                 builder,
 		headBuilder:             headBuilder,
 		accessBuilder:           accessBuilder,
-		permissionsBuilder:      permissionsBuilder,
 		permissionBuilder:       permissionBuilder,
 		writeBuilder:            writeBuilder,
 		connectionsBuilder:      connectionsBuilder,
@@ -103,7 +100,6 @@ func (app *adapterBuilder) Create() AdapterBuilder {
 		app.builder,
 		app.headBuilder,
 		app.accessBuilder,
-		app.permissionsBuilder,
 		app.permissionBuilder,
 		app.writeBuilder,
 		app.connectionsBuilder,
@@ -141,7 +137,6 @@ func (app *adapterBuilder) Now() (Adapter, error) {
 		app.builder,
 		app.headBuilder,
 		app.accessBuilder,
-		app.permissionsBuilder,
 		app.permissionBuilder,
 		app.writeBuilder,
 		app.connectionsBuilder,

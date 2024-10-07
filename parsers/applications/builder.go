@@ -3,34 +3,30 @@ package applications
 import (
 	"github.com/steve-care-software/steve/parsers/domain/asts"
 	"github.com/steve-care-software/steve/parsers/domain/asts/instructions"
-	"github.com/steve-care-software/steve/parsers/domain/queries"
 	"github.com/steve-care-software/steve/parsers/domain/walkers"
 	"github.com/steve-care-software/steve/parsers/domain/walkers/elements"
 )
 
 type builder struct {
-	queryAdapterFactory queries.AdapterFactory
-	elementsAdapter     instructions.ElementsAdapter
-	astAdapter          asts.Adapter
-	elementAdapter      elements.Adapter
-	tokensBuilder       instructions.TokensBuilder
-	pElement            *elements.Element
+	elementsAdapter instructions.ElementsAdapter
+	astAdapter      asts.Adapter
+	elementAdapter  elements.Adapter
+	tokensBuilder   instructions.TokensBuilder
+	pElement        *elements.Element
 }
 
 func createBuilder(
-	queryAdapterFactory queries.AdapterFactory,
 	elementsAdapter instructions.ElementsAdapter,
 	astAdapter asts.Adapter,
 	elementAdapter elements.Adapter,
 	tokensBuilder instructions.TokensBuilder,
 ) Builder {
 	out := builder{
-		queryAdapterFactory: queryAdapterFactory,
-		elementsAdapter:     elementsAdapter,
-		astAdapter:          astAdapter,
-		elementAdapter:      elementAdapter,
-		tokensBuilder:       tokensBuilder,
-		pElement:            nil,
+		elementsAdapter: elementsAdapter,
+		astAdapter:      astAdapter,
+		elementAdapter:  elementAdapter,
+		tokensBuilder:   tokensBuilder,
+		pElement:        nil,
 	}
 
 	return &out
@@ -39,7 +35,6 @@ func createBuilder(
 // Create initializes the builder
 func (app *builder) Create() Builder {
 	return createBuilder(
-		app.queryAdapterFactory,
 		app.elementsAdapter,
 		app.astAdapter,
 		app.elementAdapter,
@@ -65,15 +60,9 @@ func (app *builder) Now() (Application, error) {
 		walker = retWalker
 	}
 
-	queryAdapter, err := app.queryAdapterFactory.Create()
-	if err != nil {
-		return nil, err
-	}
-
 	return createApplication(
 		app.elementsAdapter,
 		app.astAdapter,
-		queryAdapter,
 		app.tokensBuilder,
 		walker,
 	), nil

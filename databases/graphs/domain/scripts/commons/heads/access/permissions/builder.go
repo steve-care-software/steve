@@ -1,16 +1,16 @@
 package permissions
 
-import (
-	"errors"
-)
+import "errors"
 
 type builder struct {
-	list []Permission
+	names        []string
+	compensation float64
 }
 
 func createBuilder() Builder {
 	out := builder{
-		list: nil,
+		names:        nil,
+		compensation: 0.0,
 	}
 
 	return &out
@@ -21,21 +21,36 @@ func (app *builder) Create() Builder {
 	return createBuilder()
 }
 
-// WithList adds a list to the builder
-func (app *builder) WithList(list []Permission) Builder {
-	app.list = list
+// WithNames adds namess to the builder
+func (app *builder) WithNames(names []string) Builder {
+	app.names = names
 	return app
 }
 
-// Now builds a new Permissions instance
-func (app *builder) Now() (Permissions, error) {
-	if app.list != nil && len(app.list) <= 0 {
-		app.list = nil
+// WithCompensation adds a compensation to the builder
+func (app *builder) WithCompensation(compensation float64) Builder {
+	app.compensation = compensation
+	return app
+}
+
+// Now builds a new Permission instance
+func (app *builder) Now() (Permission, error) {
+	if app.names != nil && len(app.names) <= 0 {
+		app.names = nil
 	}
 
-	if app.list == nil {
-		return nil, errors.New("there must be at least 1 Permission in order to build a Permissions instance")
+	if app.names == nil {
+		return nil, errors.New("there must be at least 1 permission names in order to build a Permission instance")
 	}
 
-	return createPermissions(app.list), nil
+	if app.compensation > 0.0 {
+		return createPermissionWithCompensation(
+			app.names,
+			app.compensation,
+		), nil
+	}
+
+	return createPermission(
+		app.names,
+	), nil
 }

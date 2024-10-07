@@ -7,8 +7,8 @@ import (
 )
 
 type builder struct {
-	modify permissions.Permissions
-	review permissions.Permissions
+	modify permissions.Permission
+	review permissions.Permission
 }
 
 func createBuilder() Builder {
@@ -26,13 +26,13 @@ func (app *builder) Create() Builder {
 }
 
 // WithModify adds a modify to the builder
-func (app *builder) WithModify(modify permissions.Permissions) Builder {
+func (app *builder) WithModify(modify permissions.Permission) Builder {
 	app.modify = modify
 	return app
 }
 
 // WithReview adds a review to the builder
-func (app *builder) WithReview(review permissions.Permissions) Builder {
+func (app *builder) WithReview(review permissions.Permission) Builder {
 	app.review = review
 	return app
 }

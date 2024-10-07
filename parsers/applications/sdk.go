@@ -4,7 +4,6 @@ import (
 	"github.com/steve-care-software/steve/parsers/domain/asts"
 	"github.com/steve-care-software/steve/parsers/domain/asts/instructions"
 	"github.com/steve-care-software/steve/parsers/domain/grammars"
-	"github.com/steve-care-software/steve/parsers/domain/queries"
 	"github.com/steve-care-software/steve/parsers/domain/walkers/elements"
 )
 
@@ -12,11 +11,9 @@ import (
 func NewBuilder() Builder {
 	elementsAdapter := instructions.NewElementsAdapter()
 	astAdapter := asts.NewAdapter()
-	queryAdapterFactory := queries.NewAdapterFactory()
 	elementAdapter := elements.NewAdapter()
 	tokensBuilder := instructions.NewTokensBuilder()
 	return createBuilder(
-		queryAdapterFactory,
 		elementsAdapter,
 		astAdapter,
 		elementAdapter,
