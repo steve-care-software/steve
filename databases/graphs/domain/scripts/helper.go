@@ -230,7 +230,7 @@ func fetchGrammarInput() []byte {
 						";
 					;
 
-		head: .HEAD .COLON .engine .propertyName .access? .SEMI_COLON
+		head: .HEAD .COLON .engine .propertyName .access .SEMI_COLON
 			---
 				all: "
 						head:
