@@ -1,6 +1,11 @@
-package scripts
+package heads
 
 import "github.com/steve-care-software/steve/databases/graphs/domain/scripts/commons/heads/access"
+
+// NewBuilder creates a new builder instance
+func NewBuilder() Builder {
+	return createBuilder()
+}
 
 // Builder represents the head builder
 type Builder interface {
