@@ -8,24 +8,33 @@ import (
 	"github.com/steve-care-software/steve/parsers/domain/walkers/elements"
 )
 
-// NewApplication creates a new application
-func NewApplication() Application {
+// NewBuilder creates a new application builder
+func NewBuilder() Builder {
 	elementsAdapter := instructions.NewElementsAdapter()
 	astAdapter := asts.NewAdapter()
-	queryAdapter, _ := queries.NewAdapterFactory().Create()
+	queryAdapterFactory := queries.NewAdapterFactory()
+	elementAdapter := elements.NewAdapter()
 	tokensBuilder := instructions.NewTokensBuilder()
-	return createApplication(
+	return createBuilder(
+		queryAdapterFactory,
 		elementsAdapter,
 		astAdapter,
-		queryAdapter,
+		elementAdapter,
 		tokensBuilder,
 	)
+}
+
+// Builder represents an application builder
+type Builder interface {
+	Create() Builder
+	WithElement(ins elements.Element) Builder
+	Now() (Application, error)
 }
 
 // Application represents the interpreter application
 type Application interface {
 	// Execute executes the parser
-	Execute(input []byte, grammar grammars.Grammar, ins elements.Element) (any, []byte, error)
+	Execute(input []byte, grammar grammars.Grammar) (any, []byte, error)
 
 	// Suites executes all the test suites of the grammar
 	Suites(grammar grammars.Grammar) error

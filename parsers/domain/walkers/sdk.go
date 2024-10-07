@@ -63,6 +63,7 @@ type TokenListBuilder interface {
 type TokenList interface {
 	Fn() MapFn
 	List() []SelectedTokenList
+	Fetch(name string) (SelectedTokenList, error)
 }
 
 // SelectedTokenListBuilder represents the selected token list builder

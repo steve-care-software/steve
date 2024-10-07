@@ -47,8 +47,15 @@ func (app *tokenListBuilder) Now() (TokenList, error) {
 		return nil, errors.New("there must be at least 1 SelectedTokenList in order to build a TokenList instance")
 	}
 
+	mp := map[string]SelectedTokenList{}
+	for _, oneSelectedtokenList := range app.list {
+		name := oneSelectedtokenList.Name()
+		mp[name] = oneSelectedtokenList
+	}
+
 	return createTokenList(
 		app.fn,
 		app.list,
+		mp,
 	), nil
 }

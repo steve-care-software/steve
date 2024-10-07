@@ -10,7 +10,6 @@ import (
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/suites"
 	"github.com/steve-care-software/steve/parsers/domain/queries"
 	"github.com/steve-care-software/steve/parsers/domain/walkers"
-	"github.com/steve-care-software/steve/parsers/domain/walkers/elements"
 )
 
 type application struct {
@@ -18,6 +17,7 @@ type application struct {
 	astAdapter      asts.Adapter
 	queryAdapter    queries.Adapter
 	tokensBuilder   instructions.TokensBuilder
+	walker          walkers.Walker
 }
 
 func createApplication(
@@ -25,26 +25,31 @@ func createApplication(
 	astAdapter asts.Adapter,
 	queryAdapter queries.Adapter,
 	tokensBuilder instructions.TokensBuilder,
+	walker walkers.Walker,
 ) Application {
 	out := application{
 		elementsAdapter: elementsAdapter,
 		astAdapter:      astAdapter,
 		queryAdapter:    queryAdapter,
 		tokensBuilder:   tokensBuilder,
+		walker:          walker,
 	}
 
 	return &out
 }
 
 // Execute executes the parser application
-func (app *application) Execute(input []byte, grammar grammars.Grammar, ins elements.Element) (any, []byte, error) {
+func (app *application) Execute(input []byte, grammar grammars.Grammar) (any, []byte, error) {
+	if app.walker == nil {
+		return nil, nil, errors.New("the application cannot Execute because it doesn't contain a Walker instance")
+	}
 	ast, retRemaining, err := app.astAdapter.ToAST(grammar, input)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	root := ast.Root()
-	retIns, err := app.element(root, ins)
+	retIns, err := app.element(root, app.walker)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -52,26 +57,25 @@ func (app *application) Execute(input []byte, grammar grammars.Grammar, ins elem
 	return retIns, retRemaining, nil
 }
 
-func (app *application) element(element instructions.Element, ins elements.Element) (any, error) {
+func (app *application) element(element instructions.Element, ins walkers.Walker) (any, error) {
 	if element.IsConstant() {
 		value := element.Constant().Value()
-		return app.callElementFn(value, ins.ElementFn)
+		return app.callElementFn(value, ins.Fn())
 	}
 
 	elementName := element.Name()
 	tokens := element.Instruction().Tokens()
-	if ins.TokenList != nil {
-		ptrTokenList := ins.TokenList
-		output, err := app.tokenList(elementName, tokens.List(), *ptrTokenList)
+	if ins.HasList() {
+		output, err := app.tokenList(elementName, tokens.List(), ins.List())
 		if err != nil {
 			return nil, err
 		}
 
-		return app.callElementFn(output, ins.ElementFn)
+		return app.callElementFn(output, ins.Fn())
 	}
 
 	value := tokens.Value()
-	return app.callElementFn(value, ins.ElementFn)
+	return app.callElementFn(value, ins.Fn())
 }
 
 func (app *application) callElementFn(value any, fn walkers.ElementFn) (any, error) {
@@ -85,39 +89,41 @@ func (app *application) callElementFn(value any, fn walkers.ElementFn) (any, err
 func (app *application) tokenList(
 	elementName string,
 	tokensList []instructions.Token,
-	ins elements.TokenList,
+	ins walkers.TokenList,
 ) (any, error) {
 	output := map[string][]any{}
 	for _, oneToken := range tokensList {
 		name := oneToken.Name()
-		if selectedTokenList, ok := ins.List[name]; ok {
-			retValue, err := app.selectedTokenList(name, tokensList, selectedTokenList)
-			if err != nil {
-				return nil, err
-			}
-
-			if _, ok := output[name]; !ok {
-				output[name] = []any{}
-			}
-
-			output[name] = append(output[name], retValue)
+		selectedTokenList, err := ins.Fetch(name)
+		if err != nil {
+			continue
 		}
 
+		retValue, err := app.selectedTokenList(name, tokensList, selectedTokenList)
+		if err != nil {
+			return nil, err
+		}
+
+		if _, ok := output[name]; !ok {
+			output[name] = []any{}
+		}
+
+		output[name] = append(output[name], retValue)
 	}
 
-	return ins.MapFn(elementName, output)
+	return ins.Fn()(elementName, output)
 }
 
-func (app *application) token(token instructions.Token, ins elements.Token) (any, error) {
+func (app *application) token(token instructions.Token, ins walkers.Token) (any, error) {
 	output := []any{}
 	elementsList := token.Elements().List()
 	for _, oneElement := range elementsList {
-		if ins.Next == nil {
+		if !ins.HasNext() {
 			output = append(output, oneElement.Value())
 			continue
 		}
 
-		retValue, err := app.element(oneElement, *ins.Next)
+		retValue, err := app.element(oneElement, ins.Next())
 		if err != nil {
 			return nil, err
 		}
@@ -125,13 +131,13 @@ func (app *application) token(token instructions.Token, ins elements.Token) (any
 		output = append(output, retValue)
 	}
 
-	return ins.ListFn(output)
+	return ins.Fn()(output)
 }
 
 func (app *application) selectedTokenList(
 	elementName string,
 	tokensList []instructions.Token,
-	ins elements.SelectedTokenList,
+	ins walkers.SelectedTokenList,
 ) (any, error) {
 	tokensIns, err := app.tokensBuilder.Create().
 		WithList(tokensList).
@@ -143,12 +149,9 @@ func (app *application) selectedTokenList(
 
 	var tokenIns instructions.Token
 	var elementIns instructions.Element
-	if ins.SelectorScript != nil {
-		retTokensList, retToken, retElement, err := app.query(
-			tokensIns,
-			ins.SelectorScript,
-		)
-
+	if ins.HasChain() {
+		chain := ins.Chain()
+		retTokensList, retToken, retElement, err := tokensIns.Select(chain)
 		if err != nil {
 			return nil, err
 		}
@@ -175,7 +178,7 @@ func (app *application) selectedTokenList(
 		}
 	}
 
-	if ins.Node == nil {
+	if !ins.HasNode() {
 		if tokensIns != nil {
 			return tokensIns.Value(), nil
 		}
@@ -192,7 +195,7 @@ func (app *application) selectedTokenList(
 		tokensIns,
 		tokenIns,
 		elementIns,
-		*ins.Node,
+		ins.Node(),
 	)
 }
 
@@ -201,47 +204,32 @@ func (app *application) node(
 	tokens instructions.Tokens,
 	token instructions.Token,
 	element instructions.Element,
-	ins elements.Node,
+	ins walkers.Node,
 ) (any, error) {
 	if tokens != nil {
-		if ins.TokenList == nil {
+		if !ins.IsTokenList() {
 			str := fmt.Sprintf("the element (%s) was expected to contain a Tokens instance after its selection, but the TokenList parser did not exists", elementName)
 			return nil, errors.New(str)
 		}
 
-		return app.tokenList(elementName, tokens.List(), *ins.TokenList)
+		return app.tokenList(elementName, tokens.List(), ins.TokenList())
 	}
 
 	if token != nil {
-		if ins.Token == nil {
+		if !ins.IsToken() {
 			str := fmt.Sprintf("the element (%s) was expected to contain a Token instance after its selection, but the Token parser did not exists", elementName)
 			return nil, errors.New(str)
 		}
 
-		return app.token(token, *ins.Token)
+		return app.token(token, ins.Token())
 	}
 
-	if ins.Element == nil {
+	if !ins.IsElement() {
 		str := fmt.Sprintf("the element (%s) was expected to contain an Element instance after its selection, but the Element parser did not exists", elementName)
 		return nil, errors.New(str)
 	}
 
-	return app.element(element, *ins.Element)
-}
-
-func (app *application) query(tokens instructions.Tokens, script []byte) ([]instructions.Token, instructions.Token, instructions.Element, error) {
-	query, remaining, err := app.queryAdapter.ToQuery(script)
-	if err != nil {
-		return nil, nil, nil, err
-	}
-
-	if len(remaining) > 0 {
-		str := fmt.Sprintf("the script (%s) contains a remaining (%s)", script, remaining)
-		return nil, nil, nil, errors.New(str)
-	}
-
-	chain := query.Chain()
-	return tokens.Select(chain)
+	return app.element(element, ins.Element())
 }
 
 // Suites executes all the test suites of the grammar
