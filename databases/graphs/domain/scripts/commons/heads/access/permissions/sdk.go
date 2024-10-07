@@ -1,5 +1,15 @@
 package permissions
 
+// NewBuilder creates a new builder
+func NewBuilder() Builder {
+	return createBuilder()
+}
+
+// NewPermissionBuilder creates a new permission builder
+func NewPermissionBuilder() PermissionBuilder {
+	return createPermissionBuilder()
+}
+
 // Builder represents the permissions builder
 type Builder interface {
 	Create() Builder
