@@ -5,6 +5,11 @@ import (
 	"github.com/steve-care-software/steve/databases/graphs/domain/scripts/commons/heads/access/writes"
 )
 
+// NewBuilder creates a new builder instance
+func NewBuilder() Builder {
+	return createBuilder()
+}
+
 // Builder represents the access builder
 type Builder interface {
 	Create() Builder
