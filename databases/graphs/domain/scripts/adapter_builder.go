@@ -22,7 +22,6 @@ import (
 
 type adapterBuilder struct {
 	parserAppBuilder        applications_parser.Builder
-	grammarAdapter          grammars.Adapter
 	builder                 Builder
 	headBuilder             heads.Builder
 	accessBuilder           access.Builder
@@ -43,12 +42,11 @@ type adapterBuilder struct {
 	connectionHeaderBuilder connection_headers.Builder
 	nameBuilder             names.Builder
 	cardinalityBuilder      cardinalities.Builder
-	grammar                 []byte
+	grammar                 grammars.Grammar
 }
 
 func createAdapterBuilder(
 	parserAppBuilder applications_parser.Builder,
-	grammarAdapter grammars.Adapter,
 	builder Builder,
 	headBuilder heads.Builder,
 	accessBuilder access.Builder,
@@ -72,7 +70,6 @@ func createAdapterBuilder(
 ) AdapterBuilder {
 	out := adapterBuilder{
 		parserAppBuilder:        parserAppBuilder,
-		grammarAdapter:          grammarAdapter,
 		builder:                 builder,
 		headBuilder:             headBuilder,
 		accessBuilder:           accessBuilder,
@@ -103,7 +100,6 @@ func createAdapterBuilder(
 func (app *adapterBuilder) Create() AdapterBuilder {
 	return createAdapterBuilder(
 		app.parserAppBuilder,
-		app.grammarAdapter,
 		app.builder,
 		app.headBuilder,
 		app.accessBuilder,
@@ -128,25 +124,20 @@ func (app *adapterBuilder) Create() AdapterBuilder {
 }
 
 // WithGramar adds a grammar to the builder
-func (app *adapterBuilder) WithGramar(grammar []byte) AdapterBuilder {
-	app.grammar = grammar
+func (app *adapterBuilder) WithGramar(gramar grammars.Grammar) AdapterBuilder {
+	app.grammar = gramar
 	return app
 }
 
 // Now builds a new Adapter instance
 func (app *adapterBuilder) Now() (Adapter, error) {
-	retGrammar, retRemaining, err := app.grammarAdapter.ToGrammar(app.grammar)
-	if err != nil {
-		return nil, err
-	}
-
-	if len(retRemaining) > 0 {
-		return nil, errors.New("the grammar script was expected to contain to remaining after being parsed")
+	if app.grammar == nil {
+		return nil, errors.New("the grammar is mandatory in order to build an Adapter instance")
 	}
 
 	return createAdapter(
 		app.parserAppBuilder,
-		retGrammar,
+		app.grammar,
 		app.builder,
 		app.headBuilder,
 		app.accessBuilder,

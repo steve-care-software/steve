@@ -22,7 +22,6 @@ import (
 // NewAdapterBuilder creates a new adapter builder
 func NewAdapterBuilder() AdapterBuilder {
 	parserAppBuilder := applications_parser.NewBuilder()
-	grammarAdapter := grammars.NewAdapter()
 	builder := NewBuilder()
 	headBuilder := heads.NewBuilder()
 	accessBuilder := access.NewBuilder()
@@ -45,7 +44,6 @@ func NewAdapterBuilder() AdapterBuilder {
 	cardinalityBuilder := cardinalities.NewBuilder()
 	return createAdapterBuilder(
 		parserAppBuilder,
-		grammarAdapter,
 		builder,
 		headBuilder,
 		accessBuilder,
@@ -77,7 +75,7 @@ func NewBuilder() Builder {
 // AdapterBuilder represents an adapter builder
 type AdapterBuilder interface {
 	Create() AdapterBuilder
-	WithGramar(grammar []byte) AdapterBuilder
+	WithGramar(gramar grammars.Grammar) AdapterBuilder
 	Now() (Adapter, error)
 }
 
