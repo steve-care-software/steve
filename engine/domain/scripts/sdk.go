@@ -1,7 +1,6 @@
 package scripts
 
 import (
-	"github.com/steve-care-software/steve/commons/hash"
 	"github.com/steve-care-software/steve/engine/domain/scripts/specifics/bridges"
 	"github.com/steve-care-software/steve/engine/domain/scripts/specifics/contexts"
 	"github.com/steve-care-software/steve/engine/domain/scripts/specifics/grammars"
@@ -9,6 +8,7 @@ import (
 	"github.com/steve-care-software/steve/engine/domain/scripts/specifics/programs"
 	"github.com/steve-care-software/steve/engine/domain/scripts/specifics/roots"
 	"github.com/steve-care-software/steve/engine/domain/scripts/specifics/transpiles"
+	"github.com/steve-care-software/steve/hash"
 )
 
 // NewBuilder creates a new builder

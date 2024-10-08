@@ -1,6 +1,6 @@
 package cardinalities
 
-import "github.com/steve-care-software/steve/commons/hash"
+import "github.com/steve-care-software/steve/hash"
 
 type cardinality struct {
 	hash hash.Hash

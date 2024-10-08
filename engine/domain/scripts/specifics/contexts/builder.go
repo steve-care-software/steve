@@ -3,9 +3,9 @@ package contexts
 import (
 	"errors"
 
-	"github.com/steve-care-software/steve/commons/hash"
 	"github.com/steve-care-software/steve/engine/domain/scripts/components/heads"
 	"github.com/steve-care-software/steve/engine/domain/scripts/specifics/contexts/contents"
+	"github.com/steve-care-software/steve/hash"
 )
 
 type builder struct {

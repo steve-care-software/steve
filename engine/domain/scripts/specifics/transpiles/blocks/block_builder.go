@@ -3,8 +3,8 @@ package blocks
 import (
 	"errors"
 
-	"github.com/steve-care-software/steve/commons/hash"
 	"github.com/steve-care-software/steve/engine/domain/scripts/specifics/transpiles/blocks/lines"
+	"github.com/steve-care-software/steve/hash"
 )
 
 type blockBuilder struct {

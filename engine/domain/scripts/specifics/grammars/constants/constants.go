@@ -1,6 +1,6 @@
 package constants
 
-import "github.com/steve-care-software/steve/commons/hash"
+import "github.com/steve-care-software/steve/hash"
 
 type constants struct {
 	hash hash.Hash

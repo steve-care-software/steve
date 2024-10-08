@@ -1,6 +1,6 @@
 package instructions
 
-import "github.com/steve-care-software/steve/commons/hash"
+import "github.com/steve-care-software/steve/hash"
 
 type loopInstruction struct {
 	hash        hash.Hash

@@ -1,7 +1,7 @@
 package operations
 
 import (
-	"github.com/steve-care-software/steve/commons/hash"
+	"github.com/steve-care-software/steve/hash"
 )
 
 const (

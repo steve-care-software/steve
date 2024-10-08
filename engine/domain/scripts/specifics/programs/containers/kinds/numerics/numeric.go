@@ -1,6 +1,6 @@
 package numerics
 
-import "github.com/steve-care-software/steve/commons/hash"
+import "github.com/steve-care-software/steve/hash"
 
 type numeric struct {
 	hash hash.Hash

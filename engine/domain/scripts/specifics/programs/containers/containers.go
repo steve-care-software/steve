@@ -1,6 +1,6 @@
 package containers
 
-import "github.com/steve-care-software/steve/commons/hash"
+import "github.com/steve-care-software/steve/hash"
 
 type containers struct {
 	hash hash.Hash

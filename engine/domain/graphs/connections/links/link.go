@@ -3,7 +3,7 @@ package links
 import (
 	"fmt"
 
-	"github.com/steve-care-software/steve/commons/hash"
+	"github.com/steve-care-software/steve/hash"
 )
 
 type link struct {

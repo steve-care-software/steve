@@ -1,8 +1,8 @@
 package tokens
 
 import (
-	"github.com/steve-care-software/steve/commons/hash"
 	"github.com/steve-care-software/steve/engine/domain/scripts/specifics/grammars/constants/tokens/elements"
+	"github.com/steve-care-software/steve/hash"
 )
 
 // NewBuilder creates a new builder

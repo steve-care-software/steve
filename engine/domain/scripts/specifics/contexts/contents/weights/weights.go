@@ -1,6 +1,6 @@
 package weights
 
-import "github.com/steve-care-software/steve/commons/hash"
+import "github.com/steve-care-software/steve/hash"
 
 type weights struct {
 	hash hash.Hash

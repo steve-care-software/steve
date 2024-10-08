@@ -3,7 +3,7 @@ package chains
 import (
 	"errors"
 
-	"github.com/steve-care-software/steve/commons/hash"
+	"github.com/steve-care-software/steve/hash"
 )
 
 type transpileBuilder struct {

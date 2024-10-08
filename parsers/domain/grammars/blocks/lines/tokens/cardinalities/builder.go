@@ -3,7 +3,7 @@ package cardinalities
 import (
 	"strconv"
 
-	"github.com/steve-care-software/steve/commons/hash"
+	"github.com/steve-care-software/steve/hash"
 )
 
 type builder struct {

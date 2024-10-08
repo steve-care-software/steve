@@ -3,9 +3,9 @@ package instructions
 import (
 	"errors"
 
-	"github.com/steve-care-software/steve/commons/hash"
 	"github.com/steve-care-software/steve/engine/domain/scripts/specifics/programs/instructions/assignments"
 	"github.com/steve-care-software/steve/engine/domain/scripts/specifics/programs/instructions/calls"
+	"github.com/steve-care-software/steve/hash"
 )
 
 type instructionBuilder struct {

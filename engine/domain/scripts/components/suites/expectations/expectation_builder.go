@@ -4,7 +4,7 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/steve-care-software/steve/commons/hash"
+	"github.com/steve-care-software/steve/hash"
 )
 
 type expectationBuilder struct {

@@ -1,6 +1,6 @@
 package connections
 
-import "github.com/steve-care-software/steve/commons/hash"
+import "github.com/steve-care-software/steve/hash"
 
 type connections struct {
 	hash hash.Hash
