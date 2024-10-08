@@ -23,7 +23,6 @@ func NewBuilder(
 	identityKeynamePrefix string,
 	identityUnitsKeynamePrefix string,
 	blockchainKeynamePrefix string,
-	scriptKeynamePrefix string,
 	blockKeynamePrefix string,
 ) Builder {
 	cryptographyApp := cryptography.NewApplication()
@@ -62,7 +61,6 @@ func NewBuilder(
 		identityKeynamePrefix,
 		identityUnitsKeynamePrefix,
 		blockchainKeynamePrefix,
-		scriptKeynamePrefix,
 		blockKeynamePrefix,
 	)
 }
@@ -96,7 +94,7 @@ type Application interface {
 	Units(identity identities.Identity, blockchain uuid.UUID) (*uint64, error)
 
 	// Transact creates a new transaction and adds it to our queue list
-	Transact(identity identities.Identity, script hash.Hash, fees uint64, flag hash.Hash) error
+	Transact(identity identities.Identity, script []byte, fees uint64, flag hash.Hash) error
 
 	// TrxQueue returns the transactions ready to be put in a block
 	TrxQueue() (transactions.Transactions, error)
@@ -121,7 +119,4 @@ type Application interface {
 
 	// Blockchain returns the blochain by id
 	Blockchain(identifier uuid.UUID) (blockchains.Blockchain, error)
-
-	// Script returns the script by its hash
-	Script(hash hash.Hash) ([]byte, error)
 }

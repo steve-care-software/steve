@@ -46,7 +46,6 @@ type application struct {
 	identityKeynamePrefix      string
 	identityUnitsKeynamePrefix string
 	blockchainKeynamePrefix    string
-	scriptKeynamePrefix        string
 	blockKeynamePrefix         string
 	trxQueue                   []transactions.Transaction
 }
@@ -74,7 +73,6 @@ func createApplication(
 	identityKeynamePrefix string,
 	identityUnitsKeynamePrefix string,
 	blockchainKeynamePrefix string,
-	scriptKeynamePrefix string,
 	blockKeynamePrefix string,
 ) Application {
 	out := application{
@@ -100,7 +98,6 @@ func createApplication(
 		identityKeynamePrefix:      identityKeynamePrefix,
 		identityUnitsKeynamePrefix: identityUnitsKeynamePrefix,
 		blockchainKeynamePrefix:    blockchainKeynamePrefix,
-		scriptKeynamePrefix:        scriptKeynamePrefix,
 		blockKeynamePrefix:         blockKeynamePrefix,
 		trxQueue:                   []transactions.Transaction{},
 	}
@@ -212,7 +209,7 @@ func (app *application) Units(identity identities.Identity, blockchain uuid.UUID
 }
 
 // Transact creates a new transaction and adds it to our queue list
-func (app *application) Transact(identity identities.Identity, script hash.Hash, fees uint64, flag hash.Hash) error {
+func (app *application) Transact(identity identities.Identity, script []byte, fees uint64, flag hash.Hash) error {
 	entry, err := app.entryBuilder.Create().
 		WithFees(fees).
 		WithFlag(flag).
@@ -457,12 +454,6 @@ func (app *application) Blockchain(identifier uuid.UUID) (blockchains.Blockchain
 	}
 
 	return ins, nil
-}
-
-// Script returns the script by its hash
-func (app *application) Script(hash hash.Hash) ([]byte, error) {
-	keyname := fmt.Sprintf("%s%s", app.scriptKeynamePrefix, hash.String())
-	return app.resourceApp.Retrieve(keyname)
 }
 
 func (app *application) block(blockchain blockchains.Blockchain, block blocks.Block) error {

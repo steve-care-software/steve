@@ -40,7 +40,6 @@ type builder struct {
 	identityKeynamePrefix      string
 	identityUnitsKeynamePrefix string
 	blockchainKeynamePrefix    string
-	scriptKeynamePrefix        string
 	blockKeynamePrefix         string
 }
 
@@ -65,7 +64,6 @@ func createBuilder(
 	identityKeynamePrefix string,
 	identityUnitsKeynamePrefix string,
 	blockchainKeynamePrefix string,
-	scriptKeynamePrefix string,
 	blockKeynamePrefix string,
 ) Builder {
 	out := builder{
@@ -91,7 +89,6 @@ func createBuilder(
 		identityKeynamePrefix:      identityKeynamePrefix,
 		identityUnitsKeynamePrefix: identityUnitsKeynamePrefix,
 		blockchainKeynamePrefix:    blockchainKeynamePrefix,
-		scriptKeynamePrefix:        scriptKeynamePrefix,
 		blockKeynamePrefix:         blockKeynamePrefix,
 	}
 
@@ -121,7 +118,6 @@ func (app *builder) Create() Builder {
 		app.identityKeynamePrefix,
 		app.identityUnitsKeynamePrefix,
 		app.blockchainKeynamePrefix,
-		app.scriptKeynamePrefix,
 		app.blockKeynamePrefix,
 	)
 }
@@ -171,7 +167,6 @@ func (app *builder) Now() (Application, error) {
 		app.identityKeynamePrefix,
 		app.identityUnitsKeynamePrefix,
 		app.blockchainKeynamePrefix,
-		app.scriptKeynamePrefix,
 		app.blockKeynamePrefix,
 	), nil
 }

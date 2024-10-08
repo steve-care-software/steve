@@ -12,6 +12,39 @@ import (
 )
 
 func TestApplication_Success(t *testing.T) {
+	script := []byte(`
+		head:
+			engine: v1;
+			name: mySchema;
+			access: 
+				read: .first .second (0.2);
+				write: 
+					.first .again;
+					review: .first .second .third (0.1);
+				;
+			;
+		;
+
+		son;
+		father;
+		grandFather;
+		grandGrandFather;
+
+		father[0,3](son[1,]): .son .father
+						| .father .grandFather
+						| .grandFather .grandGrandFather
+						---
+							mySuite[ .mySchema[son] .grandGrandFather]:
+								!(.son .father .grandFather .grandGrandFather);
+								(.son .father .grandFather .grandGrandFather);
+							;
+						;
+
+		grandFather(grandSon[2,]): .son .grandFather
+								| .father .grandGrandFather
+								;
+	`)
+
 	baseDir := "./test_files"
 	defer func() {
 		os.RemoveAll(baseDir)
@@ -55,7 +88,6 @@ func TestApplication_Success(t *testing.T) {
 		"identities:by_name:",
 		"units:by_blockchain_and_pubkeyhash:",
 		"blockchain:by_uuid:",
-		"script:by_hash:",
 		"block:by_hash:",
 	).Create().
 		WithResource(resourceApp).
@@ -216,19 +248,13 @@ func TestApplication_Success(t *testing.T) {
 	}
 
 	fees := 200
-	pScript, err := hash.NewAdapter().FromBytes([]byte("this is some script"))
-	if err != nil {
-		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
-		return
-	}
-
 	pFlag, err := hash.NewAdapter().FromBytes([]byte("this is some flag"))
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
 	}
 
-	err = application.Transact(retIdentity, *pScript, uint64(fees), *pFlag)
+	err = application.Transact(retIdentity, script, uint64(fees), *pFlag)
 	if err != nil {
 		t.Errorf("the error was expected to be nil, error returned: %s", err.Error())
 		return
