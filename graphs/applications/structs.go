@@ -21,7 +21,7 @@ type connectionName struct {
 
 type connectionCardinality struct {
 	min  uint
-	pMAx *uint
+	pMax *uint
 }
 
 type link struct {

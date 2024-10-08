@@ -9,6 +9,9 @@ import (
 	"github.com/steve-care-software/steve/graphs/domain/scripts/commons/heads"
 	"github.com/steve-care-software/steve/graphs/domain/scripts/schemas"
 	"github.com/steve-care-software/steve/graphs/domain/scripts/schemas/connections"
+	"github.com/steve-care-software/steve/graphs/domain/scripts/schemas/connections/headers"
+	"github.com/steve-care-software/steve/graphs/domain/scripts/schemas/connections/headers/names"
+	"github.com/steve-care-software/steve/graphs/domain/scripts/schemas/connections/headers/names/cardinalities"
 	"github.com/steve-care-software/steve/graphs/domain/scripts/schemas/connections/links"
 	"github.com/steve-care-software/steve/graphs/domain/scripts/schemas/connections/links/references"
 	"github.com/steve-care-software/steve/graphs/domain/scripts/schemas/connections/suites"
@@ -72,12 +75,88 @@ func (app *application) saveHead(head heads.Head) error {
 	return nil
 }
 
-func (app *application) saveConnections(connections connections.Connections) error {
-	return nil
+func (app *application) saveConnections(connectionsIns connections.Connections) ([]hash.Hash, error) {
+	hashes := []hash.Hash{}
+	list := connectionsIns.List()
+	for _, oneConnection := range list {
+		pHash, err := app.saveConnection(oneConnection)
+		if err != nil {
+			return nil, err
+		}
+
+		hashes = append(hashes, *pHash)
+	}
+
+	return hashes, nil
 }
 
-func (app *application) saveConnection(connection connections.Connection) error {
-	return nil
+func (app *application) saveConnection(connectionIns connections.Connection) (*hash.Hash, error) {
+	links := connectionIns.Links()
+	retLinkHashes, err := app.saveLinks(links)
+	if err != nil {
+		return nil, err
+	}
+
+	linksBytes := [][]byte{}
+	for _, oneHash := range retLinkHashes {
+		linksBytes = append(linksBytes, oneHash.Bytes())
+	}
+
+	suites := connectionIns.Suites()
+	retSuiteHashes, err := app.saveSuites(suites)
+	if err != nil {
+		return nil, err
+	}
+
+	suitesBytes := [][]byte{}
+	for _, oneHash := range retSuiteHashes {
+		suitesBytes = append(suitesBytes, oneHash.Bytes())
+	}
+
+	header := connectionIns.Header()
+	ins := connection{
+		header: app.saveConnectionHeader(header),
+		links:  linksBytes,
+		suites: suitesBytes,
+	}
+
+	return app.retrieveOrSave(ins)
+}
+
+func (app *application) saveConnectionHeader(header headers.Header) connectionHeader {
+	name := header.Name()
+	ins := connectionHeader{
+		name: app.saveConnectionHeaderName(name),
+	}
+
+	if header.HasReverse() {
+		reverseIns := header.Reverse()
+		reverse := app.saveConnectionHeaderName(reverseIns)
+		ins.pReverse = &reverse
+	}
+
+	return ins
+}
+
+func (app *application) saveConnectionHeaderName(name names.Name) connectionName {
+	cardinality := name.Cardinality()
+	return connectionName{
+		name:        name.Name(),
+		cardinality: app.saveConnectionCardinality(cardinality),
+	}
+}
+
+func (app *application) saveConnectionCardinality(cardinality cardinalities.Cardinality) connectionCardinality {
+	ins := connectionCardinality{
+		min: cardinality.Min(),
+	}
+
+	if cardinality.HaxMax() {
+		pMax := cardinality.Max()
+		ins.pMax = pMax
+	}
+
+	return ins
 }
 
 func (app *application) saveLinks(linksIns links.Links) ([]hash.Hash, error) {
