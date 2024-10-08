@@ -2,13 +2,13 @@ package scripts
 
 import (
 	"errors"
-	"fmt"
 	"strconv"
 
 	"github.com/steve-care-software/steve/databases/graphs/domain/scripts/commons/heads"
 	"github.com/steve-care-software/steve/databases/graphs/domain/scripts/commons/heads/access"
 	"github.com/steve-care-software/steve/databases/graphs/domain/scripts/commons/heads/access/permissions"
 	"github.com/steve-care-software/steve/databases/graphs/domain/scripts/commons/heads/access/writes"
+	"github.com/steve-care-software/steve/databases/graphs/domain/scripts/schemas"
 	"github.com/steve-care-software/steve/databases/graphs/domain/scripts/schemas/connections"
 	connection_headers "github.com/steve-care-software/steve/databases/graphs/domain/scripts/schemas/connections/headers"
 	"github.com/steve-care-software/steve/databases/graphs/domain/scripts/schemas/connections/headers/names"
@@ -27,6 +27,7 @@ type adapter struct {
 	parserAppBuilder        applications_parser.Builder
 	grammar                 grammars.Grammar
 	builder                 Builder
+	schemaBuilder           schemas.Builder
 	headBuilder             heads.Builder
 	accessBuilder           access.Builder
 	permissionBuilder       permissions.Builder
@@ -51,6 +52,7 @@ func createAdapter(
 	parserAppBuilder applications_parser.Builder,
 	grammar grammars.Grammar,
 	builder Builder,
+	schemaBuilder schemas.Builder,
 	headBuilder heads.Builder,
 	accessBuilder access.Builder,
 	permissionBuilder permissions.Builder,
@@ -75,6 +77,7 @@ func createAdapter(
 		parserAppBuilder:        parserAppBuilder,
 		grammar:                 grammar,
 		builder:                 builder,
+		schemaBuilder:           schemaBuilder,
 		headBuilder:             headBuilder,
 		accessBuilder:           accessBuilder,
 		permissionBuilder:       permissionBuilder,
@@ -106,7 +109,12 @@ func (app *adapter) ToScript(input []byte) (Script, []byte, error) {
 		},
 		TokenList: &elements.TokenList{
 			MapFn: func(elementName string, mp map[string][]any) (any, error) {
-				return nil, nil
+				builder := app.builder.Create()
+				if ins, ok := mp["schema"]; ok {
+					builder.WithSchema(ins[0].(schemas.Schema))
+				}
+
+				return builder.Now()
 			},
 			List: map[string]elements.SelectedTokenList{
 				"schema": {
@@ -118,13 +126,15 @@ func (app *adapter) ToScript(input []byte) (Script, []byte, error) {
 					Node: &elements.Node{
 						Element: &elements.Element{
 							ElementFn: func(input any) (any, error) {
-								fmt.Printf("\n head: %v\n", input)
-								return nil, nil
+								return input, nil
 							},
 							TokenList: &elements.TokenList{
 								MapFn: func(elementName string, mp map[string][]any) (any, error) {
-									fmt.Printf("\n schema: %s, %v\n", elementName, mp)
-									return nil, nil
+									return app.schemaBuilder.Create().
+										WithConnections(mp["connectionBlocks"][0].(connections.Connections)).
+										WithHead(mp["head"][0].(heads.Head)).
+										WithPoints(mp["instructionPoints"][0].([]string)).
+										Now()
 								},
 								List: map[string]elements.SelectedTokenList{
 									"head": {
@@ -133,87 +143,102 @@ func (app *adapter) ToScript(input []byte) (Script, []byte, error) {
 											name: mySelector;
 											head[0][0];
 										`),
+										Node: app.nodeHead(),
+									},
+									"instructionPoints": {
+										SelectorScript: []byte(`
+											v1;
+											name: mySelector;
+											instructionPoints[0][0]->instructionPoint[0];
+										`),
 										Node: &elements.Node{
-											Element: &elements.Element{
-												ElementFn: func(input any) (any, error) {
-													return input, nil
-												},
-												TokenList: &elements.TokenList{
-													MapFn: func(elementName string, mp map[string][]any) (any, error) {
-														return app.headBuilder.Create().
-															WithName(mp["propertyName"][0].(string)).
-															WithVersion(mp["engine"][0].(uint)).
-															WithAccess(mp["access"][0].(access.Access)).
-															Now()
-													},
-													List: map[string]elements.SelectedTokenList{
-														"engine": {
-															SelectorScript: []byte(`
-																v1;
-																name: mySelector;
-																engine[0][0]->version[0][0]->numbersExceptZero[0][0];
-															`),
-															Node: &elements.Node{
-																Element: &elements.Element{
-																	ElementFn: func(input any) (any, error) {
-																		value, err := strconv.Atoi(string(input.([]byte)))
-																		if err != nil {
-																			return nil, err
-																		}
+											Token: &elements.Token{
+												ListFn: func(list []any) (any, error) {
+													output := []string{}
+													for _, oneElement := range list {
+														output = append(output, oneElement.(string))
+													}
 
-																		return uint(value), nil
+													return output, nil
+												},
+												Next: &elements.Element{
+													ElementFn: func(input any) (any, error) {
+														return input, nil
+													},
+													TokenList: &elements.TokenList{
+														MapFn: func(elementName string, mp map[string][]any) (any, error) {
+															return mp["variableName"][0], nil
+														},
+														List: map[string]elements.SelectedTokenList{
+															"variableName": {
+																SelectorScript: []byte(`
+																	v1;
+																	name: mySelector;
+																	variableName[0][0];
+																`),
+																Node: &elements.Node{
+																	Element: &elements.Element{
+																		ElementFn: func(input any) (any, error) {
+																			return string(input.([]byte)), nil
+																		},
 																	},
 																},
 															},
 														},
-														"propertyName": {
-															SelectorScript: []byte(`
-																v1;
-																name: mySelector;
-																propertyName[0][0]->variableName[0][0];
-															`),
-															Node: &elements.Node{
-																Element: &elements.Element{
-																	ElementFn: func(input any) (any, error) {
-																		return string(input.([]byte)), nil
-																	},
+													},
+												},
+											},
+										},
+									},
+									"connectionBlocks": {
+										SelectorScript: []byte(`
+											v1;
+											name: mySelector;
+											connectionBlocks[0][0]->connectionBlock;
+										`),
+										Node: &elements.Node{
+											TokenList: &elements.TokenList{
+												MapFn: func(elementName string, mp map[string][]any) (any, error) {
+													return mp["connectionBlock"][0], nil
+												},
+												List: map[string]elements.SelectedTokenList{
+													"connectionBlock": {
+														SelectorScript: []byte(`
+															v1;
+															name: mySelector;
+															connectionBlock[0];
+														`),
+														Node: &elements.Node{
+															Token: &elements.Token{
+																ListFn: func(list []any) (any, error) {
+																	output := []connections.Connection{}
+																	for _, oneElement := range list {
+																		output = append(output, oneElement.(connections.Connection))
+																	}
+
+																	return app.connectionsBuilder.Create().
+																		WithList(output).
+																		Now()
 																},
-															},
-														},
-														"access": {
-															SelectorScript: []byte(`
-																v1;
-																name: mySelector;
-																access[0][0]->roleOptions[0][0];
-															`),
-															Node: &elements.Node{
-																Element: &elements.Element{
+																Next: &elements.Element{
 																	ElementFn: func(input any) (any, error) {
 																		return input, nil
 																	},
 																	TokenList: &elements.TokenList{
 																		MapFn: func(elementName string, mp map[string][]any) (any, error) {
-																			builder := app.accessBuilder.Create().WithWrite(mp["roleOptionWrite"][0].(writes.Write))
-																			if list, ok := mp["roleOptionRead"]; ok {
-																				builder.WithRead(list[0].(permissions.Permission))
+																			builder := app.connectionBuilder.Create().WithHeader(mp["connectionHeader"][0].(connection_headers.Header)).WithLinks(mp["links"][0].(links.Links))
+																			if ins, ok := mp["pointSuitesBlock"]; ok {
+																				builder.WithSuites(ins[0].(suites.Suites))
 																			}
 
 																			return builder.Now()
 																		},
 																		List: map[string]elements.SelectedTokenList{
-																			"roleOptionRead": {
+																			"connectionHeader": {
 																				SelectorScript: []byte(`
 																					v1;
 																					name: mySelector;
-																					roleOptionRead[0][0]->roleOptionSuffix[0][0]->referencesCompensation[0][0];
-																				`),
-																				Node: app.nodeReferencesCompensation(),
-																			},
-																			"roleOptionWrite": {
-																				SelectorScript: []byte(`
-																				v1;
-																					name: mySelector;
-																					roleOptionWrite[0][0];
+																					connectionHeader[0][0];
 																				`),
 																				Node: &elements.Node{
 																					Element: &elements.Element{
@@ -222,30 +247,266 @@ func (app *adapter) ToScript(input []byte) (Script, []byte, error) {
 																						},
 																						TokenList: &elements.TokenList{
 																							MapFn: func(elementName string, mp map[string][]any) (any, error) {
-																								builder := app.writeBuilder.Create().WithModify(mp["referencesCompensation"][0].(permissions.Permission))
-																								if list, ok := mp["roleOptionReview"]; ok {
-																									builder.WithReview(list[0].(permissions.Permission))
+																								builder := app.connectionHeaderBuilder.Create().
+																									WithName(mp["nameWithCardinality"][0].(names.Name))
+
+																								if reverse, ok := mp["variableNameInParenthesis"]; ok {
+																									builder.WithReverse(reverse[0].(names.Name))
 																								}
 
 																								return builder.Now()
 																							},
 																							List: map[string]elements.SelectedTokenList{
-																								"referencesCompensation": {
+																								"nameWithCardinality": {
 																									SelectorScript: []byte(`
 																										v1;
 																										name: mySelector;
-																										referencesCompensation[0][0];
+																										nameWithCardinality[0][0];
 																									`),
-																									Node: app.nodeReferencesCompensation(),
+																									Node: app.nodeNameWithCardinality(),
 																								},
-
-																								"roleOptionReview": {
+																								"variableNameInParenthesis": {
 																									SelectorScript: []byte(`
 																										v1;
 																										name: mySelector;
-																										roleOptionReview[0][0]->roleOptionSuffix[0][0]->referencesCompensation[0][0];
+																										variableNameInParenthesis[0][0]->nameWithCardinality[0][0];
 																									`),
-																									Node: app.nodeReferencesCompensation(),
+																									Node: app.nodeNameWithCardinality(),
+																								},
+																							},
+																						},
+																					},
+																				},
+																			},
+																			"links": {
+																				SelectorScript: []byte(`
+																					v1;
+																					name: mySelector;
+																					links[0][0];
+																				`),
+																				Node: &elements.Node{
+																					Element: &elements.Element{
+																						ElementFn: func(input any) (any, error) {
+																							return input, nil
+																						},
+																						TokenList: &elements.TokenList{
+																							MapFn: func(elementName string, mp map[string][]any) (any, error) {
+																								referencesList := mp["link"][0].(references.References).List()
+																								link, err := app.linkBuilder.Create().
+																									WithOrigin(referencesList[0]).
+																									WithTarget(referencesList[1]).
+																									Now()
+
+																								if err != nil {
+																									return nil, err
+																								}
+
+																								list := []links.Link{
+																									link,
+																								}
+
+																								if ins, ok := mp["pipeJourney"]; ok {
+																									list = append(list, ins[0].([]links.Link)...)
+																								}
+
+																								return app.linksBuilder.Create().
+																									WithList(list).
+																									Now()
+																							},
+																							List: map[string]elements.SelectedTokenList{
+																								"link": {
+																									SelectorScript: []byte(`
+																										v1;
+																										name: mySelector;
+																										link[0][0]->pointReference[0];
+																									`),
+																									Node: app.nodePointReference(),
+																								},
+																								"pipeJourney": {
+																									SelectorScript: []byte(`
+																										v1;
+																										name: mySelector;
+																										pipeJourney[0];
+																									`),
+																									Node: &elements.Node{
+																										Token: &elements.Token{
+																											ListFn: func(list []any) (any, error) {
+																												output := []links.Link{}
+																												for _, oneElement := range list {
+																													output = append(output, oneElement.(links.Link))
+																												}
+
+																												return output, nil
+																											},
+																											Next: &elements.Element{
+																												ElementFn: func(input any) (any, error) {
+																													return input, nil
+																												},
+																												TokenList: &elements.TokenList{
+																													MapFn: func(elementName string, mp map[string][]any) (any, error) {
+																														referencesList := mp["link"][0].(references.References).List()
+																														return app.linkBuilder.Create().
+																															WithOrigin(referencesList[0]).
+																															WithTarget(referencesList[1]).
+																															Now()
+																													},
+																													List: map[string]elements.SelectedTokenList{
+																														"link": {
+																															SelectorScript: []byte(`
+																																v1;
+																																name: mySelector;
+																																link[0][0]->pointReference[0];
+																															`),
+																															Node: app.nodePointReference(),
+																														},
+																													},
+																												},
+																											},
+																										},
+																									},
+																								},
+																							},
+																						},
+																					},
+																				},
+																			},
+																			"pointSuitesBlock": {
+																				SelectorScript: []byte(`
+																					v1;
+																					name: mySelector;
+																					pointSuitesBlock[0][0]->pointSuites[0][0]->pointSuite[0];
+																				`),
+																				Node: &elements.Node{
+																					Token: &elements.Token{
+																						ListFn: func(list []any) (any, error) {
+																							output := []suites.Suite{}
+																							for _, oneElement := range list {
+																								output = append(output, oneElement.(suites.Suite))
+																							}
+
+																							return app.suitesBuilder.Create().
+																								WithList(output).
+																								Now()
+																						},
+																						Next: &elements.Element{
+																							ElementFn: func(input any) (any, error) {
+																								return input, nil
+																							},
+																							TokenList: &elements.TokenList{
+																								MapFn: func(elementName string, mp map[string][]any) (any, error) {
+																									referencesList := mp["pointReference"][0].(references.References).List()
+																									link, err := app.linkBuilder.Create().
+																										WithOrigin(referencesList[0]).
+																										WithTarget(referencesList[1]).
+																										Now()
+
+																									if err != nil {
+																										return nil, err
+																									}
+
+																									return app.suiteBuilder.Create().
+																										WithName(mp["variableName"][0].(string)).
+																										WithLink(link).
+																										WithExpectations(mp["suiteInstructions"][0].(expectations.Expectations)).
+																										Now()
+																								},
+																								List: map[string]elements.SelectedTokenList{
+																									"variableName": {
+																										SelectorScript: []byte(`
+																											v1;
+																											name: mySelector;
+																											variableName[0][0];
+																										`),
+																										Node: app.nodeByteToString(),
+																									},
+																									"pointReference": {
+																										SelectorScript: []byte(`
+																											v1;
+																											name: mySelector;
+																											pointReference[0];
+																										`),
+																										Node: app.nodePointReference(),
+																									},
+																									"suiteInstructions": {
+																										SelectorScript: []byte(`
+																											v1;
+																											name: mySelector;
+																											suiteInstructions[0][0]->suiteOptionInstruction[0];
+																										`),
+																										Node: &elements.Node{
+																											Token: &elements.Token{
+																												ListFn: func(list []any) (any, error) {
+																													output := []expectations.Expectation{}
+																													for _, oneElement := range list {
+																														output = append(output, oneElement.(expectations.Expectation))
+																													}
+
+																													return app.expectationsBuilder.Create().
+																														WithList(output).
+																														Now()
+																												},
+																												Next: &elements.Element{
+																													ElementFn: func(input any) (any, error) {
+																														return input, nil
+																													},
+																													TokenList: &elements.TokenList{
+																														MapFn: func(elementName string, mp map[string][]any) (any, error) {
+																															return mp["suiteOption"][0], nil
+																														},
+																														List: map[string]elements.SelectedTokenList{
+																															"suiteOption": {
+																																SelectorScript: []byte(`
+																																	v1;
+																																	name: mySelector;
+																																	suiteOption[0][0];
+																																`),
+																																Node: &elements.Node{
+																																	Element: &elements.Element{
+																																		ElementFn: func(input any) (any, error) {
+																																			return input, nil
+																																		},
+																																		TokenList: &elements.TokenList{
+																																			MapFn: func(elementName string, mp map[string][]any) (any, error) {
+																																				builder := app.expectationBuilder.Create()
+																																				if ins, ok := mp["suiteInvalidLink"]; ok {
+																																					builder.IsFail().
+																																						WithReferences(ins[0].(references.References))
+																																				}
+
+																																				if ins, ok := mp["suiteReferencesInParenthesis"]; ok {
+																																					builder.WithReferences(ins[0].(references.References))
+																																				}
+
+																																				return builder.Now()
+																																			},
+																																			List: map[string]elements.SelectedTokenList{
+																																				"suiteInvalidLink": {
+																																					SelectorScript: []byte(`
+																																						v1;
+																																						name: mySelector;
+																																						suiteInvalidLink[0][0]->suiteReferencesInParenthesis[0][0]->pointReferences[0][0]->pointReference[0];
+																																					`),
+																																					Node: app.nodePointReference(),
+																																				},
+																																				"suiteReferencesInParenthesis": {
+																																					SelectorScript: []byte(`
+																																						v1;
+																																						name: mySelector;
+																																						suiteReferencesInParenthesis[0][0]->pointReferences[0][0]->pointReference[0];
+																																					`),
+																																					Node: app.nodePointReference(),
+																																				},
+																																			},
+																																		},
+																																	},
+																																},
+																															},
+																														},
+																													},
+																												},
+																											},
+																										},
+																									},
 																								},
 																							},
 																						},
@@ -262,8 +523,6 @@ func (app *adapter) ToScript(input []byte) (Script, []byte, error) {
 											},
 										},
 									},
-									//"instructionPoints": {},
-									//"connectionBlocks":  {},
 								},
 							},
 						},
@@ -293,6 +552,302 @@ func (app *adapter) ToScript(input []byte) (Script, []byte, error) {
 	return nil, nil, errors.New("the returned parser instance was was expected to contain a Script instance")
 }
 
+func (app *adapter) nodeByteToString() *elements.Node {
+	return &elements.Node{
+		Element: &elements.Element{
+			ElementFn: func(input any) (any, error) {
+				return string(input.([]byte)), nil
+			},
+		},
+	}
+}
+
+func (app *adapter) nodeByteToUint() *elements.Node {
+	return &elements.Node{
+		Element: &elements.Element{
+			ElementFn: func(input any) (any, error) {
+				value, err := strconv.Atoi(string(input.([]byte)))
+				if err != nil {
+					return nil, err
+				}
+				return uint(value), nil
+			},
+		},
+	}
+}
+
+func (app *adapter) nodeNameWithCardinality() *elements.Node {
+	return &elements.Node{
+		Element: &elements.Element{
+			ElementFn: func(input any) (any, error) {
+				return input, nil
+			},
+			TokenList: &elements.TokenList{
+				MapFn: func(elementName string, mp map[string][]any) (any, error) {
+
+					builder := app.nameBuilder.Create().
+						WithName(mp["variableName"][0].(string))
+
+					if ins, ok := mp["cardinality"]; ok {
+						builder.WithCardinality(ins[0].(cardinalities.Cardinality))
+					} else {
+						ins, err := app.cardinalityBuilder.Create().
+							WithMin(1).
+							WithMax(1).
+							Now()
+
+						if err != nil {
+							return nil, err
+						}
+
+						builder.WithCardinality(ins)
+					}
+
+					return builder.Now()
+				},
+				List: map[string]elements.SelectedTokenList{
+					"variableName": {
+						SelectorScript: []byte(`
+						v1;
+						name: mySelector;
+						variableName[0][0];
+					`),
+						Node: &elements.Node{
+							Element: &elements.Element{
+								ElementFn: func(input any) (any, error) {
+									return string(input.([]byte)), nil
+								},
+							},
+						},
+					},
+					"cardinality": {
+						SelectorScript: []byte(`
+						v1;
+						name: mySelector;
+						cardinality[0][0]->cardinalityBracketOption[0][0]->cardinalityNumberOptions[0][0];
+					`),
+						Node: &elements.Node{
+							Element: &elements.Element{
+								ElementFn: func(input any) (any, error) {
+									return input, nil
+								},
+								TokenList: &elements.TokenList{
+									MapFn: func(elementName string, mp map[string][]any) (any, error) {
+										if value, ok := mp["minMax"]; ok {
+											return value[0], nil
+										}
+
+										builder := app.cardinalityBuilder.Create()
+										if value, ok := mp["minComma"]; ok {
+											builder.WithMin(value[0].(uint))
+										}
+
+										if value, ok := mp["numbers"]; ok {
+											builder.WithMin(value[0].(uint)).
+												WithMax(value[0].(uint))
+										}
+
+										return builder.Now()
+									},
+									List: map[string]elements.SelectedTokenList{
+										"minMax": {
+											SelectorScript: []byte(`
+												v1;
+												name: mySelector;
+												minMax[0][0];
+											`),
+											Node: &elements.Node{
+												Element: &elements.Element{
+													ElementFn: func(input any) (any, error) {
+														return input, nil
+													},
+													TokenList: &elements.TokenList{
+														MapFn: func(elementName string, mp map[string][]any) (any, error) {
+															return app.cardinalityBuilder.Create().
+																WithMin(mp["minComma"][0].(uint)).
+																WithMax(mp["numbers"][0].(uint)).
+																Now()
+														},
+														List: map[string]elements.SelectedTokenList{
+															"minComma": {
+																SelectorScript: []byte(`
+																	v1;
+																	name: mySelector;
+																	minComma[0][0]->numbers[0][0];
+																`),
+																Node: app.nodeByteToUint(),
+															},
+															"numbers": {
+																SelectorScript: []byte(`
+																	v1;
+																	name: mySelector;
+																	numbers[0][0];
+																`),
+																Node: app.nodeByteToUint(),
+															},
+														},
+													},
+												},
+											},
+										},
+										"minComma": {
+											SelectorScript: []byte(`
+												v1;
+												name: mySelector;
+												minComma[0][0]->numbers[0][0];
+											`),
+											Node: app.nodeByteToUint(),
+										},
+										"numbers": {
+											SelectorScript: []byte(`
+												v1;
+												name: mySelector;
+												numbers[0][0];
+											`),
+											Node: app.nodeByteToUint(),
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
+func (app *adapter) nodeHead() *elements.Node {
+	return &elements.Node{
+		Element: &elements.Element{
+			ElementFn: func(input any) (any, error) {
+				return input, nil
+			},
+			TokenList: &elements.TokenList{
+				MapFn: func(elementName string, mp map[string][]any) (any, error) {
+					return app.headBuilder.Create().
+						WithName(mp["propertyName"][0].(string)).
+						WithVersion(mp["engine"][0].(uint)).
+						WithAccess(mp["access"][0].(access.Access)).
+						Now()
+				},
+				List: map[string]elements.SelectedTokenList{
+					"engine": {
+						SelectorScript: []byte(`
+							v1;
+							name: mySelector;
+							engine[0][0]->version[0][0]->numbersExceptZero[0][0];
+						`),
+						Node: &elements.Node{
+							Element: &elements.Element{
+								ElementFn: func(input any) (any, error) {
+									value, err := strconv.Atoi(string(input.([]byte)))
+									if err != nil {
+										return nil, err
+									}
+
+									return uint(value), nil
+								},
+							},
+						},
+					},
+					"propertyName": {
+						SelectorScript: []byte(`
+							v1;
+							name: mySelector;
+							propertyName[0][0]->variableName[0][0];
+						`),
+						Node: &elements.Node{
+							Element: &elements.Element{
+								ElementFn: func(input any) (any, error) {
+									return string(input.([]byte)), nil
+								},
+							},
+						},
+					},
+					"access": {
+						SelectorScript: []byte(`
+							v1;
+							name: mySelector;
+							access[0][0]->roleOptions[0][0];
+						`),
+						Node: &elements.Node{
+							Element: &elements.Element{
+								ElementFn: func(input any) (any, error) {
+									return input, nil
+								},
+								TokenList: &elements.TokenList{
+									MapFn: func(elementName string, mp map[string][]any) (any, error) {
+										builder := app.accessBuilder.Create().WithWrite(mp["roleOptionWrite"][0].(writes.Write))
+										if list, ok := mp["roleOptionRead"]; ok {
+											builder.WithRead(list[0].(permissions.Permission))
+										}
+
+										return builder.Now()
+									},
+									List: map[string]elements.SelectedTokenList{
+										"roleOptionRead": {
+											SelectorScript: []byte(`
+												v1;
+												name: mySelector;
+												roleOptionRead[0][0]->roleOptionSuffix[0][0]->referencesCompensation[0][0];
+											`),
+											Node: app.nodeReferencesCompensation(),
+										},
+										"roleOptionWrite": {
+											SelectorScript: []byte(`
+											v1;
+												name: mySelector;
+												roleOptionWrite[0][0];
+											`),
+											Node: &elements.Node{
+												Element: &elements.Element{
+													ElementFn: func(input any) (any, error) {
+														return input, nil
+													},
+													TokenList: &elements.TokenList{
+														MapFn: func(elementName string, mp map[string][]any) (any, error) {
+															builder := app.writeBuilder.Create().WithModify(mp["referencesCompensation"][0].(permissions.Permission))
+															if list, ok := mp["roleOptionReview"]; ok {
+																builder.WithReview(list[0].(permissions.Permission))
+															}
+
+															return builder.Now()
+														},
+														List: map[string]elements.SelectedTokenList{
+															"referencesCompensation": {
+																SelectorScript: []byte(`
+																	v1;
+																	name: mySelector;
+																	referencesCompensation[0][0];
+																`),
+																Node: app.nodeReferencesCompensation(),
+															},
+
+															"roleOptionReview": {
+																SelectorScript: []byte(`
+																	v1;
+																	name: mySelector;
+																	roleOptionReview[0][0]->roleOptionSuffix[0][0]->referencesCompensation[0][0];
+																`),
+																Node: app.nodeReferencesCompensation(),
+															},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
 func (app *adapter) nodeReferencesCompensation() *elements.Node {
 	return &elements.Node{
 		Element: &elements.Element{
@@ -305,6 +860,7 @@ func (app *adapter) nodeReferencesCompensation() *elements.Node {
 					for _, oneName := range mp["references"][0].([]any) {
 						names = append(names, oneName.(string))
 					}
+
 					builder := app.permissionBuilder.Create().
 						WithNames(names)
 
@@ -321,76 +877,7 @@ func (app *adapter) nodeReferencesCompensation() *elements.Node {
 						name: mySelector;
 						references[0][0];
 					`),
-						Node: &elements.Node{
-							Element: &elements.Element{
-								ElementFn: func(input any) (any, error) {
-									return input, nil
-								},
-								TokenList: &elements.TokenList{
-									MapFn: func(elementName string, mp map[string][]any) (any, error) {
-										return mp["reference"][0], nil
-									},
-									List: map[string]elements.SelectedTokenList{
-										"reference": {
-											SelectorScript: []byte(`
-											v1;
-											name: mySelector;
-											reference;
-										`),
-											Node: &elements.Node{
-												TokenList: &elements.TokenList{
-													MapFn: func(elementName string, mp map[string][]any) (any, error) {
-														return mp["reference"][0], nil
-													},
-													List: map[string]elements.SelectedTokenList{
-														"reference": {
-															SelectorScript: []byte(`
-															v1;
-															name: mySelector;
-															reference[0];
-														`),
-															Node: &elements.Node{
-																Token: &elements.Token{
-																	ListFn: func(list []any) (any, error) {
-																		return list, nil
-																	},
-																	Next: &elements.Element{
-																		ElementFn: func(input any) (any, error) {
-																			return input, nil
-																		},
-																		TokenList: &elements.TokenList{
-																			MapFn: func(elementName string, mp map[string][]any) (any, error) {
-																				return mp["variableName"][0], nil
-																			},
-																			List: map[string]elements.SelectedTokenList{
-																				"variableName": {
-																					SelectorScript: []byte(`
-																					v1;
-																					name: mySelector;
-																					variableName[0][0];
-																				`),
-																					Node: &elements.Node{
-																						Element: &elements.Element{
-																							ElementFn: func(input any) (any, error) {
-																								return string(input.([]byte)), nil
-																							},
-																						},
-																					},
-																				},
-																			},
-																		},
-																	},
-																},
-															},
-														},
-													},
-												},
-											},
-										},
-									},
-								},
-							},
-						},
+						Node: app.nodeReferences(),
 					},
 					"floatNumberBetweenZeroAndOneInParenthesis": {
 						SelectorScript: []byte(`
@@ -407,6 +894,177 @@ func (app *adapter) nodeReferencesCompensation() *elements.Node {
 									}
 
 									return value, nil
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
+func (app *adapter) nodeReferences() *elements.Node {
+	return &elements.Node{
+		Element: &elements.Element{
+			ElementFn: func(input any) (any, error) {
+				return input, nil
+			},
+			TokenList: &elements.TokenList{
+				MapFn: func(elementName string, mp map[string][]any) (any, error) {
+					return mp["reference"][0], nil
+				},
+				List: map[string]elements.SelectedTokenList{
+					"reference": {
+						SelectorScript: []byte(`
+						v1;
+						name: mySelector;
+						reference;
+					`),
+						Node: &elements.Node{
+							TokenList: &elements.TokenList{
+								MapFn: func(elementName string, mp map[string][]any) (any, error) {
+									return mp["reference"][0], nil
+								},
+								List: map[string]elements.SelectedTokenList{
+									"reference": {
+										SelectorScript: []byte(`
+										v1;
+										name: mySelector;
+										reference[0];
+									`),
+										Node: app.nodeReference(),
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
+func (app *adapter) nodeReference() *elements.Node {
+	return &elements.Node{
+		Token: &elements.Token{
+			ListFn: func(list []any) (any, error) {
+				return list, nil
+			},
+			Next: app.elementReference(),
+		},
+	}
+}
+
+func (app *adapter) elementReference() *elements.Element {
+	return &elements.Element{
+		ElementFn: func(input any) (any, error) {
+			return input, nil
+		},
+		TokenList: &elements.TokenList{
+			MapFn: func(elementName string, mp map[string][]any) (any, error) {
+				return mp["variableName"][0], nil
+			},
+			List: map[string]elements.SelectedTokenList{
+				"variableName": {
+					SelectorScript: []byte(`
+					v1;
+					name: mySelector;
+					variableName[0][0];
+				`),
+					Node: &elements.Node{
+						Element: &elements.Element{
+							ElementFn: func(input any) (any, error) {
+								return string(input.([]byte)), nil
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
+func (app *adapter) nodePointReference() *elements.Node {
+	return &elements.Node{
+		Token: &elements.Token{
+			ListFn: func(list []any) (any, error) {
+				output := []references.Reference{}
+				for _, oneElement := range list {
+					output = append(output, oneElement.(references.Reference))
+				}
+
+				return app.referencesBuilder.Create().
+					WithList(output).
+					Now()
+			},
+			Next: &elements.Element{
+				ElementFn: func(input any) (any, error) {
+					return input, nil
+				},
+				TokenList: &elements.TokenList{
+					MapFn: func(elementName string, mp map[string][]any) (any, error) {
+						builder := app.referenceBuilder.Create()
+						if ins, ok := mp["reference"]; ok {
+							builder.WithInternal(ins[0].(string))
+						}
+
+						if ins, ok := mp["externalPointReference"]; ok {
+							builder.WithExternal(ins[0].(externals.External))
+						}
+
+						return builder.Now()
+					},
+					List: map[string]elements.SelectedTokenList{
+						"reference": {
+							SelectorScript: []byte(`
+								v1;
+								name: mySelector;
+								reference[0][0];
+							`),
+							Node: &elements.Node{
+								Element: app.elementReference(),
+							},
+						},
+						"externalPointReference": {
+							SelectorScript: []byte(`
+								v1;
+								name: mySelector;
+								externalPointReference[0][0];
+							`),
+							Node: &elements.Node{
+								Element: &elements.Element{
+									ElementFn: func(input any) (any, error) {
+										return input, nil
+									},
+									TokenList: &elements.TokenList{
+										MapFn: func(elementName string, mp map[string][]any) (any, error) {
+											return app.externalBuilder.Create().
+												WithSchema(mp["reference"][0].(string)).
+												WithPoint(mp["variableName"][0].(string)).
+												Now()
+										},
+										List: map[string]elements.SelectedTokenList{
+											"reference": {
+												SelectorScript: []byte(`
+													v1;
+													name: mySelector;
+													reference[0][0];
+												`),
+												Node: &elements.Node{
+													Element: app.elementReference(),
+												},
+											},
+											"variableName": {
+												SelectorScript: []byte(`
+													v1;
+													name: mySelector;
+													variableName[0][0];
+												`),
+												Node: app.nodeByteToString(),
+											},
+										},
+									},
 								},
 							},
 						},

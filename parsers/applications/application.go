@@ -95,6 +95,10 @@ func (app *application) tokenList(
 			continue
 		}
 
+		if name == "pointSuite" {
+			fmt.Printf("\n ---+ %s, %s, %v, %v\n", elementName, name, tokensList, ins)
+		}
+
 		retValue, err := app.selectedTokenList(name, tokensList, selectedTokenList)
 		if err != nil {
 			return nil, err

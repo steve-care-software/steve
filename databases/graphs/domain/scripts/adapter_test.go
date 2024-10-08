@@ -1,7 +1,7 @@
 package scripts
 
 import (
-	"fmt"
+	"reflect"
 	"testing"
 
 	"github.com/steve-care-software/steve/parsers/applications"
@@ -53,13 +53,13 @@ func TestAdapter_Success(t *testing.T) {
 		grandFather;
 		grandGrandFather;
 
-		father[0,3](son+): .son .father
+		father[0,3](son[1,]): .son .father
 						| .father .grandFather
 						| .grandFather .grandGrandFather
 						---
-							mySuite[.son .grandGrandFather]:
-								(.son .father .grandFather .grandGrandFather);
+							mySuite[ .mySchema[son] .grandGrandFather]:
 								!(.son .father .grandFather .grandGrandFather);
+								(.son .father .grandFather .grandGrandFather);
 							;
 						;
 
@@ -68,11 +68,26 @@ func TestAdapter_Success(t *testing.T) {
 								;
 	`)
 
-	retScript, _, err := adapter.ToScript(input)
+	retScript, retRemaining, err := adapter.ToScript(input)
 	if err != nil {
 		t.Errorf("there was an error while converting the input to a Script instance: %s", err.Error())
 		return
 	}
 
-	fmt.Printf("\n%v\n", retScript)
+	if len(retRemaining) > 0 {
+		t.Errorf("the remaining was expected to be empty")
+		return
+	}
+
+	expectedPoints := []string{
+		"son",
+		"father",
+		"grandFather",
+		"grandGrandFather",
+	}
+
+	if !reflect.DeepEqual(expectedPoints, retScript.Schema().Points()) {
+		t.Errorf("the returned points are invalid")
+		return
+	}
 }

@@ -7,6 +7,7 @@ import (
 	"github.com/steve-care-software/steve/databases/graphs/domain/scripts/commons/heads/access"
 	"github.com/steve-care-software/steve/databases/graphs/domain/scripts/commons/heads/access/permissions"
 	"github.com/steve-care-software/steve/databases/graphs/domain/scripts/commons/heads/access/writes"
+	"github.com/steve-care-software/steve/databases/graphs/domain/scripts/schemas"
 	"github.com/steve-care-software/steve/databases/graphs/domain/scripts/schemas/connections"
 	connection_headers "github.com/steve-care-software/steve/databases/graphs/domain/scripts/schemas/connections/headers"
 	"github.com/steve-care-software/steve/databases/graphs/domain/scripts/schemas/connections/headers/names"
@@ -23,6 +24,7 @@ import (
 type adapterBuilder struct {
 	parserAppBuilder        applications_parser.Builder
 	builder                 Builder
+	schemaBuilder           schemas.Builder
 	headBuilder             heads.Builder
 	accessBuilder           access.Builder
 	permissionBuilder       permissions.Builder
@@ -47,6 +49,7 @@ type adapterBuilder struct {
 func createAdapterBuilder(
 	parserAppBuilder applications_parser.Builder,
 	builder Builder,
+	schemaBuilder schemas.Builder,
 	headBuilder heads.Builder,
 	accessBuilder access.Builder,
 	permissionBuilder permissions.Builder,
@@ -69,6 +72,7 @@ func createAdapterBuilder(
 	out := adapterBuilder{
 		parserAppBuilder:        parserAppBuilder,
 		builder:                 builder,
+		schemaBuilder:           schemaBuilder,
 		headBuilder:             headBuilder,
 		accessBuilder:           accessBuilder,
 		permissionBuilder:       permissionBuilder,
@@ -98,6 +102,7 @@ func (app *adapterBuilder) Create() AdapterBuilder {
 	return createAdapterBuilder(
 		app.parserAppBuilder,
 		app.builder,
+		app.schemaBuilder,
 		app.headBuilder,
 		app.accessBuilder,
 		app.permissionBuilder,
@@ -135,6 +140,7 @@ func (app *adapterBuilder) Now() (Adapter, error) {
 		app.parserAppBuilder,
 		app.grammar,
 		app.builder,
+		app.schemaBuilder,
 		app.headBuilder,
 		app.accessBuilder,
 		app.permissionBuilder,

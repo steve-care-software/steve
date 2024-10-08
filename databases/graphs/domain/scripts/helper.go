@@ -1,5 +1,15 @@
 package scripts
 
+import "strconv"
+
+func anyToUint(input any) (uint, error) {
+	value, err := strconv.Atoi(string(input.([]byte)))
+	if err != nil {
+		return 0, err
+	}
+	return uint(value), nil
+}
+
 func fetchGrammarInput() []byte {
 	return []byte(`
 		v1;

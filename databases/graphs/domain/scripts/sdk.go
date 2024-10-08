@@ -23,6 +23,7 @@ import (
 func NewAdapterBuilder() AdapterBuilder {
 	parserAppBuilder := applications_parser.NewBuilder()
 	builder := NewBuilder()
+	schemaBuilder := schemas.NewBuilder()
 	headBuilder := heads.NewBuilder()
 	accessBuilder := access.NewBuilder()
 	permissionsBuilder := permissions.NewBuilder()
@@ -44,6 +45,7 @@ func NewAdapterBuilder() AdapterBuilder {
 	return createAdapterBuilder(
 		parserAppBuilder,
 		builder,
+		schemaBuilder,
 		headBuilder,
 		accessBuilder,
 		permissionsBuilder,
