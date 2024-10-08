@@ -1,8 +1,8 @@
 package transpiles
 
 import (
-	"github.com/steve-care-software/steve/commons/hash"
 	"github.com/steve-care-software/steve/engine/domain/scripts/specifics/transpiles/blocks"
+	"github.com/steve-care-software/steve/hash"
 )
 
 type transpile struct {

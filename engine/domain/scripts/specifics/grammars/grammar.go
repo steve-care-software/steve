@@ -1,10 +1,10 @@
 package grammars
 
 import (
-	"github.com/steve-care-software/steve/commons/hash"
 	"github.com/steve-care-software/steve/engine/domain/scripts/components/heads"
 	"github.com/steve-care-software/steve/engine/domain/scripts/specifics/grammars/blocks"
 	"github.com/steve-care-software/steve/engine/domain/scripts/specifics/grammars/constants"
+	"github.com/steve-care-software/steve/hash"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/rules"
 )
 

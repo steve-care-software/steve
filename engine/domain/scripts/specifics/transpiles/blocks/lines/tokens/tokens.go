@@ -1,6 +1,6 @@
 package tokens
 
-import "github.com/steve-care-software/steve/commons/hash"
+import "github.com/steve-care-software/steve/hash"
 
 type tokens struct {
 	hash hash.Hash

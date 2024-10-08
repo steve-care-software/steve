@@ -1,6 +1,6 @@
 package compensations
 
-import "github.com/steve-care-software/steve/commons/hash"
+import "github.com/steve-care-software/steve/hash"
 
 type compensation struct {
 	hash    hash.Hash

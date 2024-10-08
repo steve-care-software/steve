@@ -1,6 +1,6 @@
 package values
 
-import "github.com/steve-care-software/steve/commons/hash"
+import "github.com/steve-care-software/steve/hash"
 
 type value struct {
 	hash     hash.Hash

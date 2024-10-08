@@ -1,6 +1,6 @@
 package expectations
 
-import "github.com/steve-care-software/steve/commons/hash"
+import "github.com/steve-care-software/steve/hash"
 
 type expectation struct {
 	hash   hash.Hash

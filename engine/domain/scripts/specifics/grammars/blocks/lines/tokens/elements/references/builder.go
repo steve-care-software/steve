@@ -3,8 +3,8 @@ package references
 import (
 	"errors"
 
-	"github.com/steve-care-software/steve/commons/hash"
 	"github.com/steve-care-software/steve/engine/domain/scripts/specifics/grammars/blocks/lines/tokens/elements/references/values"
+	"github.com/steve-care-software/steve/hash"
 )
 
 type builder struct {

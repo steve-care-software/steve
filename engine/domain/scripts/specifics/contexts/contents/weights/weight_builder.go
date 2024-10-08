@@ -4,8 +4,8 @@ import (
 	"errors"
 	"strconv"
 
-	"github.com/steve-care-software/steve/commons/hash"
 	"github.com/steve-care-software/steve/engine/domain/scripts/components/suites"
+	"github.com/steve-care-software/steve/hash"
 )
 
 type weightBuilder struct {

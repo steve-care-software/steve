@@ -1,6 +1,6 @@
 package rules
 
-import "github.com/steve-care-software/steve/commons/hash"
+import "github.com/steve-care-software/steve/hash"
 
 type rule struct {
 	hash  hash.Hash

@@ -3,11 +3,11 @@ package functions
 import (
 	"errors"
 
-	"github.com/steve-care-software/steve/commons/hash"
 	"github.com/steve-care-software/steve/engine/domain/scripts/specifics/programs/containers"
 	"github.com/steve-care-software/steve/engine/domain/scripts/specifics/programs/functions/parameters"
 	"github.com/steve-care-software/steve/engine/domain/scripts/specifics/programs/instructions"
 	"github.com/steve-care-software/steve/engine/domain/scripts/specifics/programs/suites"
+	"github.com/steve-care-software/steve/hash"
 )
 
 type functionBuilder struct {

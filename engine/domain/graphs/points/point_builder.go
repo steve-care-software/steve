@@ -3,9 +3,9 @@ package points
 import (
 	"errors"
 
-	"github.com/steve-care-software/steve/commons/hash"
 	"github.com/steve-care-software/steve/engine/domain/graphs/points/bridges"
 	"github.com/steve-care-software/steve/engine/domain/graphs/points/contexts"
+	"github.com/steve-care-software/steve/hash"
 )
 
 type pointBuilder struct {

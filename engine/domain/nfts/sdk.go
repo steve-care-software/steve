@@ -1,7 +1,7 @@
 package nfts
 
 import (
-	"github.com/steve-care-software/steve/commons/hash"
+	"github.com/steve-care-software/steve/hash"
 )
 
 // NewBuilder creates a new nfts builder

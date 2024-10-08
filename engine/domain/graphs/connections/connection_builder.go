@@ -4,8 +4,8 @@ import (
 	"errors"
 
 	"github.com/google/uuid"
-	"github.com/steve-care-software/steve/commons/hash"
 	"github.com/steve-care-software/steve/engine/domain/graphs/connections/links"
+	"github.com/steve-care-software/steve/hash"
 )
 
 type connectionBuilder struct {

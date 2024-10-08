@@ -1,6 +1,6 @@
 package cardinalities
 
-import "github.com/steve-care-software/steve/commons/hash"
+import "github.com/steve-care-software/steve/hash"
 
 // NewBuilder creates a new builder
 func NewBuilder() Builder {

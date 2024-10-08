@@ -1,8 +1,8 @@
 package blocks
 
 import (
-	"github.com/steve-care-software/steve/commons/hash"
 	"github.com/steve-care-software/steve/engine/domain/scripts/specifics/grammars/blocks/lines"
+	"github.com/steve-care-software/steve/hash"
 	"github.com/steve-care-software/steve/parsers/domain/grammars/blocks/suites"
 )
 

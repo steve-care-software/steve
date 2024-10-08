@@ -1,9 +1,9 @@
 package assignments
 
 import (
-	"github.com/steve-care-software/steve/commons/hash"
 	"github.com/steve-care-software/steve/engine/domain/scripts/specifics/programs/containers"
 	"github.com/steve-care-software/steve/engine/domain/scripts/specifics/programs/instructions/assignments/assignables"
+	"github.com/steve-care-software/steve/hash"
 )
 
 // NewBuilder creates a new builder

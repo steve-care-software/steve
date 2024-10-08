@@ -1,9 +1,9 @@
 package pipelines
 
 import (
-	"github.com/steve-care-software/steve/commons/hash"
 	"github.com/steve-care-software/steve/engine/domain/scripts/components/heads"
 	"github.com/steve-care-software/steve/engine/domain/scripts/specifics/pipelines/executions"
+	"github.com/steve-care-software/steve/hash"
 )
 
 // Builder represents the pipeline builder

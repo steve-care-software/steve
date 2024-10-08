@@ -1,8 +1,8 @@
 package executions
 
 import (
-	"github.com/steve-care-software/steve/commons/hash"
 	"github.com/steve-care-software/steve/engine/domain/scripts/specifics/pipelines/executions/suites"
+	"github.com/steve-care-software/steve/hash"
 )
 
 // Builder represents the execution builder

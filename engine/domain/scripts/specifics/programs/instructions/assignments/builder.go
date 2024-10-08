@@ -4,9 +4,9 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/steve-care-software/steve/commons/hash"
 	"github.com/steve-care-software/steve/engine/domain/scripts/specifics/programs/containers"
 	"github.com/steve-care-software/steve/engine/domain/scripts/specifics/programs/instructions/assignments/assignables"
+	"github.com/steve-care-software/steve/hash"
 )
 
 type builder struct {

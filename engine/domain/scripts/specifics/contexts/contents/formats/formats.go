@@ -1,6 +1,6 @@
 package formats
 
-import "github.com/steve-care-software/steve/commons/hash"
+import "github.com/steve-care-software/steve/hash"
 
 type formats struct {
 	hash hash.Hash
