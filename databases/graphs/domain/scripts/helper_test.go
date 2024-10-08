@@ -1,4 +1,4 @@
-package queries
+package scripts
 
 import (
 	"testing"
@@ -7,7 +7,7 @@ import (
 	"github.com/steve-care-software/steve/parsers/domain/grammars"
 )
 
-func TestGrammar_Success(t *testing.T) {
+func TestGrammar_executeSuites_Success(t *testing.T) {
 	grammarInput := fetchGrammarInput()
 	grammarParserAdapter := grammars.NewAdapter()
 	retGrammar, retRemaining, err := grammarParserAdapter.ToGrammar(grammarInput)
@@ -21,7 +21,7 @@ func TestGrammar_Success(t *testing.T) {
 		return
 	}
 
-	application := applications.NewApplication()
+	application, _ := applications.NewBuilder().Create().Now()
 	err = application.Suites(retGrammar)
 	if err != nil {
 		t.Errorf("there was an error while running the grammar test suites: %s", err.Error())

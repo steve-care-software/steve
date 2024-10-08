@@ -340,14 +340,6 @@ func fetchGrammarInput() []byte {
 							upperCaseLetters: !"ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 						;
 
-		positiveNumbers: .oneNumber+
-						---
-							oneNumber: "1";
-							numberWithAllNumbers: "1234567890";
-							negativeNumberWithAllNumbers: !"-1234567890";
-							oneLettter: !"a";
-						;
-
 		numbers: .oneNumber+
 				---
 					single: "0";

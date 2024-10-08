@@ -1,11 +1,11 @@
 package applications
 
 import (
-	"github.com/steve-care-software/steve/databases/graphs/domain/routes"
-	"github.com/steve-care-software/steve/databases/graphs/domain/schemas/connections/links"
+	"github.com/steve-care-software/steve/databases/graphs/domain/responses"
+	"github.com/steve-care-software/steve/databases/graphs/domain/scripts"
 )
 
 // Application represents the graphdb application
 type Application interface {
-	Route(link links.Link) (routes.Routes, error)
+	Execute(script scripts.Script) (responses.Response, error)
 }

@@ -41,31 +41,41 @@ func (obj *tokens) Value() []byte {
 	return output
 }
 
-// Fetch fetches a token by name and index
-func (obj *tokens) Fetch(name string, idx uint) (Token, error) {
+// FetchAll fetches all tokens by name
+func (obj *tokens) FetchAll(name string) ([]Token, error) {
 	if ins, ok := obj.mp[name]; ok {
-		length := uint(len(ins))
-		if idx >= length {
-			str := fmt.Sprintf("the token (%s) could not be found at index (%d), its length is: %d", name, idx, length)
-			return nil, errors.New(str)
-		}
-
-		return ins[idx], nil
+		return ins, nil
 	}
 
 	str := fmt.Sprintf("the token (name: %s) does not exists", name)
 	return nil, errors.New(str)
 }
 
+// Fetch fetches a token by name and index
+func (obj *tokens) Fetch(name string, idx uint) (Token, error) {
+	ins, err := obj.FetchAll(name)
+	if err != nil {
+		return nil, err
+	}
+
+	length := uint(len(ins))
+	if idx >= length {
+		str := fmt.Sprintf("the token (%s) could not be found at index (%d), its length is: %d", name, idx, length)
+		return nil, errors.New(str)
+	}
+
+	return ins[idx], nil
+}
+
 // Select executes a select query
-func (obj *tokens) Select(chain chains.Chain) (Elements, Element, error) {
+func (obj *tokens) Select(chain chains.Chain) ([]Token, Token, Element, error) {
 	elementName := chain.Element().Name()
 	if chain.HasToken() {
 		chainToken := chain.Token()
 		tokenIndex := chainToken.Index()
 		retToken, err := obj.Fetch(elementName, tokenIndex)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, nil, err
 		}
 
 		if chainToken.HasElement() {
@@ -73,31 +83,31 @@ func (obj *tokens) Select(chain chains.Chain) (Elements, Element, error) {
 			elementIndex := chainElement.Index()
 			retElement, err := retToken.Elements().Fetch(elementIndex)
 			if err != nil {
-				return nil, nil, err
+				return nil, nil, nil, err
 			}
 
 			if chainElement.HasChain() {
 				retChain := chainElement.Chain()
 				if retElement.IsConstant() {
-					return nil, nil, errors.New("the element was expected to contain an Instruction")
+					return nil, nil, nil, errors.New("the element was expected to contain an Instruction")
 				}
 
 				return retElement.Instruction().Tokens().Select(retChain)
 			}
 
-			return nil, retElement, nil
+			return nil, nil, retElement, nil
 
 		}
 
-		return retToken.Elements(), nil, nil
+		return nil, retToken, nil, nil
 	}
 
-	retToken, err := obj.Fetch(elementName, 0)
+	retTokensList, err := obj.FetchAll(elementName)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
-	return retToken.Elements(), nil, nil
+	return retTokensList, nil, nil, nil
 }
 
 // Search search for instruction/token by name

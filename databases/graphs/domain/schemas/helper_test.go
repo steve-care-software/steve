@@ -21,7 +21,7 @@ func TestGrammar_executeSuites_Success(t *testing.T) {
 		return
 	}
 
-	application := applications.NewApplication()
+	application, _ := applications.NewBuilder().Create().Now()
 	err = application.Suites(retGrammar)
 	if err != nil {
 		t.Errorf("there was an error while running the grammar test suites: %s", err.Error())

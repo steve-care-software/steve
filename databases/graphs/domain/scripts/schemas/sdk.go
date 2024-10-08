@@ -1,8 +1,8 @@
 package schemas
 
 import (
-	"github.com/steve-care-software/steve/databases/graphs/domain/schemas/connections"
-	"github.com/steve-care-software/steve/databases/graphs/domain/schemas/headers"
+	"github.com/steve-care-software/steve/databases/graphs/domain/scripts/commons/heads"
+	"github.com/steve-care-software/steve/databases/graphs/domain/scripts/schemas/connections"
 )
 
 // NewBuilder creates a new builder
@@ -13,7 +13,7 @@ func NewBuilder() Builder {
 // Builder represents the schema builder
 type Builder interface {
 	Create() Builder
-	WithHeader(header headers.Header) Builder
+	WithHead(head heads.Head) Builder
 	WithPoints(points []string) Builder
 	WithConnections(connections connections.Connections) Builder
 	Now() (Schema, error)
@@ -21,7 +21,7 @@ type Builder interface {
 
 // Schema represents the schema
 type Schema interface {
-	Header() headers.Header
+	Head() heads.Head
 	Points() []string
 	Connections() connections.Connections
 }
