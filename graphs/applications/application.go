@@ -23,17 +23,20 @@ type application struct {
 	storeListApp application_lists.Application
 	resourceApp  application_resources.Application
 	hashAdapter  hash.Adapter
+	dbIdentifier string
 }
 
 func createApplication(
 	storeListApp application_lists.Application,
 	resourceApp application_resources.Application,
 	hashAdapter hash.Adapter,
+	dbIdentifier string,
 ) Application {
 	out := application{
 		storeListApp: storeListApp,
 		resourceApp:  resourceApp,
 		hashAdapter:  hashAdapter,
+		dbIdentifier: dbIdentifier,
 	}
 
 	return &out
@@ -41,6 +44,24 @@ func createApplication(
 
 // Execute executes a script on the database
 func (app *application) Execute(script scripts.Script) (responses.Response, error) {
+	err := app.resourceApp.Init(app.dbIdentifier)
+	if err != nil {
+		return nil, err
+	}
+
+	if script.IsSchema() {
+		schema := script.Schema()
+		err = app.saveSchema(schema)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	err = app.resourceApp.Commit()
+	if err != nil {
+		return nil, err
+	}
+
 	return nil, nil
 }
 
