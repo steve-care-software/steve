@@ -28,7 +28,7 @@ func createAdapter(
 // ToBytes converts instance to bytes
 func (app *adapter) ToBytes(ins Entry) ([]byte, error) {
 	output := ins.Flag().Bytes()
-	output = append(output, ins.Script().Bytes()...)
+	output = append(output, ins.Script()...)
 	output = append(output, pointers.Uint64ToBytes(ins.Fees())...)
 	return output, nil
 }

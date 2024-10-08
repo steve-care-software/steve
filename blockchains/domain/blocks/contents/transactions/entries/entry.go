@@ -5,14 +5,14 @@ import "github.com/steve-care-software/steve/hash"
 type entry struct {
 	hash   hash.Hash
 	flag   hash.Hash
-	script hash.Hash
+	script []byte
 	fees   uint64
 }
 
 func createEntry(
 	hash hash.Hash,
 	flag hash.Hash,
-	script hash.Hash,
+	script []byte,
 	fees uint64,
 ) Entry {
 	out := entry{
@@ -36,7 +36,7 @@ func (obj *entry) Flag() hash.Hash {
 }
 
 // Script returns the script
-func (obj *entry) Script() hash.Hash {
+func (obj *entry) Script() []byte {
 	return obj.script
 }
 

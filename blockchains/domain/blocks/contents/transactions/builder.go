@@ -48,9 +48,9 @@ func (app *builder) Now() (Transactions, error) {
 
 	scriptMap := map[string]Transaction{}
 	for _, oneTrx := range app.list {
-		keyname := oneTrx.Entry().Script().String()
+		keyname := string(oneTrx.Entry().Script())
 		if _, ok := scriptMap[keyname]; ok {
-			str := fmt.Sprintf("the script (hash: %s) has already been added in a previous transaction", keyname)
+			str := fmt.Sprintf("the script (%s) has already been added in a previous transaction", keyname)
 			return nil, errors.New(str)
 		}
 

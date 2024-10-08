@@ -10,7 +10,7 @@ import (
 type builder struct {
 	hashAdapter hash.Adapter
 	flag        hash.Hash
-	script      hash.Hash
+	script      []byte
 	pFees       *uint64
 }
 
@@ -41,7 +41,7 @@ func (app *builder) WithFlag(flag hash.Hash) Builder {
 }
 
 // WithScript adds a script to the builder
-func (app *builder) WithScript(script hash.Hash) Builder {
+func (app *builder) WithScript(script []byte) Builder {
 	app.script = script
 	return app
 }
@@ -58,6 +58,10 @@ func (app *builder) Now() (Entry, error) {
 		return nil, errors.New("the flag is mandatory in order to build an Entry instance")
 	}
 
+	if app.script != nil && len(app.script) <= 0 {
+		app.script = nil
+	}
+
 	if app.script == nil {
 		return nil, errors.New("the script is mandatory in order to build an Entry instance")
 	}
@@ -68,7 +72,7 @@ func (app *builder) Now() (Entry, error) {
 
 	pHash, err := app.hashAdapter.FromMultiBytes([][]byte{
 		app.flag.Bytes(),
-		app.script.Bytes(),
+		app.script,
 		[]byte(fmt.Sprintf("%d", *app.pFees)),
 	})
 

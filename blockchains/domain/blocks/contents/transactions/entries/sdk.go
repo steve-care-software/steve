@@ -32,7 +32,7 @@ type Adapter interface {
 type Builder interface {
 	Create() Builder
 	WithFlag(flag hash.Hash) Builder
-	WithScript(script hash.Hash) Builder
+	WithScript(script []byte) Builder
 	WithFees(fees uint64) Builder
 	Now() (Entry, error)
 }
@@ -41,6 +41,6 @@ type Builder interface {
 type Entry interface {
 	Hash() hash.Hash
 	Flag() hash.Hash
-	Script() hash.Hash
+	Script() []byte
 	Fees() uint64
 }
