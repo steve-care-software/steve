@@ -4,6 +4,11 @@ import (
 	"github.com/steve-care-software/steve/graphs/domain/scripts/programs/instructions/queries/assignments"
 )
 
+// NewBuilder creates a new builder
+func NewBuilder() Builder {
+	return createBuilder()
+}
+
 // NewClausesBuilder creates a new clauses builder
 func NewClausesBuilder() ClausesBuilder {
 	return createClausesBuilder()
@@ -17,6 +22,14 @@ func NewClauseBuilder() ClauseBuilder {
 // NewElementBuilder creates a new element builder
 func NewElementBuilder() ElementBuilder {
 	return createElementBuilder()
+}
+
+// Builder represents a condition builder
+type Builder interface {
+	Create() Builder
+	WithElement(element Element) Builder
+	WithClauses(clauses Clauses) Builder
+	Now() (Condition, error)
 }
 
 // Condition represents a query condition
