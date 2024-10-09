@@ -1,8 +1,9 @@
 package instructions
 
 import (
-	"github.com/steve-care-software/steve/engine/domain/graphs/connections/links"
 	"github.com/steve-care-software/steve/graphs/domain/scripts/commons/kinds"
+	"github.com/steve-care-software/steve/graphs/domain/scripts/programs/instructions/grammars"
+	"github.com/steve-care-software/steve/graphs/domain/scripts/programs/instructions/queries"
 	"github.com/steve-care-software/steve/graphs/domain/scripts/schemas/connections/links/references"
 	selectors_chain "github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/balances/selectors/chains"
 )
@@ -183,26 +184,10 @@ type Assignable interface {
 type AssignableEngine interface {
 	IsSelector() bool
 	Selector() selectors_chain.Chain
-	IsRoute() bool
-	Route() Route
 	IsGrammar() bool
-	Grammar() Grammar
-	IsAST() bool
-	AST() AST
+	Grammar() grammars.Grammar
 	IsQuery() bool
-	Query() AssignableEngineQuery
-}
-
-// AssignableEngineQuery represents an assignable engine query
-type AssignableEngineQuery interface {
-	IsSave() bool
-	Save() Save
-	IsDelete() bool
-	Delete() Delete
-	IsSelect() bool
-	Select() Select
-	IsBridges() bool
-	Bridges() Bridges
+	Query() queries.Query
 }
 
 // Operation represents an operation
@@ -265,34 +250,4 @@ type NumericValue interface {
 	Uint() *uint64
 	IsInt() bool
 	Int() *int64
-}
-
-// Route represents a route
-type Route interface {
-	IsOptimal() bool
-	Link() links.Link
-}
-
-// Grammar represents a grammar
-type Grammar interface {
-}
-
-// AST represents an ast
-type AST interface {
-}
-
-// Save represents a save
-type Save interface {
-}
-
-// Delete represents a delete
-type Delete interface {
-}
-
-// Select represents a select
-type Select interface {
-}
-
-// Bridges represents bridges
-type Bridges interface {
 }
