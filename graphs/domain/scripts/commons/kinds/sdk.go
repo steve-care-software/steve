@@ -13,6 +13,37 @@ const (
 	ContainerSortedSet
 )
 
+const (
+	// EngineSelector represents the engine selector
+	EngineSelector (uint8) = iota
+
+	// EngineAST represents the engine AST
+	EngineAST
+
+	// EngineRoute represents the engine route
+	EngineRoute
+
+	// EngineSelect represents the engine select
+	EngineSelect
+
+	// EngineInsert represents the engine insert
+	EngineInsert
+
+	// EngineUpdate represents the engine update
+	EngineUpdate
+
+	// EngineDelete represents the engine delete
+	EngineDelete
+
+	// EngineBridges represents the engine bridges
+	EngineBridges
+)
+
+// NewBuilder creates a new builder
+func NewBuilder() Builder {
+	return createBuilder()
+}
+
 // NewContainerBuilder creates a new container builder
 func NewContainerBuilder() ContainerBuilder {
 	return createContainerBuilder()
@@ -25,7 +56,7 @@ type Builder interface {
 	WithEngine(engine uint8) Builder
 	WithPrimitive(primitive primitives.Primitive) Builder
 	IsMap() Builder
-	Now() Kind
+	Now() (Kind, error)
 }
 
 // Kind represents a kind
