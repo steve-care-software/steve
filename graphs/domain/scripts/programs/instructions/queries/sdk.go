@@ -13,8 +13,8 @@ type Query interface {
 	Save() saves.Save
 	IsSelect() bool
 	Select() selects.Select
-	IsBridges() bool
-	Bridges() bridges.Bridges
+	IsBridge() bool
+	Bridge() bridges.Bridge
 	IsRoute() bool
 	Route() routes.Route
 }
