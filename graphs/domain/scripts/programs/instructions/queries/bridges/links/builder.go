@@ -21,31 +21,31 @@ func createBuilder() Builder {
 }
 
 // Create initializes the link builder
-func (obj *builder) Create() Builder {
+func (app *builder) Create() Builder {
 	return createBuilder()
 }
 
 // WithOrigin adds an origin assignment to the link builder
-func (obj *builder) WithOrigin(origin assignments.Assignment) Builder {
-	obj.origin = origin
-	return obj
+func (app *builder) WithOrigin(origin assignments.Assignment) Builder {
+	app.origin = origin
+	return app
 }
 
 // WithTarget adds a target assignment to the link builder
-func (obj *builder) WithTarget(target assignments.Assignment) Builder {
-	obj.target = target
-	return obj
+func (app *builder) WithTarget(target assignments.Assignment) Builder {
+	app.target = target
+	return app
 }
 
 // Now builds a new Link instance
-func (obj *builder) Now() (Link, error) {
-	if obj.origin == nil {
+func (app *builder) Now() (Link, error) {
+	if app.origin == nil {
 		return nil, errors.New("the origin is mandatory in order to build a Link instance")
 	}
 
-	if obj.target == nil {
+	if app.target == nil {
 		return nil, errors.New("the target is mandatory in order to build a Link instance")
 	}
 
-	return createLink(obj.origin, obj.target), nil
+	return createLink(app.origin, app.target), nil
 }
