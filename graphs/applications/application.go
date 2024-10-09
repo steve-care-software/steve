@@ -7,6 +7,9 @@ import (
 	"github.com/steve-care-software/steve/graphs/domain/responses"
 	"github.com/steve-care-software/steve/graphs/domain/scripts"
 	"github.com/steve-care-software/steve/graphs/domain/scripts/commons/heads"
+	"github.com/steve-care-software/steve/graphs/domain/scripts/commons/heads/access"
+	"github.com/steve-care-software/steve/graphs/domain/scripts/commons/heads/access/permissions"
+	"github.com/steve-care-software/steve/graphs/domain/scripts/commons/heads/access/writes"
 	"github.com/steve-care-software/steve/graphs/domain/scripts/schemas"
 	"github.com/steve-care-software/steve/graphs/domain/scripts/schemas/connections"
 	"github.com/steve-care-software/steve/graphs/domain/scripts/schemas/connections/headers"
@@ -53,7 +56,7 @@ func (app *application) Execute(script scripts.Script) (responses.Response, erro
 
 	if script.IsSchema() {
 		schema := script.Schema()
-		err = app.saveSchema(schema)
+		_, err = app.saveSchema(schema)
 		if err != nil {
 			return nil, err
 		}
@@ -67,12 +70,65 @@ func (app *application) Execute(script scripts.Script) (responses.Response, erro
 	return nil, nil
 }
 
-func (app *application) saveSchema(schema schemas.Schema) error {
-	return nil
+func (app *application) saveSchema(schemaIns schemas.Schema) (*hash.Hash, error) {
+	connectionHashes, err := app.saveConnections(schemaIns.Connections())
+	if err != nil {
+		return nil, err
+	}
+
+	connectionsBytes := [][]byte{}
+	for _, oneHash := range connectionHashes {
+		connectionsBytes = append(connectionsBytes, oneHash.Bytes())
+	}
+
+	ins := schema{
+		Head:        app.saveHead(schemaIns.Head()),
+		Points:      schemaIns.Points(),
+		Connections: connectionsBytes,
+	}
+
+	return app.retrieveOrSave(ins)
 }
 
-func (app *application) saveHead(head heads.Head) error {
-	return nil
+func (app *application) saveHead(headIns heads.Head) head {
+	return head{
+		Name:    headIns.Name(),
+		Version: headIns.Version(),
+		Access:  app.saveHeadAccess(headIns.Access()),
+	}
+}
+
+func (app *application) saveHeadAccess(accessIns access.Access) headAccess {
+	ins := headAccess{
+		Write: app.saveAccessWrite(accessIns.Write()),
+	}
+
+	if accessIns.HasRead() {
+		read := app.saveAccessPermission(accessIns.Read())
+		ins.PRead = &read
+	}
+
+	return ins
+}
+
+func (app *application) saveAccessWrite(write writes.Write) accessWrite {
+	output := accessWrite{
+		Modify: app.saveAccessPermission(write.Modify()),
+	}
+
+	if write.HasReview() {
+		review := app.saveAccessPermission(write.Review())
+		output.PReview = &review
+	}
+
+	return output
+}
+
+func (app *application) saveAccessPermission(permission permissions.Permission) accessPermission {
+	return accessPermission{
+		Names:        permission.Names(),
+		Compensation: permission.Compensation(),
+	}
 }
 
 func (app *application) saveConnections(connectionsIns connections.Connections) ([]hash.Hash, error) {
@@ -102,22 +158,25 @@ func (app *application) saveConnection(connectionIns connections.Connection) (*h
 		linksBytes = append(linksBytes, oneHash.Bytes())
 	}
 
-	suites := connectionIns.Suites()
-	retSuiteHashes, err := app.saveSuites(suites)
-	if err != nil {
-		return nil, err
-	}
-
-	suitesBytes := [][]byte{}
-	for _, oneHash := range retSuiteHashes {
-		suitesBytes = append(suitesBytes, oneHash.Bytes())
-	}
-
 	header := connectionIns.Header()
 	ins := connection{
-		header: app.saveConnectionHeader(header),
-		links:  linksBytes,
-		suites: suitesBytes,
+		Header: app.saveConnectionHeader(header),
+		Links:  linksBytes,
+	}
+
+	if connectionIns.HasSuites() {
+		suites := connectionIns.Suites()
+		retSuiteHashes, err := app.saveSuites(suites)
+		if err != nil {
+			return nil, err
+		}
+
+		suitesBytes := [][]byte{}
+		for _, oneHash := range retSuiteHashes {
+			suitesBytes = append(suitesBytes, oneHash.Bytes())
+		}
+
+		ins.Suites = suitesBytes
 	}
 
 	return app.retrieveOrSave(ins)
@@ -126,13 +185,13 @@ func (app *application) saveConnection(connectionIns connections.Connection) (*h
 func (app *application) saveConnectionHeader(header headers.Header) connectionHeader {
 	name := header.Name()
 	ins := connectionHeader{
-		name: app.saveConnectionHeaderName(name),
+		Name: app.saveConnectionHeaderName(name),
 	}
 
 	if header.HasReverse() {
 		reverseIns := header.Reverse()
 		reverse := app.saveConnectionHeaderName(reverseIns)
-		ins.pReverse = &reverse
+		ins.PReverse = &reverse
 	}
 
 	return ins
@@ -141,19 +200,19 @@ func (app *application) saveConnectionHeader(header headers.Header) connectionHe
 func (app *application) saveConnectionHeaderName(name names.Name) connectionName {
 	cardinality := name.Cardinality()
 	return connectionName{
-		name:        name.Name(),
-		cardinality: app.saveConnectionCardinality(cardinality),
+		Name:        name.Name(),
+		Cardinality: app.saveConnectionCardinality(cardinality),
 	}
 }
 
 func (app *application) saveConnectionCardinality(cardinality cardinalities.Cardinality) connectionCardinality {
 	ins := connectionCardinality{
-		min: cardinality.Min(),
+		Min: cardinality.Min(),
 	}
 
 	if cardinality.HaxMax() {
 		pMax := cardinality.Max()
-		ins.pMax = pMax
+		ins.PMax = pMax
 	}
 
 	return ins
@@ -188,8 +247,8 @@ func (app *application) saveLink(linkIns links.Link) (*hash.Hash, error) {
 	}
 
 	ins := link{
-		origin: pOriginHash.Bytes(),
-		target: pTargetHash.Bytes(),
+		Origin: pOriginHash.Bytes(),
+		Target: pTargetHash.Bytes(),
 	}
 
 	return app.retrieveOrSave(ins)
@@ -224,9 +283,9 @@ func (app *application) saveSuite(suiteIns suites.Suite) (*hash.Hash, error) {
 	}
 
 	ins := suite{
-		name:         suiteIns.Name(),
-		link:         pLinkHash.Bytes(),
-		expectations: retExpectations,
+		Name:         suiteIns.Name(),
+		Link:         pLinkHash.Bytes(),
+		Expectations: retExpectations,
 	}
 
 	return app.retrieveOrSave(ins)
@@ -260,8 +319,8 @@ func (app *application) saveSuiteExpectation(expectationIns expectations.Expecta
 	}
 
 	return &suiteExpectation{
-		references: referencesBytes,
-		isFail:     expectationIns.IsFail(),
+		References: referencesBytes,
+		IsFail:     expectationIns.IsFail(),
 	}, nil
 }
 
@@ -283,14 +342,14 @@ func (app *application) saveReferences(references references.References) ([]hash
 func (app *application) saveReference(referenceIns references.Reference) (*hash.Hash, error) {
 	ins := reference{}
 	if referenceIns.IsInternal() {
-		ins.internal = referenceIns.Internal()
+		ins.Internal = referenceIns.Internal()
 	}
 
 	if referenceIns.IsExternal() {
 		externalIns := referenceIns.External()
-		ins.pExternal = &external{
-			schema: externalIns.Schema(),
-			point:  externalIns.Point(),
+		ins.PExternal = &external{
+			Schema: externalIns.Schema(),
+			Point:  externalIns.Point(),
 		}
 	}
 
@@ -311,7 +370,7 @@ func (app *application) retrieveOrSave(value any) (*hash.Hash, error) {
 
 	err = app.resourceApp.Insert(keyname, data)
 	if err != nil {
-		return nil, err
+		return pHash, nil // already modified in the current session
 	}
 
 	return pHash, nil

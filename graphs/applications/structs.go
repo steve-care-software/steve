@@ -1,51 +1,75 @@
 package applications
 
 type schema struct {
+	Head        head
+	Points      []string
+	Connections [][]byte // connection hash bytes
+}
+
+type head struct {
+	Name    string
+	Version uint
+	Access  headAccess
+}
+
+type headAccess struct {
+	Write accessWrite
+	PRead *accessPermission
+}
+
+type accessWrite struct {
+	Modify  accessPermission
+	PReview *accessPermission
+}
+
+type accessPermission struct {
+	Names        []string
+	Compensation float64
 }
 
 type connection struct {
-	header connectionHeader
-	links  [][]byte // link hash bytes
-	suites [][]byte // suite hash bytes
+	Header connectionHeader
+	Links  [][]byte // link hash bytes
+	Suites [][]byte // suite hash bytes
 }
 
 type connectionHeader struct {
-	name     connectionName
-	pReverse *connectionName
+	Name     connectionName
+	PReverse *connectionName
 }
 
 type connectionName struct {
-	name        string
-	cardinality connectionCardinality
+	Name        string
+	Cardinality connectionCardinality
 }
 
 type connectionCardinality struct {
-	min  uint
-	pMax *uint
+	Min  uint
+	PMax *uint
 }
 
 type link struct {
-	origin []byte // reference hash bytes
-	target []byte // reference hash bytes
+	Origin []byte // reference hash bytes
+	Target []byte // reference hash bytes
 }
 
 type reference struct {
-	internal  string
-	pExternal *external
+	Internal  string
+	PExternal *external
 }
 
 type external struct {
-	schema string
-	point  string
+	Schema string
+	Point  string
 }
 
 type suite struct {
-	name         string
-	link         []byte // link hash bytes
-	expectations []suiteExpectation
+	Name         string
+	Link         []byte // link hash bytes
+	Expectations []suiteExpectation
 }
 
 type suiteExpectation struct {
-	references [][]byte // reference hash bytes
-	isFail     bool
+	References [][]byte // reference hash bytes
+	IsFail     bool
 }

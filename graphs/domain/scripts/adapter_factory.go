@@ -1,8 +1,6 @@
 package scripts
 
 import (
-	"errors"
-
 	"github.com/steve-care-software/steve/graphs/domain/scripts/commons/heads"
 	"github.com/steve-care-software/steve/graphs/domain/scripts/commons/heads/access"
 	"github.com/steve-care-software/steve/graphs/domain/scripts/commons/heads/access/permissions"
@@ -21,8 +19,9 @@ import (
 	"github.com/steve-care-software/steve/parsers/domain/grammars"
 )
 
-type adapterBuilder struct {
+type adapterFactory struct {
 	parserAppBuilder        applications_parser.Builder
+	grammarAdapter          grammars.Adapter
 	builder                 Builder
 	schemaBuilder           schemas.Builder
 	headBuilder             heads.Builder
@@ -43,11 +42,12 @@ type adapterBuilder struct {
 	connectionHeaderBuilder connection_headers.Builder
 	nameBuilder             names.Builder
 	cardinalityBuilder      cardinalities.Builder
-	grammar                 grammars.Grammar
+	grammar                 []byte
 }
 
-func createAdapterBuilder(
+func createAdapterFactory(
 	parserAppBuilder applications_parser.Builder,
+	grammarAdapter grammars.Adapter,
 	builder Builder,
 	schemaBuilder schemas.Builder,
 	headBuilder heads.Builder,
@@ -68,9 +68,11 @@ func createAdapterBuilder(
 	connectionHeaderBuilder connection_headers.Builder,
 	nameBuilder names.Builder,
 	cardinalityBuilder cardinalities.Builder,
-) AdapterBuilder {
-	out := adapterBuilder{
+	grammar []byte,
+) AdapterFactory {
+	out := adapterFactory{
 		parserAppBuilder:        parserAppBuilder,
+		grammarAdapter:          grammarAdapter,
 		builder:                 builder,
 		schemaBuilder:           schemaBuilder,
 		headBuilder:             headBuilder,
@@ -91,54 +93,22 @@ func createAdapterBuilder(
 		connectionHeaderBuilder: connectionHeaderBuilder,
 		nameBuilder:             nameBuilder,
 		cardinalityBuilder:      cardinalityBuilder,
-		grammar:                 nil,
+		grammar:                 grammar,
 	}
 
 	return &out
 }
 
-// Create initializes the builder
-func (app *adapterBuilder) Create() AdapterBuilder {
-	return createAdapterBuilder(
-		app.parserAppBuilder,
-		app.builder,
-		app.schemaBuilder,
-		app.headBuilder,
-		app.accessBuilder,
-		app.permissionBuilder,
-		app.writeBuilder,
-		app.connectionsBuilder,
-		app.connectionBuilder,
-		app.suitesBuilder,
-		app.suiteBuilder,
-		app.expectationsBuilder,
-		app.expectationBuilder,
-		app.linksBuilder,
-		app.linkBuilder,
-		app.referencesBuilder,
-		app.referenceBuilder,
-		app.externalBuilder,
-		app.connectionHeaderBuilder,
-		app.nameBuilder,
-		app.cardinalityBuilder,
-	)
-}
-
-// WithGramar adds a grammar to the builder
-func (app *adapterBuilder) WithGramar(gramar grammars.Grammar) AdapterBuilder {
-	app.grammar = gramar
-	return app
-}
-
-// Now builds a new Adapter instance
-func (app *adapterBuilder) Now() (Adapter, error) {
-	if app.grammar == nil {
-		return nil, errors.New("the grammar is mandatory in order to build an Adapter instance")
+// Create creates a new adapter
+func (app *adapterFactory) Create() (Adapter, error) {
+	grammar, _, err := app.grammarAdapter.ToGrammar(app.grammar)
+	if err != nil {
+		return nil, err
 	}
 
 	return createAdapter(
 		app.parserAppBuilder,
-		app.grammar,
+		grammar,
 		app.builder,
 		app.schemaBuilder,
 		app.headBuilder,

@@ -29,7 +29,7 @@ func TestAdapter_Success(t *testing.T) {
 		return
 	}
 
-	adapter, err := NewAdapterBuilder().Create().WithGramar(retGrammar).Now()
+	adapter, err := NewAdapterFactory().Create()
 	if err != nil {
 		t.Errorf("there was an error while running the grammar test suites: %s", err.Error())
 		return

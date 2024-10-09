@@ -19,9 +19,10 @@ import (
 	"github.com/steve-care-software/steve/parsers/domain/grammars"
 )
 
-// NewAdapterBuilder creates a new adapter builder
-func NewAdapterBuilder() AdapterBuilder {
+// NewAdapterFactory creates a new adapter factory
+func NewAdapterFactory() AdapterFactory {
 	parserAppBuilder := applications_parser.NewBuilder()
+	grammarAdapter := grammars.NewAdapter()
 	builder := NewBuilder()
 	schemaBuilder := schemas.NewBuilder()
 	headBuilder := heads.NewBuilder()
@@ -42,8 +43,9 @@ func NewAdapterBuilder() AdapterBuilder {
 	connectionHeaderBuilder := connection_headers.NewBuilder()
 	nameBuilder := names.NewBuilder()
 	cardinalityBuilder := cardinalities.NewBuilder()
-	return createAdapterBuilder(
+	return createAdapterFactory(
 		parserAppBuilder,
+		grammarAdapter,
 		builder,
 		schemaBuilder,
 		headBuilder,
@@ -64,6 +66,7 @@ func NewAdapterBuilder() AdapterBuilder {
 		connectionHeaderBuilder,
 		nameBuilder,
 		cardinalityBuilder,
+		fetchGrammarInput(),
 	)
 }
 
@@ -72,11 +75,9 @@ func NewBuilder() Builder {
 	return createBuilder()
 }
 
-// AdapterBuilder represents an adapter builder
-type AdapterBuilder interface {
-	Create() AdapterBuilder
-	WithGramar(gramar grammars.Grammar) AdapterBuilder
-	Now() (Adapter, error)
+// AdapterFactory represents an adapter factory
+type AdapterFactory interface {
+	Create() (Adapter, error)
 }
 
 // Adapter represents the script adapter
