@@ -4,6 +4,11 @@ import (
 	"github.com/steve-care-software/steve/graphs/domain/scripts/programs/instructions/queries/assignments"
 )
 
+// NewClausesBuilder creates a new clauses builder
+func NewClausesBuilder() ClausesBuilder {
+	return createClausesBuilder()
+}
+
 // NewClauseBuilder creates a new clause builder
 func NewClauseBuilder() ClauseBuilder {
 	return createClauseBuilder()
@@ -19,6 +24,13 @@ type Condition interface {
 	Element() Element
 	HasClauses() bool
 	Clauses() Clauses
+}
+
+// ClausesBuilder represents the clauses builder
+type ClausesBuilder interface {
+	Create() ClausesBuilder
+	WithList(list []Clause) ClausesBuilder
+	Now() (Clauses, error)
 }
 
 // Clauses represents query condition clauses
