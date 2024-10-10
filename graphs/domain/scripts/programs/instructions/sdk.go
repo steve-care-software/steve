@@ -8,6 +8,11 @@ import (
 	selectors_chain "github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/balances/selectors/chains"
 )
 
+// NewNumericValueBuilder creates a new numeric value builder
+func NewNumericValueBuilder() NumericValueBuilder {
+	return createNumericValueBuilder()
+}
+
 // Instructions represents instructions
 type Instructions interface {
 	List() []Instruction
@@ -240,6 +245,15 @@ type PrimitiveValue interface {
 	Bool() *bool
 	IsString() bool
 	String() *string
+}
+
+// NumericValueBuilder represents the numeric value builder
+type NumericValueBuilder interface {
+	Create() NumericValueBuilder
+	WithFloat(flValue float64) NumericValueBuilder
+	WithUint(uiValue uint64) NumericValueBuilder
+	WithInt(intValue int64) NumericValueBuilder
+	Now() (NumericValue, error)
 }
 
 // NumericValue represents a numeric value
