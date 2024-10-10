@@ -19,21 +19,21 @@ func createBuilder() Builder {
 }
 
 // Create initializes the route builder
-func (obj *builder) Create() Builder {
+func (app *builder) Create() Builder {
 	return createBuilder()
 }
 
 // WithLink adds a link to the route builder
-func (obj *builder) WithLink(link links.Link) Builder {
-	obj.link = link
-	return obj
+func (app *builder) WithLink(link links.Link) Builder {
+	app.link = link
+	return app
 }
 
 // Now builds a new Route instance
-func (obj *builder) Now() (Route, error) {
-	if obj.link == nil {
+func (app *builder) Now() (Route, error) {
+	if app.link == nil {
 		return nil, errors.New("the link is mandatory in order to build a Route instance")
 	}
 
-	return createRoute(obj.link, obj.isOptimal), nil
+	return createRoute(app.link, app.isOptimal), nil
 }
