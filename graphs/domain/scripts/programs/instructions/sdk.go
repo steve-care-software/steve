@@ -9,6 +9,11 @@ import (
 	selectors_chain "github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/balances/selectors/chains"
 )
 
+// NewSingleVariableOperationBuilder creates a new single variable operation builder
+func NewSingleVariableOperationBuilder() SingleVariableOperationBuilder {
+	return createSingleVariableOperationBuilder()
+}
+
 // NewCastingBuilder creates a new casting builder
 func NewCastingBuilder() CastingBuilder {
 	return createCastingBuilder()
@@ -236,10 +241,18 @@ type Operator interface {
 	Logical() uint8
 }
 
+// SingleVariableOperationBuilder represents a single variable operation builder
+type SingleVariableOperationBuilder interface {
+	Create() SingleVariableOperationBuilder
+	WithName(name string) SingleVariableOperationBuilder
+	WithOperator(operator uint8) SingleVariableOperationBuilder
+	Now() (SingleVariableOperation, error)
+}
+
 // SingleVariableOperation represents a single variable operation
 type SingleVariableOperation interface {
 	Name() string
-	Oprator() uint8
+	Operator() uint8
 }
 
 // CastingBuilder repreents a casting builder
