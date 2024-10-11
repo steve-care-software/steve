@@ -9,6 +9,11 @@ import (
 	selectors_chain "github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/balances/selectors/chains"
 )
 
+// NewProgramCallBuilder creates a new program call builder
+func NewProgramCallBuilder() ProgramCallBuilder {
+	return createProgramCallBuilder()
+}
+
 // NewListMapBuilder creates a new list map builder
 func NewListMapBuilder() ListMapBuilder {
 	return createListMapBuilder()
@@ -90,6 +95,14 @@ type Assignable interface {
 	Expand() string
 	IsOperation() bool
 	Operation() Operation
+}
+
+// ProgramCallBuilder represents the program call builder
+type ProgramCallBuilder interface {
+	Create() ProgramCallBuilder
+	WithReferences(references references.References) ProgramCallBuilder
+	WithParams(params MapKeyValues) ProgramCallBuilder
+	Now() (ProgramCall, error)
 }
 
 // ProgramCall represents a program call
