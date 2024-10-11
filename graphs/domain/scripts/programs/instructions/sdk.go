@@ -8,6 +8,11 @@ import (
 	selectors_chain "github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/balances/selectors/chains"
 )
 
+// NewPrimitiveValueBuilder creates a new primitive value builder
+func NewPrimitiveValueBuilder() PrimitiveValueBuilder {
+	return createPrimitiveValueBuilder()
+}
+
 // NewNumericValueBuilder creates a new numeric value builder
 func NewNumericValueBuilder() NumericValueBuilder {
 	return createNumericValueBuilder()
@@ -235,6 +240,15 @@ type SingleVariableOperation interface {
 type Casting interface {
 	Variable() string
 	Kind() kinds.Kind
+}
+
+// PrimitiveValueBuilder represents a primitive value builder
+type PrimitiveValueBuilder interface {
+	Create() PrimitiveValueBuilder
+	WithNumeric(numeric NumericValue) PrimitiveValueBuilder
+	WithBool(boolBalue bool) PrimitiveValueBuilder
+	WithString(strValue string) PrimitiveValueBuilder
+	Now() (PrimitiveValue, error)
 }
 
 // PrimitiveValue represents a primitive value
