@@ -1,4 +1,4 @@
-package instructions
+package assignables
 
 type operatorAssignable struct {
 	operator   Operator

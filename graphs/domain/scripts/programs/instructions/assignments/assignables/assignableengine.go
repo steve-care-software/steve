@@ -1,4 +1,4 @@
-package instructions
+package assignables
 
 import (
 	"github.com/steve-care-software/steve/graphs/domain/scripts/programs/instructions/grammars"

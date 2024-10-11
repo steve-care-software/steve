@@ -1,4 +1,4 @@
-package instructions
+package assignables
 
 import "errors"
 

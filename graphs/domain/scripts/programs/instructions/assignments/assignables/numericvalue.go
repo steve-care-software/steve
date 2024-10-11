@@ -1,4 +1,4 @@
-package instructions
+package assignables
 
 type numericValue struct {
 	flValue  *float64

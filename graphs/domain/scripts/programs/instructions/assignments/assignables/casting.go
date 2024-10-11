@@ -1,4 +1,4 @@
-package instructions
+package assignables
 
 import (
 	"github.com/steve-care-software/steve/engine/domain/scripts/specifics/programs/instructions/assignments/assignables"

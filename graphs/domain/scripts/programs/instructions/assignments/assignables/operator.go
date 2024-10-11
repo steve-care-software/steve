@@ -1,4 +1,4 @@
-package instructions
+package assignables
 
 type operator struct {
 	arithmetic *uint8
