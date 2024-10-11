@@ -228,6 +228,13 @@ type Operation interface {
 	Assignables() OperatorAssignables
 }
 
+// OperatorAssignablesBuilder represents the operator assignbales builder
+type OperatorAssignablesBuilder interface {
+	Create() OperatorAssignablesBuilder
+	WithList(list []OperatorAssignable) OperatorAssignablesBuilder
+	Now() (OperatorAssignables, error)
+}
+
 // OperatorAssignables represents an operator assignables
 type OperatorAssignables interface {
 	List() []OperatorAssignable
