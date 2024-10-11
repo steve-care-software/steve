@@ -6,6 +6,11 @@ import (
 	"github.com/steve-care-software/steve/graphs/domain/scripts/schemas/connections/links/references"
 )
 
+// NewAssigneeNameBuilder creates a new assignee name builder
+func NewAssigneeNameBuilder() AssigneeNameBuilder {
+	return createAssigneeNameBuilder()
+}
+
 // Assignment represents an assignment
 type Assignment interface {
 	IsMultiple() bool
@@ -20,7 +25,7 @@ type AssignmentMultiple interface {
 	Assignables() assignables.Assignables
 }
 
-// AssignmentOperation represents an assignment operation (ex: myVAr++)
+// AssignmentOperation represents an assignment operation (ex: myVar++)
 type AssignmentOperation interface {
 	Assignee() Assignee
 	Operator() uint8                    // arithmetic operator
@@ -39,10 +44,16 @@ type Assignee interface {
 	Kind() kinds.Kind
 }
 
+// AssigneeNameBuilder represents the assigneename builder
+type AssigneeNameBuilder interface {
+	Create() AssigneeNameBuilder
+	WithReferences(references references.References) AssigneeNameBuilder
+	WithIndex(index uint) AssigneeNameBuilder
+	Now() (AssigneeName, error)
+}
+
 // AssigneeName represents an assignee name
 type AssigneeName interface {
-	Name() string
-	HasReferences() bool
 	References() references.References
 	HasIndex() bool
 	Index() *uint
