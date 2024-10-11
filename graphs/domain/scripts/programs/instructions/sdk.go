@@ -9,6 +9,16 @@ import (
 	selectors_chain "github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/balances/selectors/chains"
 )
 
+// NewOperationBuilder creates a new operation builder
+func NewOperationBuilder() OperationBuilder {
+	return createOperationBuilder()
+}
+
+// NewOperatorAssignablesBuilder creates a new operator assignablse builder
+func NewOperatorAssignablesBuilder() OperatorAssignablesBuilder {
+	return createOperatorAssignablesBuilder()
+}
+
 // NewOperatorAssignableBuilder creates a new operator assignable builder
 func NewOperatorAssignableBuilder() OperatorAssignableBuilder {
 	return createOperatorAssignableBuilder()
@@ -219,6 +229,14 @@ type AssignableEngine interface {
 	Grammar() grammars.Grammar
 	IsQuery() bool
 	Query() queries.Query
+}
+
+// OperationBuilder represents the operation builder
+type OperationBuilder interface {
+	Create() OperationBuilder
+	WithFirst(first Assignable) OperationBuilder
+	WithAssignables(assignables OperatorAssignables) OperationBuilder
+	Now() (Operation, error)
 }
 
 // Operation represents an operation
