@@ -1,6 +1,7 @@
 package instructions
 
 import (
+	"github.com/steve-care-software/steve/engine/domain/scripts/specifics/programs/instructions/assignments/assignables"
 	"github.com/steve-care-software/steve/graphs/domain/scripts/commons/kinds"
 	"github.com/steve-care-software/steve/graphs/domain/scripts/programs/instructions/grammars"
 	"github.com/steve-care-software/steve/graphs/domain/scripts/programs/instructions/queries"
@@ -8,7 +9,12 @@ import (
 	selectors_chain "github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/balances/selectors/chains"
 )
 
-// NewPrimitiveValueBuilder creates a new primitive value builder
+// NewCastingBuilder creates a new casting builder
+func NewCastingBuilder() CastingBuilder {
+	return createCastingBuilder()
+}
+
+// NewPrimitiveValueBuilder creates a new primitive value builderg
 func NewPrimitiveValueBuilder() PrimitiveValueBuilder {
 	return createPrimitiveValueBuilder()
 }
@@ -236,9 +242,17 @@ type SingleVariableOperation interface {
 	Oprator() uint8
 }
 
+// CastingBuilder repreents a casting builder
+type CastingBuilder interface {
+	Create() CastingBuilder
+	WithAssignable(assignable assignables.Assignable) CastingBuilder
+	WithKind(kind kinds.Kind) CastingBuilder
+	Now() (Casting, error)
+}
+
 // Casting represents a casting
 type Casting interface {
-	Variable() string
+	Assignable() assignables.Assignable
 	Kind() kinds.Kind
 }
 
