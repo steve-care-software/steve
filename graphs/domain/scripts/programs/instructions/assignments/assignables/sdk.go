@@ -9,6 +9,11 @@ import (
 	selectors_chain "github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/balances/selectors/chains"
 )
 
+// NewMapKeyValuesBuilder creates a new map key values builder
+func NewMapKeyValuesBuilder() MapKeyValuesBuilder {
+	return createMapKeyValuesBuilder()
+}
+
 // NewMapKeyValueBuilder creates a new map key value builder
 func NewMapKeyValueBuilder() MapKeyValueBuilder {
 	return createMapKeyValueBuilder()
@@ -95,6 +100,13 @@ type ListMap interface {
 	List() Assignables
 	IsMap() bool
 	Map() MapKeyValues
+}
+
+// MapKeyValuesBuilder represents the map key values builder
+type MapKeyValuesBuilder interface {
+	Create() MapKeyValuesBuilder
+	WithList(list []MapKeyValue) MapKeyValuesBuilder
+	Now() (MapKeyValues, error)
 }
 
 // MapKeyValues represents a map key->values
