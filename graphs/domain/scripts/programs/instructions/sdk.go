@@ -9,6 +9,11 @@ import (
 	selectors_chain "github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/balances/selectors/chains"
 )
 
+// NewOperatorAssignableBuilder creates a new operator assignable builder
+func NewOperatorAssignableBuilder() OperatorAssignableBuilder {
+	return createOperatorAssignableBuilder()
+}
+
 // NewOperatorBuilder creates a new operator builder
 func NewOperatorBuilder() OperatorBuilder {
 	return createOperatorBuilder()
@@ -226,6 +231,14 @@ type Operation interface {
 // OperatorAssignables represents an operator assignables
 type OperatorAssignables interface {
 	List() []OperatorAssignable
+}
+
+// OperatorAssignableBuilder represents the operator assignable builder
+type OperatorAssignableBuilder interface {
+	Create() OperatorAssignableBuilder
+	WithOperator(operator Operator) OperatorAssignableBuilder
+	WithAssignable(assignable Assignable) OperatorAssignableBuilder
+	Now() (OperatorAssignable, error)
 }
 
 // OperatorAssignable represents an operator assignable
