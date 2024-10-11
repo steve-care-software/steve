@@ -56,7 +56,7 @@ type ForUntilClause interface {
 type ForKeyValue interface {
 	Key() string
 	Value() string
-	Iterable() Iterable
+	Iterable() assignables.Iterable
 	Instructions() ForInstructions
 }
 
@@ -70,14 +70,6 @@ type ForInstruction interface {
 	IsBreak() bool
 	IsInstruction() bool
 	Instruction() Instruction
-}
-
-// Iterable represents an iterable
-type Iterable interface {
-	IsListMap() bool
-	ListMap() assignables.ListMap
-	IsVariable() bool
-	Variable() string
 }
 
 // Condition represents a condition

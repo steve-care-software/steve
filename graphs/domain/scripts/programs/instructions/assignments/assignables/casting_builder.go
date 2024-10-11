@@ -3,12 +3,11 @@ package assignables
 import (
 	"errors"
 
-	"github.com/steve-care-software/steve/engine/domain/scripts/specifics/programs/instructions/assignments/assignables"
 	"github.com/steve-care-software/steve/graphs/domain/scripts/commons/kinds"
 )
 
 type castingBuilder struct {
-	assignable assignables.Assignable
+	assignable Assignable
 	kind       kinds.Kind
 }
 
@@ -25,7 +24,7 @@ func (app *castingBuilder) Create() CastingBuilder {
 }
 
 // WithAssignable adds an assignable to the casting builder
-func (app *castingBuilder) WithAssignable(assignable assignables.Assignable) CastingBuilder {
+func (app *castingBuilder) WithAssignable(assignable Assignable) CastingBuilder {
 	app.assignable = assignable
 	return app
 }

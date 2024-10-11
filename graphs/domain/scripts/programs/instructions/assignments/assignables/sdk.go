@@ -1,13 +1,27 @@
 package assignables
 
 import (
-	"github.com/steve-care-software/steve/engine/domain/scripts/specifics/programs/instructions/assignments/assignables"
 	"github.com/steve-care-software/steve/graphs/domain/scripts/commons/kinds"
 	"github.com/steve-care-software/steve/graphs/domain/scripts/programs/instructions/grammars"
 	"github.com/steve-care-software/steve/graphs/domain/scripts/programs/instructions/queries"
 	"github.com/steve-care-software/steve/graphs/domain/scripts/schemas/connections/links/references"
 	selectors_chain "github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/balances/selectors/chains"
 )
+
+// NewBuilder creates a new builder
+func NewBuilder() Builder {
+	return createBuilder()
+}
+
+// NewAssignableBuilder creates a new assignable builder
+func NewAssignableBuilder() AssignableBuilder {
+	return createAssignableBuilder()
+}
+
+// NewIterableBuilder creates a new iterable builder
+func NewIterableBuilder() IterableBuilder {
+	return createIterableBuilder()
+}
 
 // NewProgramCallBuilder creates a new program call builder
 func NewProgramCallBuilder() ProgramCallBuilder {
@@ -74,9 +88,29 @@ func NewNumericValueBuilder() NumericValueBuilder {
 	return createNumericValueBuilder()
 }
 
+// Builder represents the assignables builder
+type Builder interface {
+	Create() Builder
+	WithList(list []Assignable) Builder
+	Now() (Assignables, error)
+}
+
 // Assignables represents assignables
 type Assignables interface {
 	List() []Assignable
+}
+
+// AssignableBuilder represents the assignable builder
+type AssignableBuilder interface {
+	Create() AssignableBuilder
+	WithEngine(engine AssignableEngine) AssignableBuilder
+	WithListMap(listMap ListMap) AssignableBuilder
+	WithProgramCall(programCall ProgramCall) AssignableBuilder
+	WithPrimitive(primitive PrimitiveValue) AssignableBuilder
+	WithCasting(casting Casting) AssignableBuilder
+	WithExpand(expand Iterable) AssignableBuilder
+	WithOperation(operation Operation) AssignableBuilder
+	Now() (Assignable, error)
 }
 
 // Assignable represents an assignable
@@ -92,9 +126,25 @@ type Assignable interface {
 	IsCasting() bool
 	Casting() Casting
 	IsExpand() bool
-	Expand() string
+	Expand() Iterable
 	IsOperation() bool
 	Operation() Operation
+}
+
+// IterableBuilder represents the iterable builder
+type IterableBuilder interface {
+	Create() IterableBuilder
+	WithListMap(listMap ListMap) IterableBuilder
+	WithVariable(variable string) IterableBuilder
+	Now() (Iterable, error)
+}
+
+// Iterable represents an iterable
+type Iterable interface {
+	IsListMap() bool
+	ListMap() ListMap
+	IsVariable() bool
+	Variable() string
 }
 
 // ProgramCallBuilder represents the program call builder
@@ -253,14 +303,14 @@ type SingleVariableOperation interface {
 // CastingBuilder repreents a casting builder
 type CastingBuilder interface {
 	Create() CastingBuilder
-	WithAssignable(assignable assignables.Assignable) CastingBuilder
+	WithAssignable(assignable Assignable) CastingBuilder
 	WithKind(kind kinds.Kind) CastingBuilder
 	Now() (Casting, error)
 }
 
 // Casting represents a casting
 type Casting interface {
-	Assignable() assignables.Assignable
+	Assignable() Assignable
 	Kind() kinds.Kind
 }
 

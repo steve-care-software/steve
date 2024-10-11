@@ -1,17 +1,16 @@
 package assignables
 
 import (
-	"github.com/steve-care-software/steve/engine/domain/scripts/specifics/programs/instructions/assignments/assignables"
 	"github.com/steve-care-software/steve/graphs/domain/scripts/commons/kinds"
 )
 
 type casting struct {
-	assignable assignables.Assignable
+	assignable Assignable
 	kind       kinds.Kind
 }
 
 func createCasting(
-	assignable assignables.Assignable,
+	assignable Assignable,
 	kind kinds.Kind,
 ) Casting {
 	return &casting{
@@ -21,7 +20,7 @@ func createCasting(
 }
 
 // Assignable returns the assignable instance
-func (obj *casting) Assignable() assignables.Assignable {
+func (obj *casting) Assignable() Assignable {
 	return obj.assignable
 }
 
