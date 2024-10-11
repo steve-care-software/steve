@@ -9,6 +9,11 @@ import (
 	selectors_chain "github.com/steve-care-software/steve/parsers/domain/grammars/blocks/lines/balances/selectors/chains"
 )
 
+// NewOperatorBuilder creates a new operator builder
+func NewOperatorBuilder() OperatorBuilder {
+	return createOperatorBuilder()
+}
+
 // NewSingleVariableOperationBuilder creates a new single variable operation builder
 func NewSingleVariableOperationBuilder() SingleVariableOperationBuilder {
 	return createSingleVariableOperationBuilder()
@@ -229,6 +234,16 @@ type OperatorAssignable interface {
 	Assignable() Assignable
 }
 
+// OperatorBuilder represents the operator builder
+type OperatorBuilder interface {
+	Create() OperatorBuilder
+	WithArithmetic(arithmetic uint8) OperatorBuilder
+	WithRelational(relational uint8) OperatorBuilder
+	WithEqual(equal uint8) OperatorBuilder
+	WithLogical(logical uint8) OperatorBuilder
+	Now() (Operator, error)
+}
+
 // Operator represents an operator
 type Operator interface {
 	IsArithmetic() bool
@@ -238,7 +253,7 @@ type Operator interface {
 	IsEqual() bool
 	Equal() *uint8
 	IsLogical() bool
-	Logical() uint8
+	Logical() *uint8
 }
 
 // SingleVariableOperationBuilder represents a single variable operation builder
