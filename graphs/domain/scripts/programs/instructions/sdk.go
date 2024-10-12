@@ -6,6 +6,11 @@ import (
 	"github.com/steve-care-software/steve/graphs/domain/scripts/programs/instructions/queries/conditions"
 )
 
+// NewForInstructionsBuilder creates a new for instructions builder
+func NewForInstructionsBuilder() ForInstructionsBuilder {
+	return createForInstructionsBuilder()
+}
+
 // NewForInstructionBuilder creates a new for instruction builder
 func NewForInstructionBuilder() ForInstructionBuilder {
 	return createForInstructionBuilder()
@@ -64,6 +69,13 @@ type ForKeyValue interface {
 	Value() string
 	Iterable() assignables.Iterable
 	Instructions() ForInstructions
+}
+
+// ForInstructionsBuilder represents the for instructions builder
+type ForInstructionsBuilder interface {
+	Create() ForInstructionsBuilder
+	WithList(list []ForInstruction) ForInstructionsBuilder
+	Now() (ForInstructions, error)
 }
 
 // ForInstructions represents the for instructions
