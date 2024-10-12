@@ -6,7 +6,12 @@ import (
 	"github.com/steve-care-software/steve/graphs/domain/scripts/programs/instructions/queries/conditions"
 )
 
-// NewKeyValueBuilder creates a new key value builder
+// NewForUntilClauseBuilder creates a new for until clause builder
+func NewForUntilClauseBuilder() ForUntilClauseBuilder {
+	return createForUntilClauseBuilder()
+}
+
+// NewKeyValueBuilder creates a new key value builderg
 func NewKeyValueBuilder() ForKeyValueBuilder {
 	return createForKeyValueBuilder()
 }
@@ -60,6 +65,14 @@ type ForLoop interface {
 type ForIndex interface {
 	Clause() ForUntilClause
 	Instructions() ForInstructions
+}
+
+// ForUntilClauseBuilder represents the for until clause builder
+type ForUntilClauseBuilder interface {
+	Create() ForUntilClauseBuilder
+	WithName(name string) ForUntilClauseBuilder
+	WithValue(value uint) ForUntilClauseBuilder
+	Now() (ForUntilClause, error)
 }
 
 // ForUntilClause represents the for until clause
