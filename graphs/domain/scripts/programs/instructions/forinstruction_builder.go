@@ -17,30 +17,30 @@ func createForInstructionBuilder() ForInstructionBuilder {
 }
 
 // Create initializes the builder
-func (obj *forInstructionBuilder) Create() ForInstructionBuilder {
+func (app *forInstructionBuilder) Create() ForInstructionBuilder {
 	return createForInstructionBuilder()
 }
 
 // WithInstruction adds an instruction to the for instruction builder
-func (obj *forInstructionBuilder) WithInstruction(instruction Instruction) ForInstructionBuilder {
-	obj.instruction = instruction
-	return obj
+func (app *forInstructionBuilder) WithInstruction(instruction Instruction) ForInstructionBuilder {
+	app.instruction = instruction
+	return app
 }
 
 // IsBreak marks the for instruction as a break statement
-func (obj *forInstructionBuilder) IsBreak() ForInstructionBuilder {
-	obj.isBreak = true
-	return obj
+func (app *forInstructionBuilder) IsBreak() ForInstructionBuilder {
+	app.isBreak = true
+	return app
 }
 
 // Now builds and returns a ForInstruction instance
-func (obj *forInstructionBuilder) Now() (ForInstruction, error) {
-	if obj.isBreak {
+func (app *forInstructionBuilder) Now() (ForInstruction, error) {
+	if app.isBreak {
 		return createForInstructionWithBreak(), nil
 	}
 
-	if obj.instruction != nil {
-		return createForInstructionWithInstruction(obj.instruction), nil
+	if app.instruction != nil {
+		return createForInstructionWithInstruction(app.instruction), nil
 	}
 
 	return nil, errors.New("the ForInstruction is invalid")

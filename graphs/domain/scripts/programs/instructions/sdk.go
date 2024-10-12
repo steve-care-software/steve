@@ -6,6 +6,11 @@ import (
 	"github.com/steve-care-software/steve/graphs/domain/scripts/programs/instructions/queries/conditions"
 )
 
+// NewKeyValueBuilder creates a new key value builder
+func NewKeyValueBuilder() ForKeyValueBuilder {
+	return createForKeyValueBuilder()
+}
+
 // NewForInstructionsBuilder creates a new for instructions builder
 func NewForInstructionsBuilder() ForInstructionsBuilder {
 	return createForInstructionsBuilder()
@@ -61,6 +66,16 @@ type ForIndex interface {
 type ForUntilClause interface {
 	Name() string
 	Value() uint
+}
+
+// ForKeyValueBuilder represents the for key->value builder
+type ForKeyValueBuilder interface {
+	Create() ForKeyValueBuilder
+	WithKey(key string) ForKeyValueBuilder
+	WithValue(value string) ForKeyValueBuilder
+	WithIterable(iterable assignables.Iterable) ForKeyValueBuilder
+	WithInstructions(instructions ForInstructions) ForKeyValueBuilder
+	Now() (ForKeyValue, error)
 }
 
 // ForKeyValue represents the for key->value
