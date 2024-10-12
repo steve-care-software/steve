@@ -3,7 +3,13 @@ package instructions
 import (
 	"github.com/steve-care-software/steve/graphs/domain/scripts/programs/instructions/assignments"
 	"github.com/steve-care-software/steve/graphs/domain/scripts/programs/instructions/assignments/assignables"
+	"github.com/steve-care-software/steve/graphs/domain/scripts/programs/instructions/queries/conditions"
 )
+
+// NewForInstructionBuilder creates a new for instruction builder
+func NewForInstructionBuilder() ForInstructionBuilder {
+	return createForInstructionBuilder()
+}
 
 // Instructions represents instructions
 type Instructions interface {
@@ -17,7 +23,7 @@ type Instruction interface {
 	IsAssignment() bool
 	Assignment() assignments.Assignment
 	IsCondition() bool
-	Condition() Condition
+	Condition() conditions.Condition
 	IsProgramCall() bool
 	ProgramCall() assignables.ProgramCall
 	IsForLoop() bool
@@ -65,15 +71,17 @@ type ForInstructions interface {
 	List() []ForInstruction
 }
 
+// ForInstructionBuilder represents the for instruction builder
+type ForInstructionBuilder interface {
+	Create() ForInstructionBuilder
+	WithInstruction(instruction Instruction) ForInstructionBuilder
+	IsBreak() ForInstructionBuilder
+	Now() (ForInstruction, error)
+}
+
 // ForInstruction represents the for instruction
 type ForInstruction interface {
 	IsBreak() bool
 	IsInstruction() bool
 	Instruction() Instruction
-}
-
-// Condition represents a condition
-type Condition interface {
-	Operation() assignables.Operation
-	Instructions() Instructions
 }
