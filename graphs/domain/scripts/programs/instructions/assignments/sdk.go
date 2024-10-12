@@ -21,6 +21,11 @@ func NewAssignmentOperatorBuilder() AssignmentOperationBuilder {
 	return createAssignmentOperationBuilder()
 }
 
+// NewAssigneesBuilder creates a new assignees builder
+func NewAssigneesBuilder() AssigneesBuilder {
+	return createAssigneesBuilder()
+}
+
 // NewAssigneeBuilder creates a new assignee builderg
 func NewAssigneeBuilder() AssigneeBuilder {
 	return createAssigneeBuilder()
@@ -75,6 +80,13 @@ type AssignmentOperation interface {
 	Assignee() Assignee
 	Operator() uint8                    // arithmetic operator
 	Assignable() assignables.Assignable // must compute to an arithmetic-valid value
+}
+
+// AssigneesBuilder represents the assignees builder
+type AssigneesBuilder interface {
+	Create() AssigneesBuilder
+	WithList(list []Assignee) AssigneesBuilder
+	Now() (Assignees, error)
 }
 
 // Assignees represents assignees
