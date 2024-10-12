@@ -6,6 +6,16 @@ import (
 	"github.com/steve-care-software/steve/graphs/domain/scripts/schemas/connections/links/references"
 )
 
+// NewAssignmentOperatorBuilder creates a new assignment operator builder
+func NewAssignmentOperatorBuilder() AssignmentOperationBuilder {
+	return createAssignmentOperationBuilder()
+}
+
+// NewAssigneeBuilder creates a new assignee builder
+func NewAssigneeBuilder() AssigneeBuilder {
+	return createAssigneeBuilder()
+}
+
 // NewAssigneeNameBuilder creates a new assignee name builder
 func NewAssigneeNameBuilder() AssigneeNameBuilder {
 	return createAssigneeNameBuilder()
@@ -25,6 +35,15 @@ type AssignmentMultiple interface {
 	Assignables() assignables.Assignables
 }
 
+// AssignmentOperationBuilder represents the assignment operation builder
+type AssignmentOperationBuilder interface {
+	Create() AssignmentOperationBuilder
+	WithAssignee(assignee Assignee) AssignmentOperationBuilder
+	WithOperator(operator uint8) AssignmentOperationBuilder
+	WithAssignable(assignable assignables.Assignable) AssignmentOperationBuilder
+	Now() (AssignmentOperation, error)
+}
+
 // AssignmentOperation represents an assignment operation (ex: myVar++)
 type AssignmentOperation interface {
 	Assignee() Assignee
@@ -35,6 +54,14 @@ type AssignmentOperation interface {
 // Assignees represents assignees
 type Assignees interface {
 	List() []Assignee
+}
+
+// AssigneeBuilder represents the assignee builder
+type AssigneeBuilder interface {
+	Create() AssigneeBuilder
+	WithName(name AssigneeName) AssigneeBuilder
+	WithKind(kind kinds.Kind) AssigneeBuilder
+	Now() (Assignee, error)
 }
 
 // Assignee represents an assignee
