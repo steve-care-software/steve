@@ -6,6 +6,11 @@ import (
 	"github.com/steve-care-software/steve/graphs/domain/scripts/schemas/connections/links/references"
 )
 
+// NewBuilder creates a new builder
+func NewBuilder() Builder {
+	return createBuilder()
+}
+
 // NewAssignmentMultipleBuilder creates a new assignment multiple builder
 func NewAssignmentMultipleBuilder() AssignmentMultipleBuilder {
 	return createAssignmentMultipleBuilder()
@@ -24,6 +29,14 @@ func NewAssigneeBuilder() AssigneeBuilder {
 // NewAssigneeNameBuilder creates a new assignee name builder
 func NewAssigneeNameBuilder() AssigneeNameBuilder {
 	return createAssigneeNameBuilder()
+}
+
+// Builder represents the assignment builder
+type Builder interface {
+	Create() Builder
+	WithMultiple(multiple AssignmentMultiple) Builder
+	WithOperation(operation AssignmentOperation) Builder
+	Now() (Assignment, error)
 }
 
 // Assignment represents an assignment
