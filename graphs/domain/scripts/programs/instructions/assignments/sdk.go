@@ -6,12 +6,17 @@ import (
 	"github.com/steve-care-software/steve/graphs/domain/scripts/schemas/connections/links/references"
 )
 
+// NewAssignmentMultipleBuilder creates a new assignment multiple builder
+func NewAssignmentMultipleBuilder() AssignmentMultipleBuilder {
+	return createAssignmentMultipleBuilder()
+}
+
 // NewAssignmentOperatorBuilder creates a new assignment operator builder
 func NewAssignmentOperatorBuilder() AssignmentOperationBuilder {
 	return createAssignmentOperationBuilder()
 }
 
-// NewAssigneeBuilder creates a new assignee builder
+// NewAssigneeBuilder creates a new assignee builderg
 func NewAssigneeBuilder() AssigneeBuilder {
 	return createAssigneeBuilder()
 }
@@ -27,6 +32,14 @@ type Assignment interface {
 	Multiple() AssignmentMultiple
 	IsOperation() bool
 	Operation() AssignmentOperation
+}
+
+// AssignmentMultipleBuilder represents the assignment multiple builder
+type AssignmentMultipleBuilder interface {
+	Create() AssignmentMultipleBuilder
+	WithAssignees(assignees Assignees) AssignmentMultipleBuilder
+	WithAssignables(assignables assignables.Assignables) AssignmentMultipleBuilder
+	Now() (AssignmentMultiple, error)
 }
 
 // AssignmentMultiple represents a multiple assignment
