@@ -54,23 +54,26 @@ const (
 	// OperationStop represents a stop operation
 	OperationStop
 
-	// OperationOpenFile represents an open file operation
-	OperationOpenFile
+	// OperationFileOpen represents an open file operation
+	OperationFileOpen
 
-	// OperationCloseFile represents a close file operation
-	OperationCloseFile
+	// OperationFileClose represents a close file operation
+	OperationFileClose
 
-	// OperationSeek represents a seek operation
-	OperationSeek
+	// OperationFileSeek represents a seek operation
+	OperationFileSeek
 
-	// OperationPositionAt represents a positionAt operation
-	OperationPositionAt
+	// OperationFilePositionAt represents a positionAt operation
+	OperationFilePositionAt
 
-	// OperationReadAt represents a reatAt operation
-	OperationReadAt
+	// OperationFileReadAt represents a reatAt operation
+	OperationFileReadAt
 
-	// OperationWriteAt represents a writeAt operation
-	OperationWriteAt
+	// OperationFileWriteAt represents a writeAt operation
+	OperationFileWriteAt
+
+	// OperationFileRename represents a name file operation
+	OperationFileRename
 )
 
 const (
