@@ -5,6 +5,11 @@ func NewBuilder() Builder {
 	return createBuilder()
 }
 
+// Externals represents externals
+type Externals interface {
+	List() []External
+}
+
 // Builder represents the external builder
 type Builder interface {
 	Create() Builder

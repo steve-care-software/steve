@@ -459,7 +459,7 @@ func fetchGrammarInput() []byte {
 						";
 					  ;
 
-		forIndex: .FOR .forUntilClause? .COLON .instructions .SEMI_COLON
+		forIndex: .FOR .forUntilClause? .COLON .forInstructions .SEMI_COLON
 				---
 					withUntilClause: "
 						for i->5:
@@ -587,7 +587,7 @@ func fetchGrammarInput() []byte {
 					 ;
 
 		assignment: .assigneesCommaSeparated .assignmentSymbol .assignableOptions .SEMI_COLON
-				  | .variableName .arithmeticOperator .EQUAL .assignable .SEMI_COLON
+				  | .assignee .arithmeticOperator .EQUAL .assignable .SEMI_COLON
 				---
 					plusEqual: "
 						myVaraible += 12;
@@ -706,7 +706,7 @@ func fetchGrammarInput() []byte {
 					variableWithType: "uint8 myVariable";
 				;
 
-		assigneeName: .variableName .reference* .index?
+		assigneeName: .variableName .references? .index?
 					| 
 					---
 						variable: "myVariable";
