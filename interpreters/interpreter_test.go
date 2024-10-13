@@ -17,6 +17,8 @@ func TestAssign_uint8_inline_withRemaining_Success(t *testing.T) {
 		createAssign_uint32_stack_withRemaining(),
 		createAssign_uint64_inline_withRemaining(),
 		createAssign_uint64_stack_withRemaining(),
+		createAssign_int8_inline_withRemaining(),
+		createAssign_int8_stack_withRemaining(),
 	}
 
 	for idx, oneTestSuite := range testSuitesList {
