@@ -1,15 +1,15 @@
-package applications
+package interpreters
 
-type application struct {
+type interpreter struct {
 	instructions []byte
 	params       map[string][]byte
 }
 
-func createApplication(
+func createInterpreter(
 	instructions []byte,
 	params map[string][]byte,
-) Application {
-	out := application{
+) Interpreter {
+	out := interpreter{
 		instructions: instructions,
 		params:       params,
 	}
@@ -17,7 +17,7 @@ func createApplication(
 	return &out
 }
 
-// Execute executes the application
-func (app *application) Execute() ([]byte, error) {
+// Execute executes the interpreter
+func (app *interpreter) Execute() ([]byte, error) {
 	return nil, nil
 }

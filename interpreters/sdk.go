@@ -1,4 +1,4 @@
-package applications
+package interpreters
 
 const (
 	// BeginInstruction represents a begin instruction
@@ -120,18 +120,18 @@ const (
 	PositionEnd
 )
 
-// NewApplication creates a new application
-func NewApplication(
+// NewInterpreter creates a new interpreter
+func NewInterpreter(
 	instructions []byte,
 	params map[string][]byte,
-) Application {
-	return createApplication(
+) Interpreter {
+	return createInterpreter(
 		instructions,
 		params,
 	)
 }
 
-// Application represents the vm application
-type Application interface {
+// Interpreter represents the vm interpreter
+type Interpreter interface {
 	Execute() ([]byte, error)
 }
