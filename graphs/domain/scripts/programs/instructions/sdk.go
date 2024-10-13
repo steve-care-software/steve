@@ -6,7 +6,12 @@ import (
 	"github.com/steve-care-software/steve/graphs/domain/scripts/programs/instructions/queries/conditions"
 )
 
-// NewInstructionBuilder creates a new instruction builder
+// NewBuilder creates a new builder
+func NewBuilder() Builder {
+	return createBuilder()
+}
+
+// NewInstructionBuilder creates a new instruction builderg
 func NewInstructionBuilder() InstructionBuilder {
 	return createInstructionBuilder()
 }
@@ -44,6 +49,13 @@ func NewForInstructionsBuilder() ForInstructionsBuilder {
 // NewForInstructionBuilder creates a new for instruction builder
 func NewForInstructionBuilder() ForInstructionBuilder {
 	return createForInstructionBuilder()
+}
+
+// Builder represents the instructions builder
+type Builder interface {
+	Create() Builder
+	WithList(list []Instruction) Builder
+	Now() (Instructions, error)
 }
 
 // Instructions represents instructions
