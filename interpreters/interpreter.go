@@ -13,9 +13,11 @@ type interpreter struct {
 
 func createInterpreter(
 	instructions []byte,
+	params map[uint8]map[uint8]map[uint64]any,
 ) Interpreter {
 	out := interpreter{
 		instructions: instructions,
+		stack:        params,
 	}
 
 	return out.init()
@@ -33,11 +35,14 @@ func (app *interpreter) Execute() (map[uint8]map[uint8]map[uint64]any, []byte, e
 }
 
 func (app *interpreter) init() Interpreter {
-	app.stack = map[uint8]map[uint8]map[uint64]any{
-		KindUint: {
-			Size8: {},
-		},
+	if _, ok := app.stack[KindUint]; !ok {
+		app.stack[KindUint] = map[uint8]map[uint64]any{}
 	}
+
+	if _, ok := app.stack[KindUint][Size8]; !ok {
+		app.stack[KindUint][Size8] = map[uint64]any{}
+	}
+
 	return app
 }
 

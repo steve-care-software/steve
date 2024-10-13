@@ -143,9 +143,11 @@ const (
 // NewInterpreter creates a new interpreter
 func NewInterpreter(
 	instructions []byte,
+	params map[uint8]map[uint8]map[uint64]any,
 ) Interpreter {
 	return createInterpreter(
 		instructions,
+		params,
 	)
 }
 
