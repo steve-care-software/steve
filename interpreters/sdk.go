@@ -9,71 +9,71 @@ const (
 )
 
 const (
-	// OperationPointer represents a pointer operation
-	OperationPointer (uint8) = iota
+	// InstructionAssignment represents an assignment
+	InstructionAssignment (uint8) = iota
 
-	// OperationAddition represents an addition operation
-	OperationAddition
+	// InstructionPointer represents a pointer operation
+	InstructionPointer
 
-	// OperationSubstraction represents a substraction
-	OperationSubstraction
+	// InstructionAddition represents an addition operation
+	InstructionAddition
 
-	// OperationMultiplication represents a multiplication
-	OperationMultiplication
+	// InstructionSubstraction represents a substraction
+	InstructionSubstraction
 
-	// OperationDivision represents a division
-	OperationDivision
+	// InstructionMultiplication represents a multiplication
+	InstructionMultiplication
 
-	// OperationModulo represents a modulo
-	OperationModulo
+	// InstructionDivision represents a division
+	InstructionDivision
 
-	// OperationEqual represents an equal operation
-	OperationEqual
+	// InstructionModulo represents a modulo
+	InstructionModulo
 
-	// OperationNot represents a not operation
-	OperationNot
+	// InstructionEqual represents an equal operation
+	InstructionEqual
 
-	// OperationJumpNext represents a jump next
-	OperationJumpNext
+	// InstructionNot represents a not operation
+	InstructionNot
 
-	// OperationJumpTo represents a jump to
-	OperationJumpTo
+	// InstructionJumpNext represents a jump next
+	InstructionJumpNext
 
-	// OperationAssignment represents an assignment
-	OperationAssignment
+	// InstructionJumpTo represents a jump to
+	InstructionJumpTo
 
-	// OperationHash512 represents an hash512 operation
-	OperationHash512
+	// InstructionHash512 represents an hash512 operation
+	InstructionHash512
 
-	// OperationPush represents a push operation
-	OperationPush
+	// InstructionPush represents a push operation
+	InstructionPush
 
-	// OperationPop represents a pop operation
-	OperationPop
+	// InstructionPop represents a pop operation
+	InstructionPop
 
-	// OperationStop represents a stop operation
-	OperationStop
+	// InstructionStop represents a stop operation
+	InstructionStop
 
-	// OperationFileOpen represents an open file operation
-	OperationFileOpen
+	// InstructionFileOpen represents an open file operation
+	InstructionFileOpen
 
-	// OperationFileClose represents a close file operation
-	OperationFileClose
+	// InstructionFileClose represents a close file operation
+	InstructionFileClose
 
-	// OperationFileSeek represents a seek operation
-	OperationFileSeek
+	// InstructionFileSeek represents a seek operation
+	InstructionFileSeek
 
-	// OperationFilePositionAt represents a positionAt operation
-	OperationFilePositionAt
+	// InstructionFilePositionAt represents a positionAt operation
+	InstructionFilePositionAt
 
-	// OperationFileReadAt represents a reatAt operation
-	OperationFileReadAt
+	// InstructionFileReadAt represents a reatAt operation
+	InstructionFileReadAt
 
-	// OperationFileWriteAt represents a writeAt operation
-	OperationFileWriteAt
+	// InstructionFileWriteAt represents a writeAt operation
+	InstructionFileWriteAt
 
-	// OperationFileRename represents a name file operation
-	OperationFileRename
+	// InstructionFileRename reprgesents a name file operation
+	InstructionFileRename
 )
 
 const (
@@ -102,14 +102,31 @@ const (
 
 	// KindBool represents the bool kind
 	KindBool
+
+	// KindPointer represents the pointer kind
+	KindPointer
+)
+
+const (
+	// Size8 represents the size 8
+	Size8 (uint8) = iota
+
+	// Size16 represents the size 16
+	Size16
+
+	// Size32 represents the size 32
+	Size32
+
+	// Size64 represents the size 64
+	Size64
 )
 
 const (
 	// OriginStack represents a variable origin
 	OriginStack (uint8) = iota
 
-	// OriginStatic represents a static origin
-	OriginStatic
+	// OriginInline represents an inline origin
+	OriginInline
 )
 
 const (
@@ -126,11 +143,9 @@ const (
 // NewInterpreter creates a new interpreter
 func NewInterpreter(
 	instructions []byte,
-	params map[string][]byte,
 ) Interpreter {
 	return createInterpreter(
 		instructions,
-		params,
 	)
 }
 
