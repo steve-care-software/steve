@@ -31,7 +31,25 @@ func (app *interpreter) Execute() (map[uint8]map[uint8]map[uint64]any, []byte, e
 		return nil, nil, err
 	}
 
-	return app.stack, retRemaining, nil
+	output := map[uint8]map[uint8]map[uint64]any{}
+	for idxFirst, oneMap := range app.stack {
+		firstOutput := map[uint8]map[uint64]any{}
+		for idxSecond, oneSubMap := range oneMap {
+			if len(oneSubMap) <= 0 {
+				continue
+			}
+
+			firstOutput[idxSecond] = oneSubMap
+		}
+
+		if len(firstOutput) <= 0 {
+			continue
+		}
+
+		output[idxFirst] = firstOutput
+	}
+
+	return output, retRemaining, nil
 }
 
 func (app *interpreter) init() Interpreter {
@@ -41,6 +59,10 @@ func (app *interpreter) init() Interpreter {
 
 	if _, ok := app.stack[KindUint][Size8]; !ok {
 		app.stack[KindUint][Size8] = map[uint64]any{}
+	}
+
+	if _, ok := app.stack[KindUint][Size16]; !ok {
+		app.stack[KindUint][Size16] = map[uint64]any{}
 	}
 
 	return app
@@ -163,6 +185,114 @@ func (app *interpreter) execAssignmentUint(input []byte) ([]byte, bool, error) {
 	}
 }
 
+func (app *interpreter) execAssignmentUint32(input []byte) ([]byte, bool, error) {
+	return nil, false, nil
+}
+
+func (app *interpreter) execAssignmentUint64(input []byte) ([]byte, bool, error) {
+	return nil, false, nil
+}
+
+func (app *interpreter) execAssignmentInt(input []byte) ([]byte, bool, error) {
+	return nil, false, nil
+}
+
+func (app *interpreter) execAssignmentFloat(input []byte) ([]byte, bool, error) {
+	return nil, false, nil
+}
+
+func (app *interpreter) execAssignmentBool(input []byte) ([]byte, bool, error) {
+	return nil, false, nil
+}
+
+func (app *interpreter) execAssignmentPointer(input []byte) ([]byte, bool, error) {
+	return nil, false, nil
+}
+
+/*
+	uint16
+*/
+
+func (app *interpreter) execAssignmentUint16(input []byte) ([]byte, bool, error) {
+	// find the variable index:
+	pIndex, isEnd, retRemaining, err := app.fetchValueUint64Inline(input)
+	if err != nil {
+		return nil, false, err
+	}
+
+	if isEnd {
+		return nil, true, nil
+	}
+
+	// find the value:
+	pValue, isEnd, retRemaining, err := app.fetchValueUint16(retRemaining)
+	if err != nil {
+		return nil, false, err
+	}
+
+	if isEnd {
+		return nil, true, nil
+	}
+
+	// execute the assignment:
+	app.stack[KindUint][Size16][*pIndex] = *pValue
+	return retRemaining, false, nil
+}
+
+func (app *interpreter) fetchValueUint16(input []byte) (*uint16, bool, []byte, error) {
+	if len(input) <= 0 {
+		return nil, true, nil, nil
+	}
+
+	remaining := input[1:]
+	switch input[0] {
+	case OriginStack:
+		return app.fetchValueUint16Stack(remaining)
+	case OriginInline:
+		return app.fetchValueUint16Inline(remaining)
+	default:
+		str := fmt.Sprintf("the byte (%d) is not a valid uint16 origin", input[0])
+		return nil, false, nil, errors.New(str)
+	}
+}
+
+func (app *interpreter) fetchValueUint16Stack(input []byte) (*uint16, bool, []byte, error) {
+	pIndex, isEnd, retRemaining, err := app.fetchValueUint64Inline(input)
+	if err != nil {
+		return nil, false, nil, err
+	}
+
+	if isEnd {
+		return nil, true, nil, nil
+	}
+
+	if value, ok := app.stack[KindUint][Size16][*pIndex]; ok {
+		if casted, ok := value.(uint16); ok {
+			return &casted, false, retRemaining, nil
+		}
+
+		str := fmt.Sprintf("casting error: the stack value (index: %d) was expected to contain a uint16 value", *pIndex)
+		return nil, false, nil, errors.New(str)
+	}
+
+	str := fmt.Sprintf("the the value (index: %d) is not valid on the uint16 stack", *pIndex)
+	return nil, false, nil, errors.New(str)
+}
+
+func (app *interpreter) fetchValueUint16Inline(input []byte) (*uint16, bool, []byte, error) {
+	if len(input) <= 0 {
+		return nil, true, nil, nil
+	}
+
+	valueBytes := input[:2]
+	value := binary.LittleEndian.Uint16(valueBytes)
+	return &value, false, input[2:], nil
+}
+
+/*
+	uint8
+*/
+
 func (app *interpreter) execAssignmentUint8(input []byte) ([]byte, bool, error) {
 	// find the variable index:
 	pIndex, isEnd, retRemaining, err := app.fetchValueUint64Inline(input)
@@ -187,34 +317,6 @@ func (app *interpreter) execAssignmentUint8(input []byte) ([]byte, bool, error) 
 	// execute the assignment:
 	app.stack[KindUint][Size8][*pIndex] = *pValue
 	return retRemaining, false, nil
-}
-
-func (app *interpreter) execAssignmentUint16(input []byte) ([]byte, bool, error) {
-	return nil, false, nil
-}
-
-func (app *interpreter) execAssignmentUint32(input []byte) ([]byte, bool, error) {
-	return nil, false, nil
-}
-
-func (app *interpreter) execAssignmentUint64(input []byte) ([]byte, bool, error) {
-	return nil, false, nil
-}
-
-func (app *interpreter) execAssignmentInt(input []byte) ([]byte, bool, error) {
-	return nil, false, nil
-}
-
-func (app *interpreter) execAssignmentFloat(input []byte) ([]byte, bool, error) {
-	return nil, false, nil
-}
-
-func (app *interpreter) execAssignmentBool(input []byte) ([]byte, bool, error) {
-	return nil, false, nil
-}
-
-func (app *interpreter) execAssignmentPointer(input []byte) ([]byte, bool, error) {
-	return nil, false, nil
 }
 
 func (app *interpreter) fetchValueUint8(input []byte) (*uint8, bool, []byte, error) {
