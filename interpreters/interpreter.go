@@ -31,6 +31,7 @@ func (app *interpreter) Execute() (map[uint8]map[uint8]map[uint64]any, []byte, e
 		return nil, nil, err
 	}
 
+	// cleanup:
 	output := map[uint8]map[uint8]map[uint64]any{}
 	for idxFirst, oneMap := range app.stack {
 		firstOutput := map[uint8]map[uint64]any{}
@@ -49,6 +50,7 @@ func (app *interpreter) Execute() (map[uint8]map[uint8]map[uint64]any, []byte, e
 		output[idxFirst] = firstOutput
 	}
 
+	// return:
 	return output, retRemaining, nil
 }
 
