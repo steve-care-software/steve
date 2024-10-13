@@ -12,6 +12,9 @@ const (
 	// InstructionAssignment represents an assignment
 	InstructionAssignment (uint8) = iota
 
+	// InstructionCast represents a cast instruction
+	InstructionCast
+
 	// InstructionPointer represents a pointer operation
 	InstructionPointer
 
