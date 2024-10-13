@@ -34,8 +34,8 @@ func (app *interpreter) Execute() (map[uint8]map[uint8]map[uint64]any, []byte, e
 
 func (app *interpreter) init() Interpreter {
 	app.stack = map[uint8]map[uint8]map[uint64]any{
-		KindUint: map[uint8]map[uint64]any{
-			Size8: map[uint64]any{},
+		KindUint: {
+			Size8: {},
 		},
 	}
 	return app
