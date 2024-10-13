@@ -39,6 +39,12 @@ const (
 	// InstructionNot represents a not operation
 	InstructionNot
 
+	// InstructionGreaterThan represents a greater than operation
+	InstructionGreaterThan
+
+	// InstructionSmallerThan represents a smaller than operation
+	InstructionSmallerThan
+
 	// InstructionJumpNext represents a jump next
 	InstructionJumpNext
 

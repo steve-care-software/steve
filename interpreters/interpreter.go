@@ -67,6 +67,10 @@ func (app *interpreter) init() Interpreter {
 		app.stack[KindUint][Size16] = map[uint64]any{}
 	}
 
+	if _, ok := app.stack[KindUint][Size32]; !ok {
+		app.stack[KindUint][Size32] = map[uint64]any{}
+	}
+
 	return app
 }
 
@@ -187,10 +191,6 @@ func (app *interpreter) execAssignmentUint(input []byte) ([]byte, bool, error) {
 	}
 }
 
-func (app *interpreter) execAssignmentUint32(input []byte) ([]byte, bool, error) {
-	return nil, false, nil
-}
-
 func (app *interpreter) execAssignmentUint64(input []byte) ([]byte, bool, error) {
 	return nil, false, nil
 }
@@ -209,6 +209,86 @@ func (app *interpreter) execAssignmentBool(input []byte) ([]byte, bool, error) {
 
 func (app *interpreter) execAssignmentPointer(input []byte) ([]byte, bool, error) {
 	return nil, false, nil
+}
+
+/*
+	uint32
+*/
+
+func (app *interpreter) execAssignmentUint32(input []byte) ([]byte, bool, error) {
+	// find the variable index:
+	pIndex, isEnd, retRemaining, err := app.fetchValueUint64Inline(input)
+	if err != nil {
+		return nil, false, err
+	}
+
+	if isEnd {
+		return nil, true, nil
+	}
+
+	// find the value:
+	pValue, isEnd, retRemaining, err := app.fetchValueUint32(retRemaining)
+	if err != nil {
+		return nil, false, err
+	}
+
+	if isEnd {
+		return nil, true, nil
+	}
+
+	// execute the assignment:
+	app.stack[KindUint][Size32][*pIndex] = *pValue
+	return retRemaining, false, nil
+}
+
+func (app *interpreter) fetchValueUint32(input []byte) (*uint32, bool, []byte, error) {
+	if len(input) <= 0 {
+		return nil, true, nil, nil
+	}
+
+	remaining := input[1:]
+	switch input[0] {
+	case OriginStack:
+		return app.fetchValueUint32Stack(remaining)
+	case OriginInline:
+		return app.fetchValueUint32Inline(remaining)
+	default:
+		str := fmt.Sprintf("the byte (%d) is not a valid uint32 origin", input[0])
+		return nil, false, nil, errors.New(str)
+	}
+}
+
+func (app *interpreter) fetchValueUint32Stack(input []byte) (*uint32, bool, []byte, error) {
+	pIndex, isEnd, retRemaining, err := app.fetchValueUint64Inline(input)
+	if err != nil {
+		return nil, false, nil, err
+	}
+
+	if isEnd {
+		return nil, true, nil, nil
+	}
+
+	if value, ok := app.stack[KindUint][Size32][*pIndex]; ok {
+		if casted, ok := value.(uint32); ok {
+			return &casted, false, retRemaining, nil
+		}
+
+		str := fmt.Sprintf("casting error: the stack value (index: %d) was expected to contain a uint32 value", *pIndex)
+		return nil, false, nil, errors.New(str)
+	}
+
+	str := fmt.Sprintf("the value (index: %d) is not valid on the uint32 stack", *pIndex)
+	return nil, false, nil, errors.New(str)
+}
+
+func (app *interpreter) fetchValueUint32Inline(input []byte) (*uint32, bool, []byte, error) {
+	if len(input) <= 0 {
+		return nil, true, nil, nil
+	}
+
+	valueBytes := input[:4]
+	value := binary.LittleEndian.Uint32(valueBytes)
+	return &value, false, input[4:], nil
 }
 
 /*
@@ -277,7 +357,7 @@ func (app *interpreter) fetchValueUint16Stack(input []byte) (*uint16, bool, []by
 		return nil, false, nil, errors.New(str)
 	}
 
-	str := fmt.Sprintf("the the value (index: %d) is not valid on the uint16 stack", *pIndex)
+	str := fmt.Sprintf("the value (index: %d) is not valid on the uint16 stack", *pIndex)
 	return nil, false, nil, errors.New(str)
 }
 
@@ -357,7 +437,7 @@ func (app *interpreter) fetchValueUint8Stack(input []byte) (*uint8, bool, []byte
 		return nil, false, nil, errors.New(str)
 	}
 
-	str := fmt.Sprintf("the the value (index: %d) is not valid on the uint8 stack", *pIndex)
+	str := fmt.Sprintf("the value (index: %d) is not valid on the uint8 stack", *pIndex)
 	return nil, false, nil, errors.New(str)
 }
 
