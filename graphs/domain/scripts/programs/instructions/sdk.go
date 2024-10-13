@@ -6,7 +6,12 @@ import (
 	"github.com/steve-care-software/steve/graphs/domain/scripts/programs/instructions/queries/conditions"
 )
 
-// NewForIndexBuilder creates a new for index builder
+// NewForLoopBuilder creates a new for loop builder
+func NewForLoopBuilder() ForLoopBuilder {
+	return createForLoopBuilder()
+}
+
+// NewForIndexBuilder creates a new for index builderg
 func NewForIndexBuilder() ForIndexBuilder {
 	return createForIndexBuilder()
 }
@@ -56,6 +61,14 @@ type Instruction interface {
 type ReturnInstruction interface {
 	HasAssignable() bool
 	Assignable() assignables.Assignable
+}
+
+// ForLoopBuilder creates a for loop builder
+type ForLoopBuilder interface {
+	Create() ForLoopBuilder
+	WithIndex(index ForIndex) ForLoopBuilder
+	WithKeyValue(keyValue ForKeyValue) ForLoopBuilder
+	Now() (ForLoop, error)
 }
 
 // ForLoop represents a for loop
