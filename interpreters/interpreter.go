@@ -8,7 +8,7 @@ import (
 
 type interpreter struct {
 	instructions []byte
-	stackUint8   map[uint64]uint8
+	stack        map[uint8]map[uint8]map[uint64]any
 }
 
 func createInterpreter(
@@ -22,37 +22,89 @@ func createInterpreter(
 }
 
 // Execute executes the interpreter
-func (app *interpreter) Execute() ([]byte, error) {
+func (app *interpreter) Execute() (map[uint8]map[uint8]map[uint64]any, []byte, error) {
 	app.init()
-	return app.execInstructions(app.instructions)
+	retRemaining, err := app.execInstructions(app.instructions)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return app.stack, retRemaining, nil
 }
 
 func (app *interpreter) init() Interpreter {
-	app.stackUint8 = map[uint64]uint8{}
+	app.stack = map[uint8]map[uint8]map[uint64]any{
+		KindUint: map[uint8]map[uint64]any{
+			Size8: map[uint64]any{},
+		},
+	}
 	return app
 }
 
 func (app *interpreter) execInstructions(input []byte) ([]byte, error) {
-	remaining := input
-	for {
+	pAmount, isEnd, retRemaining, err := app.fetchValueUint64Inline(input)
+	if err != nil {
+		return nil, err
+	}
+
+	if isEnd {
+		return nil, errors.New("the byteCode was expected to contain the amount of instructions contained in the execution, but the byteCode was empty")
+	}
+
+	amount := int(*pAmount)
+	remaining := retRemaining
+	for i := 0; i < amount; i++ {
 
 		if len(remaining) <= 0 {
 			break
 		}
 
-		retRemaining, isEnd, err := app.execInstruction(remaining)
+		retRemaining, isEnd, err := app.execInstructionLine(remaining)
 		if err != nil {
 			return nil, err
 		}
 
 		if isEnd {
-			return remaining, nil
+			str := fmt.Sprintf("the byteCode was expected to contain %d instructions, the end of instructions was reached at index: %d", *pAmount, i)
+			return nil, errors.New(str)
 		}
 
 		remaining = retRemaining
 	}
 
 	return remaining, nil
+}
+
+func (app *interpreter) execInstructionLine(input []byte) ([]byte, bool, error) {
+	if len(input) <= 0 {
+		return nil, false, nil
+	}
+
+	if input[0] != BeginInstruction {
+		str := fmt.Sprintf("the byte (%d) was expected to be the begin instruction byte (%d)", input[0], BeginInstruction)
+		return nil, false, errors.New(str)
+	}
+
+	retBytes, isEnd, err := app.execInstruction(input[1:])
+	if err != nil {
+		return nil, false, err
+	}
+
+	if isEnd {
+		return nil, true, nil
+	}
+
+	if len(retBytes) <= 0 {
+		str := fmt.Sprintf("the bytes were NOT expected to be empty, the end instruction byte (%d) was expected", EndInstruction)
+		return nil, false, errors.New(str)
+	}
+
+	if retBytes[0] != EndInstruction {
+		str := fmt.Sprintf("the byte (%d) was expected to be the end instruction byte (%d)", retBytes[0], EndInstruction)
+		return nil, false, errors.New(str)
+	}
+
+	return retBytes[1:], false, nil
 }
 
 func (app *interpreter) execInstruction(input []byte) ([]byte, bool, error) {
@@ -128,7 +180,7 @@ func (app *interpreter) execAssignmentUint8(input []byte) ([]byte, bool, error) 
 	}
 
 	// execute the assignment:
-	app.stackUint8[*pIndex] = *pValue
+	app.stack[KindUint][Size8][*pIndex] = *pValue
 	return retRemaining, false, nil
 }
 
@@ -187,8 +239,13 @@ func (app *interpreter) fetchValueUint8Stack(input []byte) (*uint8, bool, []byte
 		return nil, true, nil, nil
 	}
 
-	if value, ok := app.stackUint8[*pIndex]; ok {
-		return &value, false, retRemaining, nil
+	if value, ok := app.stack[KindUint][Size8][*pIndex]; ok {
+		if casted, ok := value.(uint8); ok {
+			return &casted, false, retRemaining, nil
+		}
+
+		str := fmt.Sprintf("casting error: the stack value (index: %d) was expected to contain a uint8 value", *pIndex)
+		return nil, false, nil, errors.New(str)
 	}
 
 	str := fmt.Sprintf("the the value (index: %d) is not valid on the uint8 stack", *pIndex)

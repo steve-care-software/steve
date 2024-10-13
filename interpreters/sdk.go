@@ -151,5 +151,5 @@ func NewInterpreter(
 
 // Interpreter represents the vm interpreter
 type Interpreter interface {
-	Execute() ([]byte, error)
+	Execute() (map[uint8]map[uint8]map[uint64]any, []byte, error)
 }
