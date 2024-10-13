@@ -19,6 +19,8 @@ func TestAssign_uint8_inline_withRemaining_Success(t *testing.T) {
 		createAssign_uint64_stack_withRemaining(),
 		createAssign_int8_inline_withRemaining(),
 		createAssign_int8_stack_withRemaining(),
+		createAssign_int16_inline_withRemaining(),
+		createAssign_int16_stack_withRemaining(),
 	}
 
 	for idx, oneTestSuite := range testSuitesList {
@@ -34,7 +36,7 @@ func TestAssign_uint8_inline_withRemaining_Success(t *testing.T) {
 		}
 
 		if !bytes.Equal(retBytes, oneTestSuite.remaining) {
-			t.Errorf("suite (index: %d): the returned bytes were invalid, expected: %v, returned; %v", idx, retBytes, oneTestSuite.remaining)
+			t.Errorf("suite (index: %d): the returned bytes were invalid, expected: %v, returned; %v", idx, oneTestSuite.remaining, retBytes)
 			return
 		}
 
