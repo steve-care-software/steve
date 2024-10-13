@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestAssign_uint8_inline_withRemaining_Success(t *testing.T) {
+func TestInterpreter_Success(t *testing.T) {
 
 	testSuitesList := []testSuite{
 		createAssign_uint8_inline_withRemaining(),
@@ -21,6 +21,8 @@ func TestAssign_uint8_inline_withRemaining_Success(t *testing.T) {
 		createAssign_int8_stack_withRemaining(),
 		createAssign_int16_inline_withRemaining(),
 		createAssign_int16_stack_withRemaining(),
+		createAssign_int32_inline_withRemaining(),
+		createAssign_int32_stack_withRemaining(),
 	}
 
 	for idx, oneTestSuite := range testSuitesList {
