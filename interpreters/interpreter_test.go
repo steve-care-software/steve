@@ -23,6 +23,8 @@ func TestInterpreter_Success(t *testing.T) {
 		createAssign_int16_stack_withRemaining(),
 		createAssign_int32_inline_withRemaining(),
 		createAssign_int32_stack_withRemaining(),
+		createAssign_int64_inline_withRemaining(),
+		createAssign_int64_stack_withRemaining(),
 	}
 
 	for idx, oneTestSuite := range testSuitesList {

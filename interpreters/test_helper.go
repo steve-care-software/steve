@@ -828,3 +828,121 @@ func createAssign_int32_stack_withRemaining() testSuite {
 	}
 
 }
+
+func createAssign_int64_inline_withRemaining() testSuite {
+	// set the amount of instructions:
+	amountInstructions := uint64(1)
+	amountInstructionsBytes := make([]byte, 8)
+	binary.LittleEndian.PutUint64(amountInstructionsBytes, amountInstructions)
+
+	// set the index
+	index := uint64(0)
+	indexBytes := make([]byte, 8)
+	binary.LittleEndian.PutUint64(indexBytes, index)
+
+	// set the value
+	value := int64(-2322334564366543232)
+	valueBytes := make([]byte, 8)
+	binary.LittleEndian.PutUint64(valueBytes, uint64(value))
+
+	// set the remaining:
+	remaining := []byte("this is some remaining data")
+
+	byteCode := amountInstructionsBytes
+	byteCode = append(byteCode, []byte{
+		BeginInstruction,
+		InstructionAssignment,
+		KindInt,
+		Size64,
+	}...)
+
+	byteCode = append(byteCode, indexBytes...)
+	byteCode = append(byteCode, []byte{
+		OriginInline,
+	}...)
+
+	byteCode = append(byteCode, valueBytes...)
+	byteCode = append(byteCode, EndInstruction)
+	byteCode = append(byteCode, remaining...)
+
+	expectedStack := map[uint8]map[uint8]map[uint64]any{
+		KindInt: {
+			Size64: {
+				index: value,
+			},
+		},
+	}
+
+	return testSuite{
+		params:        map[uint8]map[uint8]map[uint64]any{},
+		byteCode:      byteCode,
+		remaining:     remaining,
+		expectedStack: expectedStack,
+	}
+}
+
+func createAssign_int64_stack_withRemaining() testSuite {
+	// set the amount of instructions:
+	amountInstructions := uint64(1)
+	amountInstructionsBytes := make([]byte, 8)
+	binary.LittleEndian.PutUint64(amountInstructionsBytes, amountInstructions)
+
+	// set the index
+	index := uint64(1)
+	indexBytes := make([]byte, 8)
+	binary.LittleEndian.PutUint64(indexBytes, index)
+
+	// set the param index
+	paramIndex := uint64(0)
+	paramIndexBytes := make([]byte, 8)
+	binary.LittleEndian.PutUint64(paramIndexBytes, paramIndex)
+
+	// set the value
+	value := int64(2323564242342344162)
+	valueBytes := make([]byte, 8)
+	binary.LittleEndian.PutUint64(valueBytes, uint64(value))
+
+	// set the remaining:
+	remaining := []byte("this is some remaining data")
+
+	byteCode := amountInstructionsBytes
+	byteCode = append(byteCode, []byte{
+		BeginInstruction,
+		InstructionAssignment,
+		KindInt,
+		Size64,
+	}...)
+
+	byteCode = append(byteCode, indexBytes...)
+	byteCode = append(byteCode, []byte{
+		OriginStack,
+	}...)
+
+	byteCode = append(byteCode, paramIndexBytes...)
+	byteCode = append(byteCode, EndInstruction)
+
+	byteCode = append(byteCode, remaining...)
+
+	expectedStack := map[uint8]map[uint8]map[uint64]any{
+		KindInt: {
+			Size64: {
+				paramIndex: value,
+				index:      value,
+			},
+		},
+	}
+
+	return testSuite{
+		params: map[uint8]map[uint8]map[uint64]any{
+			KindInt: {
+				Size64: {
+					paramIndex: value,
+				},
+			},
+		},
+		byteCode:      byteCode,
+		remaining:     remaining,
+		expectedStack: expectedStack,
+	}
+
+}
