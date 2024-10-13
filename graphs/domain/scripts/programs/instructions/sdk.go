@@ -6,7 +6,12 @@ import (
 	"github.com/steve-care-software/steve/graphs/domain/scripts/programs/instructions/queries/conditions"
 )
 
-// NewForLoopBuilder creates a new for loop builder
+// NewReturnInstructionBuilder creates a new return instruction builder
+func NewReturnInstructionBuilder() ReturnInstructionBuilder {
+	return createReturnInstructionBuilder()
+}
+
+// NewForLoopBuilder creates a new for loop builderg
 func NewForLoopBuilder() ForLoopBuilder {
 	return createForLoopBuilder()
 }
@@ -55,6 +60,13 @@ type Instruction interface {
 	ForLoop() ForLoop
 	IsReturnInstruction() bool
 	ReturnInstruction() ReturnInstruction
+}
+
+// ReturnInstructionBuilder represents the return instruction builder
+type ReturnInstructionBuilder interface {
+	Create() ReturnInstructionBuilder
+	WithAssignable(assignable assignables.Assignable) ReturnInstructionBuilder
+	Now() (ReturnInstruction, error)
 }
 
 // ReturnInstruction represents a return instruction
